@@ -1,0 +1,274 @@
+/* ========== SEÇÃO DO MASCOTE ========== */
+.mascote-section {
+    background: linear-gradient(135deg, rgba(139, 94, 221, 0.1) 0%, rgba(25, 0, 75, 0.05) 100%);
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.mascote-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+}
+
+.mascote-title {
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.mascote-title span {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.mascote-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 50px;
+    margin-top: 30px;
+}
+
+.mascote-imagem {
+    flex: 1;
+    min-width: 250px;
+    text-align: center;
+    position: relative;
+}
+
+/* ESPAÇO PARA SUA ANIMAÇÃO CSS DO MASCOTE - COLE AQUI DEPOIS */
+.mascote-flutuante {
+    max-width: 280px;
+    width: 100%;
+    height: auto;
+    border-radius: 30px;
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.3));
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.mascote-flutuante {
+    animation: flutuarMascote 3s ease-in-out infinite;
+}
+
+@keyframes flutuarMascote {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(2deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.mascote-flutuante:active {
+    transform: scale(0.95);
+}
+
+.mascote-clique {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: var(--accent);
+    opacity: 0.7;
+    animation: piscaClique 2s infinite;
+}
+
+@keyframes piscaClique {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.mascote-info {
+    flex: 1;
+    min-width: 250px;
+    text-align: left;
+    background: rgba(139, 94, 221, 0.15);
+    padding: 30px;
+    border-radius: 25px;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+}
+
+.mascote-info:hover {
+    transform: translateY(-5px);
+    background: rgba(139, 94, 221, 0.25);
+}
+
+.mascote-info h3 {
+    font-size: 1.8rem;
+    color: var(--accent);
+    margin-bottom: 15px;
+}
+
+.mascote-info p {
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.mascote-stats {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.mascote-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    color: var(--text-main);
+    background: rgba(0,0,0,0.2);
+    padding: 8px 16px;
+    border-radius: 30px;
+}
+
+.mascote-stat i {
+    color: var(--accent);
+    font-size: 1.2rem;
+}
+
+.mascote-stat i.fa-heart {
+    animation: batida 1.5s infinite;
+}
+
+@keyframes batida {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.btn-mascote {
+    background: linear-gradient(135deg, var(--accent) 0%, #764ba2 100%);
+    border: none;
+    padding: 12px 28px;
+    border-radius: 40px;
+    color: var(--bg-base);
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-mascote:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(139, 94, 221, 0.4);
+}
+
+.btn-mascote:active {
+    transform: scale(0.95);
+}
+
+.btn-mascote:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Animações para quando ganha carinho */
+@keyframes coracaoVoa {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-80px) scale(1.5);
+        opacity: 0;
+    }
+}
+
+.coracao-animado {
+    position: fixed;
+    color: #ff6b6b;
+    font-size: 1.5rem;
+    pointer-events: none;
+    z-index: 9999;
+    animation: coracaoVoa 1s ease-out forwards;
+}
+
+/* ========== BARRA DE PROGRESSO DOS CARINHOS ========== */
+.progresso-container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.progresso-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.progresso-bar {
+    width: 100%;
+    height: 12px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progresso-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #764ba2);
+    border-radius: 20px;
+    transition: width 0.5s ease;
+    width: 0%;
+}
+
+/* Quando atinge o limite */
+.limite-atingido .mascote-flutuante {
+    filter: drop-shadow(0 0 20px gold);
+    animation: brilhoLimite 1s ease-in-out infinite alternate;
+}
+
+@keyframes brilhoLimite {
+    from { filter: drop-shadow(0 0 10px gold); }
+    to { filter: drop-shadow(0 0 30px orange); }
+}
+
+/* Medalha de conquista */
+.medalha-conquista {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    background: gold;
+    color: #333;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    animation: girarMedalha 0.5s ease;
+}
+
+@keyframes girarMedalha {
+    from { transform: rotate(0deg) scale(0); }
+    to { transform: rotate(360deg) scale(1); }
+}
+
+/* Tema claro */
+body.light-theme .mascote-info {
+    background: rgba(139, 94, 221, 0.1);
+}
+
+body.light-theme .mascote-stat {
+    background: rgba(0,0,0,0.05);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .mascote-title { font-size: 1.8rem; }
+    .mascote-wrapper { flex-direction: column; }
+    .mascote-info { text-align: center; }
+    .mascote-stats { justify-content: center; }
+    .btn-mascote { margin: 0 auto; }
+}

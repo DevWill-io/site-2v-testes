@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'self' https://*.firebaseio.com; form-action 'self' https://suap.ifrn.edu.br; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; connect-src 'self' https://suap.ifrn.edu.br https://*.firebaseio.com wss://*.firebaseio.com https://*.googleapis.com https://api.github.com;"
+    />
+    <meta name="theme-color" content="#2196f3" />
+
+    <!-- Meta tags para SEO / Social -->
+    <meta
+      name="description"
+      content="Site oficial da turma 2V do curso de Informática para Internet do IFRN Campus Caicó. Conheça nossos projetos, equipe, novidades e integração com o SUAP!"
+    />
+    <meta property="og:title" content="Turma 2V | InfoWeb IFRN Caicó" />
+    <meta
+      property="og:description"
+      content="A turma do futuro. Formando desenvolvedores web no sertão potiguar."
+    />
+    <meta
+      property="og:image"
+      content="https://infoweb-2v.vercel.app/img/2V.png"
+    />
+    <meta property="og:url" content="https://infoweb-2v.vercel.app" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
+    <title>Turma 2V | 1º Ano Informática IFRN</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600&family=Poppins:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="styles/style.css" />
+    <link rel="stylesheet" href="styles/mascote.css" />
+    <link rel="manifest" href="manifest.json" />
+  </head>
+  <body>
+    <div id="scroll-progress"></div>
+
+    <div id="preloader">
+      <div class="spinner"></div>
+    </div>
+
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="#inicio" class="logo">
+          <i class="fa-solid fa-code-branch"></i> InfoWeb<span> - 2V</span>
+        </a>
+        <ul class="nav-links">
+          <li><a href="#inicio" class="active">Início</a></li>
+          <li><a href="#curso">O Curso</a></li>
+          <li><a href="#estatisticas">Números</a></li>
+          <li><a href="#lideres">Líderes</a></li>
+          <li><a href="#coordenadores">Coord.</a></li>
+          <li><a href="login.html">Horários</a></li>
+          <li><a href="#galeria">Galeria</a></li>
+          <li><a href="#projetos">Projetos</a></li>
+          <li><a href="login.html">SUAP</a></li>
+          <li><a href="#contato">Contato</a></li>
+          <li><a href="#mascote">Mascote</a></li>
+        </ul>
+
+        <button id="theme-toggle" class="btn-theme" aria-label="Alternar tema">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+
+        <div class="menu-mobile" id="btn-menu">
+          <i class="fa-solid fa-bars-staggered"></i>
+        </div>
+      </div>
+    </nav>
+
+    <div class="bg-glow"></div>
+
+    <main>
+      <!-- SEÇÃO HERO CORRIGIDA -->
+      <section id="inicio" class="hero hero-main">
+        <div id="particles-container"></div>
+        <div class="hero-content">
+          <img
+            style="height: 245px; width: 220px"
+            src="img/2V.png"
+            alt="Logo da Turma 2V"
+            class="hero-logo"
+          />
+
+          <div class="badge">
+            <i class="fa-solid fa-location-dot pulse-icon"></i> IFRN Campus
+            Caicó
+          </div>
+
+          <h1>A Turma do <span class="highlight">Futuro</span></h1>
+
+          <div class="typing-container">
+            <p>
+              1º Ano de <span id="typing-text"></span
+              ><span class="cursor">|</span>
+            </p>
+          </div>
+
+          <div class="hero-actions">
+            <a href="#curso" class="btn btn-primary">Conheça o Curso</a>
+            <a href="login.html" class="btn btn-outline btn-suap"
+              ><i class="fa-solid fa-id-card"></i> Acessar SUAP</a
+            >
+          </div>
+
+          <!-- Frase do Dia -->
+          <div class="frase-do-dia reveal">
+            <i class="fa-solid fa-quote-left"></i>
+            <p id="frase-texto">Carregando frase inspiradora...</p>
+            <span id="frase-autor"></span>
+          </div>
+        </div>
+      </section>
+
+      <section id="curso" class="curso">
+        <div class="container">
+          <div class="section-title reveal">
+            <h2>Sobre o <span class="highlight">Curso</span></h2>
+            <p>Informática para Internet no IFRN Caicó</p>
+          </div>
+          <div class="curso-grid">
+            <div class="curso-card reveal tilt-element">
+              <i class="fa-solid fa-laptop-code"></i>
+              <h3>O que é?</h3>
+              <p>
+                O curso técnico integrado prepara os alunos para o
+                desenvolvimento de sistemas web, unindo o ensino médio à
+                formação profissional tecnológica de excelência oferecida pelo
+                IFRN.
+              </p>
+            </div>
+            <div
+              class="curso-card reveal tilt-element"
+              style="transition-delay: 0.1s"
+            >
+              <i class="fa-solid fa-layer-group"></i>
+              <h3>O que aprendemos?</h3>
+              <p>
+                Dominamos a criação de interfaces (Front-end), regras de negócio
+                (Back-end), modelagem de banco de dados, design de interação
+                (UI/UX) e redes de computadores.
+              </p>
+            </div>
+            <div
+              class="curso-card reveal tilt-element"
+              style="transition-delay: 0.2s"
+            >
+              <i class="fa-solid fa-user"></i>
+              <h3>Nosso Perfil</h3>
+              <p>
+                Formamos profissionais capazes de atuar em agências de
+                tecnologia, startups e grandes empresas, sempre focados em
+                resolver problemas reais através do raciocínio lógico e da
+                inovação.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="estatisticas" class="estatisticas">
+        <div class="container">
+          <div class="section-title reveal">
+            <h2>Nossos <span class="highlight">Números</span></h2>
+            <p>A turma 2V em dados</p>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card reveal tilt-element">
+              <i class="fa-solid fa-users"></i>
+              <h3 class="counter" data-target="40">0</h3>
+              <p>Quantos Alunos?</p>
+            </div>
+            <div
+              class="stat-card reveal tilt-element"
+              style="transition-delay: 0.1s"
+            >
+              <i class="fa-solid fa-code"></i>
+              <h3 class="counter" data-target="15234">0</h3>
+              <p>Linhas de Código</p>
+            </div>
+            <div
+              class="stat-card reveal tilt-element"
+              style="transition-delay: 0.2s"
+            >
+              <i class="fa-solid fa-user"></i>
+              <h3 class="counter" data-target="3142">0</h3>
+              <p>Resenhas Feitas</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="lideres" class="lideres">
+        <div class="container">
+          <div class="section-title reveal">
+            <h2>Nossos <span class="highlight">Líderes</span></h2>
+            <p>Quem representa a turma?</p>
+          </div>
+          <div class="curso-grid">
+            <div class="curso-card reveal tilt-element">
+              <i class="fa-solid fa-crown"></i>
+              <h3>Líder de sala</h3>
+              <div class="lider-nome">Bela Cardoso</div>
+            </div>
+            <div
+              class="curso-card reveal tilt-element"
+              style="transition-delay: 0.1s"
+            >
+              <i class="fa-solid fa-star"></i>
+              <h3>Vice-líder</h3>
+              <div class="lider-nome">Samuel Nóbrega</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="coordenadores" class="coordenadores">
+        <div class="container">
+          <div class="section-title reveal">
+            <h2>Nossos <span class="highlight">Coordenadores</span></h2>
+            <p>A equipe que organiza e inspira</p>
+          </div>
+          <div class="curso-grid">
+            <div class="curso-card reveal tilt-element">
+              <i class="fa-solid fa-photo-film"></i>
+              <h3>Coordenador de Mídia</h3>
+              <div class="lider-nome">Williams</div>
+            </div>
+            <div
+              class="curso-card reveal tilt-element"
+              style="transition-delay: 0.1s"
+            >
+              <i class="fa-solid fa-pen-ruler"></i>
+              <h3>Coordenador de Design</h3>
+              <div class="lider-nome">Kleber</div>
+            </div>
+            <div
+              class="curso-card reveal tilt-element"
+              style="transition-delay: 0.2s"
+            >
+              <i class="fa-brands fa-html5"></i>
+              <i class="fa-brands fa-css3-alt"></i>
+              <h3>Coordenadores de html e css</h3>
+              <div class="lider-nome">Jonas e Ayslan</div>
+            </div>
+            <!-- AJUSTE DE DELAY (0.3s) -->
+            <div
+              class="curso-card reveal tilt-element"
+              style="transition-delay: 0.3s"
+            >
+              <i class="fa-solid fa-clock"></i>
+              <h3>Em breve</h3>
+              <div class="lider-nome">Novo coordenador em breve...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Galeria da Turma -->
+      <section id="galeria" class="galeria">
+        <div class="container">
+          <div class="section-title reveal">
+            <h2>Galeria da <span class="highlight">Turma</span></h2>
+            <p>Momentos que construímos juntos</p>
+          </div>
+          <div class="galeria-grid">
+            <div class="galeria-item reveal">
+              <img
+                src="img/turma01.jpg"
+                alt="Primeiro Dia da Turma 2V"
+                loading="lazy"
+              />
+            </div>
+            <div class="galeria-item reveal">
+              <img
+                src="img/turma02.jpg"
+                alt="Foto Oficial da Turma 2V"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="perfis-secao" class="is-authenticated is-hidden">
+        <h3><i class="fa-solid fa-users"></i> Alunos da Turma</h3>
+        <div id="lista-perfis" class="grid-perfis"></div>
+      </section>
+
+      <!-- Projetos -->
+      <section id="projetos" class="projetos">
+        <div class="container">
+          <div class="section-title reveal">
+            <h2>Nossos Projetos</h2>
+            <p>O que estamos construindo</p>
+          </div>
+          <div id="projetos-container" class="projetos-grid">
+            <div class="loading-projetos">Carregando projetos do GitHub...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tecnologias -->
+      <section id="tecnologias" class="tecnologias">
+        <div class="container">
+          <div class="section-title reveal">
+            <h2>Nossa Stack</h2>
+            <p>Ferramentas que dominamos</p>
+          </div>
+          <div class="empty-state reveal">
+            <i class="fa-solid fa-microchip"></i>
+            <h3>Sem tecnologias disponíveis no momento</h3>
+            <p>
+              Nossa jornada está apenas começando. Logo adicionaremos as
+              linguagens e frameworks que farão parte do nosso arsenal.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contato -->
+      <section id="contato" class="contato">
+        <div class="container">
+          <div class="section-title reveal">
+            <h2>Contato</h2>
+            <p>Onde nos encontrar</p>
+          </div>
+          <div class="contato-grid">
+            <div class="contato-card reveal tilt-element">
+              <div class="card-header">
+                <i class="fa-solid fa-building-columns"></i>
+                <h3>Instituição</h3>
+              </div>
+              <div class="card-body">
+                <h4>IFRN - Campus Caicó</h4>
+                <p>
+                  <i class="fa-solid fa-location-dot"></i> Rodovia RN 288, s/n -
+                  Nova Caicó, RN<br />CEP: 59300-000
+                </p>
+                <p>
+                  <i class="fa-solid fa-phone"></i> (84) 4005-4102
+                  <em>(Ramal Caicó)</em>
+                </p>
+                <a href="mailto:seac.ca@ifrn.edu.br" class="link-destaque">
+                  <i class="fa-solid fa-envelope"></i> seac.ca@ifrn.edu.br
+                </a>
+              </div>
+            </div>
+            <div
+              class="contato-card reveal tilt-element"
+              style="transition-delay: 0.1s"
+            >
+              <div class="card-header">
+                <i class="fa-solid fa-users"></i>
+                <h3>Pessoal (Turma 2V)</h3>
+              </div>
+              <div class="card-body">
+                <h4>Fale com a Turma</h4>
+                <p>
+                  Siga-nos nas redes sociais ou envie uma mensagem direta para
+                  parcerias e troca de ideias.
+                </p>
+                <div class="social-links-pessoal">
+                  <a
+                    href="https://instagram.com/InfoWeb2026.1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    ><i class="fa-brands fa-instagram"></i> @InfoWeb2026.1</a
+                  >
+                  <a
+                    href="https://github.com/infoWeb2026-2V"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    ><i class="fa-brands fa-github"></i> infoWeb2026-2V</a
+                  >
+                  <a
+                    href="https://www.tiktok.com/@infoweb2026_2v"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    ><i class="fa-brands fa-tiktok"></i> @infoweb2026_2v</a
+                  >
+                  <a href="mailto:infowebifrn2026@gmail.com"
+                    ><i class="fa-solid fa-envelope"></i>
+                    infowebifrn2026@gmail.com</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mascote -->
+      <section id="mascote" class="mascote-section">
+        <div class="mascote-container reveal">
+          <h2 class="mascote-title">🐾 <span>Nosso Mascote</span> 🤖</h2>
+          <div class="mascote-wrapper">
+            <div class="mascote-imagem">
+              <img
+                style="-webkit-tap-highlight-color: transparent"
+                src="img/Mascote.png"
+                alt="Mascote da Turma 2V"
+                class="mascote-flutuante"
+                id="mascoteImg"
+              />
+              <p class="mascote-clique">✨ Clique no mascote! ✨</p>
+            </div>
+            <div class="mascote-info">
+              <h3>Conheça nosso mascote!</h3>
+              <p>
+                Ele representa a energia, criatividade e inovação da turma 2V.
+                Sempre pronto para novos desafios no mundo da tecnologia!
+              </p>
+
+              <div class="mascote-stats">
+                <div class="mascote-stat">
+                  <i class="fa-solid fa-heart"></i>
+                  <span id="mascote-likes">0</span> / 1.000.000 carinhos
+                </div>
+                <div class="mascote-stat">
+                  <i class="fa-solid fa-comment"></i>
+                  <span id="mascote-mensagens">0</span> mensagens
+                </div>
+              </div>
+
+              <div class="progresso-container">
+                <div class="progresso-label">
+                  <span
+                    ><i class="fa-solid fa-chart-line"></i> Progresso para 1
+                    MILHÃO</span
+                  >
+                  <span id="progresso-texto">0 / 1.000.000</span>
+                </div>
+                <div class="progresso-bar">
+                  <div class="progresso-fill" id="progresso-fill"></div>
+                </div>
+              </div>
+
+              <button id="darCarinhoBtn" class="btn-mascote">
+                <i class="fa-solid fa-heart"></i> Dar carinho
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="footer-logo">
+          <i class="fa-solid fa-code-branch"></i> Turma 2V
+        </div>
+        <p>
+          © <span id="ano">2026</span> - Feito pela turma
+          <a
+            href="https://github.com/infoWeb2026-2V"
+            target="_blank"
+            rel="noopener noreferrer"
+            >InfoWeb2026.2V</a
+          >
+          Com Carinho 💜
+        </p>
+      </div>
+    </footer>
+
+    <a
+      style="-webkit-tap-highlight-color: transparent"
+      href="#inicio"
+      id="back-to-top"
+      class="back-to-top"
+      aria-label="Voltar ao topo"
+    >
+      <i class="fa-solid fa-arrow-up"></i>
+    </a>
+
+    <!-- Scripts da Página -->
+    <script src="scripts/script.js"></script>
+    <script src="scripts/mascote.js"></script>
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("./sw.js")
+          .then(() => console.log("Service Worker Registrado!"))
+          .catch((err) => console.error("Erro ao registrar SW:", err));
+      }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="suapi/js.cookie.js"></script>
+    <script src="suapi/settings.sample.js"></script>
+    <script src="suapi/client.js"></script>
+    <script>
+      var suap = new SuapClient(SUAP_URL, CLIENT_ID, REDIRECT_URI, SCOPE);
+      suap.init();
+
+      $(document).ready(function () {
+        if (suap.isAuthenticated()) {
+          console.log("Usuário logado nesta página!");
+        } else {
+          console.log("Usuário deslogado.");
+        }
+      });
+    </script>
+  </body>
+</html>
