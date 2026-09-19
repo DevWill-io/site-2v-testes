@@ -4,11 +4,15 @@
 const TRADUCOES = {
   "pt-BR": {
     titulo_pagina: "Turma 2V | 1º Ano Informática IFRN",
+    titulo_pagina_login: "Login SUAP | Turma 2V IFRN",
+
+    /* ===== MENU LATERAL / NAV ===== */
+    menu: "Menu",
     nav_inicio: "Início",
     nav_curso: "O Curso",
     nav_numeros: "Números",
     nav_lideres: "Líderes",
-    nav_coord: "Coord.",
+    nav_coord: "Coordenadores",
     nav_horarios: "Horários",
     nav_galeria: "Galeria",
     nav_projetos: "Projetos",
@@ -25,46 +29,54 @@ const TRADUCOES = {
     nav_suap_desc: "Portal acadêmico",
     nav_contato_desc: "Fale com a turma",
     nav_mascote_desc: "Interaja com ele",
-    menu: "Menu",
+
+    /* ===== AÇÕES ===== */
     idioma: "Idioma",
     tema: "Tema",
+    cor_tema: "Cor do tema",
+    modo: "Modo",
     cor_roxo: "Roxo",
     cor_azul: "Azul",
     cor_verde: "Verde",
     cor_rosa: "Rosa",
     cor_laranja: "Laranja",
-    cor_tema: "Cor do tema",
-    modo: "Modo",
     modo_claro: "Claro",
     modo_escuro: "Escuro",
+
+    /* ===== HERO ===== */
     hero_badge: "IFRN Campus Caicó",
     hero_titulo_1: "A Turma do",
     hero_titulo_2: "Futuro",
     hero_typing_1: "1º Ano de",
     hero_btn_curso: "Conheça o Curso",
     hero_btn_suap: "Acessar SUAP",
+
+    /* ===== CURSO ===== */
     curso_titulo_1: "Sobre o",
     curso_titulo_2: "Curso",
     curso_sub: "Informática para Internet no IFRN Caicó",
     curso_card1_t: "O que é?",
-    curso_card1_p:
-      "O curso técnico integrado prepara os alunos para o desenvolvimento de sistemas web, unindo o ensino médio à formação profissional tecnológica de excelência oferecida pelo IFRN.",
+    curso_card1_p: "O curso técnico integrado prepara os alunos para o desenvolvimento de sistemas web, unindo o ensino médio à formação profissional tecnológica de excelência oferecida pelo IFRN.",
     curso_card2_t: "O que aprendemos?",
-    curso_card2_p:
-      "Dominamos a criação de interfaces (Front-end), regras de negócio (Back-end), modelagem de banco de dados, design de interação (UI/UX) e redes de computadores.",
+    curso_card2_p: "Dominamos a criação de interfaces (Front-end), regras de negócio (Back-end), modelagem de banco de dados, design de interação (UI/UX) e redes de computadores.",
     curso_card3_t: "Nosso Perfil",
-    curso_card3_p:
-      "Formamos profissionais capazes de atuar em agências de tecnologia, startups e grandes empresas, sempre focados em resolver problemas reais através do raciocínio lógico e da inovação.",
+    curso_card3_p: "Formamos profissionais capazes de atuar em agências de tecnologia, startups e grandes empresas, sempre focados em resolver problemas reais através do raciocínio lógico e da inovação.",
+
+    /* ===== STATS ===== */
     stats_titulo_1: "Nossos",
     stats_titulo_2: "Números",
     stats_sub: "A turma 2V em dados",
     stats_alunos: "Quantos Alunos?",
     stats_linhas: "Linhas de Código",
+
+    /* ===== LÍDERES ===== */
     lideres_titulo_1: "Nossos",
     lideres_titulo_2: "Líderes",
     lideres_sub: "Quem representa a turma?",
     lider_lider: "Líder de sala",
     lider_vice: "Vice-líder",
+
+    /* ===== COORDENADORES ===== */
     coord_titulo_1: "Nossos",
     coord_titulo_2: "Coordenadores",
     coord_sub: "A equipe que organiza e inspira",
@@ -73,9 +85,13 @@ const TRADUCOES = {
     coord_html_css: "Coordenadores de html e css",
     coord_em_breve: "Em breve",
     coord_em_breve_desc: "Novo coordenador em breve...",
+
+    /* ===== GALERIA ===== */
     galeria_titulo_1: "Galeria da",
     galeria_titulo_2: "Turma",
     galeria_sub: "Momentos que construímos juntos",
+
+    /* ===== PROJETOS ===== */
     projetos_titulo: "Nossos Projetos",
     projetos_sub: "O que estamos construindo",
     projetos_carregando: "Carregando projetos do GitHub...",
@@ -85,37 +101,205 @@ const TRADUCOES = {
     projetos_erro_p: "Verifique sua conexão ou tente novamente mais tarde.",
     projetos_sem_desc: "Sem descrição fornecida.",
     projetos_ver_github: "Ver no GitHub",
+
+    /* ===== TECH ===== */
     tech_titulo: "Nossa Stack",
     tech_sub: "Ferramentas que dominamos",
     tech_vazio_t: "Sem tecnologias disponíveis no momento",
-    tech_vazio_p:
-      "Nossa jornada está apenas começando. Logo adicionaremos as linguagens e frameworks que farão parte do nosso arsenal.",
+    tech_vazio_p: "Nossa jornada está apenas começando. Logo adicionaremos as linguagens e frameworks que farão parte do nosso arsenal.",
+
+    /* ===== CONTATO ===== */
     contato_titulo: "Contato",
     contato_sub: "Onde nos encontrar",
     contato_inst_t: "Instituição",
     contato_turma_t: "Pessoal (Turma 2V)",
     contato_fale_t: "Fale com a Turma",
-    contato_fale_p:
-      "Siga-nos nas redes sociais ou envie uma mensagem direta para parcerias e troca de ideias.",
+    contato_fale_p: "Siga-nos nas redes sociais ou envie uma mensagem direta para parcerias e troca de ideias.",
+
+    /* ===== MASCOTE ===== */
     mascote_titulo: "Nosso Mascote",
     mascote_clique: "✨ Clique no mascote! ✨",
     mascote_conheca: "Conheça nosso mascote!",
-    mascote_desc:
-      "Ele representa a energia, criatividade e inovação da turma 2V. Sempre pronto para novos desafios no mundo da tecnologia!",
+    mascote_desc: "Ele representa a energia, criatividade e inovação da turma 2V. Sempre pronto para novos desafios no mundo da tecnologia!",
     mascote_carinhos: "/ 1.000.000 carinhos",
     mascote_seus: "Seus:",
     mascote_progresso: "Progresso para 1 MILHÃO",
     mascote_btn: "Dar carinho",
+
+    /* ===== RANKING ===== */
+    ranking_titulo: "Top Carinhos",
+    ranking_carregando: "Carregando ranking...",
+    ranking_vazio: "Ninguém deu carinho ainda. Seja o primeiro!",
+    ranking_voce: "Você está em:",
+    ranking_lugar: "º lugar",
+
+    /* ===== FOOTER ===== */
     footer_feito: "- Feito pela turma",
     footer_carinho: "Com Carinho 💜",
+
+    /* ===== LOGIN (compartilhado) ===== */
+    voltar: "Voltar",
+    portal_suap: "Portal SUAP",
+    area_auth: "Área de autenticação acadêmica",
+    acesse_credenciais: "Acesse com suas credenciais institucionais do IFRN para integrar e visualizar seus dados acadêmicos.",
+    login_suap: "Login com SUAP",
+    login_ok: "Você foi logado com sucesso!",
+    sessao_ativa: "Sessão ativa e conectada ao SUAP.",
+    bem_vindo: "Bem-vindo,",
+    editar_perfil: "Editar Perfil",
+    editar_perfil_sub: "Personalize como você aparece para a turma.",
+    encerrar_sessao: "Encerrar Sessão",
+
+    /* ===== CALCULADORA ===== */
+    calc_titulo_1: "Calculadora de",
+    calc_titulo_2: "Notas",
+    calc_sub: "Boletim atualizado diretamente pelo SUAP",
+    media_geral: "Média Geral",
+    disciplinas: "Disciplinas",
+    em_risco: "Em Risco",
+    faltas_totais: "Faltas Totais",
+    periodo: "Período",
+    meta: "Meta",
+    atualizar: "Atualizar",
+    export_csv: "Exportar CSV",
+    export_pdf: "Exportar PDF",
+    limpar_simulador: "Limpar simulador",
+    filtro_todas: "Todas",
+    filtro_aprovadas: "Aprovadas",
+    filtro_recuperacao: "Recuperação",
+    filtro_reprovadas: "Reprovadas",
+    filtro_risco: "Em risco",
+    aguardando_suap: "Aguardando dados do SUAP...",
+    th_disciplina: "Disciplina",
+    th_etapas: "Etapas",
+    th_media: "Média",
+    th_faltas: "Faltas",
+    th_projecao: "Projeção",
+    th_status: "Status",
+    th_simulador: "Simulador: digite uma nota hipotética na próxima etapa",
+    th_meta_ind: "Meta individual",
+    notas_vazio: "Faça login para carregar suas notas.",
+    leg_aprovado: "Aprovado",
+    leg_recuperacao: "Recuperação",
+    leg_reprovado: "Reprovado",
+    leg_extra: "🧪 Simulador • 🎯 Meta individual",
+    evolucao_titulo: "Evolução das Médias",
+    evolucao_sub: "Sua média por período letivo",
+    historico_titulo: "Histórico de Períodos",
+    historico_vazio: "Carregue pelo menos 2 períodos para comparar.",
+
+    /* ===== HORÁRIOS ===== */
+    horarios_titulo_1: "Quadro de",
+    horarios_titulo_2: "Horários",
+    horarios_sub: "Nossa rotina semanal",
+    th_horario: "Horário",
+    dia_seg: "Segunda",
+    dia_ter: "Terça",
+    dia_qua: "Quarta",
+    dia_qui: "Quinta",
+    dia_sex: "Sexta",
+    intervalo_1: "I Intervalo",
+    intervalo_2: "II Intervalo",
+    horario_sujeito: "Horário sujeito a alterações. Consulte o",
+    horario_versao: "para a versão oficial.",
+
+    /* ===== MURAL ===== */
+    mural_titulo_1: "Mural de",
+    mural_titulo_2: "Recados",
+    mural_sub: "Deixe um recado para a turma",
+    busca_recados: "🔍 Buscar recados...",
+    recado_msg: "Sua mensagem...",
+    recado_link: "Link/Anexo opcional (https://...)",
+    expirar_em: "Expirar em:",
+    dia_1: "1 Dia",
+    dias_7: "7 Dias",
+    dias_15: "15 Dias",
+    publicar: "Publicar",
+
+    /* ===== PERFIS ===== */
+    membros_titulo_1: "Membros do",
+    membros_titulo_2: "Sistema",
+    membros_sub: "Membros integrados ao sistema",
+    busca_perfis: "🔍 Filtrar por nome ou matrícula...",
+
+    /* ===== AGENDA ===== */
+    agenda_titulo_1: "Agenda da",
+    agenda_titulo_2: "Turma",
+    agenda_sub: "Eventos de Setembro a Dezembro de 2026",
+    matricula: "Matrícula:",
+    ultimo_acesso: "Último Acesso:",
+    nao_registrado: "Não registrado",
+    trocar_foto: "Trocar foto",
+    restaurar_suap: "Voltar para a foto do SUAP",
+    foto_hint: "JPG/PNG até 5MB — será otimizada.",
+    nome_exibicao: "Nome de exibição",
+    nome_placeholder: "Como quer ser chamado",
+    bio: "Bio",
+    bio_placeholder: "Fale um pouco sobre você...",
+    redes_sociais: "Redes sociais",
+    cancelar: "Cancelar",
+    salvar: "Salvar",
+    meta_individual: "Meta individual",
+    usar_meta_global: "Usar meta global",
+    notificacoes: "Notificações",
+    marcar_todas: "Marcar todas",
+    sem_notif: "Sem notificações.",
+    instalar_app: "Instalar app",
+
+    /* ===== CONTAGEM ===== */
+    contagem_titulo_1: "Faltam",
+    contagem_titulo_2: "pouco!",
+    contagem_sub: "Próximos eventos importantes",
+    contagem_vazio: "Nenhum evento próximo nos próximos 30 dias.",
+    contagem_dias: "dias",
+    contagem_horas: "horas",
+    contagem_min: "min",
+    contagem_seg: "seg",
+
+    /* ===== AVATAR MASCOTE ===== */
+    mascote_avatar_titulo: "Seu mascote",
+    mascote_avatar_desc: "Personalize o mascote que aparece quando você dá carinho.",
+
+    /* ===== SALA PROFESSORES ===== */
+    sala_titulo: "Sala dos Professores",
+    sala_sub: "Visão geral da turma (acesso restrito)",
+    sala_tab_alunos: "Alunos",
+    sala_tab_risco: "Em Risco",
+    sala_tab_engajamento: "Engajamento",
+    sala_busca: "🔍 Buscar aluno por nome ou matrícula...",
+    sala_th_aluno: "Aluno",
+    sala_th_matricula: "Matrícula",
+    sala_th_media: "Média",
+    sala_th_faltas: "Faltas",
+    sala_th_carinhos: "Carinhos",
+    sala_th_status: "Status",
+    sala_carregando: "Carregando dados...",
+    sala_risco_carregando: "Carregando...",
+    sala_stat_carinhos: "Carinhos totais",
+    sala_stat_recados: "Recados publicados",
+    sala_stat_alunos: "Alunos ativos",
+    sala_stat_top: "Top contribuinte",
+
+    /* ===== CALENDÁRIO ===== */
+    cal_provas: "Provas e avaliações",
+    cal_trabalhos: "Trabalhos e listas",
+    cal_feriados: "Feriados e recessos",
+    cal_reunioes: "Reuniões e aulas",
+    cal_esportes: "Esportes e jogos",
+    cal_festas: "Festas e eventos",
+    cal_outros: "Outros eventos",
   },
+
   en: {
     titulo_pagina: "Class 2V | 1st Year IT IFRN",
+    titulo_pagina_login: "SUAP Login | Class 2V IFRN",
+
+    menu: "Menu",
     nav_inicio: "Home",
     nav_curso: "The Course",
     nav_numeros: "Numbers",
     nav_lideres: "Leaders",
-    nav_coord: "Coords.",
+    nav_coord: "Coordinators",
     nav_horarios: "Schedule",
     nav_galeria: "Gallery",
     nav_projetos: "Projects",
@@ -132,46 +316,48 @@ const TRADUCOES = {
     nav_suap_desc: "Academic portal",
     nav_contato_desc: "Talk to class",
     nav_mascote_desc: "Interact with it",
-    menu: "Menu",
+
     idioma: "Language",
     tema: "Theme",
+    cor_tema: "Theme color",
+    modo: "Mode",
     cor_roxo: "Purple",
     cor_azul: "Blue",
     cor_verde: "Green",
     cor_rosa: "Pink",
     cor_laranja: "Orange",
-    cor_tema: "Theme color",
-    modo: "Mode",
     modo_claro: "Light",
     modo_escuro: "Dark",
+
     hero_badge: "IFRN Caicó Campus",
     hero_titulo_1: "The Class of the",
     hero_titulo_2: "Future",
     hero_typing_1: "1st Year of",
     hero_btn_curso: "Discover the Course",
     hero_btn_suap: "Access SUAP",
+
     curso_titulo_1: "About the",
     curso_titulo_2: "Course",
     curso_sub: "Internet Computing at IFRN Caicó",
     curso_card1_t: "What is it?",
-    curso_card1_p:
-      "The integrated technical course prepares students for web systems development, combining high school with the excellent professional technology training offered by IFRN.",
+    curso_card1_p: "The integrated technical course prepares students for web systems development, combining high school with the excellent professional technology training offered by IFRN.",
     curso_card2_t: "What do we learn?",
-    curso_card2_p:
-      "We master interface creation (Front-end), business rules (Back-end), database modeling, interaction design (UI/UX), and computer networks.",
+    curso_card2_p: "We master interface creation (Front-end), business rules (Back-end), database modeling, interaction design (UI/UX), and computer networks.",
     curso_card3_t: "Our Profile",
-    curso_card3_p:
-      "We train professionals able to work in tech agencies, startups, and large companies, always focused on solving real problems through logical reasoning and innovation.",
+    curso_card3_p: "We train professionals able to work in tech agencies, startups, and large companies, always focused on solving real problems through logical reasoning and innovation.",
+
     stats_titulo_1: "Our",
     stats_titulo_2: "Numbers",
     stats_sub: "Class 2V in data",
     stats_alunos: "How many Students?",
     stats_linhas: "Lines of Code",
+
     lideres_titulo_1: "Our",
     lideres_titulo_2: "Leaders",
     lideres_sub: "Who represents the class?",
     lider_lider: "Class Leader",
     lider_vice: "Vice-Leader",
+
     coord_titulo_1: "Our",
     coord_titulo_2: "Coordinators",
     coord_sub: "The team that organizes and inspires",
@@ -180,9 +366,11 @@ const TRADUCOES = {
     coord_html_css: "HTML & CSS Coordinators",
     coord_em_breve: "Coming soon",
     coord_em_breve_desc: "New coordinator coming soon...",
+
     galeria_titulo_1: "Class",
     galeria_titulo_2: "Gallery",
     galeria_sub: "Moments we built together",
+
     projetos_titulo: "Our Projects",
     projetos_sub: "What we're building",
     projetos_carregando: "Loading projects from GitHub...",
@@ -192,37 +380,190 @@ const TRADUCOES = {
     projetos_erro_p: "Check your connection or try again later.",
     projetos_sem_desc: "No description provided.",
     projetos_ver_github: "View on GitHub",
+
     tech_titulo: "Our Stack",
     tech_sub: "Tools we master",
     tech_vazio_t: "No technologies available at the moment",
-    tech_vazio_p:
-      "Our journey is just beginning. Soon we'll add the languages and frameworks that will be part of our arsenal.",
+    tech_vazio_p: "Our journey is just beginning. Soon we'll add the languages and frameworks that will be part of our arsenal.",
+
     contato_titulo: "Contact",
     contato_sub: "Where to find us",
     contato_inst_t: "Institution",
     contato_turma_t: "Personal (Class 2V)",
     contato_fale_t: "Talk to the Class",
-    contato_fale_p:
-      "Follow us on social media or send a direct message for partnerships and idea exchange.",
+    contato_fale_p: "Follow us on social media or send a direct message for partnerships and idea exchange.",
+
     mascote_titulo: "Our Mascot",
     mascote_clique: "✨ Click the mascot! ✨",
     mascote_conheca: "Meet our mascot!",
-    mascote_desc:
-      "It represents the energy, creativity, and innovation of class 2V. Always ready for new challenges in the tech world!",
+    mascote_desc: "It represents the energy, creativity, and innovation of class 2V. Always ready for new challenges in the tech world!",
     mascote_carinhos: "/ 1,000,000 hugs",
     mascote_seus: "Yours:",
     mascote_progresso: "Progress to 1 MILLION",
     mascote_btn: "Give a hug",
+
+    ranking_titulo: "Top Hugs",
+    ranking_carregando: "Loading ranking...",
+    ranking_vazio: "No hugs yet. Be the first!",
+    ranking_voce: "You are at:",
+    ranking_lugar: "place",
+
     footer_feito: "- Made by class",
     footer_carinho: "With love 💜",
+
+    voltar: "Back",
+    portal_suap: "SUAP Portal",
+    area_auth: "Academic authentication area",
+    acesse_credenciais: "Log in with your IFRN institutional credentials to integrate and view your academic data.",
+    login_suap: "Login with SUAP",
+    login_ok: "You logged in successfully!",
+    sessao_ativa: "Active session connected to SUAP.",
+    bem_vindo: "Welcome,",
+    editar_perfil: "Edit Profile",
+    editar_perfil_sub: "Customize how you appear to the class.",
+    encerrar_sessao: "Log Out",
+
+    calc_titulo_1: "Grade",
+    calc_titulo_2: "Calculator",
+    calc_sub: "Report card updated directly from SUAP",
+    media_geral: "Overall Average",
+    disciplinas: "Subjects",
+    em_risco: "At Risk",
+    faltas_totais: "Total Absences",
+    periodo: "Term",
+    meta: "Target",
+    atualizar: "Refresh",
+    export_csv: "Export CSV",
+    export_pdf: "Export PDF",
+    limpar_simulador: "Clear simulator",
+    filtro_todas: "All",
+    filtro_aprovadas: "Passed",
+    filtro_recuperacao: "Recovery",
+    filtro_reprovadas: "Failed",
+    filtro_risco: "At risk",
+    aguardando_suap: "Waiting for SUAP data...",
+    th_disciplina: "Subject",
+    th_etapas: "Grades",
+    th_media: "Average",
+    th_faltas: "Absences",
+    th_projecao: "Projection",
+    th_status: "Status",
+    th_simulador: "Simulator: enter a hypothetical grade for the next term",
+    th_meta_ind: "Individual target",
+    notas_vazio: "Log in to load your grades.",
+    leg_aprovado: "Passed",
+    leg_recuperacao: "Recovery",
+    leg_reprovado: "Failed",
+    leg_extra: "🧪 Simulator • 🎯 Individual target",
+    evolucao_titulo: "Average Evolution",
+    evolucao_sub: "Your average per academic term",
+    historico_titulo: "Term History",
+    historico_vazio: "Load at least 2 terms to compare.",
+
+    horarios_titulo_1: "Weekly",
+    horarios_titulo_2: "Schedule",
+    horarios_sub: "Our weekly routine",
+    th_horario: "Time",
+    dia_seg: "Monday",
+    dia_ter: "Tuesday",
+    dia_qua: "Wednesday",
+    dia_qui: "Thursday",
+    dia_sex: "Friday",
+    intervalo_1: "Break I",
+    intervalo_2: "Break II",
+    horario_sujeito: "Schedule subject to change. Check",
+    horario_versao: "for the official version.",
+
+    mural_titulo_1: "Message",
+    mural_titulo_2: "Board",
+    mural_sub: "Leave a message for the class",
+    busca_recados: "🔍 Search messages...",
+    recado_msg: "Your message...",
+    recado_link: "Optional link/attachment (https://...)",
+    expirar_em: "Expires in:",
+    dia_1: "1 Day",
+    dias_7: "7 Days",
+    dias_15: "15 Days",
+    publicar: "Post",
+
+    membros_titulo_1: "System",
+    membros_titulo_2: "Members",
+    membros_sub: "Members integrated into the system",
+    busca_perfis: "🔍 Filter by name or ID...",
+
+    agenda_titulo_1: "Class",
+    agenda_titulo_2: "Agenda",
+    agenda_sub: "Events from September to December 2026",
+    matricula: "ID:",
+    ultimo_acesso: "Last Access:",
+    nao_registrado: "Not registered",
+    trocar_foto: "Change photo",
+    restaurar_suap: "Restore SUAP photo",
+    foto_hint: "JPG/PNG up to 5MB — will be optimized.",
+    nome_exibicao: "Display name",
+    nome_placeholder: "How you want to be called",
+    bio: "Bio",
+    bio_placeholder: "Tell a bit about yourself...",
+    redes_sociais: "Social media",
+    cancelar: "Cancel",
+    salvar: "Save",
+    meta_individual: "Individual target",
+    usar_meta_global: "Use global target",
+    notificacoes: "Notifications",
+    marcar_todas: "Mark all",
+    sem_notif: "No notifications.",
+    instalar_app: "Install app",
+
+    contagem_titulo_1: "Almost",
+    contagem_titulo_2: "there!",
+    contagem_sub: "Upcoming important events",
+    contagem_vazio: "No upcoming events in the next 30 days.",
+    contagem_dias: "days",
+    contagem_horas: "hours",
+    contagem_min: "min",
+    contagem_seg: "sec",
+
+    mascote_avatar_titulo: "Your mascot",
+    mascote_avatar_desc: "Customize the mascot that appears when you send a hug.",
+
+    sala_titulo: "Teachers' Room",
+    sala_sub: "Class overview (restricted access)",
+    sala_tab_alunos: "Students",
+    sala_tab_risco: "At Risk",
+    sala_tab_engajamento: "Engagement",
+    sala_busca: "🔍 Search student by name or ID...",
+    sala_th_aluno: "Student",
+    sala_th_matricula: "ID",
+    sala_th_media: "Average",
+    sala_th_faltas: "Absences",
+    sala_th_carinhos: "Hugs",
+    sala_th_status: "Status",
+    sala_carregando: "Loading data...",
+    sala_risco_carregando: "Loading...",
+    sala_stat_carinhos: "Total hugs",
+    sala_stat_recados: "Posts published",
+    sala_stat_alunos: "Active students",
+    sala_stat_top: "Top contributor",
+
+    cal_provas: "Exams and quizzes",
+    cal_trabalhos: "Assignments and lists",
+    cal_feriados: "Holidays and breaks",
+    cal_reunioes: "Meetings and classes",
+    cal_esportes: "Sports and games",
+    cal_festas: "Parties and events",
+    cal_outros: "Other events",
   },
+
   es: {
     titulo_pagina: "Clase 2V | 1º Año Informática IFRN",
+    titulo_pagina_login: "Login SUAP | Clase 2V IFRN",
+
+    menu: "Menú",
     nav_inicio: "Inicio",
     nav_curso: "El Curso",
     nav_numeros: "Números",
     nav_lideres: "Líderes",
-    nav_coord: "Coord.",
+    nav_coord: "Coordinadores",
     nav_horarios: "Horarios",
     nav_galeria: "Galería",
     nav_projetos: "Proyectos",
@@ -239,46 +580,48 @@ const TRADUCOES = {
     nav_suap_desc: "Portal académico",
     nav_contato_desc: "Habla con la clase",
     nav_mascote_desc: "Interactúa con él",
-    menu: "Menú",
+
     idioma: "Idioma",
     tema: "Tema",
+    cor_tema: "Color del tema",
+    modo: "Modo",
     cor_roxo: "Morado",
     cor_azul: "Azul",
     cor_verde: "Verde",
     cor_rosa: "Rosa",
     cor_laranja: "Naranja",
-    cor_tema: "Color del tema",
-    modo: "Modo",
     modo_claro: "Claro",
     modo_escuro: "Oscuro",
+
     hero_badge: "IFRN Campus Caicó",
     hero_titulo_1: "La Clase del",
     hero_titulo_2: "Futuro",
     hero_typing_1: "1º Año de",
     hero_btn_curso: "Conoce el Curso",
     hero_btn_suap: "Acceder al SUAP",
+
     curso_titulo_1: "Sobre el",
     curso_titulo_2: "Curso",
     curso_sub: "Informática para Internet en el IFRN Caicó",
     curso_card1_t: "¿Qué es?",
-    curso_card1_p:
-      "El curso técnico integrado prepara a los alumnos para el desarrollo de sistemas web, uniendo la enseñanza media a la formación profesional tecnológica de excelencia ofrecida por el IFRN.",
+    curso_card1_p: "El curso técnico integrado prepara a los alumnos para el desarrollo de sistemas web, uniendo la enseñanza media a la formación profesional tecnológica de excelencia ofrecida por el IFRN.",
     curso_card2_t: "¿Qué aprendemos?",
-    curso_card2_p:
-      "Dominamos la creación de interfaces (Front-end), reglas de negocio (Back-end), modelado de bases de datos, diseño de interacción (UI/UX) y redes de computadoras.",
+    curso_card2_p: "Dominamos la creación de interfaces (Front-end), reglas de negocio (Back-end), modelado de bases de datos, diseño de interacción (UI/UX) y redes de computadoras.",
     curso_card3_t: "Nuestro Perfil",
-    curso_card3_p:
-      "Formamos profesionales capaces de actuar en agencias de tecnología, startups y grandes empresas, siempre enfocados en resolver problemas reales a través del razonamiento lógico y la innovación.",
+    curso_card3_p: "Formamos profesionales capaces de actuar en agencias de tecnología, startups y grandes empresas, siempre enfocados en resolver problemas reales a través del razonamiento lógico y la innovación.",
+
     stats_titulo_1: "Nuestros",
     stats_titulo_2: "Números",
     stats_sub: "La clase 2V en datos",
     stats_alunos: "¿Cuántos Alumnos?",
     stats_linhas: "Líneas de Código",
+
     lideres_titulo_1: "Nuestros",
     lideres_titulo_2: "Líderes",
     lideres_sub: "¿Quién representa a la clase?",
     lider_lider: "Líder de clase",
     lider_vice: "Vice-líder",
+
     coord_titulo_1: "Nuestros",
     coord_titulo_2: "Coordinadores",
     coord_sub: "El equipo que organiza e inspira",
@@ -287,9 +630,11 @@ const TRADUCOES = {
     coord_html_css: "Coordinadores de html y css",
     coord_em_breve: "Próximamente",
     coord_em_breve_desc: "Nuevo coordinador próximamente...",
+
     galeria_titulo_1: "Galería de la",
     galeria_titulo_2: "Clase",
     galeria_sub: "Momentos que construimos juntos",
+
     projetos_titulo: "Nuestros Proyectos",
     projetos_sub: "Lo que estamos construyendo",
     projetos_carregando: "Cargando proyectos de GitHub...",
@@ -299,29 +644,178 @@ const TRADUCOES = {
     projetos_erro_p: "Verifica tu conexión o inténtalo más tarde.",
     projetos_sem_desc: "Sin descripción proporcionada.",
     projetos_ver_github: "Ver en GitHub",
+
     tech_titulo: "Nuestra Stack",
     tech_sub: "Herramientas que dominamos",
     tech_vazio_t: "Sin tecnologías disponibles por el momento",
-    tech_vazio_p:
-      "Nuestro viaje apenas comienza. Pronto agregaremos los lenguajes y frameworks que formarán parte de nuestro arsenal.",
+    tech_vazio_p: "Nuestro viaje apenas comienza. Pronto agregaremos los lenguajes y frameworks que formarán parte de nuestro arsenal.",
+
     contato_titulo: "Contacto",
     contato_sub: "Dónde encontrarnos",
     contato_inst_t: "Institución",
     contato_turma_t: "Personal (Clase 2V)",
     contato_fale_t: "Habla con la Clase",
-    contato_fale_p:
-      "Síguenos en redes sociales o envía un mensaje directo para alianzas e intercambio de ideas.",
+    contato_fale_p: "Síguenos en redes sociales o envía un mensaje directo para alianzas e intercambio de ideas.",
+
     mascote_titulo: "Nuestra Mascota",
     mascote_clique: "✨ ¡Haz clic en la mascota! ✨",
     mascote_conheca: "¡Conoce nuestra mascota!",
-    mascote_desc:
-      "Representa la energía, creatividad e innovación de la clase 2V. ¡Siempre lista para nuevos desafíos en el mundo de la tecnología!",
+    mascote_desc: "Representa la energía, creatividad e innovación de la clase 2V. ¡Siempre lista para nuevos desafíos en el mundo de la tecnología!",
     mascote_carinhos: "/ 1.000.000 cariños",
     mascote_seus: "Tuyos:",
     mascote_progresso: "Progreso hacia 1 MILLÓN",
     mascote_btn: "Dar cariño",
+
+    ranking_titulo: "Top Cariños",
+    ranking_carregando: "Cargando ranking...",
+    ranking_vazio: "Nadie dio cariño aún. ¡Sé el primero!",
+    ranking_voce: "Estás en:",
+    ranking_lugar: "º lugar",
+
     footer_feito: "- Hecho por la clase",
     footer_carinho: "Con cariño 💜",
+
+    voltar: "Volver",
+    portal_suap: "Portal SUAP",
+    area_auth: "Área de autenticación académica",
+    acesse_credenciais: "Inicia sesión con tus credenciales institucionales del IFRN para integrar y ver tus datos académicos.",
+    login_suap: "Entrar con SUAP",
+    login_ok: "¡Iniciaste sesión correctamente!",
+    sessao_ativa: "Sesión activa y conectada al SUAP.",
+    bem_vindo: "Bienvenido,",
+    editar_perfil: "Editar Perfil",
+    editar_perfil_sub: "Personaliza cómo apareces ante la clase.",
+    encerrar_sessao: "Cerrar Sesión",
+
+    calc_titulo_1: "Calculadora de",
+    calc_titulo_2: "Notas",
+    calc_sub: "Boletín actualizado directamente desde SUAP",
+    media_geral: "Promedio General",
+    disciplinas: "Asignaturas",
+    em_risco: "En Riesgo",
+    faltas_totais: "Faltas Totales",
+    periodo: "Período",
+    meta: "Meta",
+    atualizar: "Actualizar",
+    export_csv: "Exportar CSV",
+    export_pdf: "Exportar PDF",
+    limpar_simulador: "Limpiar simulador",
+    filtro_todas: "Todas",
+    filtro_aprovadas: "Aprobadas",
+    filtro_recuperacao: "Recuperación",
+    filtro_reprovadas: "Reprobadas",
+    filtro_risco: "En riesgo",
+    aguardando_suap: "Esperando datos del SUAP...",
+    th_disciplina: "Asignatura",
+    th_etapas: "Notas",
+    th_media: "Promedio",
+    th_faltas: "Faltas",
+    th_projecao: "Proyección",
+    th_status: "Estado",
+    th_simulador: "Simulador: ingresa una nota hipotética para la próxima etapa",
+    th_meta_ind: "Meta individual",
+    notas_vazio: "Inicia sesión para cargar tus notas.",
+    leg_aprovado: "Aprobado",
+    leg_recuperacao: "Recuperación",
+    leg_reprovado: "Reprobado",
+    leg_extra: "🧪 Simulador • 🎯 Meta individual",
+    evolucao_titulo: "Evolución de Promedios",
+    evolucao_sub: "Tu promedio por período lectivo",
+    historico_titulo: "Historial de Períodos",
+    historico_vazio: "Carga al menos 2 períodos para comparar.",
+
+    horarios_titulo_1: "Horario",
+    horarios_titulo_2: "Semanal",
+    horarios_sub: "Nuestra rutina semanal",
+    th_horario: "Hora",
+    dia_seg: "Lunes",
+    dia_ter: "Martes",
+    dia_qua: "Miércoles",
+    dia_qui: "Jueves",
+    dia_sex: "Viernes",
+    intervalo_1: "Recreo I",
+    intervalo_2: "Recreo II",
+    horario_sujeito: "Horario sujeto a cambios. Consulta el",
+    horario_versao: "para la versión oficial.",
+
+    mural_titulo_1: "Mural de",
+    mural_titulo_2: "Mensajes",
+    mural_sub: "Deja un mensaje para la clase",
+    busca_recados: "🔍 Buscar mensajes...",
+    recado_msg: "Tu mensaje...",
+    recado_link: "Enlace/adjunto opcional (https://...)",
+    expirar_em: "Expira en:",
+    dia_1: "1 Día",
+    dias_7: "7 Días",
+    dias_15: "15 Días",
+    publicar: "Publicar",
+
+    membros_titulo_1: "Miembros del",
+    membros_titulo_2: "Sistema",
+    membros_sub: "Miembros integrados al sistema",
+    busca_perfis: "🔍 Filtrar por nombre o matrícula...",
+
+    agenda_titulo_1: "Agenda de la",
+    agenda_titulo_2: "Clase",
+    agenda_sub: "Eventos de Septiembre a Diciembre de 2026",
+    matricula: "Matrícula:",
+    ultimo_acesso: "Último Acceso:",
+    nao_registrado: "No registrado",
+    trocar_foto: "Cambiar foto",
+    restaurar_suap: "Restaurar foto SUAP",
+    foto_hint: "JPG/PNG hasta 5MB — será optimizada.",
+    nome_exibicao: "Nombre para mostrar",
+    nome_placeholder: "Cómo quieres ser llamado",
+    bio: "Biografía",
+    bio_placeholder: "Cuenta un poco sobre ti...",
+    redes_sociais: "Redes sociales",
+    cancelar: "Cancelar",
+    salvar: "Guardar",
+    meta_individual: "Meta individual",
+    usar_meta_global: "Usar meta global",
+    notificacoes: "Notificaciones",
+    marcar_todas: "Marcar todas",
+    sem_notif: "Sin notificaciones.",
+    instalar_app: "Instalar app",
+
+    contagem_titulo_1: "Falta",
+    contagem_titulo_2: "poco!",
+    contagem_sub: "Próximos eventos importantes",
+    contagem_vazio: "Ningún evento próximo en los próximos 30 días.",
+    contagem_dias: "días",
+    contagem_horas: "horas",
+    contagem_min: "min",
+    contagem_seg: "seg",
+
+    mascote_avatar_titulo: "Tu mascota",
+    mascote_avatar_desc: "Personaliza la mascota que aparece cuando das cariño.",
+
+    sala_titulo: "Sala de Profesores",
+    sala_sub: "Vista general de la clase (acceso restringido)",
+    sala_tab_alunos: "Alumnos",
+    sala_tab_risco: "En Riesgo",
+    sala_tab_engajamento: "Compromiso",
+    sala_busca: "🔍 Buscar alumno por nombre o matrícula...",
+    sala_th_aluno: "Alumno",
+    sala_th_matricula: "Matrícula",
+    sala_th_media: "Promedio",
+    sala_th_faltas: "Faltas",
+    sala_th_carinhos: "Cariños",
+    sala_th_status: "Estado",
+    sala_carregando: "Cargando datos...",
+    sala_risco_carregando: "Cargando...",
+    sala_stat_carinhos: "Cariños totales",
+    sala_stat_recados: "Mensajes publicados",
+    sala_stat_alumnos: "Alumnos activos",
+    sala_stat_top: "Top contribuyente",
+
+    cal_provas: "Exámenes y evaluaciones",
+    cal_trabalhos: "Trabajos y listas",
+    cal_feriados: "Feriados y recesos",
+    cal_reunioes: "Reuniones y clases",
+    cal_esportes: "Deportes y juegos",
+    cal_festas: "Fiestas y eventos",
+    cal_outros: "Otros eventos",
   },
 };
 
@@ -374,7 +868,11 @@ function aplicarTraducoes() {
       btn.classList.toggle("ativo", btn.dataset.idioma === lang);
     });
 
-  document.title = t("titulo_pagina");
+  if (document.querySelector("[data-i18n='titulo_pagina_login']")) {
+    document.title = t("titulo_pagina_login");
+  } else {
+    document.title = t("titulo_pagina");
+  }
 }
 
 function trocarIdioma(novoIdioma) {
@@ -433,77 +931,91 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 1. Efeito de Digitação
   const textElement = document.getElementById("typing-text");
-  const words = ["Informática.", "Inovação.", "Tecnologia.", "Código."];
-  let wordIndex = 0;
-  let charIndex = 0;
-  let isDeleting = false;
+  if (textElement) {
+    const words = ["Informática.", "Inovação.", "Tecnologia.", "Código."];
+    let wordIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
 
-  function typeEffect() {
-    if (!textElement) return;
-    const currentWord = words[wordIndex];
-    if (isDeleting) {
-      textElement.textContent = currentWord.substring(0, charIndex - 1);
-      charIndex--;
-    } else {
-      textElement.textContent = currentWord.substring(0, charIndex + 1);
-      charIndex++;
+    function typeEffect() {
+      const currentWord = words[wordIndex];
+      if (isDeleting) {
+        textElement.textContent = currentWord.substring(0, charIndex - 1);
+        charIndex--;
+      } else {
+        textElement.textContent = currentWord.substring(0, charIndex + 1);
+        charIndex++;
+      }
+      let typeSpeed = isDeleting ? 40 : 100;
+      if (!isDeleting && charIndex === currentWord.length) {
+        typeSpeed = 2000;
+        isDeleting = true;
+      } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        wordIndex = (wordIndex + 1) % words.length;
+        typeSpeed = 500;
+      }
+      setTimeout(typeEffect, typeSpeed);
     }
-    let typeSpeed = isDeleting ? 40 : 100;
-    if (!isDeleting && charIndex === currentWord.length) {
-      typeSpeed = 2000;
-      isDeleting = true;
-    } else if (isDeleting && charIndex === 0) {
-      isDeleting = false;
-      wordIndex = (wordIndex + 1) % words.length;
-      typeSpeed = 500;
-    }
-    setTimeout(typeEffect, typeSpeed);
+    setTimeout(typeEffect, 500);
   }
-  setTimeout(typeEffect, 500);
 
   // 2. Scroll Reveal
   const reveals = document.querySelectorAll(".reveal");
-  const revealOnScroll = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("active");
-          revealOnScroll.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
-  );
-  reveals.forEach((reveal) => revealOnScroll.observe(reveal));
+  if (reveals.length > 0) {
+    const revealOnScroll = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("active");
+            revealOnScroll.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+    );
+    reveals.forEach((reveal) => revealOnScroll.observe(reveal));
+  }
 
-  // 3. Highlight Menu (menu lateral)
-    const sections = document.querySelectorAll("section");
-    const menuItems = document.querySelectorAll(".menu-lateral-nav .menu-item");
-    window.addEventListener("scroll", () => {
-    if (menuItems.length === 0) return;
-    let current = "";
-    sections.forEach((section) => {
-        const sectionTop = section.offsetTop;
-        if (pageYOffset >= sectionTop - 250) {
-        current = section.getAttribute("id");
-        }
-    });
-    menuItems.forEach((item) => {
-        item.classList.remove("active");
-        if (
-        item.getAttribute("href") &&
-        item.getAttribute("href").substring(1) === current
-        ) {
-        item.classList.add("active");
-        }
-    });
-    });
+  // 3. Highlight Menu Lateral
+  const sections = document.querySelectorAll("section");
+  const menuItems = document.querySelectorAll(".menu-lateral-nav .menu-item");
+  if (menuItems.length > 0) {
+    let ticking = false;
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          let current = "";
+          sections.forEach((section) => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 250) {
+              current = section.getAttribute("id");
+            }
+          });
+          menuItems.forEach((item) => {
+            item.classList.remove("active");
+            if (
+              item.getAttribute("href") &&
+              item.getAttribute("href").substring(1) === current
+            ) {
+              item.classList.add("active");
+            }
+          });
+          ticking = false;
+        });
+      },
+      { passive: true }
+    );
+  }
 
   // 4. Ano Dinâmico
   const spanAno = document.getElementById("ano");
   if (spanAno) spanAno.textContent = new Date().getFullYear();
 
-  // 5. Tema Claro/Escuro
+  // 5. Tema Claro/Escuro (toggle do sol/lua)
   const themeToggleBtn = document.getElementById("theme-toggle");
   if (themeToggleBtn) {
     const themeIcon = themeToggleBtn.querySelector("i");
@@ -560,13 +1072,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // 8. Botão Voltar ao Topo
   const backToTopBtn = document.getElementById("back-to-top");
   if (backToTopBtn) {
-    window.addEventListener("scroll", () => {
-      if (window.pageYOffset > 400) {
-        backToTopBtn.classList.add("show");
-      } else {
-        backToTopBtn.classList.remove("show");
-      }
-    });
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (window.pageYOffset > 400) {
+          backToTopBtn.classList.add("show");
+        } else {
+          backToTopBtn.classList.remove("show");
+        }
+      },
+      { passive: true }
+    );
   }
 
   // 9. Contadores
@@ -574,57 +1090,62 @@ document.addEventListener("DOMContentLoaded", () => {
   const statsSection = document.getElementById("estatisticas");
   let animated = false;
   if (statsSection && counters.length > 0) {
-    window.addEventListener("scroll", () => {
-      const sectionPos = statsSection.getBoundingClientRect().top;
-      const screenPos = window.innerHeight;
-      if (sectionPos < screenPos && !animated) {
-        counters.forEach((counter) => {
-          const updateCount = () => {
-            const target = +counter.getAttribute("data-target");
-            const count = +counter.innerText;
-            const speed = 50;
-            const inc = target / speed;
-            if (count < target) {
-              counter.innerText = Math.ceil(count + inc);
-              setTimeout(updateCount, 40);
-            } else {
-              counter.innerText = target + (target >= 300 ? "+" : "");
-            }
-          };
-          updateCount();
-        });
-        animated = true;
-      }
-    });
+    window.addEventListener(
+      "scroll",
+      () => {
+        const sectionPos = statsSection.getBoundingClientRect().top;
+        const screenPos = window.innerHeight;
+        if (sectionPos < screenPos && !animated) {
+          counters.forEach((counter) => {
+            const updateCount = () => {
+              const target = +counter.getAttribute("data-target");
+              const count = +counter.innerText.replace(/[^\d]/g, "");
+              const speed = 50;
+              const inc = target / speed;
+              if (count < target) {
+                counter.innerText = Math.ceil(count + inc);
+                setTimeout(updateCount, 40);
+              } else {
+                counter.innerText = target + (target >= 300 ? "+" : "");
+              }
+            };
+            updateCount();
+          });
+          animated = true;
+        }
+      },
+      { passive: true }
+    );
   }
 
-  // 10. Barra de Progresso (otimizada com transform)
-const scrollProgress = document.getElementById("scroll-progress");
-if (scrollProgress) {
-  let ticking = false;
-  window.addEventListener(
-    "scroll",
-    () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        const scrollable =
-          document.documentElement.scrollHeight - window.innerHeight;
-        const scrolled = window.scrollY;
-        const progress = scrollable > 0 ? scrolled / scrollable : 0;
-        scrollProgress.style.transform = `scaleX(${progress})`;
-        ticking = false;
-      });
-    },
-    { passive: true }
-  );
-}
+  // 10. Barra de Progresso (com transform)
+  const scrollProgress = document.getElementById("scroll-progress");
+  if (scrollProgress) {
+    let ticking = false;
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          const scrollable =
+            document.documentElement.scrollHeight - window.innerHeight;
+          const scrolled = window.scrollY;
+          const progress = scrollable > 0 ? scrolled / scrollable : 0;
+          scrollProgress.style.transform = `scaleX(${progress})`;
+          ticking = false;
+        });
+      },
+      { passive: true }
+    );
+  }
 
   // 11. Partículas
   function createParticles() {
     const container = document.getElementById("particles-container");
     if (!container) return;
-    const particleCount = 25;
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    const particleCount = isMobile ? 8 : 15;
     for (let i = 0; i < particleCount; i++) {
       const particle = document.createElement("div");
       particle.classList.add("particle");
@@ -635,6 +1156,7 @@ if (scrollProgress) {
       particle.style.top = `${Math.random() * 100 + 20}vh`;
       particle.style.animationDuration = `${Math.random() * 15 + 10}s`;
       particle.style.animationDelay = `${Math.random() * 5}s`;
+      particle.style.willChange = "transform";
       container.appendChild(particle);
     }
   }
@@ -645,6 +1167,8 @@ if (scrollProgress) {
     const cards = document.querySelectorAll(".tilt-element");
     if (window.matchMedia("(min-width: 850px)").matches) {
       cards.forEach((card) => {
+        if (card.dataset.tiltBound) return;
+        card.dataset.tiltBound = "1";
         card.addEventListener("mousemove", (e) => {
           const rect = card.getBoundingClientRect();
           const x = e.clientX - rect.left;
@@ -671,26 +1195,13 @@ if (scrollProgress) {
 
   // 13. Frase do Dia
   const frases = [
-    {
-      texto: "A melhor maneira de prever o futuro é criá-lo.",
-      autor: "Peter Drucker",
-    },
+    { texto: "A melhor maneira de prever o futuro é criá-lo.", autor: "Peter Drucker" },
     { texto: "Código é poesia.", autor: "WordPress" },
-    {
-      texto: "Primeiro resolva o problema. Depois, escreva o código.",
-      autor: "John Johnson",
-    },
+    { texto: "Primeiro resolva o problema. Depois, escreva o código.", autor: "John Johnson" },
     { texto: "A tecnologia move o mundo.", autor: "Steve Jobs" },
-    {
-      texto:
-        "Qualquer um pode escrever código que um computador entende. Bons programadores escrevem código que humanos entendem.",
-      autor: "Martin Fowler",
-    },
+    { texto: "Qualquer um pode escrever código que um computador entende. Bons programadores escrevem código que humanos entendem.", autor: "Martin Fowler" },
     { texto: "O segredo para progredir é começar.", autor: "Mark Twain" },
-    {
-      texto: "Não tenha medo de errar, tenha medo de não tentar.",
-      autor: "Desconhecido",
-    },
+    { texto: "Não tenha medo de errar, tenha medo de não tentar.", autor: "Desconhecido" },
   ];
 
   function exibirFraseAleatoria() {
@@ -785,27 +1296,27 @@ if (scrollProgress) {
   const menuLateralOverlay = document.getElementById("menu-lateral-overlay");
   const btnFecharMenu = document.getElementById("btn-fechar-menu");
 
- function abrirMenuLateral() {
+  function abrirMenuLateral() {
     menuLateral?.classList.add("aberto");
     menuLateralOverlay?.classList.add("aberto");
     menuLateral?.setAttribute("aria-hidden", "false");
     document.body.classList.add("menu-aberto");
-    // 🆕 dá blur pra remover foco fantasma do botão
     btnMenuLateral?.blur();
     setTimeout(() => btnFecharMenu?.focus(), 100);
-}
+  }
+
   function fecharMenuLateral() {
-  menuLateral?.classList.remove("aberto");
-  menuLateralOverlay?.classList.remove("aberto");
-  menuLateral?.setAttribute("aria-hidden", "true");
-  document.body.classList.remove("menu-aberto");
-  document.getElementById("submenu-idioma")?.classList.remove("aberto");
-  document.getElementById("submenu-tema")?.classList.remove("aberto");
-  document.getElementById("menu-btn-idioma")?.setAttribute("aria-expanded", "false");
-  document.getElementById("menu-btn-tema")?.setAttribute("aria-expanded", "false");
-  const btnMenuEl = document.getElementById("btn-menu");
-  if (btnMenuEl) btnMenuEl.blur();
-}
+    menuLateral?.classList.remove("aberto");
+    menuLateralOverlay?.classList.remove("aberto");
+    menuLateral?.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("menu-aberto");
+    document.getElementById("submenu-idioma")?.classList.remove("aberto");
+    document.getElementById("submenu-tema")?.classList.remove("aberto");
+    document.getElementById("menu-btn-idioma")?.setAttribute("aria-expanded", "false");
+    document.getElementById("menu-btn-tema")?.setAttribute("aria-expanded", "false");
+    const btnMenuEl = document.getElementById("btn-menu");
+    if (btnMenuEl) btnMenuEl.blur();
+  }
 
   btnMenuLateral?.addEventListener("click", abrirMenuLateral);
   btnFecharMenu?.addEventListener("click", fecharMenuLateral);
@@ -817,14 +1328,12 @@ if (scrollProgress) {
     }
   });
 
-    document.querySelectorAll(".menu-lateral-nav .menu-item").forEach((item) => {
+  document.querySelectorAll(".menu-lateral-nav .menu-item").forEach((item) => {
     item.addEventListener("click", () => {
-        // Fecha imediatamente, sem setTimeout (mais leve)
-        fecharMenuLateral();
+      fecharMenuLateral();
     });
-    });
+  });
 
-  // Submenus internos
   const btnSubmenuIdioma = document.getElementById("menu-btn-idioma");
   const submenuIdioma = document.getElementById("submenu-idioma");
   const btnSubmenuTema = document.getElementById("menu-btn-tema");

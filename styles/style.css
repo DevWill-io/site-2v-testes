@@ -1,8 +1,6 @@
 /* ==========================================
    🔇 REMOVE O FUNDO AZUL DE CLIQUE + CURSOR "|"
    ========================================== */
-
-/* Remove o highlight azul (mobile) */
 * {
     -webkit-tap-highlight-color: transparent;
 }
@@ -11,7 +9,6 @@ a, button, input, textarea, select, [role="button"], label {
     -webkit-tap-highlight-color: transparent;
 }
 
-/* Remove o contorno de foco padrão (mas mantém acessibilidade) */
 a:focus,
 button:focus,
 input:focus,
@@ -21,7 +18,6 @@ select:focus,
     outline: none;
 }
 
-/* Só mostra contorno quando navega por teclado (TAB) */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -32,17 +28,13 @@ select:focus-visible,
     outline-offset: 2px;
 }
 
-/* 🔇 Remove o cursor "|" de piscar em tudo que NÃO é texto */
 html, body {
     caret-color: transparent;
 }
-
-/* MAS permite o cursor de texto em campos de digitação */
 input, textarea, [contenteditable="true"] {
     caret-color: auto;
 }
 
-/* Remove seleção de texto ao clicar em botões/links (não seleciona "fantasma") */
 button, a, label, [role="button"],
 .navbar, .menu-lateral, .menu-item, .menu-acao-btn,
 .btn-theme, .btn-menu-hamburguer, .btn-fechar-menu {
@@ -50,7 +42,6 @@ button, a, label, [role="button"],
     -webkit-user-select: none;
 }
 
-/* Permite seleção de texto no conteúdo (parágrafos, etc) */
 p, h1, h2, h3, h4, h5, h6, span, li, .recado-mensagem, .projeto-card p {
     user-select: text;
     -webkit-user-select: text;
@@ -90,7 +81,6 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* 🎨 TEMAS DE COR */
 body.tema-roxo    { --tema-h: 265; --tema-s: 60%; --tema-l: 62%; }
 body.tema-azul    { --tema-h: 215; --tema-s: 85%; --tema-l: 55%; }
 body.tema-verde   { --tema-h: 155; --tema-s: 65%; --tema-l: 45%; }
@@ -102,7 +92,6 @@ body.tema-verde   { --text-muted: hsl(155, 25%, 70%); }
 body.tema-rosa    { --text-muted: hsl(330, 30%, 78%); }
 body.tema-laranja { --text-muted: hsl(25,  30%, 78%); }
 
-/* MODO CLARO */
 body.light-theme {
     --bg-base: #F8FAFC;
     --bg-surface: #EDF2F7;
@@ -156,7 +145,8 @@ a { text-decoration: none; color: inherit; }
     width: 90%;
     max-width: 1200px;
     background: rgba(25, 0, 75, 0.8);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--border-color);
     border-radius: 40px;
     z-index: 1000;
@@ -298,14 +288,14 @@ a { text-decoration: none; color: inherit; }
 .tema-swatch-laranja { background: linear-gradient(135deg, #fb923c, #ea580c); }
 
 /* ==========================================
-   MENU LATERAL — versão robusta
+   MENU LATERAL
    ========================================== */
 .menu-lateral-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -316,7 +306,6 @@ a { text-decoration: none; color: inherit; }
     visibility: visible;
 }
 
-/* Drawer base */
 .menu-lateral {
     position: fixed;
     top: 0;
@@ -334,12 +323,12 @@ a { text-decoration: none; color: inherit; }
     flex-direction: column;
     overflow-y: auto;
     overscroll-behavior: contain;
+    contain: layout style paint;
 }
 .menu-lateral.aberto {
     transform: translateX(0);
 }
 
-/* 🖥️ Desktop — um pouco mais largo */
 @media (min-width: 1101px) {
     .menu-lateral {
         width: 420px;
@@ -533,7 +522,6 @@ body.light-theme .menu-lateral-footer {
     transform: translateY(-3px);
 }
 
-/* Submenus internos */
 .menu-submenu {
     max-height: 0;
     overflow: hidden;
@@ -705,6 +693,7 @@ body.menu-aberto { overflow: hidden; }
     display: block;
     filter: drop-shadow(0 0 20px hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.6));
     animation: float 5s ease-in-out infinite;
+    will-change: transform;
 }
 
 @keyframes float {
@@ -873,13 +862,14 @@ footer p { color: var(--text-muted); font-size: 0.9rem; }
     .galeria-grid { grid-template-columns: 1fr; }
     .header-actions { gap: 2px; }
     .btn-menu-hamburguer { width: 40px; height: 40px; padding: 0; justify-content: center; border-radius: 50%; }
-    .navbar { padding: 10px 16px; }
+    .navbar { padding: 10px 16px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
     .logo { font-size: 1rem; }
+    .bg-glow { display: none; }
+    #particles-container { display: none; }
+    .curso-card, .stat-card, .contato-card, .projeto-card { box-shadow: 0 4px 12px var(--shadow); }
 }
 
-/* ==========================================
-   MODO CLARO — ajustes finos
-   ========================================== */
+/* MODO CLARO */
 body.light-theme .bg-glow {
     background: radial-gradient(circle, hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.12) 0%, rgba(248, 250, 252, 0) 70%);
 }
@@ -888,15 +878,12 @@ body.light-theme .navbar {
     border-color: var(--border-color);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
-
 body.light-theme .btn-primary { background-color: var(--accent); color: #FFFFFF; }
 body.light-theme .btn-primary:hover { background-color: var(--accent-strong); color: #FFFFFF; }
 body.light-theme .btn-outline { border-color: var(--accent); color: var(--accent); }
 body.light-theme .btn-outline:hover { background-color: var(--accent); color: #FFFFFF; }
-
 body.light-theme .btn-suap { border-color: var(--accent); color: var(--accent); }
 body.light-theme .btn-suap:hover { background-color: var(--accent); color: #FFFFFF; }
-
 body.light-theme .curso-card,
 body.light-theme .stat-card,
 body.light-theme .contato-card,
@@ -981,11 +968,13 @@ body.light-theme .frase-do-dia {
     position: fixed;
     top: 0;
     left: 0;
-    width: 0%;
+    width: 100%;
     height: 4px;
     background: var(--accent);
     z-index: 10000;
-    transition: width 0.1s ease-out;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.1s linear;
 }
 
 #particles-container {
@@ -1005,6 +994,9 @@ body.light-theme .frase-do-dia {
     border-radius: 50%;
     opacity: 0.2;
     animation: float-particle linear infinite;
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 @keyframes float-particle {
     0% { transform: translateY(0) scale(1); opacity: 0; }
@@ -1028,7 +1020,6 @@ body.light-theme .frase-do-dia {
 .frase-do-dia p { font-size: clamp(1rem, 2vw, 1.2rem); font-style: italic; margin-bottom: 5px; color: var(--text-main); }
 .frase-do-dia span { display: block; text-align: right; color: var(--text-muted); font-weight: 500; }
 
-/* Horários */
 .horarios { background-color: var(--bg-surface); }
 .table-responsive { overflow-x: auto; margin: 30px 0; border-radius: 16px; border: 1px solid var(--bg-card); }
 .tabela-horarios { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 800px; }
@@ -1040,7 +1031,6 @@ body.light-theme .frase-do-dia {
 .horario-legenda { text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-top: 20px; }
 .horario-legenda i { margin-right: 8px; }
 
-/* Galeria */
 .galeria { background-color: var(--bg-base); }
 .galeria-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); gap: 20px; }
 .galeria-item { overflow: hidden; border-radius: 16px; border: 2px solid var(--bg-surface); transition: transform 0.3s, border-color 0.3s; aspect-ratio: 4 / 3; }
@@ -1048,7 +1038,6 @@ body.light-theme .frase-do-dia {
 .galeria-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s; }
 .galeria-item:hover img { transform: scale(1.1); }
 
-/* Projetos */
 .projetos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 25px; }
 .projeto-card {
     background: var(--bg-surface);
@@ -1068,7 +1057,6 @@ body.light-theme .frase-do-dia {
 .projeto-link:hover { color: var(--accent); }
 .loading-projetos { grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted); }
 
-/* Recados (mural) */
 .lista-recados { display: flex; flex-direction: column; gap: 18px; }
 .recado-item { background: var(--bg-surface); padding: 20px; border-radius: 12px; border-left: 5px solid var(--accent); border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); transition: var(--transition); }
 .recado-item:hover { transform: translateX(5px); box-shadow: 0 6px 20px var(--shadow); }
@@ -1080,94 +1068,11 @@ body.light-theme .frase-do-dia {
 .btn-like:hover { color: var(--danger); transform: scale(1.1); }
 .sem-recados { text-align: center; padding: 40px; color: var(--text-muted); font-style: italic; }
 
-/* ==========================================
-   ⚡ OTIMIZAÇÕES DE PERFORMANCE
-   ========================================== */
-
-/* Reduz blur do navbar (12px → 8px) */
-.navbar {
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-
-/* Overlay do menu lateral SEM blur (era o maior vilão) */
-.menu-lateral-overlay {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: rgba(0, 0, 0, 0.7);
-}
-
-/* Força aceleração GPU em elementos animados */
-.hero-logo,
-.particle,
-.coracao-animado,
-.confete,
-.spinner {
-    will-change: transform;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-}
-
-/* Desativa animações pesadas quando não estão visíveis */
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    *, *::before, *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
-    }
-}
-
-/* Otimiza o menu lateral (evita repaint desnecessário) */
-.menu-lateral {
-    contain: layout style paint;
-}
-
-/* Reduz custo do blur em telas pequenas */
-@media (max-width: 768px) {
-    .navbar {
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
-    }
-}
-
-/* Desativa o bg-glow (radial-gradient gigante) em mobile — economiza muito */
-@media (max-width: 600px) {
-    .bg-glow {
-        display: none;
-    }
-}
-
-/* Reduz a quantidade de partículas no hero em telas pequenas */
-@media (max-width: 768px) {
-    #particles-container {
-        display: none;
-    }
-}
-
-/* Scroll progress: usa transform em vez de width (muito mais rápido) */
-#scroll-progress {
-    width: 100%;
-    transform: scaleX(0);
-    transform-origin: left center;
-    transition: transform 0.1s linear;
-}
-
-/* Reduz shadow pesada em cards quando em mobile */
-@media (max-width: 600px) {
-    .curso-card,
-    .stat-card,
-    .contato-card,
-    .projeto-card {
-        box-shadow: 0 4px 12px var(--shadow);
-    }
-}
-
-/* Smooth scroll só quando o usuário não tem preferência por redução de movimento */
-@media (prefers-reduced-motion: no-preference) {
-    html {
-        scroll-behavior: smooth;
     }
 }

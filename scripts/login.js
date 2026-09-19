@@ -9,10 +9,6 @@ var SCOPE = "identificacao email documentos_pessoais";
 // ==========================================
 // 🎨 HELPERS DE COR (Canvas precisa de hex/rgb clássico)
 // ==========================================
-/**
- * Converte qualquer cor CSS para HEX (#rrggbb).
- * Aceita: #rgb, #rrggbb, #rrggbbaa, rgb(), rgba(), hsl(), hsla() (clássico e moderno).
- */
 function corParaHex(cor, fallback) {
   fallback = fallback || "#8b5edd";
   if (!cor) return fallback;
@@ -84,11 +80,31 @@ function addStopSeguro(gradient, posicao, cor, fallback) {
 }
 
 // ==========================================
-// 🌐 i18n — DICIONÁRIO DE TRADUÇÕES
+// 🎭 AVATARES DO MASCOTE
 // ==========================================
-const TRADUCOES = {
+const AVATARES_MASCOTE = [
+  { id: "padrao", emoji: "🐾", nome: "Padrão" },
+  { id: "dev", emoji: "💻", nome: "Dev" },
+  { id: "ninja", emoji: "🥷", nome: "Ninja" },
+  { id: "mago", emoji: "🧙", nome: "Mago" },
+  { id: "astronauta", emoji: "🚀", nome: "Astronauta" },
+  { id: "pirata", emoji: "🏴‍☠️", nome: "Pirata" },
+  { id: "rei", emoji: "👑", nome: "Rei" },
+  { id: "dragao", emoji: "🐉", nome: "Dragão" },
+  { id: "gato", emoji: "😺", nome: "Gato" },
+  { id: "unicornio", emoji: "🦄", nome: "Unicórnio" },
+  { id: "alien", emoji: "👽", nome: "Alien" },
+  { id: "robo", emoji: "🤖", nome: "Robô" },
+];
+
+let avatarSelecionado = "padrao";
+
+// ==========================================
+// 📋 DICIONÁRIO DE TRADUÇÕES
+// ==========================================
+const TRADUCOES_LOGIN = {
   "pt-BR": {
-    titulo_pagina: "Login SUAP | Turma 2V IFRN",
+    titulo_pagina_login: "Login SUAP | Turma 2V IFRN",
     voltar: "Voltar",
     portal_suap: "Portal SUAP",
     area_auth: "Área de autenticação acadêmica",
@@ -100,6 +116,22 @@ const TRADUCOES = {
     editar_perfil: "Editar Perfil",
     editar_perfil_sub: "Personalize como você aparece para a turma.",
     encerrar_sessao: "Encerrar Sessão",
+    idioma: "Idioma",
+    tema: "Tema",
+    cor_tema: "Cor do tema",
+    modo: "Modo",
+    cor_roxo: "Roxo",
+    cor_azul: "Azul",
+    cor_verde: "Verde",
+    cor_rosa: "Rosa",
+    cor_laranja: "Laranja",
+    modo_claro: "Claro",
+    modo_escuro: "Escuro",
+    instalar_app: "Instalar app",
+    notificacoes: "Notificações",
+    marcar_todas: "Marcar todas",
+    sem_notif: "Sem notificações.",
+
     calc_titulo_1: "Calculadora de",
     calc_titulo_2: "Notas",
     calc_sub: "Boletim atualizado diretamente pelo SUAP",
@@ -136,6 +168,16 @@ const TRADUCOES = {
     evolucao_sub: "Sua média por período letivo",
     historico_titulo: "Histórico de Períodos",
     historico_vazio: "Carregue pelo menos 2 períodos para comparar.",
+
+    contagem_titulo_1: "Faltam",
+    contagem_titulo_2: "pouco!",
+    contagem_sub: "Próximos eventos importantes",
+    contagem_vazio: "Nenhum evento próximo nos próximos 30 dias.",
+    contagem_dias: "dias",
+    contagem_horas: "horas",
+    contagem_min: "min",
+    contagem_seg: "seg",
+
     horarios_titulo_1: "Quadro de",
     horarios_titulo_2: "Horários",
     horarios_sub: "Nossa rotina semanal",
@@ -149,6 +191,7 @@ const TRADUCOES = {
     intervalo_2: "II Intervalo",
     horario_sujeito: "Horário sujeito a alterações. Consulte o",
     horario_versao: "para a versão oficial.",
+
     mural_titulo_1: "Mural de",
     mural_titulo_2: "Recados",
     mural_sub: "Deixe um recado para a turma",
@@ -160,10 +203,12 @@ const TRADUCOES = {
     dias_7: "7 Dias",
     dias_15: "15 Dias",
     publicar: "Publicar",
+
     membros_titulo_1: "Membros do",
     membros_titulo_2: "Sistema",
     membros_sub: "Membros integrados ao sistema",
     busca_perfis: "🔍 Filtrar por nome ou matrícula...",
+
     agenda_titulo_1: "Agenda da",
     agenda_titulo_2: "Turma",
     agenda_sub: "Eventos de Setembro a Dezembro de 2026",
@@ -182,16 +227,28 @@ const TRADUCOES = {
     salvar: "Salvar",
     meta_individual: "Meta individual",
     usar_meta_global: "Usar meta global",
-    notificacoes: "Notificações",
-    marcar_todas: "Marcar todas",
-    sem_notif: "Sem notificações.",
-    footer_feito: "- Feito pela turma",
-    footer_carinho: "Com Carinho 💜",
-    instalar_app: "Instalar app",
-    idioma: "Idioma",
-    tema: "Tema",
-    carregando_periodos: "Carregando períodos...",
-    aguardando_dados: "Aguardando dados do SUAP...",
+    mascote_avatar_titulo: "Seu mascote",
+    mascote_avatar_desc: "Personalize o mascote que aparece quando você dá carinho.",
+
+    sala_titulo: "Sala dos Professores",
+    sala_sub: "Visão geral da turma (acesso restrito)",
+    sala_tab_alunos: "Alunos",
+    sala_tab_risco: "Em Risco",
+    sala_tab_engajamento: "Engajamento",
+    sala_busca: "🔍 Buscar aluno por nome ou matrícula...",
+    sala_th_aluno: "Aluno",
+    sala_th_matricula: "Matrícula",
+    sala_th_media: "Média",
+    sala_th_faltas: "Faltas",
+    sala_th_carinhos: "Carinhos",
+    sala_th_status: "Status",
+    sala_carregando: "Carregando dados...",
+    sala_risco_carregando: "Carregando...",
+    sala_stat_carinhos: "Carinhos totais",
+    sala_stat_recados: "Recados publicados",
+    sala_stat_alunos: "Alunos ativos",
+    sala_stat_top: "Top contribuinte",
+
     cal_provas: "Provas e avaliações",
     cal_trabalhos: "Trabalhos e listas",
     cal_feriados: "Feriados e recessos",
@@ -199,9 +256,12 @@ const TRADUCOES = {
     cal_esportes: "Esportes e jogos",
     cal_festas: "Festas e eventos",
     cal_outros: "Outros eventos",
+
+    footer_feito: "- Feito pela turma",
+    footer_carinho: "Com Carinho 💜",
   },
   en: {
-    titulo_pagina: "SUAP Login | Class 2V IFRN",
+    titulo_pagina_login: "SUAP Login | Class 2V IFRN",
     voltar: "Back",
     portal_suap: "SUAP Portal",
     area_auth: "Academic authentication area",
@@ -213,6 +273,22 @@ const TRADUCOES = {
     editar_perfil: "Edit Profile",
     editar_perfil_sub: "Customize how you appear to the class.",
     encerrar_sessao: "Log Out",
+    idioma: "Language",
+    tema: "Theme",
+    cor_tema: "Theme color",
+    modo: "Mode",
+    cor_roxo: "Purple",
+    cor_azul: "Blue",
+    cor_verde: "Green",
+    cor_rosa: "Pink",
+    cor_laranja: "Orange",
+    modo_claro: "Light",
+    modo_escuro: "Dark",
+    instalar_app: "Install app",
+    notificacoes: "Notifications",
+    marcar_todas: "Mark all",
+    sem_notif: "No notifications.",
+
     calc_titulo_1: "Grade",
     calc_titulo_2: "Calculator",
     calc_sub: "Report card updated directly from SUAP",
@@ -249,6 +325,16 @@ const TRADUCOES = {
     evolucao_sub: "Your average per academic term",
     historico_titulo: "Term History",
     historico_vazio: "Load at least 2 terms to compare.",
+
+    contagem_titulo_1: "Almost",
+    contagem_titulo_2: "there!",
+    contagem_sub: "Upcoming important events",
+    contagem_vazio: "No upcoming events in the next 30 days.",
+    contagem_dias: "days",
+    contagem_horas: "hours",
+    contagem_min: "min",
+    contagem_seg: "sec",
+
     horarios_titulo_1: "Weekly",
     horarios_titulo_2: "Schedule",
     horarios_sub: "Our weekly routine",
@@ -262,6 +348,7 @@ const TRADUCOES = {
     intervalo_2: "Break II",
     horario_sujeito: "Schedule subject to change. Check",
     horario_versao: "for the official version.",
+
     mural_titulo_1: "Message",
     mural_titulo_2: "Board",
     mural_sub: "Leave a message for the class",
@@ -273,14 +360,16 @@ const TRADUCOES = {
     dias_7: "7 Days",
     dias_15: "15 Days",
     publicar: "Post",
+
     membros_titulo_1: "System",
     membros_titulo_2: "Members",
     membros_sub: "Members integrated into the system",
-    busca_perfis: "🔍 Filter by name or enrollment...",
+    busca_perfis: "🔍 Filter by name or ID...",
+
     agenda_titulo_1: "Class",
     agenda_titulo_2: "Agenda",
     agenda_sub: "Events from September to December 2026",
-    matricula: "Enrollment:",
+    matricula: "ID:",
     ultimo_acesso: "Last Access:",
     nao_registrado: "Not registered",
     trocar_foto: "Change photo",
@@ -295,16 +384,28 @@ const TRADUCOES = {
     salvar: "Save",
     meta_individual: "Individual target",
     usar_meta_global: "Use global target",
-    notificacoes: "Notifications",
-    marcar_todas: "Mark all",
-    sem_notif: "No notifications.",
-    footer_feito: "- Made by class",
-    footer_carinho: "With love 💜",
-    instalar_app: "Install app",
-    idioma: "Language",
-    tema: "Theme",
-    carregando_periodos: "Loading terms...",
-    aguardando_dados: "Waiting for SUAP data...",
+    mascote_avatar_titulo: "Your mascot",
+    mascote_avatar_desc: "Customize the mascot that appears when you send a hug.",
+
+    sala_titulo: "Teachers' Room",
+    sala_sub: "Class overview (restricted access)",
+    sala_tab_alunos: "Students",
+    sala_tab_risco: "At Risk",
+    sala_tab_engajamento: "Engagement",
+    sala_busca: "🔍 Search student by name or ID...",
+    sala_th_aluno: "Student",
+    sala_th_matricula: "ID",
+    sala_th_media: "Average",
+    sala_th_faltas: "Absences",
+    sala_th_carinhos: "Hugs",
+    sala_th_status: "Status",
+    sala_carregando: "Loading data...",
+    sala_risco_carregando: "Loading...",
+    sala_stat_carinhos: "Total hugs",
+    sala_stat_recados: "Posts published",
+    sala_stat_alunos: "Active students",
+    sala_stat_top: "Top contributor",
+
     cal_provas: "Exams and quizzes",
     cal_trabalhos: "Assignments and lists",
     cal_feriados: "Holidays and breaks",
@@ -312,9 +413,12 @@ const TRADUCOES = {
     cal_esportes: "Sports and games",
     cal_festas: "Parties and events",
     cal_outros: "Other events",
+
+    footer_feito: "- Made by class",
+    footer_carinho: "With love 💜",
   },
   es: {
-    titulo_pagina: "Login SUAP | Clase 2V IFRN",
+    titulo_pagina_login: "Login SUAP | Clase 2V IFRN",
     voltar: "Volver",
     portal_suap: "Portal SUAP",
     area_auth: "Área de autenticación académica",
@@ -326,6 +430,22 @@ const TRADUCOES = {
     editar_perfil: "Editar Perfil",
     editar_perfil_sub: "Personaliza cómo apareces ante la clase.",
     encerrar_sessao: "Cerrar Sesión",
+    idioma: "Idioma",
+    tema: "Tema",
+    cor_tema: "Color del tema",
+    modo: "Modo",
+    cor_roxo: "Morado",
+    cor_azul: "Azul",
+    cor_verde: "Verde",
+    cor_rosa: "Rosa",
+    cor_laranja: "Naranja",
+    modo_claro: "Claro",
+    modo_escuro: "Oscuro",
+    instalar_app: "Instalar app",
+    notificacoes: "Notificaciones",
+    marcar_todas: "Marcar todas",
+    sem_notif: "Sin notificaciones.",
+
     calc_titulo_1: "Calculadora de",
     calc_titulo_2: "Notas",
     calc_sub: "Boletín actualizado directamente desde SUAP",
@@ -362,6 +482,16 @@ const TRADUCOES = {
     evolucao_sub: "Tu promedio por período lectivo",
     historico_titulo: "Historial de Períodos",
     historico_vazio: "Carga al menos 2 períodos para comparar.",
+
+    contagem_titulo_1: "Falta",
+    contagem_titulo_2: "poco!",
+    contagem_sub: "Próximos eventos importantes",
+    contagem_vazio: "Ningún evento próximo en los próximos 30 días.",
+    contagem_dias: "días",
+    contagem_horas: "horas",
+    contagem_min: "min",
+    contagem_seg: "seg",
+
     horarios_titulo_1: "Horario",
     horarios_titulo_2: "Semanal",
     horarios_sub: "Nuestra rutina semanal",
@@ -375,6 +505,7 @@ const TRADUCOES = {
     intervalo_2: "Recreo II",
     horario_sujeito: "Horario sujeto a cambios. Consulta el",
     horario_versao: "para la versión oficial.",
+
     mural_titulo_1: "Mural de",
     mural_titulo_2: "Mensajes",
     mural_sub: "Deja un mensaje para la clase",
@@ -386,10 +517,12 @@ const TRADUCOES = {
     dias_7: "7 Días",
     dias_15: "15 Días",
     publicar: "Publicar",
+
     membros_titulo_1: "Miembros del",
     membros_titulo_2: "Sistema",
     membros_sub: "Miembros integrados al sistema",
     busca_perfis: "🔍 Filtrar por nombre o matrícula...",
+
     agenda_titulo_1: "Agenda de la",
     agenda_titulo_2: "Clase",
     agenda_sub: "Eventos de Septiembre a Diciembre de 2026",
@@ -408,16 +541,28 @@ const TRADUCOES = {
     salvar: "Guardar",
     meta_individual: "Meta individual",
     usar_meta_global: "Usar meta global",
-    notificacoes: "Notificaciones",
-    marcar_todas: "Marcar todas",
-    sem_notif: "Sin notificaciones.",
-    footer_feito: "- Hecho por la clase",
-    footer_carinho: "Con cariño 💜",
-    instalar_app: "Instalar app",
-    idioma: "Idioma",
-    tema: "Tema",
-    carregando_periodos: "Cargando períodos...",
-    aguardando_dados: "Esperando datos del SUAP...",
+    mascote_avatar_titulo: "Tu mascota",
+    mascote_avatar_desc: "Personaliza la mascota que aparece cuando das cariño.",
+
+    sala_titulo: "Sala de Profesores",
+    sala_sub: "Vista general de la clase (acceso restringido)",
+    sala_tab_alunos: "Alumnos",
+    sala_tab_risco: "En Riesgo",
+    sala_tab_engajamento: "Compromiso",
+    sala_busca: "🔍 Buscar alumno por nombre o matrícula...",
+    sala_th_aluno: "Alumno",
+    sala_th_matricula: "Matrícula",
+    sala_th_media: "Promedio",
+    sala_th_faltas: "Faltas",
+    sala_th_carinhos: "Cariños",
+    sala_th_status: "Estado",
+    sala_carregando: "Cargando datos...",
+    sala_risco_carregando: "Cargando...",
+    sala_stat_carinhos: "Cariños totales",
+    sala_stat_recados: "Mensajes publicados",
+    sala_stat_alumnos: "Alumnos activos",
+    sala_stat_top: "Top contribuyente",
+
     cal_provas: "Exámenes y evaluaciones",
     cal_trabalhos: "Trabajos y listas",
     cal_feriados: "Feriados y recesos",
@@ -425,6 +570,9 @@ const TRADUCOES = {
     cal_esportes: "Deportes y juegos",
     cal_festas: "Fiestas y eventos",
     cal_outros: "Otros eventos",
+
+    footer_feito: "- Hecho por la clase",
+    footer_carinho: "Con cariño 💜",
   },
 };
 
@@ -443,8 +591,8 @@ function obterIdiomaAtual() {
 function t(chave) {
   var lang = obterIdiomaAtual();
   return (
-    (TRADUCOES[lang] && TRADUCOES[lang][chave]) ||
-    TRADUCOES[IDIOMA_PADRAO][chave] ||
+    (TRADUCOES_LOGIN[lang] && TRADUCOES_LOGIN[lang][chave]) ||
+    TRADUCOES_LOGIN[IDIOMA_PADRAO][chave] ||
     chave
   );
 }
@@ -477,9 +625,7 @@ function aplicarTraducoes() {
       btn.classList.toggle("ativo", btn.dataset.idioma === lang);
     });
 
-  document.title = t("titulo_pagina");
-  if (typeof renderizarLegendaCalendario === "function")
-    renderizarLegendaCalendario();
+  document.title = t("titulo_pagina_login");
 }
 
 function trocarIdioma(novoIdioma) {
@@ -491,7 +637,7 @@ function trocarIdioma(novoIdioma) {
 }
 
 // ==========================================
-// 🎨 TEMAS DE COR
+// 🎨 TEMAS
 // ==========================================
 const TEMAS_DISPONIVEIS = ["roxo", "azul", "verde", "rosa", "laranja"];
 const TEMA_PADRAO = "roxo";
@@ -521,9 +667,11 @@ function aplicarTema(novoTema) {
     meta.setAttribute("content", cores[novoTema] || "#8b5edd");
   }
 
-  document.querySelectorAll("#menu-tema .dropdown-item").forEach(function (btn) {
-    btn.classList.toggle("ativo", btn.dataset.tema === novoTema);
-  });
+  document
+    .querySelectorAll("#menu-tema .dropdown-item")
+    .forEach(function (btn) {
+      btn.classList.toggle("ativo", btn.dataset.tema === novoTema);
+    });
 
   if (typeof desenharGraficoEvolucao === "function") {
     setTimeout(desenharGraficoEvolucao, 60);
@@ -546,17 +694,13 @@ window.addEventListener("appinstalled", function () {
   __deferredPrompt = null;
   var btn = document.getElementById("btn-instalar-app");
   if (btn) btn.classList.add("is-hidden");
-  if (typeof exibirToast === "function")
-    exibirToast("App instalado! 🎉", "sucesso");
+  if (typeof exibirToast === "function") exibirToast("App instalado! 🎉", "sucesso");
 });
 
 function instalarPWA() {
   if (!__deferredPrompt) {
     if (typeof exibirToast === "function") {
-      exibirToast(
-        "Para instalar, use o menu do navegador > 'Adicionar à tela inicial'.",
-        "info"
-      );
+      exibirToast("Para instalar, use o menu do navegador > 'Adicionar à tela inicial'.", "info");
     }
     return;
   }
@@ -587,39 +731,18 @@ if ("serviceWorker" in navigator) {
 // ==========================================
 const REGRAS_CORES_CALENDARIO = [
   { regex: /prova|avalia|exame|teste/i, cor: "#ff4757", textoKey: "cal_provas" },
-  {
-    regex: /trabalho|projeto|entrega|lista|seminario|seminário/i,
-    cor: "#f59e0b",
-    textoKey: "cal_trabalhos",
-  },
-  {
-    regex: /feriado|recesso|f[eé]rias|ponto facultativo/i,
-    cor: "#10b981",
-    textoKey: "cal_feriados",
-  },
-  {
-    regex: /reuni[aã]o|aula|encontro|palestra/i,
-    cor: "#7c3aed",
-    textoKey: "cal_reunioes",
-  },
-  {
-    regex: /jogo|esporte|campeonato|torneio/i,
-    cor: "#06b6d4",
-    textoKey: "cal_esportes",
-  },
-  {
-    regex: /festa|evento|apresenta|show/i,
-    cor: "#ec4899",
-    textoKey: "cal_festas",
-  },
+  { regex: /trabalho|projeto|entrega|lista|seminario|seminário/i, cor: "#f59e0b", textoKey: "cal_trabalhos" },
+  { regex: /feriado|recesso|f[eé]rias|ponto facultativo/i, cor: "#10b981", textoKey: "cal_feriados" },
+  { regex: /reuni[aã]o|aula|encontro|palestra/i, cor: "#7c3aed", textoKey: "cal_reunioes" },
+  { regex: /jogo|esporte|campeonato|torneio/i, cor: "#06b6d4", textoKey: "cal_esportes" },
+  { regex: /festa|evento|apresenta|show/i, cor: "#ec4899", textoKey: "cal_festas" },
 ];
 const COR_PADRAO_CALENDARIO = { cor: "#8b5edd", textoKey: "cal_outros" };
 
 function corDoEvento(titulo) {
   var t2 = String(titulo || "").toLowerCase();
   for (var i = 0; i < REGRAS_CORES_CALENDARIO.length; i++) {
-    if (REGRAS_CORES_CALENDARIO[i].regex.test(t2))
-      return REGRAS_CORES_CALENDARIO[i].cor;
+    if (REGRAS_CORES_CALENDARIO[i].regex.test(t2)) return REGRAS_CORES_CALENDARIO[i].cor;
   }
   return COR_PADRAO_CALENDARIO.cor;
 }
@@ -664,6 +787,8 @@ const recadosRef = ref(db, "mural_recados");
 const perfisRef = ref(db, "perfis_alunos");
 
 const MATRICULAS_ADMIN = ["20261101110002"];
+const ADMIN_MATRICULAS_SALA = MATRICULAS_ADMIN;
+let __salaDadosCarregados = false;
 
 window.usuarioLogado = { nome: "", matricula: "", foto: "", fotoOriginal: "" };
 let bancoDeRecados = [];
@@ -698,8 +823,7 @@ function exibirToast(mensagem, tipo = "info") {
     document.body.appendChild(toastContainer);
   }
   const toast = document.createElement("div");
-  const corBg =
-    tipo === "erro" ? "#ff4757" : tipo === "sucesso" ? "#2ed573" : "#2f3542";
+  const corBg = tipo === "erro" ? "#ff4757" : tipo === "sucesso" ? "#2ed573" : "#2f3542";
   toast.style.cssText = `background:${corBg};color:#fff;padding:12px 20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-size:0.9em;pointer-events:auto;opacity:0;transform:translateY(20px);transition:all 0.3s ease;font-family:sans-serif;`;
   toast.textContent = mensagem;
   toastContainer.appendChild(toast);
@@ -763,27 +887,20 @@ if (themeToggle) {
   const themeIcon = themeToggle.querySelector("i");
   let currentTheme = localStorage.getItem("theme");
   if (!currentTheme)
-    currentTheme = window.matchMedia("(prefers-color-scheme: light)").matches
-      ? "light"
-      : "dark";
+    currentTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
   if (currentTheme === "light") {
     document.body.classList.add("light-theme");
     if (themeIcon) themeIcon.classList.replace("fa-moon", "fa-sun");
   }
   themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("light-theme");
-    let theme = document.body.classList.contains("light-theme")
-      ? "light"
-      : "dark";
+    let theme = document.body.classList.contains("light-theme") ? "light" : "dark";
     if (themeIcon) {
       if (theme === "light") themeIcon.classList.replace("fa-moon", "fa-sun");
       else themeIcon.classList.replace("fa-sun", "fa-moon");
     }
     localStorage.setItem("theme", theme);
-    if (
-      window.__graficoEvolucao &&
-      typeof desenharGraficoEvolucao === "function"
-    )
+    if (window.__graficoEvolucao && typeof desenharGraficoEvolucao === "function")
       desenharGraficoEvolucao();
   });
 }
@@ -798,18 +915,13 @@ onValue(recadosRef, (snapshot) => {
     const recado = childSnapshot.val();
     const id = childSnapshot.key;
     const timestampCriacao = recado.timestamp || agora;
-    const duracaoHoras =
-      recado.duracao_horas ||
-      (recado.duracao_dias ? recado.duracao_dias * 24 : 7 * 24);
+    const duracaoHoras = recado.duracao_horas || (recado.duracao_dias ? recado.duracao_dias * 24 : 7 * 24);
     const tempoDeVidaMs = duracaoHoras * 60 * 60 * 1000;
-    if (agora - timestampCriacao > tempoDeVidaMs)
-      remove(ref(db, "mural_recados/" + id));
-    else
-      bancoDeRecados.push({ id, ...recado, timestampCriacao, duracaoHoras });
+    if (agora - timestampCriacao > tempoDeVidaMs) remove(ref(db, "mural_recados/" + id));
+    else bancoDeRecados.push({ id, ...recado, timestampCriacao, duracaoHoras });
   });
   window.renderizarMural();
-  if (typeof gerarNotificacoesRecados === "function")
-    gerarNotificacoesRecados();
+  if (typeof gerarNotificacoesRecados === "function") gerarNotificacoesRecados();
 });
 
 onValue(perfisRef, (snapshot) => {
@@ -868,9 +980,7 @@ if (formRecado) {
         const contador = document.getElementById("contador-caracteres");
         if (contador) contador.textContent = "0";
       })
-      .catch((err) =>
-        exibirToast("Erro ao enviar recado: " + err.message, "erro")
-      );
+      .catch((err) => exibirToast("Erro ao enviar recado: " + err.message, "erro"));
   });
 }
 
@@ -921,9 +1031,7 @@ window.abrirModalPerfil = function (identificador) {
   const bioEl = document.getElementById("modal-perfil-bio");
   const redesEl = document.getElementById("modal-perfil-redes");
   const nomeExibir = perfil.nomeCompleto || perfil.nome || "Não informado";
-  const fotoExibir =
-    perfil.foto ||
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random`;
+  const fotoExibir = perfil.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random`;
   if (imgEl) imgEl.src = fotoExibir;
   if (nomeEl) nomeEl.textContent = nomeExibir;
   if (matEl) matEl.textContent = perfil.matricula || perfil.id || "Não informada";
@@ -944,10 +1052,7 @@ window.abrirModalPerfil = function (identificador) {
     const links = montarLinksRedes(perfil.redes);
     if (links.length > 0) {
       redesEl.innerHTML = links
-        .map(
-          (l) =>
-            `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}" class="modal-rede-link"><i class="${l.icone}"></i></a>`
-        )
+        .map((l) => `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}" class="modal-rede-link"><i class="${l.icone}"></i></a>`)
         .join("");
       redesEl.classList.remove("is-hidden");
     } else {
@@ -974,92 +1079,60 @@ window.renderizarMural = function () {
     return msg.includes(filtroRecadoTexto) || autor.includes(filtroRecadoTexto);
   });
   if (recadosFiltrados.length === 0) {
-    lista.innerHTML =
-      '<p class="sem-recados" style="text-align:center;opacity:0.7;padding:15px;">Nenhum recado encontrado.</p>';
+    lista.innerHTML = '<p class="sem-recados" style="text-align:center;opacity:0.7;padding:15px;">Nenhum recado encontrado.</p>';
     return;
   }
   const recadosReversos = [...recadosFiltrados].reverse();
   const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
   recadosReversos.forEach((recado) => {
-    const jaCurtiu =
-      recado.likes && recado.likes.includes(window.usuarioLogado.matricula);
-    const iconeCoracao = jaCurtiu
-      ? "fa-solid fa-heart"
-      : "fa-regular fa-heart";
+    const jaCurtiu = recado.likes && recado.likes.includes(window.usuarioLogado.matricula);
+    const iconeCoracao = jaCurtiu ? "fa-solid fa-heart" : "fa-regular fa-heart";
     const corCoracao = jaCurtiu ? "color: #ff4757;" : "";
     const totalLikes = recado.likes ? recado.likes.length : 0;
-    const textoExpiracao = calcularTempoRestante(
-      recado.timestampCriacao,
-      recado.duracaoHoras
-    );
+    const textoExpiracao = calcularTempoRestante(recado.timestampCriacao, recado.duracaoHoras);
     const ehAutor = recado.autor_matricula === window.usuarioLogado.matricula;
-    const btnExcluir =
-      ehAutor || ehAdmin
-        ? `<button type="button" class="btn-like" style="color: #ff4757;" onclick="excluirRecado('${recado.id}')"><i class="fa-solid fa-trash"></i></button>`
-        : "";
-    const btnEditar =
-      ehAutor || ehAdmin
-        ? `<button type="button" class="btn-like" style="color: #eccc68;" onclick="editarRecado('${recado.id}')"><i class="fa-solid fa-pen"></i></button>`
-        : "";
+    const btnExcluir = ehAutor || ehAdmin
+      ? `<button type="button" class="btn-like" style="color: #ff4757;" onclick="excluirRecado('${recado.id}')"><i class="fa-solid fa-trash"></i></button>`
+      : "";
+    const btnEditar = ehAutor || ehAdmin
+      ? `<button type="button" class="btn-like" style="color: #eccc68;" onclick="editarRecado('${recado.id}')"><i class="fa-solid fa-pen"></i></button>`
+      : "";
     const mensagemComLinks = converterLinks(escaparHTML(recado.mensagem));
     const nomeSeguro = escaparHTML(nomeParaExibicao(recado.autor_nome));
-    const tagEditado = recado.editado
-      ? ' <small style="opacity:0.6;font-style:italic;">(editado)</small>'
-      : "";
+    const tagEditado = recado.editado ? ' <small style="opacity:0.6;font-style:italic;">(editado)</small>' : "";
     const anexoHTML = recado.link_anexo
       ? `<div class="recado-anexo" style="margin-top:8px;"><a href="${recado.link_anexo}" target="_blank" rel="noopener noreferrer" style="font-size:0.85em;color:#70a1ff;text-decoration:underline;"><i class="fa-solid fa-paperclip"></i> Ver anexo</a></div>`
       : "";
     const comentariosObj = recado.comentarios || {};
-    const listaComentarios = Object.keys(comentariosObj).map((cId) => ({
-      cId,
-      ...comentariosObj[cId],
-    }));
+    const listaComentarios = Object.keys(comentariosObj).map((cId) => ({ cId, ...comentariosObj[cId] }));
     const totalComentarios = listaComentarios.length;
     let htmlComentarios = "";
     listaComentarios.forEach((com) => {
-      const ehAutorCom =
-        com.autor_matricula === window.usuarioLogado.matricula;
-      const btnDelCom =
-        ehAutorCom || ehAdmin
-          ? `<button type="button" style="background:none;border:none;color:#ff4757;cursor:pointer;font-size:0.8em;" onclick="excluirComentario('${recado.id}','${com.cId}')"><i class="fa-solid fa-xmark"></i></button>`
-          : "";
-      htmlComentarios += `<div class="comentario-item" style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.05);padding:6px 10px;border-radius:6px;margin-top:5px;font-size:0.85em;"><div style="flex:1;"><strong>${escaparHTML(
-        com.autor_nome
-      )}:</strong> ${converterLinks(
-        escaparHTML(com.texto)
-      )}</div>${btnDelCom}</div>`;
+      const ehAutorCom = com.autor_matricula === window.usuarioLogado.matricula;
+      const btnDelCom = ehAutorCom || ehAdmin
+        ? `<button type="button" style="background:none;border:none;color:#ff4757;cursor:pointer;font-size:0.8em;" onclick="excluirComentario('${recado.id}','${com.cId}')"><i class="fa-solid fa-xmark"></i></button>`
+        : "";
+      htmlComentarios += `<div class="comentario-item" style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.05);padding:6px 10px;border-radius:6px;margin-top:5px;font-size:0.85em;"><div style="flex:1;"><strong>${escaparHTML(com.autor_nome)}:</strong> ${converterLinks(escaparHTML(com.texto))}</div>${btnDelCom}</div>`;
     });
     const div = document.createElement("div");
     div.className = "recado-item";
     div.innerHTML = `
       <div class="recado-header">
         <span class="recado-nome">${nomeSeguro}</span>
-        <span class="recado-data" title="${textoExpiracao}"><i class="fa-regular fa-clock" style="font-size:0.85em;margin-right:3px;"></i>${
-          recado.data
-        }${tagEditado} • <small style="opacity:0.8;">${textoExpiracao}</small></span>
+        <span class="recado-data" title="${textoExpiracao}"><i class="fa-regular fa-clock" style="font-size:0.85em;margin-right:3px;"></i>${recado.data}${tagEditado} • <small style="opacity:0.8;">${textoExpiracao}</small></span>
       </div>
       <p class="recado-mensagem">${mensagemComLinks}</p>
       ${anexoHTML}
       <div class="recado-acoes" style="margin-top:10px;display:flex;gap:8px;align-items:center;">
         ${btnEditar}${btnExcluir}
-        <button type="button" class="btn-like" style="${corCoracao}" onclick="curtirRecado('${
-      recado.id
-    }')"><i class="${iconeCoracao}"></i> ${totalLikes}</button>
-        <button type="button" class="btn-like" onclick="alternarComentarios('${
-          recado.id
-        }')" title="Comentários"><i class="fa-regular fa-comment"></i> ${totalComentarios}</button>
+        <button type="button" class="btn-like" style="${corCoracao}" onclick="curtirRecado('${recado.id}')"><i class="${iconeCoracao}"></i> ${totalLikes}</button>
+        <button type="button" class="btn-like" onclick="alternarComentarios('${recado.id}')" title="Comentários"><i class="fa-regular fa-comment"></i> ${totalComentarios}</button>
       </div>
-      <div id="box-comentarios-${
-        recado.id
-      }" class="box-comentarios" style="display:none;margin-top:12px;border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;">
+      <div id="box-comentarios-${recado.id}" class="box-comentarios" style="display:none;margin-top:12px;border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;">
         <div id="lista-comentarios-${recado.id}">${htmlComentarios}</div>
         <div style="display:flex;gap:5px;margin-top:8px;">
-          <input type="text" id="input-comentario-${
-            recado.id
-          }" placeholder="Escreva um comentário..." style="flex:1;padding:6px 10px;border-radius:4px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:inherit;font-size:0.85em;" />
-          <button type="button" onclick="adicionarComentario('${
-            recado.id
-          }')" style="padding:6px 12px;border-radius:4px;border:none;background:#70a1ff;color:white;cursor:pointer;font-size:0.85em;">Enviar</button>
+          <input type="text" id="input-comentario-${recado.id}" placeholder="Escreva um comentário..." style="flex:1;padding:6px 10px;border-radius:4px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:inherit;font-size:0.85em;" />
+          <button type="button" onclick="adicionarComentario('${recado.id}')" style="padding:6px 12px;border-radius:4px;border:none;background:#70a1ff;color:white;cursor:pointer;font-size:0.85em;">Enviar</button>
         </div>
       </div>
     `;
@@ -1094,10 +1167,7 @@ window.adicionarComentario = function (recadoId) {
 };
 
 window.excluirComentario = function (recadoId, comentarioId) {
-  const itemRef = ref(
-    db,
-    `mural_recados/${recadoId}/comentarios/${comentarioId}`
-  );
+  const itemRef = ref(db, `mural_recados/${recadoId}/comentarios/${comentarioId}`);
   get(itemRef).then((snapshot) => {
     const com = snapshot.val();
     if (com) {
@@ -1108,9 +1178,7 @@ window.excluirComentario = function (recadoId, comentarioId) {
         return;
       }
       if (confirm("Excluir este comentário?"))
-        remove(itemRef).then(() =>
-          exibirToast("Comentário removido.", "sucesso")
-        );
+        remove(itemRef).then(() => exibirToast("Comentário removido.", "sucesso"));
     }
   });
 };
@@ -1127,8 +1195,7 @@ window.renderizarPerfis = function () {
     return nome.includes(filtro) || mat.includes(filtro);
   });
   const contadorEl = document.getElementById("contador-membros");
-  if (contadorEl)
-    contadorEl.textContent = `${bancoDePerfis.length} membro(s) cadastrado(s)`;
+  if (contadorEl) contadorEl.textContent = `${bancoDePerfis.length} membro(s) cadastrado(s)`;
   if (perfisFiltrados.length === 0) {
     container.innerHTML = `<p class="sem-perfis" style="text-align:center;opacity:0.7;padding:20px;grid-column:1/-1;">${
       bancoDePerfis.length === 0
@@ -1144,22 +1211,8 @@ window.renderizarPerfis = function () {
     card.setAttribute("onclick", `abrirModalPerfil('${identificador}')`);
     card.style.cursor = "pointer";
     const nomeExibir = perfil.nomeCompleto || perfil.nome || "Usuário sem nome";
-    const fotoFinal =
-      perfil.foto ||
-      `https://ui-avatars.com/api/?name=${encodeURIComponent(
-        nomeExibir
-      )}&background=random`;
-    card.innerHTML = `<div class="perfil-avatar"><img src="${escaparHTML(
-      fotoFinal
-    )}" alt="${escaparHTML(
-      nomeExibir
-    )}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(
-      nomeExibir
-    )}&background=random'" /></div><div class="perfil-info"><h4 class="perfil-nome">${escaparHTML(
-      nomeExibir
-    )}</h4><span class="perfil-matricula">${escaparHTML(
-      matriculaParaExibicao(perfil.matricula || perfil.id)
-    )}</span></div>`;
+    const fotoFinal = perfil.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random`;
+    card.innerHTML = `<div class="perfil-avatar"><img src="${escaparHTML(fotoFinal)}" alt="${escaparHTML(nomeExibir)}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random'" /></div><div class="perfil-info"><h4 class="perfil-nome">${escaparHTML(nomeExibir)}</h4><span class="perfil-matricula">${escaparHTML(matriculaParaExibicao(perfil.matricula || perfil.id))}</span></div>`;
     container.appendChild(card);
   });
 };
@@ -1175,31 +1228,16 @@ window.editarRecado = function (id) {
         exibirToast("Sem permissão.", "erro");
         return;
       }
-      const textoAtual = recado.mensagem
-        .replace(/&amp;/g, "&")
-        .replace(/&lt;/g, "<")
-        .replace(/&gt;/g, ">")
-        .replace(/&quot;/g, '"')
-        .replace(/&#039;/g, "'");
+      const textoAtual = recado.mensagem.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#039;/g, "'");
       const novaMensagem = prompt("1/2 - Edite a sua mensagem:", textoAtual);
       if (novaMensagem !== null && novaMensagem.trim() !== "") {
-        const horasAtuais =
-          recado.duracao_horas ||
-          (recado.duracao_dias ? recado.duracao_dias * 24 : 168);
-        const tempoAtualStr =
-          horasAtuais % 24 === 0 ? horasAtuais / 24 + "d" : horasAtuais + "h";
-        const novosDiasInput = prompt(
-          "2/2 - Duração (ex: 5h, 12h, 2d, 15d)",
-          tempoAtualStr
-        );
+        const horasAtuais = recado.duracao_horas || (recado.duracao_dias ? recado.duracao_dias * 24 : 168);
+        const tempoAtualStr = horasAtuais % 24 === 0 ? horasAtuais / 24 + "d" : horasAtuais + "h";
+        const novosDiasInput = prompt("2/2 - Duração (ex: 5h, 12h, 2d, 15d)", tempoAtualStr);
         let novasHoras = horasAtuais;
         if (novosDiasInput !== null && novosDiasInput.trim() !== "")
           novasHoras = parseDuracaoParaHoras(novosDiasInput);
-        update(itemRef, {
-          mensagem: escaparHTML(novaMensagem.trim()),
-          duracao_horas: novasHoras,
-          editado: true,
-        })
+        update(itemRef, { mensagem: escaparHTML(novaMensagem.trim()), duracao_horas: novasHoras, editado: true })
           .then(() => exibirToast("Recado atualizado!", "sucesso"))
           .catch((err) => exibirToast("Erro: " + err.message, "erro"));
       }
@@ -1244,15 +1282,11 @@ window.excluirRecado = function (id) {
 window.forceLogout = function () {
   if (typeof suap !== "undefined") suap.logout();
   document.cookie = "suapToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  document.cookie =
-    "suapToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/login;";
-  document.cookie =
-    "suapToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=" +
-    window.location.hostname +
-    "; path=/;";
+  document.cookie = "suapToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/login;";
+  document.cookie = "suapToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=" + window.location.hostname + "; path=/;";
+  localStorage.removeItem("suapToken");
   localStorage.removeItem("matricula_suap");
   document.cookie = "matricula=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  localStorage.removeItem("suapToken");
   sessionStorage.clear();
   window.location.replace(window.location.origin + "/login.html");
 };
@@ -1265,41 +1299,17 @@ const MAX_FOTO_BYTES = 500 * 1024;
 let perfilUsuarioAtual = null;
 
 function limparArroba(valor) {
-  return String(valor || "")
-    .trim()
-    .replace(/^@+/, "")
-    .replace(/\s+/g, "");
+  return String(valor || "").trim().replace(/^@+/, "").replace(/\s+/g, "");
 }
 
 function montarLinksRedes(redes) {
   if (!redes) return [];
   const links = [];
-  if (redes.tiktok)
-    links.push({
-      url: `https://tiktok.com/@${limparArroba(redes.tiktok)}`,
-      icone: "fa-brands fa-tiktok",
-      titulo: "TikTok",
-    });
-  if (redes.instagram)
-    links.push({
-      url: `https://instagram.com/${limparArroba(redes.instagram)}`,
-      icone: "fa-brands fa-instagram",
-      titulo: "Instagram",
-    });
-  if (redes.github)
-    links.push({
-      url: `https://github.com/${limparArroba(redes.github)}`,
-      icone: "fa-brands fa-github",
-      titulo: "GitHub",
-    });
-  if (redes.email)
-    links.push({
-      url: `mailto:${redes.email}`,
-      icone: "fa-solid fa-envelope",
-      titulo: "Email",
-    });
-  if (redes.site)
-    links.push({ url: redes.site, icone: "fa-solid fa-globe", titulo: "Site" });
+  if (redes.tiktok) links.push({ url: `https://tiktok.com/@${limparArroba(redes.tiktok)}`, icone: "fa-brands fa-tiktok", titulo: "TikTok" });
+  if (redes.instagram) links.push({ url: `https://instagram.com/${limparArroba(redes.instagram)}`, icone: "fa-brands fa-instagram", titulo: "Instagram" });
+  if (redes.github) links.push({ url: `https://github.com/${limparArroba(redes.github)}`, icone: "fa-brands fa-github", titulo: "GitHub" });
+  if (redes.email) links.push({ url: `mailto:${redes.email}`, icone: "fa-solid fa-envelope", titulo: "Email" });
+  if (redes.site) links.push({ url: redes.site, icone: "fa-solid fa-globe", titulo: "Site" });
   return links;
 }
 
@@ -1329,11 +1339,7 @@ function comprimirImagem(file, maxLado = 500, qualidade = 0.82) {
         let qualidadeAtual = qualidade;
         let dataUrl = canvas.toDataURL("image/jpeg", qualidadeAtual);
         let tentativas = 0;
-        while (
-          dataUrl.length * 0.75 > MAX_FOTO_BYTES &&
-          tentativas < 5 &&
-          qualidadeAtual > 0.4
-        ) {
+        while (dataUrl.length * 0.75 > MAX_FOTO_BYTES && tentativas < 5 && qualidadeAtual > 0.4) {
           qualidadeAtual -= 0.12;
           dataUrl = canvas.toDataURL("image/jpeg", qualidadeAtual);
           tentativas++;
@@ -1350,10 +1356,7 @@ function comprimirImagem(file, maxLado = 500, qualidade = 0.82) {
 
 function salvarPerfilLocal(matricula, perfil) {
   try {
-    localStorage.setItem(
-      CHAVE_STORAGE_PERFIL + matricula,
-      JSON.stringify(perfil)
-    );
+    localStorage.setItem(CHAVE_STORAGE_PERFIL + matricula, JSON.stringify(perfil));
   } catch (e) {
     console.warn("Falha ao salvar no localStorage:", e);
   }
@@ -1376,9 +1379,7 @@ window.aplicarPerfilNoCard = function (perfil) {
   const bioEl = document.getElementById("user-bio");
   const redesEl = document.getElementById("user-redes");
   if (fotoEl && perfil.foto) fotoEl.src = perfil.foto;
-  if (nomeEl)
-    nomeEl.textContent =
-      perfil.nomeCompleto || perfil.nome || window.usuarioLogado.nome || "Usuário";
+  if (nomeEl) nomeEl.textContent = perfil.nomeCompleto || perfil.nome || window.usuarioLogado.nome || "Usuário";
   if (bioEl) {
     if (perfil.bio) {
       bioEl.textContent = perfil.bio;
@@ -1391,14 +1392,16 @@ window.aplicarPerfilNoCard = function (perfil) {
   if (redesEl) {
     const links = montarLinksRedes(perfil.redes);
     redesEl.innerHTML = links
-      .map(
-        (l) =>
-          `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}"><i class="${l.icone}"></i></a>`
-      )
+      .map((l) => `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}"><i class="${l.icone}"></i></a>`)
       .join("");
   }
   if (perfil.foto) window.usuarioLogado.foto = perfil.foto;
   if (perfil.nome) window.usuarioLogado.nome = perfil.nome;
+  if (perfil.mascoteAvatar) {
+    try {
+      localStorage.setItem("mascote_avatar", perfil.mascoteAvatar);
+    } catch (e) {}
+  }
   const btn = document.getElementById("btn-editar-perfil");
   const label = document.getElementById("btn-editar-perfil-label");
   if (btn && label) {
@@ -1418,15 +1421,14 @@ window.carregarPerfilUsuario = function (matricula) {
       if (!dados) return local;
       const perfilFinal = {
         nome: dados.nome || (local && local.nome) || window.usuarioLogado.nome,
-        nomeCompleto:
-          dados.nomeCompleto || (local && local.nomeCompleto) || "",
+        nomeCompleto: dados.nomeCompleto || (local && local.nomeCompleto) || "",
         matricula: dados.matricula || matricula,
         foto: dados.foto || (local && local.foto) || window.usuarioLogado.foto,
         bio: dados.bio || (local && local.bio) || "",
         redes: dados.redes || (local && local.redes) || {},
-        perfilEditadoEm:
-          dados.perfilEditadoEm || (local && local.perfilEditadoEm) || 0,
+        perfilEditadoEm: dados.perfilEditadoEm || (local && local.perfilEditadoEm) || 0,
         ultimoAcesso: dados.ultimoAcesso || Date.now(),
+        mascoteAvatar: dados.mascoteAvatar || (local && local.mascoteAvatar) || "padrao",
       };
       window.aplicarPerfilNoCard(perfilFinal);
       salvarPerfilLocal(matricula, perfilFinal);
@@ -1438,6 +1440,36 @@ window.carregarPerfilUsuario = function (matricula) {
     });
 };
 
+// ==========================================
+// 🎭 SELETOR DE AVATAR DO MASCOTE
+// ==========================================
+function renderizarSeletorAvatar() {
+  const grid = document.getElementById("avatar-mascote-grid");
+  if (!grid) return;
+
+  grid.innerHTML = AVATARES_MASCOTE.map((av) => {
+    const ativo = av.id === avatarSelecionado;
+    return `
+      <button
+        type="button"
+        class="avatar-mascote-opcao ${ativo ? "ativo" : ""}"
+        data-avatar="${av.id}"
+        title="${av.nome}"
+      >
+        ${av.emoji}
+      </button>`;
+  }).join("");
+
+  grid.querySelectorAll(".avatar-mascote-opcao").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      avatarSelecionado = btn.dataset.avatar;
+      grid.querySelectorAll(".avatar-mascote-opcao").forEach((b) => {
+        b.classList.toggle("ativo", b.dataset.avatar === avatarSelecionado);
+      });
+    });
+  });
+}
+
 window.abrirModalEditarPerfil = function () {
   if (!perfilUsuarioAtual) {
     exibirToast("Perfil ainda não carregado.", "erro");
@@ -1448,23 +1480,14 @@ window.abrirModalEditarPerfil = function () {
   const inputFoto = document.getElementById("edit-foto-input");
   document.getElementById("edit-nome").value = perfilUsuarioAtual.nome || "";
   document.getElementById("edit-bio").value = perfilUsuarioAtual.bio || "";
-  document.getElementById("edit-bio-count").textContent = (
-    perfilUsuarioAtual.bio || ""
-  ).length;
+  document.getElementById("edit-bio-count").textContent = (perfilUsuarioAtual.bio || "").length;
   const redes = perfilUsuarioAtual.redes || {};
-  document.getElementById("edit-tiktok").value = redes.tiktok
-    ? "@" + limparArroba(redes.tiktok)
-    : "";
-  document.getElementById("edit-instagram").value = redes.instagram
-    ? "@" + limparArroba(redes.instagram)
-    : "";
-  document.getElementById("edit-github").value = redes.github
-    ? "@" + limparArroba(redes.github)
-    : "";
+  document.getElementById("edit-tiktok").value = redes.tiktok ? "@" + limparArroba(redes.tiktok) : "";
+  document.getElementById("edit-instagram").value = redes.instagram ? "@" + limparArroba(redes.instagram) : "";
+  document.getElementById("edit-github").value = redes.github ? "@" + limparArroba(redes.github) : "";
   document.getElementById("edit-email").value = redes.email || "";
   document.getElementById("edit-site").value = redes.site || "";
-  document.getElementById("edit-avatar-preview").src =
-    perfilUsuarioAtual.foto || "";
+  document.getElementById("edit-avatar-preview").src = perfilUsuarioAtual.foto || "";
   if (inputFoto) {
     inputFoto.value = "";
     delete inputFoto.dataset.novaFoto;
@@ -1473,9 +1496,7 @@ window.abrirModalEditarPerfil = function () {
   }
   if (bloqueioEl) bloqueioEl.classList.add("is-hidden");
   if (btnSalvar) btnSalvar.disabled = false;
-  document
-    .querySelectorAll("#form-editar-perfil input, #form-editar-perfil textarea")
-    .forEach((el) => (el.disabled = false));
+  document.querySelectorAll("#form-editar-perfil input, #form-editar-perfil textarea").forEach((el) => (el.disabled = false));
   const btnRestaurar = document.getElementById("btn-restaurar-foto");
   if (btnRestaurar) btnRestaurar.disabled = false;
   const btnUpload = document.querySelector(".btn-upload");
@@ -1483,6 +1504,10 @@ window.abrirModalEditarPerfil = function () {
     btnUpload.style.pointerEvents = "auto";
     btnUpload.style.opacity = "1";
   }
+
+  avatarSelecionado = perfilUsuarioAtual.mascoteAvatar || "padrao";
+  renderizarSeletorAvatar();
+
   document.getElementById("modal-editar-perfil")?.classList.remove("is-hidden");
 };
 
@@ -1492,8 +1517,7 @@ window.fecharModalEditarPerfil = function () {
 
 function inicializarModalEditarPerfil() {
   const btnEditar = document.getElementById("btn-editar-perfil");
-  if (btnEditar)
-    btnEditar.addEventListener("click", window.abrirModalEditarPerfil);
+  if (btnEditar) btnEditar.addEventListener("click", window.abrirModalEditarPerfil);
   const inputFoto = document.getElementById("edit-foto-input");
   if (inputFoto) {
     inputFoto.addEventListener("change", async (e) => {
@@ -1516,8 +1540,7 @@ function inicializarModalEditarPerfil() {
   const btnRestaurar = document.getElementById("btn-restaurar-foto");
   if (btnRestaurar) {
     btnRestaurar.addEventListener("click", () => {
-      const fotoOriginal =
-        window.usuarioLogado.fotoOriginal || window.usuarioLogado.foto;
+      const fotoOriginal = window.usuarioLogado.fotoOriginal || window.usuarioLogado.foto;
       document.getElementById("edit-avatar-preview").src = fotoOriginal;
       if (inputFoto) {
         delete inputFoto.dataset.novaFoto;
@@ -1565,11 +1588,7 @@ async function salvarPerfilEditado() {
     exibirToast("Informe um nome.", "erro");
     return;
   }
-  const bio = document
-    .getElementById("edit-bio")
-    .value.replace(/[\r\n]+/g, " ")
-    .trim()
-    .slice(0, 160);
+  const bio = document.getElementById("edit-bio").value.replace(/[\r\n]+/g, " ").trim().slice(0, 160);
   const redes = {
     tiktok: limparArroba(document.getElementById("edit-tiktok").value),
     instagram: limparArroba(document.getElementById("edit-instagram").value),
@@ -1595,16 +1614,22 @@ async function salvarPerfilEditado() {
     redes,
     perfilEditadoEm: agora,
     ultimoAcesso: agora,
+    mascoteAvatar: avatarSelecionado,
   };
   const btnSalvar = document.getElementById("btn-salvar-perfil");
   const textoOriginal = btnSalvar.innerHTML;
   btnSalvar.disabled = true;
-  btnSalvar.innerHTML =
-    '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+  btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
   try {
     await update(ref(db, "perfis_alunos/" + matricula), perfilAtualizado);
     salvarPerfilLocal(matricula, perfilAtualizado);
     window.aplicarPerfilNoCard(perfilAtualizado);
+    try {
+      await update(ref(db, "mascote/avatares/" + matricula), { avatar: avatarSelecionado });
+      localStorage.setItem("mascote_avatar", avatarSelecionado);
+    } catch (e) {
+      console.warn("[mascote avatar] Erro:", e);
+    }
     exibirToast("Perfil atualizado!", "sucesso");
     window.fecharModalEditarPerfil();
   } catch (err) {
@@ -1641,19 +1666,13 @@ function atualizarStatusNotas(mensagem, tipo) {
     sucesso: "fa-circle-check",
     erro: "fa-circle-exclamation",
   };
-  status.className =
-    "notas-status" +
-    (variante === "loading" ? " loading" : variante === "info" ? "" : " " + variante);
-  status.innerHTML = `<i class="fa-solid ${
-    icones[variante] || icones.info
-  }"></i> <span>${escaparHTML(mensagem)}</span>`;
+  status.className = "notas-status" + (variante === "loading" ? " loading" : variante === "info" ? "" : " " + variante);
+  status.innerHTML = `<i class="fa-solid ${icones[variante] || icones.info}"></i> <span>${escaparHTML(mensagem)}</span>`;
 }
 
 function obterEtapasDaDisciplina(disciplina) {
-  if (disciplina.segundo_semestre === true)
-    return { tipo: "Semestral", etapas: [3, 4] };
-  if (disciplina.segundo_semestre === false)
-    return { tipo: "Semestral", etapas: [1, 2] };
+  if (disciplina.segundo_semestre === true) return { tipo: "Semestral", etapas: [3, 4] };
+  if (disciplina.segundo_semestre === false) return { tipo: "Semestral", etapas: [1, 2] };
   var tem12 = [1, 2].some(function (n) {
     var e = disciplina["nota_etapa_" + n];
     return formatarNota(e && typeof e === "object" ? e.nota : e) !== null;
@@ -1684,8 +1703,7 @@ var __metasDisciplinas = {};
 var __gruposColapsados = { Semestral: false, Anual: false };
 var __historicoPeriodos = [];
 
-const MATRICULA_STORAGE_KEY = () =>
-  "metas_disc_" + (window.usuarioLogado.matricula || "anon");
+const MATRICULA_STORAGE_KEY = () => "metas_disc_" + (window.usuarioLogado.matricula || "anon");
 const LIMITE_FALTAS_PCT = 0.25;
 const LIMITE_FALTAS_ALERTA = 0.2;
 const CARGA_HORARIA_PADRAO = 60;
@@ -1695,9 +1713,7 @@ function getCodigoDisc(d) {
 }
 function metaEfetiva(d) {
   var cod = getCodigoDisc(d);
-  return __metasDisciplinas[cod] != null
-    ? __metasDisciplinas[cod]
-    : __metaAtual;
+  return __metasDisciplinas[cod] != null ? __metasDisciplinas[cod] : __metaAtual;
 }
 function classificarStatusNota(media, faltas, meta) {
   var limite = CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT;
@@ -1752,8 +1768,7 @@ function calcularProjecaoDisciplina(notasPreenchidas, totalEtapas, soma, meta) {
   var faltantes = totalEtapas - notasPreenchidas;
   if (faltantes <= 0) {
     var mediaFinal = notasPreenchidas ? soma / notasPreenchidas : null;
-    if (mediaFinal === null)
-      return { texto: "Sem notas", classe: "projecao-alerta" };
+    if (mediaFinal === null) return { texto: "Sem notas", classe: "projecao-alerta" };
     return mediaFinal >= meta
       ? { texto: "Meta atingida", classe: "projecao-ok" }
       : { texto: "Abaixo da meta", classe: "projecao-ruim" };
@@ -1793,16 +1808,11 @@ function salvarMetasDisciplinas() {
   var mat = window.usuarioLogado.matricula;
   if (!mat) return Promise.resolve();
   try {
-    localStorage.setItem(
-      MATRICULA_STORAGE_KEY(),
-      JSON.stringify(__metasDisciplinas)
-    );
+    localStorage.setItem(MATRICULA_STORAGE_KEY(), JSON.stringify(__metasDisciplinas));
   } catch (e) {}
-  return update(ref(db, "metas_disciplinas/" + mat), __metasDisciplinas).catch(
-    function (err) {
-      console.warn("[metas] save:", err);
-    }
-  );
+  return update(ref(db, "metas_disciplinas/" + mat), __metasDisciplinas).catch(function (err) {
+    console.warn("[metas] save:", err);
+  });
 }
 
 function ordenarDisciplinas(lista) {
@@ -1817,16 +1827,8 @@ function ordenarDisciplinas(lista) {
       return __sortDir === "asc" ? va.localeCompare(vb) : vb.localeCompare(va);
     }
     if (__sortKey === "media") {
-      va = calcularMediaSimples(
-        a,
-        obterEtapasDaDisciplina(a).etapas,
-        __simulacoes[getCodigoDisc(a)]
-      ).media;
-      vb = calcularMediaSimples(
-        b,
-        obterEtapasDaDisciplina(b).etapas,
-        __simulacoes[getCodigoDisc(b)]
-      ).media;
+      va = calcularMediaSimples(a, obterEtapasDaDisciplina(a).etapas, __simulacoes[getCodigoDisc(a)]).media;
+      vb = calcularMediaSimples(b, obterEtapasDaDisciplina(b).etapas, __simulacoes[getCodigoDisc(b)]).media;
       va = va === null ? -1 : va;
       vb = vb === null ? -1 : vb;
     } else if (__sortKey === "faltas") {
@@ -1834,16 +1836,8 @@ function ordenarDisciplinas(lista) {
       vb = Number(b.numero_faltas) || 0;
     } else if (__sortKey === "status") {
       var ordem = { reprovado: 0, recuperacao: 1, aprovado: 2 };
-      var ma = calcularMediaSimples(
-        a,
-        obterEtapasDaDisciplina(a).etapas,
-        __simulacoes[getCodigoDisc(a)]
-      ).media;
-      var mb = calcularMediaSimples(
-        b,
-        obterEtapasDaDisciplina(b).etapas,
-        __simulacoes[getCodigoDisc(b)]
-      ).media;
+      var ma = calcularMediaSimples(a, obterEtapasDaDisciplina(a).etapas, __simulacoes[getCodigoDisc(a)]).media;
+      var mb = calcularMediaSimples(b, obterEtapasDaDisciplina(b).etapas, __simulacoes[getCodigoDisc(b)]).media;
       va = ordem[classificarStatusNota(ma, Number(a.numero_faltas) || 0, meta)];
       vb = ordem[classificarStatusNota(mb, Number(b.numero_faltas) || 0, meta)];
     }
@@ -1860,13 +1854,10 @@ function aplicarSort(key) {
     __sortKey = key;
     __sortDir = key === "media" ? "desc" : "asc";
   }
-  document
-    .querySelectorAll(".tabela-notas thead th.sortable")
-    .forEach(function (th) {
-      th.classList.remove("sort-asc", "sort-desc");
-      if (th.dataset.sort === __sortKey)
-        th.classList.add(__sortDir === "asc" ? "sort-asc" : "sort-desc");
-    });
+  document.querySelectorAll(".tabela-notas thead th.sortable").forEach(function (th) {
+    th.classList.remove("sort-asc", "sort-desc");
+    if (th.dataset.sort === __sortKey) th.classList.add(__sortDir === "asc" ? "sort-asc" : "sort-desc");
+  });
   if (__notasCache.length) renderizarNotas(__notasCache);
 }
 
@@ -1894,8 +1885,7 @@ function atualizarResumoNotas(disciplinas) {
     if (st !== "aprovado") emRisco++;
   });
   var mediaGeral = contMedias ? somaMedias / contMedias : null;
-  if (elMedia)
-    elMedia.textContent = mediaGeral !== null ? mediaGeral.toFixed(1) : "—";
+  if (elMedia) elMedia.textContent = mediaGeral !== null ? mediaGeral.toFixed(1) : "—";
   if (elDisc) elDisc.textContent = total || "—";
   if (elRisco) elRisco.textContent = emRisco;
   if (elFaltas) elFaltas.textContent = faltasTotais;
@@ -1912,22 +1902,11 @@ function alertaDeFaltas(disciplinas) {
     var faltas = Number(d.numero_faltas) || 0;
     if (faltas >= limiteReprov && faltas > alertaMax) {
       alertaMax = faltas;
-      discCritica = {
-        nome: d.disciplina || d.codigo_diario,
-        faltas,
-        nivel: "danger",
-      };
-    } else if (
-      faltas >= limiteAlerta &&
-      (!discCritica || discCritica.nivel !== "danger")
-    ) {
+      discCritica = { nome: d.disciplina || d.codigo_diario, faltas, nivel: "danger" };
+    } else if (faltas >= limiteAlerta && (!discCritica || discCritica.nivel !== "danger")) {
       if (faltas > alertaMax) {
         alertaMax = faltas;
-        discCritica = {
-          nome: d.disciplina || d.codigo_diario,
-          faltas,
-          nivel: "warn",
-        };
+        discCritica = { nome: d.disciplina || d.codigo_diario, faltas, nivel: "warn" };
       }
     }
   });
@@ -1938,14 +1917,8 @@ function alertaDeFaltas(disciplinas) {
   banner.className = "alerta-faltas " + discCritica.nivel;
   banner.innerHTML =
     discCritica.nivel === "danger"
-      ? `<i class="fa-solid fa-triangle-exclamation"></i><span><strong>Atenção!</strong> ${
-          discCritica.faltas
-        } faltas em <em>${escaparHTML(
-          discCritica.nome
-        )}</em> — próximo do limite (${limiteReprov}).</span>`
-      : `<i class="fa-solid fa-circle-exclamation"></i><span><strong>Cuidado:</strong> ${
-          discCritica.faltas
-        } faltas em <em>${escaparHTML(discCritica.nome)}</em>.</span>`;
+      ? `<i class="fa-solid fa-triangle-exclamation"></i><span><strong>Atenção!</strong> ${discCritica.faltas} faltas em <em>${escaparHTML(discCritica.nome)}</em> — próximo do limite (${limiteReprov}).</span>`
+      : `<i class="fa-solid fa-circle-exclamation"></i><span><strong>Cuidado:</strong> ${discCritica.faltas} faltas em <em>${escaparHTML(discCritica.nome)}</em>.</span>`;
   var refEl = panel.querySelector(".notas-controls");
   if (refEl) panel.insertBefore(banner, refEl);
   else panel.insertBefore(banner, panel.firstChild);
@@ -1967,12 +1940,7 @@ function atualizarHistoricoComDisciplinas(disciplinas, periodoLabel, ano) {
   var idx = __historicoPeriodos.findIndex(function (h) {
     return h.periodo === periodoLabel;
   });
-  var entry = {
-    periodo: periodoLabel,
-    media,
-    disciplinas: disciplinas.length,
-    ano,
-  };
+  var entry = { periodo: periodoLabel, media, disciplinas: disciplinas.length, ano };
   if (idx >= 0) __historicoPeriodos[idx] = entry;
   else __historicoPeriodos.push(entry);
   __historicoPeriodos.sort(function (a, b) {
@@ -1988,9 +1956,7 @@ function renderizarHistorico() {
   var container = document.getElementById("historico-content");
   if (!container) return;
   if (__historicoPeriodos.length < 1) {
-    container.innerHTML = `<p class="historico-vazio">${escaparHTML(
-      t("historico_vazio")
-    )}</p>`;
+    container.innerHTML = `<p class="historico-vazio">${escaparHTML(t("historico_vazio"))}</p>`;
     return;
   }
   var cronologico = __historicoPeriodos.slice().sort(function (a, b) {
@@ -2010,24 +1976,11 @@ function renderizarHistorico() {
       var diff = mapa[h.periodo];
       var trendHTML = "";
       if (diff !== null && diff !== undefined) {
-        if (diff > 0.3)
-          trendHTML = `<span class="periodo-trend up"><i class="fa-solid fa-arrow-up"></i> +${diff.toFixed(
-            1
-          )}</span>`;
-        else if (diff < -0.3)
-          trendHTML = `<span class="periodo-trend down"><i class="fa-solid fa-arrow-down"></i> ${diff.toFixed(
-            1
-          )}</span>`;
-        else
-          trendHTML = `<span class="periodo-trend eq"><i class="fa-solid fa-minus"></i> estável</span>`;
+        if (diff > 0.3) trendHTML = `<span class="periodo-trend up"><i class="fa-solid fa-arrow-up"></i> +${diff.toFixed(1)}</span>`;
+        else if (diff < -0.3) trendHTML = `<span class="periodo-trend down"><i class="fa-solid fa-arrow-down"></i> ${diff.toFixed(1)}</span>`;
+        else trendHTML = `<span class="periodo-trend eq"><i class="fa-solid fa-minus"></i> estável</span>`;
       }
-      return `<div class="historico-card"><span class="periodo-label">${escaparHTML(
-        h.periodo
-      )}</span><span class="periodo-media">${
-        h.media !== null ? h.media.toFixed(1) : "—"
-      }</span><span class="periodo-info">${
-        h.disciplinas
-      } disciplina(s)</span>${trendHTML}</div>`;
+      return `<div class="historico-card"><span class="periodo-label">${escaparHTML(h.periodo)}</span><span class="periodo-media">${h.media !== null ? h.media.toFixed(1) : "—"}</span><span class="periodo-info">${h.disciplinas} disciplina(s)</span>${trendHTML}</div>`;
     })
     .join("");
 }
@@ -2041,13 +1994,9 @@ function desenharGraficoEvolucao() {
   var canvas = document.getElementById("grafico-evolucao");
   var panel = document.getElementById("evolucao-panel");
 
-  if (!canvas || !panel) {
-    console.warn("[evolução] canvas ou panel não encontrados");
-    return;
-  }
+  if (!canvas || !panel) return;
 
   if (typeof Chart === "undefined") {
-    console.warn("[evolução] Chart.js não carregado");
     panel.classList.add("is-hidden");
     return;
   }
@@ -2055,8 +2004,6 @@ function desenharGraficoEvolucao() {
   var comMedia = (__historicoPeriodos || []).filter(function (h) {
     return h && h.media !== null && h.media !== undefined;
   });
-
-  console.log("[evolução] Períodos com média:", comMedia.length);
 
   if (comMedia.length === 0) {
     panel.classList.add("is-hidden");
@@ -2082,30 +2029,16 @@ function desenharGraficoEvolucao() {
     window.__graficoEvolucao = null;
   }
 
-  // 🎨 Normaliza as cores para HEX (Canvas não aceita hsl moderno)
   var estilo = getComputedStyle(document.body);
-  var corAccent = corParaHex(
-    estilo.getPropertyValue("--accent-strong").trim(),
-    "#8b5edd"
-  );
-  var corAccent2 = corParaHex(
-    estilo.getPropertyValue("--accent").trim(),
-    "#cebdec"
-  );
-  var corTexto = corParaHex(
-    estilo.getPropertyValue("--text-muted").trim(),
-    "#b8a8d9"
-  );
+  var corAccent = corParaHex(estilo.getPropertyValue("--accent-strong").trim(), "#8b5edd");
+  var corAccent2 = corParaHex(estilo.getPropertyValue("--accent").trim(), "#cebdec");
+  var corTexto = corParaHex(estilo.getPropertyValue("--text-muted").trim(), "#b8a8d9");
   var corGrade = estilo.getPropertyValue("--border-color").trim() || "rgba(206,189,236,0.18)";
-  var corMeta = corParaHex(
-    estilo.getPropertyValue("--warning").trim(),
-    "#f59e0b"
-  );
+  var corMeta = corParaHex(estilo.getPropertyValue("--warning").trim(), "#f59e0b");
 
   var ctx = canvas.getContext("2d");
   var gradient = ctx.createLinearGradient(0, 0, 0, 260);
 
-  // Usa hex + alpha concatenado (seguro)
   addStopSeguro(gradient, 0, corAccent + "cc", "rgba(139,94,221,0.8)");
   addStopSeguro(gradient, 1, corAccent + "08", "rgba(139,94,221,0.03)");
 
@@ -2171,24 +2104,16 @@ function desenharGraficoEvolucao() {
           y: {
             beginAtZero: true,
             max: 100,
-            ticks: {
-              color: corTexto,
-              font: { family: "Inter", size: 11 },
-              stepSize: 20,
-            },
+            ticks: { color: corTexto, font: { family: "Inter", size: 11 }, stepSize: 20 },
             grid: { color: corGrade, drawBorder: false },
           },
           x: {
-            ticks: {
-              color: corTexto,
-              font: { family: "Inter", size: 11, weight: "600" },
-            },
+            ticks: { color: corTexto, font: { family: "Inter", size: 11, weight: "600" } },
             grid: { display: false },
           },
         },
       },
     });
-    console.log("[evolução] Gráfico renderizado com", labels.length, "períodos");
   } catch (err) {
     console.error("[evolução] Erro ao criar gráfico:", err);
     panel.classList.add("is-hidden");
@@ -2206,9 +2131,7 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   __metaAtual = meta;
 
   if (apenasLinhaCodigo && __notasCache.length) {
-    var tr = corpo.querySelector(
-      `tr[data-codigo="${CSS.escape(apenasLinhaCodigo)}"]`
-    );
+    var tr = corpo.querySelector(`tr[data-codigo="${CSS.escape(apenasLinhaCodigo)}"]`);
     if (tr) {
       var d = __notasCache.find(function (x) {
         return getCodigoDisc(x) === apenasLinhaCodigo;
@@ -2225,8 +2148,7 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   corpo.innerHTML = "";
 
   if (!__notasCache.length) {
-    corpo.innerHTML =
-      '<tr><td colspan="8" class="notas-vazia"><i class="fa-solid fa-inbox"></i><span>Nenhuma disciplina neste período.</span></td></tr>';
+    corpo.innerHTML = '<tr><td colspan="8" class="notas-vazia"><i class="fa-solid fa-inbox"></i><span>Nenhuma disciplina neste período.</span></td></tr>';
     atualizarResumoNotas([]);
     return;
   }
@@ -2242,8 +2164,7 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   });
 
   if (!visiveis.length) {
-    corpo.innerHTML =
-      '<tr><td colspan="8" class="notas-vazia"><i class="fa-solid fa-filter-circle-xmark"></i><span>Nenhuma disciplina neste filtro.</span></td></tr>';
+    corpo.innerHTML = '<tr><td colspan="8" class="notas-vazia"><i class="fa-solid fa-filter-circle-xmark"></i><span>Nenhuma disciplina neste filtro.</span></td></tr>';
     atualizarResumoNotas(__notasCache);
     return;
   }
@@ -2259,28 +2180,19 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   ["Semestral", "Anual"].forEach(function (tipo) {
     if (!grupos[tipo].length) return;
     var linhaGrupo = document.createElement("tr");
-    linhaGrupo.className =
-      "notas-grupo" + (__gruposColapsados[tipo] ? " colapsado" : "");
+    linhaGrupo.className = "notas-grupo" + (__gruposColapsados[tipo] ? " colapsado" : "");
     linhaGrupo.dataset.grupo = tipo;
-    linhaGrupo.innerHTML = `<th colspan="8">${
-      tipo === "Semestral" ? "Matérias Semestrais" : "Matérias Anuais"
-    }<span class="grupo-contador">${
-      grupos[tipo].length
-    } disciplina(s)</span></th>`;
+    linhaGrupo.innerHTML = `<th colspan="8">${tipo === "Semestral" ? "Matérias Semestrais" : "Matérias Anuais"}<span class="grupo-contador">${grupos[tipo].length} disciplina(s)</span></th>`;
     linhaGrupo.addEventListener("click", function () {
       __gruposColapsados[tipo] = !__gruposColapsados[tipo];
       linhaGrupo.classList.toggle("colapsado", __gruposColapsados[tipo]);
-      document
-        .querySelectorAll(`tr[data-grupo-linha="${tipo}"]`)
-        .forEach(function (tr) {
-          tr.style.display = __gruposColapsados[tipo] ? "none" : "";
-        });
+      document.querySelectorAll(`tr[data-grupo-linha="${tipo}"]`).forEach(function (tr) {
+        tr.style.display = __gruposColapsados[tipo] ? "none" : "";
+      });
     });
     corpo.appendChild(linhaGrupo);
     grupos[tipo].forEach(function (item) {
-      corpo.appendChild(
-        criarLinhaNota(item.disciplina, item.etapas, tipo, meta)
-      );
+      corpo.appendChild(criarLinhaNota(item.disciplina, item.etapas, tipo, meta));
     });
   });
 
@@ -2301,25 +2213,14 @@ function criarLinhaNota(d, etapas, tipo, meta) {
     return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa);
   });
   var status = classificarStatusNota(media, faltas, metaDisc);
-  var proj = calcularProjecaoDisciplina(
-    calc.preenchidasComSim,
-    etapas.length,
-    calc.somaComSim,
-    metaDisc
-  );
-  var faltasClasse =
-    faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT
-      ? "critico"
-      : faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_ALERTA
-      ? "alerta"
-      : "";
+  var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, etapas.length, calc.somaComSim, metaDisc);
+  var faltasClasse = faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT ? "critico" : faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_ALERTA ? "alerta" : "";
   var badgeLabel = {
     aprovado: '<i class="fa-solid fa-check"></i> ' + t("leg_aprovado"),
     recuperacao: '<i class="fa-solid fa-rotate"></i> ' + t("leg_recuperacao"),
     reprovado: '<i class="fa-solid fa-xmark"></i> ' + t("leg_reprovado"),
   }[status];
-  var linhaRisco =
-    status === "reprovado" || faltasClasse === "critico" ? "linha-risco" : "";
+  var linhaRisco = status === "reprovado" || faltasClasse === "critico" ? "linha-risco" : "";
   var linhaSim = calc.simulando ? "simulando" : "";
   var etapasHTML = notasEtapas
     .map(function (n) {
@@ -2337,63 +2238,23 @@ function criarLinhaNota(d, etapas, tipo, meta) {
     '%"></div></div></div>';
   var temEtapaEmAberto = calc.temEtapaAberta;
   var simuladorHTML = temEtapaEmAberto
-    ? `<div class="simulador-cell"><input type="number" class="simulador-input" data-codigo="${escaparHTML(
-        codigo
-      )}" min="0" max="100" step="0.1" placeholder="Nota" value="${
-        sim != null ? sim : ""
-      }" />${
-        calc.simulando
-          ? `<span class="simulador-resultado ${
-              status === "aprovado"
-                ? "ok"
-                : status === "recuperacao"
-                ? "mid"
-                : "ruim"
-            }">${textoNota(media)}</span>`
-          : ""
-      }</div>`
+    ? `<div class="simulador-cell"><input type="number" class="simulador-input" data-codigo="${escaparHTML(codigo)}" min="0" max="100" step="0.1" placeholder="Nota" value="${sim != null ? sim : ""}" />${calc.simulando ? `<span class="simulador-resultado ${status === "aprovado" ? "ok" : status === "recuperacao" ? "mid" : "ruim"}">${textoNota(media)}</span>` : ""}</div>`
     : '<span style="color:var(--text-muted);font-size:.8rem;">Fechada</span>';
   var metaCustom = __metasDisciplinas[codigo] != null;
-  var metaHTML = `<button type="button" class="btn-meta-disciplina ${
-    metaCustom ? "customizada" : ""
-  }" data-codigo="${escaparHTML(codigo)}" data-nome="${escaparHTML(
-    d.disciplina || codigo
-  )}" title="Meta: ${metaDisc}">🎯</button>`;
+  var metaHTML = `<button type="button" class="btn-meta-disciplina ${metaCustom ? "customizada" : ""}" data-codigo="${escaparHTML(codigo)}" data-nome="${escaparHTML(d.disciplina || codigo)}" title="Meta: ${metaDisc}">🎯</button>`;
   var tr = document.createElement("tr");
   tr.className = [linhaRisco, linhaSim].filter(Boolean).join(" ");
   tr.dataset.grupoLinha = tipo;
   tr.dataset.codigo = codigo;
   tr.innerHTML =
-    '<td class="td-disciplina"><strong>' +
-    escaparHTML(d.disciplina || d.codigo_diario || "Disciplina") +
-    "</strong></td>" +
-    '<td><div class="etapas-cell">' +
-    (etapasHTML || '<span class="etapa-pill">—</span>') +
-    "</div></td>" +
-    '<td class="td-media">' +
-    mediaHTML +
-    "</td>" +
-    '<td class="td-faltas"><span class="faltas-cell ' +
-    faltasClasse +
-    '">' +
-    faltas +
-    "</span></td>" +
-    '<td class="td-projecao"><span class="projecao-cell ' +
-    proj.classe +
-    '">' +
-    proj.texto +
-    "</span></td>" +
-    '<td class="td-status"><span class="badge badge-' +
-    status +
-    '">' +
-    badgeLabel +
-    "</span></td>" +
-    '<td class="td-simulador">' +
-    simuladorHTML +
-    "</td>" +
-    '<td class="td-meta">' +
-    metaHTML +
-    "</td>";
+    '<td class="td-disciplina"><strong>' + escaparHTML(d.disciplina || d.codigo_diario || "Disciplina") + "</strong></td>" +
+    '<td><div class="etapas-cell">' + (etapasHTML || '<span class="etapa-pill">—</span>') + "</div></td>" +
+    '<td class="td-media">' + mediaHTML + "</td>" +
+    '<td class="td-faltas"><span class="faltas-cell ' + faltasClasse + '">' + faltas + "</span></td>" +
+    '<td class="td-projecao"><span class="projecao-cell ' + proj.classe + '">' + proj.texto + "</span></td>" +
+    '<td class="td-status"><span class="badge badge-' + status + '">' + badgeLabel + "</span></td>" +
+    '<td class="td-simulador">' + simuladorHTML + "</td>" +
+    '<td class="td-meta">' + metaHTML + "</td>";
   return tr;
 }
 
@@ -2406,37 +2267,16 @@ function atualizarLinhaNota(tr, d, meta) {
   var calc = calcularMediaSimples(d, etapas, sim);
   var media = calc.media;
   var status = classificarStatusNota(media, faltas, metaDisc);
-  var proj = calcularProjecaoDisciplina(
-    calc.preenchidasComSim,
-    etapas.length,
-    calc.somaComSim,
-    metaDisc
-  );
-  tr.classList.toggle(
-    "linha-risco",
-    status === "reprovado" || faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT
-  );
+  var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, etapas.length, calc.somaComSim, metaDisc);
+  tr.classList.toggle("linha-risco", status === "reprovado" || faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT);
   tr.classList.toggle("simulando", calc.simulando);
   var tdMedia = tr.querySelector(".td-media");
   if (tdMedia) {
     var percentual = media !== null ? Math.min(media, 100) : 0;
-    tdMedia.innerHTML =
-      '<div class="media-cell"><span>' +
-      textoNota(media) +
-      '</span><div class="media-bar"><div class="media-bar-fill ' +
-      status +
-      '" style="width:' +
-      percentual +
-      '%"></div></div></div>';
+    tdMedia.innerHTML = '<div class="media-cell"><span>' + textoNota(media) + '</span><div class="media-bar"><div class="media-bar-fill ' + status + '" style="width:' + percentual + '%"></div></div></div>';
   }
   var tdProj = tr.querySelector(".td-projecao");
-  if (tdProj)
-    tdProj.innerHTML =
-      '<span class="projecao-cell ' +
-      proj.classe +
-      '">' +
-      proj.texto +
-      "</span>";
+  if (tdProj) tdProj.innerHTML = '<span class="projecao-cell ' + proj.classe + '">' + proj.texto + "</span>";
   var tdStatus = tr.querySelector(".td-status");
   if (tdStatus) {
     var badgeLabel = {
@@ -2444,15 +2284,13 @@ function atualizarLinhaNota(tr, d, meta) {
       recuperacao: '<i class="fa-solid fa-rotate"></i> ' + t("leg_recuperacao"),
       reprovado: '<i class="fa-solid fa-xmark"></i> ' + t("leg_reprovado"),
     }[status];
-    tdStatus.innerHTML =
-      '<span class="badge badge-' + status + '">' + badgeLabel + "</span>";
+    tdStatus.innerHTML = '<span class="badge badge-' + status + '">' + badgeLabel + "</span>";
   }
   var tdSim = tr.querySelector(".td-simulador");
   if (tdSim) {
     var resultadoEl = tdSim.querySelector(".simulador-resultado");
     if (calc.simulando) {
-      var classeRes =
-        status === "aprovado" ? "ok" : status === "recuperacao" ? "mid" : "ruim";
+      var classeRes = status === "aprovado" ? "ok" : status === "recuperacao" ? "mid" : "ruim";
       if (resultadoEl) {
         resultadoEl.className = "simulador-resultado " + classeRes;
         resultadoEl.textContent = textoNota(media);
@@ -2479,8 +2317,7 @@ function bindSimuladores(corpo) {
       if (val === "") delete __simulacoes[cod];
       else {
         var num = Number(String(val).replace(",", "."));
-        if (Number.isFinite(num))
-          __simulacoes[cod] = Math.max(0, Math.min(100, num));
+        if (Number.isFinite(num)) __simulacoes[cod] = Math.max(0, Math.min(100, num));
       }
       var tr = input.closest("tr");
       var d = __notasCache.find(function (x) {
@@ -2504,8 +2341,7 @@ function bindSimuladores(corpo) {
 function abrirModalMetaDisciplina(codigo, nome) {
   var modal = document.getElementById("modal-meta-disciplina");
   if (!modal) return;
-  var atual =
-    __metasDisciplinas[codigo] != null ? __metasDisciplinas[codigo] : __metaAtual;
+  var atual = __metasDisciplinas[codigo] != null ? __metasDisciplinas[codigo] : __metaAtual;
   var rangeInput = modal.querySelector('input[type="range"]');
   var numEl = modal.querySelector(".meta-num");
   var nomeEl = modal.querySelector(".meta-disciplina-nome");
@@ -2547,54 +2383,21 @@ function exportarCSV() {
     return;
   }
   var linhas = [];
-  linhas.push(
-    ["Disciplina", "Tipo", "Etapas", "Média", "Meta", "Faltas", "Projeção", "Status"].join(
-      ";"
-    )
-  );
+  linhas.push(["Disciplina", "Tipo", "Etapas", "Média", "Meta", "Faltas", "Projeção", "Status"].join(";"));
   __notasCache.forEach(function (d) {
     var cfg = obterEtapasDaDisciplina(d);
-    var calc = calcularMediaSimples(
-      d,
-      cfg.etapas,
-      __simulacoes[getCodigoDisc(d)]
-    );
+    var calc = calcularMediaSimples(d, cfg.etapas, __simulacoes[getCodigoDisc(d)]);
     var faltas = Number(d.numero_faltas) || 0;
     var meta = metaEfetiva(d);
     var st = classificarStatusNota(calc.media, faltas, meta);
-    var proj = calcularProjecaoDisciplina(
-      calc.preenchidasComSim,
-      cfg.etapas.length,
-      calc.somaComSim,
-      meta
-    );
-    linhas.push(
-      [
-        (d.disciplina || d.codigo_diario || "").replace(/;/g, ","),
-        cfg.tipo,
-        cfg.etapas
-          .map(function (n) {
-            var e = d["nota_etapa_" + n];
-            return textoNota(
-              formatarNota(e && typeof e === "object" ? e.nota : e)
-            );
-          })
-          .join(" | "),
-        textoNota(calc.media),
-        meta,
-        faltas,
-        proj.texto,
-        st,
-      ].join(";")
-    );
+    var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, cfg.etapas.length, calc.somaComSim, meta);
+    linhas.push([(d.disciplina || d.codigo_diario || "").replace(/;/g, ","), cfg.tipo, cfg.etapas.map(function (n) { var e = d["nota_etapa_" + n]; return textoNota(formatarNota(e && typeof e === "object" ? e.nota : e)); }).join(" | "), textoNota(calc.media), meta, faltas, proj.texto, st].join(";"));
   });
   var csv = "\uFEFF" + linhas.join("\n");
   var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   var url = URL.createObjectURL(blob);
   var a = document.createElement("a");
-  var periodo = (
-    document.getElementById("periodo-notas")?.value || "boletim"
-  ).replace("/", ".");
+  var periodo = (document.getElementById("periodo-notas")?.value || "boletim").replace("/", ".");
   a.href = url;
   a.download = "boletim_" + periodo + ".csv";
   document.body.appendChild(a);
@@ -2618,68 +2421,27 @@ function exportarPDF() {
       return obterEtapasDaDisciplina(d).tipo === tipo;
     });
     if (!doTipo.length) return;
-    linhasHTML += `<tr class="grupo"><td colspan="6"><strong>${
-      tipo === "Semestral" ? "Matérias Semestrais" : "Matérias Anuais"
-    }</strong></td></tr>`;
+    linhasHTML += `<tr class="grupo"><td colspan="6"><strong>${tipo === "Semestral" ? "Matérias Semestrais" : "Matérias Anuais"}</strong></td></tr>`;
     doTipo.forEach(function (d) {
       var cfg = obterEtapasDaDisciplina(d);
-      var calc = calcularMediaSimples(
-        d,
-        cfg.etapas,
-        __simulacoes[getCodigoDisc(d)]
-      );
+      var calc = calcularMediaSimples(d, cfg.etapas, __simulacoes[getCodigoDisc(d)]);
       var faltas = Number(d.numero_faltas) || 0;
       var meta = metaEfetiva(d);
       var st = classificarStatusNota(calc.media, faltas, meta);
-      var proj = calcularProjecaoDisciplina(
-        calc.preenchidasComSim,
-        cfg.etapas.length,
-        calc.somaComSim,
-        meta
-      );
-      var cor =
-        st === "aprovado"
-          ? "#10b981"
-          : st === "recuperacao"
-          ? "#f59e0b"
-          : "#ff4757";
-      linhasHTML += `<tr><td>${escaparHTML(
-        d.disciplina || d.codigo_diario || ""
-      )}</td><td>${cfg.etapas
-        .map(function (n) {
-          var e = d["nota_etapa_" + n];
-          return textoNota(formatarNota(e && typeof e === "object" ? e.nota : e));
-        })
-        .join(" | ")}</td><td>${textoNota(calc.media)}</td><td>${faltas}</td><td>${
-        proj.texto
-      }</td><td style="color:${cor};font-weight:700">${st}</td></tr>`;
+      var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, cfg.etapas.length, calc.somaComSim, meta);
+      var cor = st === "aprovado" ? "#10b981" : st === "recuperacao" ? "#f59e0b" : "#ff4757";
+      linhasHTML += `<tr><td>${escaparHTML(d.disciplina || d.codigo_diario || "")}</td><td>${cfg.etapas.map(function (n) { var e = d["nota_etapa_" + n]; return textoNota(formatarNota(e && typeof e === "object" ? e.nota : e)); }).join(" | ")}</td><td>${textoNota(calc.media)}</td><td>${faltas}</td><td>${proj.texto}</td><td style="color:${cor};font-weight:700">${st}</td></tr>`;
     });
   });
   var w = window.open("", "_blank");
-  w.document.write(
-    `<!doctype html><html><head><meta charset="utf-8"><title>Boletim ${escaparHTML(
-      nome
-    )}</title><style>*{font-family:'Segoe UI',Arial,sans-serif;}body{padding:30px;color:#222;}h1{font-size:20px;margin:0 0 4px;}.sub{color:#666;font-size:12px;margin-bottom:20px;}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;}th,td{border:1px solid #ccc;padding:6px 8px;text-align:left;}th{background:#f3f0fa;}tr.grupo td{background:#ece7f8;font-size:13px;}.rodape{margin-top:24px;font-size:10px;color:#999;text-align:center;}@media print{body{padding:10px;}}</style></head><body><h1>Boletim Acadêmico — ${escaparHTML(
-      nome
-    )}</h1><div class="sub">Matrícula: ${escaparHTML(
-      mat
-    )} • Período: ${escaparHTML(
-      periodo
-    )} • Emitido em ${new Date().toLocaleString(
-      "pt-BR"
-    )}</div><table><thead><tr><th>Disciplina</th><th>Etapas</th><th>Média</th><th>Faltas</th><th>Projeção</th><th>Status</th></tr></thead><tbody>${linhasHTML}</tbody></table><div class="rodape">Gerado pelo Portal InfoWeb 2V — IFRN</div><script>window.onload=()=>setTimeout(()=>window.print(),300);<\/script></body></html>`
-  );
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Boletim ${escaparHTML(nome)}</title><style>*{font-family:'Segoe UI',Arial,sans-serif;}body{padding:30px;color:#222;}h1{font-size:20px;margin:0 0 4px;}.sub{color:#666;font-size:12px;margin-bottom:20px;}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;}th,td{border:1px solid #ccc;padding:6px 8px;text-align:left;}th{background:#f3f0fa;}tr.grupo td{background:#ece7f8;font-size:13px;}.rodape{margin-top:24px;font-size:10px;color:#999;text-align:center;}@media print{body{padding:10px;}}</style></head><body><h1>Boletim Acadêmico — ${escaparHTML(nome)}</h1><div class="sub">Matrícula: ${escaparHTML(mat)} • Período: ${escaparHTML(periodo)} • Emitido em ${new Date().toLocaleString("pt-BR")}</div><table><thead><tr><th>Disciplina</th><th>Etapas</th><th>Média</th><th>Faltas</th><th>Projeção</th><th>Status</th></tr></thead><tbody>${linhasHTML}</tbody></table><div class="rodape">Gerado pelo Portal InfoWeb 2V — IFRN</div><script>window.onload=()=>setTimeout(()=>window.print(),300);<\/script></body></html>`);
   w.document.close();
 }
 
 function carregarBoletim(ano, periodo) {
   atualizarStatusNotas("Buscando notas no SUAP...", "loading");
   suap.getAuthenticatedResource(
-    "/api/ensino/meu-boletim/" +
-      encodeURIComponent(ano) +
-      "/" +
-      encodeURIComponent(periodo) +
-      "/?page=1",
+    "/api/ensino/meu-boletim/" + encodeURIComponent(ano) + "/" + encodeURIComponent(periodo) + "/?page=1",
     function (resposta) {
       var disciplinas = resposta.results || [];
       renderizarNotas(disciplinas);
@@ -2690,10 +2452,7 @@ function carregarBoletim(ano, periodo) {
     },
     function (xhr) {
       renderizarNotas([]);
-      atualizarStatusNotas(
-        "Erro ao carregar boletim (HTTP " + xhr.status + ").",
-        "erro"
-      );
+      atualizarStatusNotas("Erro ao carregar boletim (HTTP " + xhr.status + ").", "erro");
     }
   );
 }
@@ -2714,8 +2473,7 @@ function carregarPeriodosNotas() {
         if (indice === 0) opcao.selected = true;
       });
       seletor.disabled = !periodos.length;
-      if (periodos.length)
-        carregarBoletim(periodos[0].ano_letivo, periodos[0].periodo_letivo);
+      if (periodos.length) carregarBoletim(periodos[0].ano_letivo, periodos[0].periodo_letivo);
       else atualizarStatusNotas("Nenhum período disponível.", "erro");
     },
     function (xhr) {
@@ -2727,8 +2485,7 @@ function carregarPeriodosNotas() {
 // ==========================================
 // NOTIFICAÇÕES
 // ==========================================
-const CHAVE_NOTIF_LIDAS = () =>
-  "notif_lidas_" + (window.usuarioLogado.matricula || "anon");
+const CHAVE_NOTIF_LIDAS = () => "notif_lidas_" + (window.usuarioLogado.matricula || "anon");
 let __notificacoes = [];
 
 function gerarNotificacoesRecados() {
@@ -2751,9 +2508,7 @@ function gerarNotificacoesRecados() {
       tipo: "recado",
       icone: "fa-regular fa-comment-dots",
       titulo: "Novo recado de " + nomeParaExibicao(r.autor_nome),
-      descricao:
-        (r.mensagem || "").slice(0, 80) +
-        ((r.mensagem || "").length > 80 ? "..." : ""),
+      descricao: (r.mensagem || "").slice(0, 80) + ((r.mensagem || "").length > 80 ? "..." : ""),
       data: r.timestampCriacao,
       lida: !!lidas[r.id],
     });
@@ -2783,28 +2538,13 @@ function renderizarPainelNotificacoes() {
   var lista = document.getElementById("lista-notificacoes");
   if (!lista) return;
   if (__notificacoes.length === 0) {
-    lista.innerHTML = `<p class="notif-vazio">${escaparHTML(
-      t("sem_notif")
-    )}</p>`;
+    lista.innerHTML = `<p class="notif-vazio">${escaparHTML(t("sem_notif"))}</p>`;
     return;
   }
   lista.innerHTML = __notificacoes
     .map(function (n) {
-      var dataStr = new Date(n.data).toLocaleString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-      return `<div class="notif-item ${
-        n.lida ? "" : "nao-lida"
-      }" data-id="${n.id}"><div class="notif-icone"><i class="${
-        n.icone
-      }"></i></div><div class="notif-corpo"><div class="notif-titulo">${escaparHTML(
-        n.titulo
-      )}</div><div class="notif-descricao">${escaparHTML(
-        n.descricao
-      )}</div><div class="notif-data">${dataStr}</div></div></div>`;
+      var dataStr = new Date(n.data).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+      return `<div class="notif-item ${n.lida ? "" : "nao-lida"}" data-id="${n.id}"><div class="notif-icone"><i class="${n.icone}"></i></div><div class="notif-corpo"><div class="notif-titulo">${escaparHTML(n.titulo)}</div><div class="notif-descricao">${escaparHTML(n.descricao)}</div><div class="notif-data">${dataStr}</div></div></div>`;
     })
     .join("");
   lista.querySelectorAll(".notif-item").forEach(function (el) {
@@ -2812,9 +2552,7 @@ function renderizarPainelNotificacoes() {
       var id = el.dataset.id;
       marcarNotificacaoLida(id);
       document.getElementById("mural")?.scrollIntoView({ behavior: "smooth" });
-      document
-        .getElementById("painel-notificacoes")
-        ?.classList.add("is-hidden");
+      document.getElementById("painel-notificacoes")?.classList.add("is-hidden");
     });
   });
 }
@@ -2848,8 +2586,10 @@ function marcarTodasLidas() {
 }
 
 // ==========================================
-// PRÓXIMOS EVENTOS
+// PRÓXIMOS EVENTOS + CONTAGEM REGRESSIVA
 // ==========================================
+let __contagemInterval = null;
+
 function renderizarProximosEventos(eventos) {
   var container = document.getElementById("proximos-eventos-lista");
   if (!container) return;
@@ -2872,46 +2612,284 @@ function renderizarProximosEventos(eventos) {
   if (proximos.length === 0) {
     container.innerHTML = "";
     document.getElementById("proximos-eventos")?.classList.add("is-hidden");
-    return;
+  } else {
+    document.getElementById("proximos-eventos")?.classList.remove("is-hidden");
+    var MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    container.innerHTML = proximos
+      .map(function (ev) {
+        var inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
+        var dia = inicio.getDate();
+        var mes = MESES[inicio.getMonth()];
+        var diffDias = Math.floor((inicio - hoje) / (1000 * 60 * 60 * 24));
+        var classeCard = "evento-card";
+        var badgeHTML = "";
+        if (diffDias === 0) {
+          classeCard += " hoje";
+          badgeHTML = '<span class="evento-badge hoje"><i class="fa-solid fa-fire"></i> HOJE</span>';
+        } else if (diffDias === 1) {
+          classeCard += " destaque";
+          badgeHTML = '<span class="evento-badge amanha">Amanhã</span>';
+        } else if (diffDias <= 3) {
+          classeCard += " destaque";
+          badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`;
+        } else badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`;
+        var cor = ev.backgroundColor || ev.borderColor || "#8b5edd";
+        return `<div class="${classeCard}" style="border-left-color:${cor}"><div class="evento-data" style="background:${cor}22"><span class="evento-dia" style="color:${cor}">${String(dia).padStart(2, "0")}</span><span class="evento-mes">${mes}</span></div><div class="evento-info"><div class="evento-titulo">${escaparHTML(ev.title || "Sem título")}</div><div class="evento-descricao">${inicio.toLocaleDateString("pt-BR", { weekday: "long" })}</div>${badgeHTML}</div></div>`;
+      })
+      .join("");
   }
-  document.getElementById("proximos-eventos")?.classList.remove("is-hidden");
-  var MESES = [
-    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
-    "Jul", "Ago", "Set", "Out", "Nov", "Dez",
-  ];
-  container.innerHTML = proximos
-    .map(function (ev) {
-      var inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
-      var dia = inicio.getDate();
-      var mes = MESES[inicio.getMonth()];
-      var diffDias = Math.floor((inicio - hoje) / (1000 * 60 * 60 * 24));
-      var classeCard = "evento-card";
-      var badgeHTML = "";
-      if (diffDias === 0) {
-        classeCard += " hoje";
-        badgeHTML =
-          '<span class="evento-badge hoje"><i class="fa-solid fa-fire"></i> HOJE</span>';
-      } else if (diffDias === 1) {
-        classeCard += " destaque";
-        badgeHTML = '<span class="evento-badge amanha">Amanhã</span>';
-      } else if (diffDias <= 3) {
-        classeCard += " destaque";
-        badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`;
-      } else
-        badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`;
-      var cor = ev.backgroundColor || ev.borderColor || "#8b5edd";
-      return `<div class="${classeCard}" style="border-left-color:${cor}"><div class="evento-data" style="background:${cor}22"><span class="evento-dia" style="color:${cor}">${String(
-        dia
-      ).padStart(2, "0")}</span><span class="evento-mes">${mes}</span></div><div class="evento-info"><div class="evento-titulo">${escaparHTML(
-        ev.title || "Sem título"
-      )}</div><div class="evento-descricao">${inicio.toLocaleDateString(
-        "pt-BR",
-        { weekday: "long" }
-      )}</div>${badgeHTML}</div></div>`;
-    })
-    .join("");
+
+  // 🆕 Contagem regressiva com os mesmos eventos
+  atualizarContagemRegressiva(eventos);
 }
 
+function atualizarContagemRegressiva(eventos) {
+  const grid = document.getElementById("contagem-grid");
+  if (!grid) return;
+
+  const agora = Date.now();
+  const em30dias = agora + 30 * 24 * 60 * 60 * 1000;
+
+  const proximos = (eventos || [])
+    .map((ev) => {
+      const inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
+      return { titulo: ev.title || "Evento", data: inicio };
+    })
+    .filter((e) => e.data.getTime() >= agora && e.data.getTime() <= em30dias)
+    .sort((a, b) => a.data - b.data)
+    .slice(0, 4);
+
+  if (proximos.length === 0) {
+    grid.innerHTML = `
+      <div class="contagem-vazio">
+        <i class="fa-regular fa-calendar"></i>
+        <p data-i18n="contagem_vazio">Nenhum evento próximo nos próximos 30 dias.</p>
+      </div>`;
+    if (__contagemInterval) clearInterval(__contagemInterval);
+    return;
+  }
+
+  grid.innerHTML = proximos
+    .map((ev, i) => {
+      const diffMs = ev.data.getTime() - agora;
+      const diffHoras = diffMs / (1000 * 60 * 60);
+      let classe = "";
+      if (diffHoras < 24) classe = "urgente";
+      else if (diffHoras < 72) classe = "proximo";
+
+      return `
+        <div class="contagem-card ${classe}" data-index="${i}" data-data="${ev.data.toISOString()}">
+          <div class="contagem-titulo">${escaparHTML(ev.titulo)}</div>
+          <div class="contagem-timer" id="timer-${i}">
+            <div class="contagem-bloco">
+              <span class="contagem-num" data-tipo="dias">0</span>
+              <span class="contagem-label" data-i18n="contagem_dias">dias</span>
+            </div>
+            <div class="contagem-bloco">
+              <span class="contagem-num" data-tipo="horas">00</span>
+              <span class="contagem-label" data-i18n="contagem_horas">horas</span>
+            </div>
+            <div class="contagem-bloco">
+              <span class="contagem-num" data-tipo="min">00</span>
+              <span class="contagem-label" data-i18n="contagem_min">min</span>
+            </div>
+            <div class="contagem-bloco">
+              <span class="contagem-num" data-tipo="seg">00</span>
+              <span class="contagem-label" data-i18n="contagem_seg">seg</span>
+            </div>
+          </div>
+          <div class="contagem-data">
+            <i class="fa-regular fa-calendar-check"></i>
+            ${ev.data.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
+          </div>
+        </div>`;
+    })
+    .join("");
+
+  if (typeof aplicarTraducoes === "function") aplicarTraducoes();
+
+  if (__contagemInterval) clearInterval(__contagemInterval);
+  atualizarTimersContagem();
+  __contagemInterval = setInterval(atualizarTimersContagem, 1000);
+}
+
+function atualizarTimersContagem() {
+  const cards = document.querySelectorAll(".contagem-card[data-data]");
+  const agora = Date.now();
+
+  cards.forEach((card) => {
+    const data = new Date(card.dataset.data).getTime();
+    const diff = Math.max(0, data - agora);
+
+    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const min = Math.floor((diff / (1000 * 60)) % 60);
+    const seg = Math.floor((diff / 1000) % 60);
+
+    const timer = card.querySelector(".contagem-timer");
+    if (!timer) return;
+
+    const elDias = timer.querySelector('[data-tipo="dias"]');
+    const elHoras = timer.querySelector('[data-tipo="horas"]');
+    const elMin = timer.querySelector('[data-tipo="min"]');
+    const elSeg = timer.querySelector('[data-tipo="seg"]');
+
+    if (elDias) elDias.textContent = dias;
+    if (elHoras) elHoras.textContent = String(horas).padStart(2, "0");
+    if (elMin) elMin.textContent = String(min).padStart(2, "0");
+    if (elSeg) elSeg.textContent = String(seg).padStart(2, "0");
+  });
+}
+
+// ==========================================
+// 🆕 SALA DOS PROFESSORES
+// ==========================================
+function revelarSalaProfessores() {
+  if (!window.usuarioLogado.matricula) return;
+  if (!ADMIN_MATRICULAS_SALA.includes(window.usuarioLogado.matricula)) return;
+
+  const secao = document.getElementById("sala-professores");
+  if (secao) {
+    secao.classList.remove("is-admin-hidden");
+    secao.classList.remove("is-hidden");
+  }
+}
+window.revelarSalaProfessores = revelarSalaProfessores;
+
+async function carregarSalaProfessores() {
+  if (__salaDadosCarregados) return;
+  __salaDadosCarregados = true;
+
+  const tbody = document.getElementById("sala-lista-alunos");
+  if (!tbody) return;
+
+  try {
+    const perfisSnap = await get(perfisRef);
+    const perfis = perfisSnap.val() || {};
+
+    const carinhosSnap = await get(ref(db, "mascote/por_aluno"));
+    const carinhos = carinhosSnap.val() || {};
+
+    const alunos = Object.keys(perfis).map((mat) => {
+      const p = perfis[mat] || {};
+      return {
+        matricula: mat,
+        nome: p.nome || p.nomeCompleto || "Aluno " + mat.slice(-4),
+        nomeCompleto: p.nomeCompleto || p.nome || "",
+        foto: p.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.nome || mat)}&background=random`,
+        carinhos: Number(carinhos[mat]) || 0,
+        ultimoAcesso: p.ultimoAcesso || 0,
+        bio: p.bio || "",
+        redes: p.redes || {},
+      };
+    });
+
+    alunos.sort((a, b) => a.nome.localeCompare(b.nome));
+
+    if (alunos.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" class="sala-vazio"><i class="fa-regular fa-folder-open"></i> Nenhum aluno cadastrado.</td></tr>`;
+    } else {
+      tbody.innerHTML = alunos
+        .map((a) => {
+          const diasSemAcesso = a.ultimoAcesso
+            ? Math.floor((Date.now() - a.ultimoAcesso) / (1000 * 60 * 60 * 24))
+            : null;
+          let statusClasse = "ok";
+          let statusLabel = "Ativo";
+          if (diasSemAcesso !== null && diasSemAcesso > 14) {
+            statusClasse = "danger";
+            statusLabel = `${diasSemAcesso}d sem acesso`;
+          } else if (diasSemAcesso !== null && diasSemAcesso > 7) {
+            statusClasse = "warn";
+            statusLabel = `${diasSemAcesso}d sem acesso`;
+          }
+
+          return `
+            <tr data-nome="${a.nome.toLowerCase()}" data-mat="${a.matricula}">
+              <td>
+                <div class="td-aluno">
+                  <img src="${a.foto}" alt="${a.nome}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=random'">
+                  <span>${escaparHTML(a.nome)}</span>
+                </div>
+              </td>
+              <td>${a.matricula}</td>
+              <td>—</td>
+              <td>—</td>
+              <td><i class="fa-solid fa-heart" style="color:#ff6b6b;font-size:0.8rem;"></i> ${a.carinhos.toLocaleString("pt-BR")}</td>
+              <td><span class="sala-badge ${statusClasse}">${statusLabel}</span></td>
+            </tr>`;
+        })
+        .join("");
+    }
+
+    const totalCarinhos = Object.values(carinhos).reduce((a, b) => a + (Number(b) || 0), 0);
+    const recadosSnap = await get(ref(db, "mural_recados"));
+    const totalRecados = recadosSnap.exists() ? Object.keys(recadosSnap.val()).length : 0;
+
+    document.getElementById("sala-stat-total-carinhos").textContent = totalCarinhos.toLocaleString("pt-BR");
+    document.getElementById("sala-stat-total-recados").textContent = totalRecados;
+    document.getElementById("sala-stat-total-alunos").textContent = alunos.length;
+
+    const top = alunos.reduce((max, a) => (a.carinhos > (max?.carinhos || 0) ? a : max), null);
+    document.getElementById("sala-stat-top-carinhos").textContent = top
+      ? `${top.nome} (${top.carinhos})`
+      : "—";
+
+    const engajamentoLista = document.getElementById("sala-engajamento-lista");
+    if (engajamentoLista) {
+      const ordenados = [...alunos].sort((a, b) => b.carinhos - a.carinhos).slice(0, 10);
+      engajamentoLista.innerHTML = ordenados
+        .filter((a) => a.carinhos > 0)
+        .map((a, i) => `
+          <div class="sala-engajamento-item">
+            <span style="font-weight:800;color:var(--accent);min-width:26px;">${i + 1}º</span>
+            <img src="${a.foto}" alt="${a.nome}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=random'">
+            <div class="sala-engajamento-info">
+              <div class="sala-engajamento-nome">${escaparHTML(a.nome)}</div>
+              <div class="sala-engajamento-metricas">
+                <span><i class="fa-solid fa-heart" style="color:#ff6b6b;"></i> ${a.carinhos.toLocaleString("pt-BR")} carinhos</span>
+              </div>
+            </div>
+          </div>`)
+        .join("") || '<p class="sala-vazio-msg">Sem dados de engajamento ainda.</p>';
+    }
+
+    const buscaInput = document.getElementById("sala-busca-aluno");
+    if (buscaInput && !buscaInput.dataset.bound) {
+      buscaInput.dataset.bound = "1";
+      buscaInput.addEventListener("input", (e) => {
+        const q = e.target.value.toLowerCase().trim();
+        document.querySelectorAll("#sala-lista-alunos tr[data-nome]").forEach((tr) => {
+          const nome = tr.dataset.nome || "";
+          const mat = tr.dataset.mat || "";
+          tr.style.display = !q || nome.includes(q) || mat.includes(q) ? "" : "none";
+        });
+      });
+    }
+
+    document.querySelectorAll(".sala-tab").forEach((tab) => {
+      if (tab.dataset.bound) return;
+      tab.dataset.bound = "1";
+      tab.addEventListener("click", () => {
+        const alvo = tab.dataset.tab;
+        document.querySelectorAll(".sala-tab").forEach((t) => t.classList.remove("ativo"));
+        document.querySelectorAll(".sala-tab-content").forEach((c) => c.classList.remove("ativo"));
+        tab.classList.add("ativo");
+        document.getElementById("sala-tab-" + alvo)?.classList.add("ativo");
+      });
+    });
+
+  } catch (err) {
+    console.error("[sala] Erro ao carregar:", err);
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="6" class="sala-vazio">Erro ao carregar dados. Tente novamente.</td></tr>`;
+    }
+  }
+}
+
+// ==========================================
+// LISTENERS DA CALCULADORA
+// ==========================================
 function initCalculadoraNotas() {
   const elPeriodo = document.getElementById("periodo-notas");
   if (elPeriodo && !elPeriodo.dataset.bound) {
@@ -2938,11 +2916,9 @@ function initCalculadoraNotas() {
     if (chip.dataset.bound) return;
     chip.dataset.bound = "1";
     chip.addEventListener("click", function () {
-      document
-        .querySelectorAll(".filtro-chip")
-        .forEach(function (c) {
-          c.classList.remove("ativo");
-        });
+      document.querySelectorAll(".filtro-chip").forEach(function (c) {
+        c.classList.remove("ativo");
+      });
       chip.classList.add("ativo");
       __filtroAtivo = chip.dataset.filtro || "todas";
       if (__notasCache.length) renderizarNotas(__notasCache);
@@ -2958,29 +2934,23 @@ function initCalculadoraNotas() {
       if (periodo.length === 2) carregarBoletim(periodo[0], periodo[1]);
     });
   }
-  document
-    .querySelectorAll(".tabela-notas thead th.sortable")
-    .forEach(function (th) {
-      if (th.dataset.bound) return;
-      th.dataset.bound = "1";
-      th.addEventListener("click", function () {
-        aplicarSort(th.dataset.sort);
-      });
+  document.querySelectorAll(".tabela-notas thead th.sortable").forEach(function (th) {
+    if (th.dataset.bound) return;
+    th.dataset.bound = "1";
+    th.addEventListener("click", function () {
+      aplicarSort(th.dataset.sort);
     });
+  });
   document.getElementById("btn-export-csv")?.addEventListener("click", exportarCSV);
   document.getElementById("btn-export-pdf")?.addEventListener("click", exportarPDF);
-  document
-    .getElementById("btn-limpar-simulador")
-    ?.addEventListener("click", function () {
-      __simulacoes = {};
-      if (__notasCache.length) renderizarNotas(__notasCache);
-      exibirToast("Simulações limpas.", "sucesso");
-    });
-  document
-    .getElementById("btn-toggle-historico")
-    ?.addEventListener("click", function () {
-      document.getElementById("historico-panel")?.classList.toggle("colapsado");
-    });
+  document.getElementById("btn-limpar-simulador")?.addEventListener("click", function () {
+    __simulacoes = {};
+    if (__notasCache.length) renderizarNotas(__notasCache);
+    exibirToast("Simulações limpas.", "sucesso");
+  });
+  document.getElementById("btn-toggle-historico")?.addEventListener("click", function () {
+    document.getElementById("historico-panel")?.classList.toggle("colapsado");
+  });
   const btnNotif = document.getElementById("btn-notificacoes");
   const painelNotif = document.getElementById("painel-notificacoes");
   if (btnNotif && !btnNotif.dataset.bound) {
@@ -2994,10 +2964,7 @@ function initCalculadoraNotas() {
   document.getElementById("btn-marcar-lidas")?.addEventListener("click", marcarTodasLidas);
   document.addEventListener("click", function (e) {
     if (!painelNotif || painelNotif.classList.contains("is-hidden")) return;
-    if (
-      !e.target.closest("#painel-notificacoes") &&
-      !e.target.closest("#btn-notificacoes")
-    )
+    if (!e.target.closest("#painel-notificacoes") && !e.target.closest("#btn-notificacoes"))
       painelNotif.classList.add("is-hidden");
   });
   carregarMetasDisciplinas();
@@ -3007,6 +2974,7 @@ function initCalculadoraNotas() {
 // INICIALIZAÇÃO
 // ==========================================
 document.addEventListener("DOMContentLoaded", function () {
+  // Aplica tema e idioma salvos
   aplicarTema(obterTemaAtual());
   aplicarTraducoes();
 
@@ -3016,57 +2984,78 @@ document.addEventListener("DOMContentLoaded", function () {
   initCalculadoraNotas();
   renderizarLegendaCalendario();
 
-  document.querySelectorAll("#menu-idioma .dropdown-item").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      trocarIdioma(btn.dataset.idioma);
+  // Dropdown de idioma
+  document
+    .querySelectorAll("#menu-idioma .dropdown-item")
+    .forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        trocarIdioma(btn.dataset.idioma);
+      });
     });
-  });
 
-  document.querySelectorAll("#menu-tema .dropdown-item").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var tema = btn.dataset.tema;
-      if (tema === "claro") {
-        document.body.classList.add("light-theme");
-        localStorage.setItem("theme", "light");
-        var icon = themeToggle?.querySelector("i");
-        if (icon) icon.classList.replace("fa-moon", "fa-sun");
-        return;
-      }
-      if (tema === "escuro") {
-        document.body.classList.remove("light-theme");
-        localStorage.setItem("theme", "dark");
-        var icon = themeToggle?.querySelector("i");
-        if (icon) icon.classList.replace("fa-sun", "fa-moon");
-        return;
-      }
-      aplicarTema(tema);
+  // Dropdown de tema
+  document
+    .querySelectorAll("#menu-tema .dropdown-item")
+    .forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var tema = btn.dataset.tema;
+        var themeToggleBtnRef = document.getElementById("theme-toggle");
+        var themeIconRef = themeToggleBtnRef?.querySelector("i");
+        if (tema === "claro") {
+          document.body.classList.add("light-theme");
+          localStorage.setItem("theme", "light");
+          if (themeIconRef) themeIconRef.classList.replace("fa-moon", "fa-sun");
+          return;
+        }
+        if (tema === "escuro") {
+          document.body.classList.remove("light-theme");
+          localStorage.setItem("theme", "dark");
+          if (themeIconRef) themeIconRef.classList.replace("fa-sun", "fa-moon");
+          return;
+        }
+        aplicarTema(tema);
+      });
     });
-  });
 
+  // Botão instalar PWA
   document
     .getElementById("btn-instalar-app")
     ?.addEventListener("click", instalarPWA);
 
+  // Botão login
   const btnLogin = document.getElementById("suap-login-button");
   if (btnLogin) btnLogin.setAttribute("href", suap.getLoginURL());
+
+  // Botão logout
   const btnLogout = document.getElementById("suap-logout-button");
-  if (btnLogout)
+  if (btnLogout) {
     btnLogout.addEventListener("click", function (e) {
       e.preventDefault();
       window.forceLogout();
     });
+  }
+
+  // Ano dinâmico
   const anoEl = document.getElementById("ano");
   if (anoEl) anoEl.textContent = new Date().getFullYear();
 
+  // ==========================================
+  // AUTENTICAÇÃO
+  // ==========================================
   if (suap.isAuthenticated()) {
     if (window.location.hash.includes("access_token")) {
       history.replaceState(null, null, window.location.pathname);
     }
+
     document.querySelectorAll(".is-authenticated").forEach(function (el) {
       el.classList.remove("is-hidden");
     });
+
     carregarPeriodosNotas();
 
+    // ==========================================
+    // CALENDÁRIO
+    // ==========================================
     var calendarEl = document.getElementById("calendar");
     if (calendarEl && typeof FullCalendar !== "undefined") {
       function pintarElementoEvento(el, titulo) {
@@ -3075,6 +3064,7 @@ document.addEventListener("DOMContentLoaded", function () {
         el.style.setProperty("border-color", cor, "important");
         el.style.setProperty("color", "#ffffff", "important");
       }
+
       var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: "dayGridMonth",
         locale: obterIdiomaAtual(),
@@ -3100,6 +3090,7 @@ document.addEventListener("DOMContentLoaded", function () {
         },
       });
       calendar.render();
+
       var observer = new MutationObserver(function () {
         document.querySelectorAll(".fc-event").forEach(function (el) {
           var texto = el.innerText || "";
@@ -3116,6 +3107,9 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
+    // ==========================================
+    // DADOS DO USUÁRIO (SUAP)
+    // ==========================================
     var scope = suap.getToken().getScope();
     suap.getResource(scope, function (dados_suap) {
       var fotoPath =
@@ -3138,25 +3132,31 @@ document.addEventListener("DOMContentLoaded", function () {
           encodeURIComponent(dados_suap.nome_usual || dados_suap.nome) +
           "&background=random";
       }
+
       const userFotoEl = document.getElementById("user-foto");
       if (userFotoEl) userFotoEl.src = fotoUrl;
+
       const nomeSuap = dados_suap.nome_usual || dados_suap.nome;
       const nomeCompletoSuap = dados_suap.nome || nomeSuap;
       const matriculaSuap =
         dados_suap.matricula || dados_suap.siape || "Matrícula não disponível";
+
       const userNomeEl = document.getElementById("user-nome");
       if (userNomeEl) userNomeEl.textContent = nomeParaExibicao(nomeSuap);
+
       const userMatEl = document.getElementById("user-matricula");
       if (userMatEl) userMatEl.textContent = matriculaSuap;
+
       window.usuarioLogado.nome = nomeParaExibicao(nomeSuap);
       window.usuarioLogado.matricula = matriculaSuap;
-      // 🆕 Salva pra outros scripts (mascote) usarem
+      window.usuarioLogado.foto = fotoUrl;
+      window.usuarioLogado.fotoOriginal = fotoUrl;
+
+      // 🆕 Salva matrícula em localStorage + cookie pra o mascote usar
       try {
         localStorage.setItem("matricula_suap", matriculaSuap);
         document.cookie = `matricula=${matriculaSuap}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`;
       } catch (e) {}
-      window.usuarioLogado.foto = fotoUrl;
-      window.usuarioLogado.fotoOriginal = fotoUrl;
 
       if (matriculaSuap && matriculaSuap !== "Matrícula não disponível") {
         const perfilAlunoRef = ref(db, "perfis_alunos/" + matriculaSuap);
@@ -3175,15 +3175,28 @@ document.addEventListener("DOMContentLoaded", function () {
             window.carregarPerfilUsuario(matriculaSuap);
           });
         });
+
         carregarMetasDisciplinas();
         gerarNotificacoesRecados();
+
+        // 🆕 SALA DOS PROFESSORES — só admin
+        if (ADMIN_MATRICULAS_SALA.includes(matriculaSuap)) {
+          setTimeout(() => {
+            const secaoSala = document.getElementById("sala-professores");
+            if (secaoSala) secaoSala.classList.remove("is-admin-hidden");
+            carregarSalaProfessores();
+          }, 1000);
+        }
       }
 
+      // Remove campo "nome" do mural
       const inputRecadoNome = document.getElementById("recado-nome");
       if (inputRecadoNome) {
         inputRecadoNome.style.display = "none";
         inputRecadoNome.removeAttribute("required");
       }
+
+      // Renderiza mural e perfis
       window.renderizarMural();
       window.renderizarPerfis();
     });

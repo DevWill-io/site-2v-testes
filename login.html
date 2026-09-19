@@ -12,7 +12,7 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'self' https://*.firebaseio.com; form-action 'self' https://suap.ifrn.edu.br; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; connect-src 'self' https://suap.ifrn.edu.br https://*.firebaseio.com wss://*.firebaseio.com https://*.googleapis.com https://api.github.com;"
     />
-    <title data-i18n="titulo_pagina">Login SUAP | Turma 2V IFRN</title>
+    <title data-i18n="titulo_pagina_login">Login SUAP | Turma 2V IFRN</title>
 
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/img/icon-192.png" />
@@ -75,29 +75,40 @@
           </button>
           <div class="dropdown-content dropdown-temas">
             <button type="button" class="dropdown-item" data-tema="roxo">
-              <span class="tema-swatch tema-swatch-roxo"></span> Roxo
+              <span class="tema-swatch tema-swatch-roxo"></span>
+              <span data-i18n="cor_roxo">Roxo</span>
             </button>
             <button type="button" class="dropdown-item" data-tema="azul">
-              <span class="tema-swatch tema-swatch-azul"></span> Azul
+              <span class="tema-swatch tema-swatch-azul"></span>
+              <span data-i18n="cor_azul">Azul</span>
             </button>
             <button type="button" class="dropdown-item" data-tema="verde">
-              <span class="tema-swatch tema-swatch-verde"></span> Verde
+              <span class="tema-swatch tema-swatch-verde"></span>
+              <span data-i18n="cor_verde">Verde</span>
             </button>
             <button type="button" class="dropdown-item" data-tema="rosa">
-              <span class="tema-swatch tema-swatch-rosa"></span> Rosa
+              <span class="tema-swatch tema-swatch-rosa"></span>
+              <span data-i18n="cor_rosa">Rosa</span>
             </button>
             <button type="button" class="dropdown-item" data-tema="laranja">
-              <span class="tema-swatch tema-swatch-laranja"></span> Laranja
+              <span class="tema-swatch tema-swatch-laranja"></span>
+              <span data-i18n="cor_laranja">Laranja</span>
             </button>
             <div class="dropdown-separator"></div>
             <button type="button" class="dropdown-item" data-tema="claro">
-              <i class="fa-solid fa-sun"></i> Modo claro
+              <i class="fa-solid fa-sun"></i>
+              <span data-i18n="modo_claro">Modo claro</span>
             </button>
             <button type="button" class="dropdown-item" data-tema="escuro">
-              <i class="fa-solid fa-moon"></i> Modo escuro
+              <i class="fa-solid fa-moon"></i>
+              <span data-i18n="modo_escuro">Modo escuro</span>
             </button>
           </div>
         </div>
+
+        <button id="theme-toggle" class="btn-theme" aria-label="Alternar tema">
+          <i class="fa-solid fa-moon"></i>
+        </button>
 
         <a href="../index.html" class="btn-voltar">
           <i class="fa-solid fa-arrow-left"></i>
@@ -150,7 +161,11 @@
             </div>
 
             <div class="logout-action">
-              <button type="button" class="button is-danger" id="suap-logout-button">
+              <button
+                type="button"
+                class="button is-danger"
+                id="suap-logout-button"
+              >
                 <i class="fa-solid fa-right-from-bracket"></i>
                 <span data-i18n="encerrar_sessao">Encerrar Sessão</span>
               </button>
@@ -163,6 +178,26 @@
     <section id="proximos-eventos" class="proximos-eventos is-authenticated is-hidden">
       <div class="container">
         <div id="proximos-eventos-lista" class="proximos-eventos-lista"></div>
+      </div>
+    </section>
+
+    <!-- 🆕 CONTAGEM REGRESSIVA -->
+    <section id="contagem-regressiva" class="contagem-regressiva is-authenticated is-hidden">
+      <div class="container">
+        <div class="section-title">
+          <h2>
+            <span data-i18n="contagem_titulo_1">Faltam</span>
+            <span class="highlight" data-i18n="contagem_titulo_2">pouco!</span>
+          </h2>
+          <p data-i18n="contagem_sub">Próximos eventos importantes</p>
+        </div>
+
+        <div class="contagem-grid" id="contagem-grid">
+          <div class="contagem-vazio">
+            <i class="fa-regular fa-calendar"></i>
+            <p data-i18n="contagem_vazio">Nenhum evento próximo nos próximos 30 dias.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -538,6 +573,104 @@
       </div>
     </section>
 
+    <!-- 🆕 SALA DOS PROFESSORES (só admin) -->
+    <section id="sala-professores" class="sala-professores is-authenticated is-hidden is-admin-hidden">
+      <div class="container">
+        <div class="section-title">
+          <h2>
+            <i class="fa-solid fa-user-tie" style="color: var(--accent);"></i>
+            <span data-i18n="sala_titulo">Sala dos Professores</span>
+          </h2>
+          <p data-i18n="sala_sub">Visão geral da turma (acesso restrito)</p>
+        </div>
+
+        <div class="sala-tabs">
+          <button type="button" class="sala-tab ativo" data-tab="alunos">
+            <i class="fa-solid fa-users"></i>
+            <span data-i18n="sala_tab_alunos">Alunos</span>
+          </button>
+          <button type="button" class="sala-tab" data-tab="risco">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span data-i18n="sala_tab_risco">Em Risco</span>
+          </button>
+          <button type="button" class="sala-tab" data-tab="engajamento">
+            <i class="fa-solid fa-heart"></i>
+            <span data-i18n="sala_tab_engajamento">Engajamento</span>
+          </button>
+        </div>
+
+        <div class="sala-painel">
+          <div class="sala-tab-content ativo" id="sala-tab-alunos">
+            <input
+              type="text"
+              id="sala-busca-aluno"
+              class="input-search"
+              placeholder="🔍 Buscar aluno por nome ou matrícula..."
+              data-i18n-placeholder="sala_busca"
+              autocomplete="off"
+            />
+            <div class="sala-tabela-wrapper">
+              <table class="sala-tabela">
+                <thead>
+                  <tr>
+                    <th data-i18n="sala_th_aluno">Aluno</th>
+                    <th data-i18n="sala_th_matricula">Matrícula</th>
+                    <th data-i18n="sala_th_media">Média</th>
+                    <th data-i18n="sala_th_faltas">Faltas</th>
+                    <th data-i18n="sala_th_carinhos">Carinhos</th>
+                    <th data-i18n="sala_th_status">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="sala-lista-alunos">
+                  <tr>
+                    <td colspan="6" class="sala-vazio">
+                      <i class="fa-solid fa-spinner fa-spin"></i>
+                      <span data-i18n="sala_carregando">Carregando dados...</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="sala-tab-content" id="sala-tab-risco">
+            <div id="sala-lista-risco" class="sala-cards">
+              <p class="sala-vazio-msg" data-i18n="sala_risco_carregando">
+                Carregando...
+              </p>
+            </div>
+          </div>
+
+          <div class="sala-tab-content" id="sala-tab-engajamento">
+            <div class="sala-stats-grid">
+              <div class="sala-stat-card">
+                <i class="fa-solid fa-heart"></i>
+                <h3 id="sala-stat-total-carinhos">—</h3>
+                <p data-i18n="sala_stat_carinhos">Carinhos totais</p>
+              </div>
+              <div class="sala-stat-card">
+                <i class="fa-solid fa-message"></i>
+                <h3 id="sala-stat-total-recados">—</h3>
+                <p data-i18n="sala_stat_recados">Recados publicados</p>
+              </div>
+              <div class="sala-stat-card">
+                <i class="fa-solid fa-users"></i>
+                <h3 id="sala-stat-total-alunos">—</h3>
+                <p data-i18n="sala_stat_alunos">Alunos ativos</p>
+              </div>
+              <div class="sala-stat-card">
+                <i class="fa-solid fa-fire"></i>
+                <h3 id="sala-stat-top-carinhos">—</h3>
+                <p data-i18n="sala_stat_top">Top contribuinte</p>
+              </div>
+            </div>
+
+            <div class="sala-engajamento-lista" id="sala-engajamento-lista"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <div id="modal-perfil" class="modal-overlay is-hidden" onclick="fecharModalPerfil()">
       <div class="modal-content" onclick="event.stopPropagation()">
         <button type="button" class="modal-close" onclick="fecharModalPerfil()" aria-label="Fechar">
@@ -550,11 +683,8 @@
             <strong data-i18n="matricula">Matrícula:</strong>
             <span id="modal-perfil-matricula"></span>
           </p>
-
           <p id="modal-perfil-bio" class="modal-perfil-bio is-hidden"></p>
-
           <div id="modal-perfil-redes" class="modal-perfil-redes is-hidden"></div>
-
           <p style="margin-top: 12px; font-size: 0.85em; color: var(--text-muted);">
             <span data-i18n="ultimo_acesso">Último Acesso:</span>
             <span id="modal-perfil-acesso" data-i18n="nao_registrado">Não registrado</span>
@@ -634,6 +764,18 @@
               <i class="fa-solid fa-globe"></i>
               <input type="url" id="edit-site" placeholder="https://seusite.com" maxlength="120" />
             </div>
+          </div>
+
+          <!-- 🆕 AVATAR DO MASCOTE -->
+          <div class="avatar-mascote-area">
+            <p class="field-section-title">
+              <i class="fa-solid fa-paw"></i>
+              <span data-i18n="mascote_avatar_titulo">Seu mascote</span>
+            </p>
+            <p class="avatar-mascote-desc" data-i18n="mascote_avatar_desc">
+              Personalize o mascote que aparece quando você dá carinho.
+            </p>
+            <div class="avatar-mascote-grid" id="avatar-mascote-grid"></div>
           </div>
 
           <div id="edit-perfil-bloqueio" class="edit-bloqueio is-hidden">
