@@ -104,104 +104,116 @@
 
     <!-- CALCULADORA DE NOTAS -->
     <section id="notas" class="notas is-authenticated is-hidden">
-  <div class="container">
-    <div class="section-title">
-      <h2>Calculadora de <span class="highlight">Notas</span></h2>
-      <p>Boletim atualizado diretamente pelo SUAP</p>
-    </div>
-
-    <!-- 🆕 CARDS DE RESUMO -->
-    <div class="notas-resumo">
-      <div class="resumo-card">
-        <i class="fa-solid fa-chart-line"></i>
-        <span class="resumo-label">Média Geral</span>
-        <strong id="resumo-media" class="resumo-valor">—</strong>
-      </div>
-      <div class="resumo-card">
-        <i class="fa-solid fa-book"></i>
-        <span class="resumo-label">Disciplinas</span>
-        <strong id="resumo-disciplinas" class="resumo-valor">—</strong>
-      </div>
-      <div class="resumo-card">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-        <span class="resumo-label">Em Risco</span>
-        <strong id="resumo-risco" class="resumo-valor">—</strong>
-      </div>
-      <div class="resumo-card">
-        <i class="fa-solid fa-user-xmark"></i>
-        <span class="resumo-label">Faltas Totais</span>
-        <strong id="resumo-faltas" class="resumo-valor">—</strong>
-      </div>
-    </div>
-
-    <div class="notas-panel">
-      <!-- 🆕 CONTROLES MELHORADOS -->
-      <div class="notas-controls">
-        <div class="control-group">
-          <label for="periodo-notas">Período letivo</label>
-          <select id="periodo-notas" disabled>
-            <option value="">Carregando períodos...</option>
-          </select>
+      <div class="container">
+        <div class="section-title">
+          <h2>Calculadora de <span class="highlight">Notas</span></h2>
+          <p>Boletim atualizado diretamente pelo SUAP</p>
         </div>
 
-        <div class="control-group">
-          <label for="meta-notas">
-            Meta de média: <span id="meta-valor">60</span>
-          </label>
-          <input
-            id="meta-notas"
-            type="range"
-            min="0"
-            max="100"
-            step="5"
-            value="60"
-          />
+        <!-- 🆕 CARDS DE RESUMO -->
+        <div class="notas-resumo">
+          <div class="resumo-card">
+            <i class="fa-solid fa-chart-line"></i>
+            <span class="resumo-label">Média Geral</span>
+            <strong id="resumo-media" class="resumo-valor">—</strong>
+          </div>
+          <div class="resumo-card">
+            <i class="fa-solid fa-book"></i>
+            <span class="resumo-label">Disciplinas</span>
+            <strong id="resumo-disciplinas" class="resumo-valor">—</strong>
+          </div>
+          <div class="resumo-card">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span class="resumo-label">Em Risco</span>
+            <strong id="resumo-risco" class="resumo-valor">—</strong>
+          </div>
+          <div class="resumo-card">
+            <i class="fa-solid fa-user-xmark"></i>
+            <span class="resumo-label">Faltas Totais</span>
+            <strong id="resumo-faltas" class="resumo-valor">—</strong>
+          </div>
         </div>
 
-        <button id="atualizar-notas" type="button" class="button is-link">
-          <i class="fa-solid fa-rotate"></i> Atualizar
-        </button>
-      </div>
+        <div class="notas-panel">
+          <!-- CONTROLES -->
+          <div class="notas-controls">
+            <label for="periodo-notas">Período letivo</label>
+            <select id="periodo-notas" disabled>
+              <option value="">Carregando períodos...</option>
+            </select>
 
-      <!-- 🆕 STATUS COM LOADING -->
-      <p id="notas-status" class="notas-status" role="status">
-        <i class="fa-solid fa-circle-info"></i>
-        Aguardando dados do SUAP...
-      </p>
+            <label for="meta-notas">
+              Meta: <span id="meta-valor">60</span>
+            </label>
+            <input
+              id="meta-notas"
+              type="range"
+              min="0"
+              max="100"
+              step="5"
+              value="60"
+            />
 
-      <!-- 🆕 TABELA RESPONSIVA -->
-      <div class="notas-table-wrapper">
-        <table class="tabela-notas">
-          <thead>
-            <tr>
-              <th>Disciplina</th>
-              <th>Etapas</th>
-              <th>Média</th>
-              <th>Faltas</th>
-              <th>Projeção</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="lista-notas">
-            <tr>
-              <td colspan="6" class="notas-vazia">
-                <i class="fa-solid fa-lock"></i>
-                Faça login para carregar suas notas.
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+            <button id="atualizar-notas" type="button" class="button is-link">
+              <i class="fa-solid fa-rotate"></i> Atualizar
+            </button>
+          </div>
 
-      <!-- 🆕 LEGENDA -->
-      <div class="notas-legenda">
-        <span><i class="dot dot-aprovado"></i> Aprovado</span>
-        <span><i class="dot dot-recuperacao"></i> Recuperação</span>
-        <span><i class="dot dot-reprovado"></i> Reprovado</span>
+          <!-- 🆕 FILTROS RÁPIDOS -->
+          <div class="notas-filtros" role="tablist">
+            <button type="button" class="filtro-chip ativo" data-filtro="todas">
+              Todas
+            </button>
+            <button type="button" class="filtro-chip" data-filtro="aprovado">
+              <i class="fa-solid fa-check"></i> Aprovadas
+            </button>
+            <button type="button" class="filtro-chip" data-filtro="recuperacao">
+              <i class="fa-solid fa-rotate"></i> Recuperação
+            </button>
+            <button type="button" class="filtro-chip" data-filtro="reprovado">
+              <i class="fa-solid fa-xmark"></i> Reprovadas
+            </button>
+            <button type="button" class="filtro-chip" data-filtro="risco">
+              <i class="fa-solid fa-triangle-exclamation"></i> Em risco
+            </button>
+          </div>
+
+          <p id="notas-status" class="notas-status" role="status">
+            <i class="fa-solid fa-circle-info"></i>
+            Aguardando dados do SUAP...
+          </p>
+
+          <div class="notas-table-wrapper">
+            <table class="tabela-notas">
+              <thead>
+                <tr>
+                  <th>Disciplina</th>
+                  <th>Etapas</th>
+                  <th>Média</th>
+                  <th>Faltas</th>
+                  <th>Projeção</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="lista-notas">
+                <tr>
+                  <td colspan="6" class="notas-vazia">
+                    <i class="fa-solid fa-lock"></i>
+                    Faça login para carregar suas notas.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="notas-legenda">
+            <span><i class="dot dot-aprovado"></i> Aprovado</span>
+            <span><i class="dot dot-recuperacao"></i> Recuperação</span>
+            <span><i class="dot dot-reprovado"></i> Reprovado</span>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
     <!-- QUADRO DE HORÁRIOS -->
     <section id="horarios" class="horarios is-authenticated is-hidden">
@@ -304,7 +316,6 @@
           <p>Deixe um recado para a turma</p>
         </div>
         <div class="mural-container reveal">
-          <!-- Campo de Busca de Recados -->
           <input
             type="text"
             id="busca-recados"
@@ -342,7 +353,6 @@
               />
             </div>
 
-            <!-- Controle de tempo e Botão de Envio -->
             <div
               style="
                 display: flex;
@@ -434,7 +444,7 @@
       </div>
     </section>
 
-    <!-- MODAL DE PERFIL DO ALUNO (visualização pública) -->
+    <!-- MODAL DE PERFIL DO ALUNO -->
     <div
       id="modal-perfil"
       class="modal-overlay is-hidden"
@@ -462,10 +472,8 @@
             <span id="modal-perfil-matricula"></span>
           </p>
 
-          <!-- BIO -->
           <p id="modal-perfil-bio" class="modal-perfil-bio is-hidden"></p>
 
-          <!-- REDES SOCIAIS -->
           <div
             id="modal-perfil-redes"
             class="modal-perfil-redes is-hidden"
@@ -507,7 +515,6 @@
         <p class="modal-subtitle">Personalize como você aparece para a turma.</p>
 
         <form id="form-editar-perfil">
-          <!-- FOTO -->
           <div class="avatar-edit-area">
             <img
               id="edit-avatar-preview"
@@ -539,7 +546,6 @@
             </small>
           </div>
 
-          <!-- NOME -->
           <label class="field-label" for="edit-nome">
             Nome de exibição
           </label>
@@ -551,7 +557,6 @@
             required
           />
 
-          <!-- BIO -->
           <label class="field-label" for="edit-bio">
             Bio
             <span class="char-counter-inline">
@@ -565,7 +570,6 @@
             placeholder="Fale um pouco sobre você..."
           ></textarea>
 
-          <!-- REDES SOCIAIS -->
           <p class="field-section-title">
             <i class="fa-solid fa-share-nodes"></i> Redes sociais
           </p>
@@ -618,13 +622,11 @@
             </div>
           </div>
 
-          <!-- AVISO DE BLOQUEIO -->
           <div id="edit-perfil-bloqueio" class="edit-bloqueio is-hidden">
             <i class="fa-solid fa-lock"></i>
             <span id="edit-bloqueio-texto"></span>
           </div>
 
-          <!-- AÇÕES -->
           <div class="modal-actions">
             <button
               type="button"
@@ -659,7 +661,7 @@
       </p>
     </footer>
 
-    <!-- Scripts de Integração SUAP e Tema -->
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
