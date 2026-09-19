@@ -1290,6 +1290,38 @@ document.addEventListener("DOMContentLoaded", () => {
   carregarProjetosGitHub();
   window.carregarProjetosGitHub = carregarProjetosGitHub;
 
+
+  // 14.5 📱 INSTALAR APP (PWA)
+    let __deferredPrompt = null;
+
+    window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault();
+    __deferredPrompt = e;
+    const btn = document.getElementById("btn-instalar-app");
+    if (btn) btn.classList.remove("is-hidden");
+    });
+
+    window.addEventListener("appinstalled", function () {
+    __deferredPrompt = null;
+    const btn = document.getElementById("btn-instalar-app");
+    if (btn) btn.classList.add("is-hidden");
+    });
+
+    function instalarPWA() {
+    if (!__deferredPrompt) {
+        alert("Para instalar, use o menu do navegador > 'Adicionar à tela inicial'.");
+        return;
+    }
+    __deferredPrompt.prompt();
+    __deferredPrompt.userChoice.then(function (choice) {
+        __deferredPrompt = null;
+    });
+    }
+
+    document
+    .getElementById("btn-instalar-app")
+    ?.addEventListener("click", instalarPWA);
+
   // 15. Menu Lateral
   const btnMenuLateral = document.getElementById("btn-menu");
   const menuLateral = document.getElementById("menu-lateral");
