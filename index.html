@@ -8,9 +8,8 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'self' https://*.firebaseio.com; form-action 'self' https://suap.ifrn.edu.br; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; connect-src 'self' https://suap.ifrn.edu.br https://*.firebaseio.com wss://*.firebaseio.com https://*.googleapis.com https://api.github.com;"
     />
-    <meta name="theme-color" content="#2196f3" />
+    <meta name="theme-color" content="#8b5edd" />
 
-    <!-- Meta tags para SEO / Social -->
     <meta
       name="description"
       content="Site oficial da turma 2V do curso de Informática para Internet do IFRN Campus Caicó. Conheça nossos projetos, equipe, novidades e integração com o SUAP!"
@@ -20,15 +19,12 @@
       property="og:description"
       content="A turma do futuro. Formando desenvolvedores web no sertão potiguar."
     />
-    <meta
-      property="og:image"
-      content="https://infoweb-2v.vercel.app/img/2V.png"
-    />
+    <meta property="og:image" content="https://infoweb-2v.vercel.app/img/2V.png" />
     <meta property="og:url" content="https://infoweb-2v.vercel.app" />
     <meta name="twitter:card" content="summary_large_image" />
 
     <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
-    <title>Turma 2V | 1º Ano Informática IFRN</title>
+    <title data-i18n="titulo_pagina">Turma 2V | 1º Ano Informática IFRN</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600&family=Poppins:wght@600;700;800&display=swap"
       rel="stylesheet"
@@ -55,22 +51,86 @@
           <i class="fa-solid fa-code-branch"></i> InfoWeb<span> - 2V</span>
         </a>
         <ul class="nav-links">
-          <li><a href="#inicio" class="active">Início</a></li>
-          <li><a href="#curso">O Curso</a></li>
-          <li><a href="#estatisticas">Números</a></li>
-          <li><a href="#lideres">Líderes</a></li>
-          <li><a href="#coordenadores">Coord.</a></li>
-          <li><a href="login.html">Horários</a></li>
-          <li><a href="#galeria">Galeria</a></li>
-          <li><a href="#projetos">Projetos</a></li>
+          <li><a href="#inicio" class="active" data-i18n="nav_inicio">Início</a></li>
+          <li><a href="#curso" data-i18n="nav_curso">O Curso</a></li>
+          <li><a href="#estatisticas" data-i18n="nav_numeros">Números</a></li>
+          <li><a href="#lideres" data-i18n="nav_lideres">Líderes</a></li>
+          <li><a href="#coordenadores" data-i18n="nav_coord">Coord.</a></li>
+          <li><a href="login.html" data-i18n="nav_horarios">Horários</a></li>
+          <li><a href="#galeria" data-i18n="nav_galeria">Galeria</a></li>
+          <li><a href="#projetos" data-i18n="nav_projetos">Projetos</a></li>
           <li><a href="login.html">SUAP</a></li>
-          <li><a href="#contato">Contato</a></li>
-          <li><a href="#mascote">Mascote</a></li>
+          <li><a href="#contato" data-i18n="nav_contato">Contato</a></li>
+          <li><a href="#mascote" data-i18n="nav_mascote">Mascote</a></li>
         </ul>
 
-        <button id="theme-toggle" class="btn-theme" aria-label="Alternar tema">
-          <i class="fa-solid fa-moon"></i>
-        </button>
+        <div class="header-actions">
+          <div class="menu-dropdown" id="menu-idioma">
+            <button
+              class="btn-theme btn-idioma"
+              aria-label="Idioma"
+              data-i18n-title="idioma"
+            >
+              <i class="fa-solid fa-globe"></i>
+            </button>
+            <div class="dropdown-content">
+              <button type="button" class="dropdown-item" data-idioma="pt-BR">
+                🇧🇷 Português
+              </button>
+              <button type="button" class="dropdown-item" data-idioma="en">
+                🇺🇸 English
+              </button>
+              <button type="button" class="dropdown-item" data-idioma="es">
+                🇪🇸 Español
+              </button>
+            </div>
+          </div>
+
+          <div class="menu-dropdown" id="menu-tema">
+            <button
+              class="btn-theme btn-paleta"
+              aria-label="Tema"
+              data-i18n-title="tema"
+            >
+              <i class="fa-solid fa-palette"></i>
+            </button>
+            <div class="dropdown-content dropdown-temas">
+              <button type="button" class="dropdown-item" data-tema="roxo">
+                <span class="tema-swatch tema-swatch-roxo"></span>
+                <span data-i18n="cor_roxo">Roxo</span>
+              </button>
+              <button type="button" class="dropdown-item" data-tema="azul">
+                <span class="tema-swatch tema-swatch-azul"></span>
+                <span data-i18n="cor_azul">Azul</span>
+              </button>
+              <button type="button" class="dropdown-item" data-tema="verde">
+                <span class="tema-swatch tema-swatch-verde"></span>
+                <span data-i18n="cor_verde">Verde</span>
+              </button>
+              <button type="button" class="dropdown-item" data-tema="rosa">
+                <span class="tema-swatch tema-swatch-rosa"></span>
+                <span data-i18n="cor_rosa">Rosa</span>
+              </button>
+              <button type="button" class="dropdown-item" data-tema="laranja">
+                <span class="tema-swatch tema-swatch-laranja"></span>
+                <span data-i18n="cor_laranja">Laranja</span>
+              </button>
+              <div class="dropdown-separator"></div>
+              <button type="button" class="dropdown-item" data-tema="claro">
+                <i class="fa-solid fa-sun"></i>
+                <span data-i18n="modo_claro">Modo claro</span>
+              </button>
+              <button type="button" class="dropdown-item" data-tema="escuro">
+                <i class="fa-solid fa-moon"></i>
+                <span data-i18n="modo_escuro">Modo escuro</span>
+              </button>
+            </div>
+          </div>
+
+          <button id="theme-toggle" class="btn-theme" aria-label="Alternar tema">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+        </div>
 
         <div class="menu-mobile" id="btn-menu">
           <i class="fa-solid fa-bars-staggered"></i>
@@ -81,7 +141,7 @@
     <div class="bg-glow"></div>
 
     <main>
-      <!-- SEÇÃO HERO CORRIGIDA -->
+      <!-- SEÇÃO HERO -->
       <section id="inicio" class="hero hero-main">
         <div id="particles-container"></div>
         <div class="hero-content">
@@ -93,27 +153,32 @@
           />
 
           <div class="badge">
-            <i class="fa-solid fa-location-dot pulse-icon"></i> IFRN Campus
-            Caicó
+            <i class="fa-solid fa-location-dot pulse-icon"></i>
+            <span data-i18n="hero_badge">IFRN Campus Caicó</span>
           </div>
 
-          <h1>A Turma do <span class="highlight">Futuro</span></h1>
+          <h1>
+            <span data-i18n="hero_titulo_1">A Turma do</span>
+            <span class="highlight" data-i18n="hero_titulo_2">Futuro</span>
+          </h1>
 
           <div class="typing-container">
             <p>
-              1º Ano de <span id="typing-text"></span
-              ><span class="cursor">|</span>
+              <span data-i18n="hero_typing_1">1º Ano de</span>
+              <span id="typing-text"></span><span class="cursor">|</span>
             </p>
           </div>
 
           <div class="hero-actions">
-            <a href="#curso" class="btn btn-primary">Conheça o Curso</a>
-            <a href="login.html" class="btn btn-outline btn-suap"
-              ><i class="fa-solid fa-id-card"></i> Acessar SUAP</a
+            <a href="#curso" class="btn btn-primary" data-i18n="hero_btn_curso"
+              >Conheça o Curso</a
             >
+            <a href="login.html" class="btn btn-outline btn-suap">
+              <i class="fa-solid fa-id-card"></i>
+              <span data-i18n="hero_btn_suap">Acessar SUAP</span>
+            </a>
           </div>
 
-          <!-- Frase do Dia -->
           <div class="frase-do-dia reveal">
             <i class="fa-solid fa-quote-left"></i>
             <p id="frase-texto">Carregando frase inspiradora...</p>
@@ -125,14 +190,17 @@
       <section id="curso" class="curso">
         <div class="container">
           <div class="section-title reveal">
-            <h2>Sobre o <span class="highlight">Curso</span></h2>
-            <p>Informática para Internet no IFRN Caicó</p>
+            <h2>
+              <span data-i18n="curso_titulo_1">Sobre o</span>
+              <span class="highlight" data-i18n="curso_titulo_2">Curso</span>
+            </h2>
+            <p data-i18n="curso_sub">Informática para Internet no IFRN Caicó</p>
           </div>
           <div class="curso-grid">
             <div class="curso-card reveal tilt-element">
               <i class="fa-solid fa-laptop-code"></i>
-              <h3>O que é?</h3>
-              <p>
+              <h3 data-i18n="curso_card1_t">O que é?</h3>
+              <p data-i18n="curso_card1_p">
                 O curso técnico integrado prepara os alunos para o
                 desenvolvimento de sistemas web, unindo o ensino médio à
                 formação profissional tecnológica de excelência oferecida pelo
@@ -144,8 +212,8 @@
               style="transition-delay: 0.1s"
             >
               <i class="fa-solid fa-layer-group"></i>
-              <h3>O que aprendemos?</h3>
-              <p>
+              <h3 data-i18n="curso_card2_t">O que aprendemos?</h3>
+              <p data-i18n="curso_card2_p">
                 Dominamos a criação de interfaces (Front-end), regras de negócio
                 (Back-end), modelagem de banco de dados, design de interação
                 (UI/UX) e redes de computadores.
@@ -156,8 +224,8 @@
               style="transition-delay: 0.2s"
             >
               <i class="fa-solid fa-user"></i>
-              <h3>Nosso Perfil</h3>
-              <p>
+              <h3 data-i18n="curso_card3_t">Nosso Perfil</h3>
+              <p data-i18n="curso_card3_p">
                 Formamos profissionais capazes de atuar em agências de
                 tecnologia, startups e grandes empresas, sempre focados em
                 resolver problemas reais através do raciocínio lógico e da
@@ -171,14 +239,17 @@
       <section id="estatisticas" class="estatisticas">
         <div class="container">
           <div class="section-title reveal">
-            <h2>Nossos <span class="highlight">Números</span></h2>
-            <p>A turma 2V em dados</p>
+            <h2>
+              <span data-i18n="stats_titulo_1">Nossos</span>
+              <span class="highlight" data-i18n="stats_titulo_2">Números</span>
+            </h2>
+            <p data-i18n="stats_sub">A turma 2V em dados</p>
           </div>
           <div class="stats-grid">
             <div class="stat-card reveal tilt-element">
               <i class="fa-solid fa-users"></i>
               <h3 class="counter" data-target="40">0</h3>
-              <p>Quantos Alunos?</p>
+              <p data-i18n="stats_alunos">Quantos Alunos?</p>
             </div>
             <div
               class="stat-card reveal tilt-element"
@@ -186,7 +257,7 @@
             >
               <i class="fa-solid fa-code"></i>
               <h3 class="counter" data-target="15234">0</h3>
-              <p>Linhas de Código</p>
+              <p data-i18n="stats_linhas">Linhas de Código</p>
             </div>
             <div
               class="stat-card reveal tilt-element"
@@ -194,6 +265,7 @@
             >
               <i class="fa-solid fa-user"></i>
               <h3 class="counter" data-target="3142">0</h3>
+              <!-- Resenhas Feitas: piada interna, mantida em PT -->
               <p>Resenhas Feitas</p>
             </div>
           </div>
@@ -203,13 +275,17 @@
       <section id="lideres" class="lideres">
         <div class="container">
           <div class="section-title reveal">
-            <h2>Nossos <span class="highlight">Líderes</span></h2>
-            <p>Quem representa a turma?</p>
+            <h2>
+              <span data-i18n="lideres_titulo_1">Nossos</span>
+              <span class="highlight" data-i18n="lideres_titulo_2">Líderes</span>
+            </h2>
+            <p data-i18n="lideres_sub">Quem representa a turma?</p>
           </div>
           <div class="curso-grid">
             <div class="curso-card reveal tilt-element">
               <i class="fa-solid fa-crown"></i>
-              <h3>Líder de sala</h3>
+              <h3 data-i18n="lider_lider">Líder de sala</h3>
+              <!-- Nome próprio: não traduzir -->
               <div class="lider-nome">Bela Cardoso</div>
             </div>
             <div
@@ -217,7 +293,8 @@
               style="transition-delay: 0.1s"
             >
               <i class="fa-solid fa-star"></i>
-              <h3>Vice-líder</h3>
+              <h3 data-i18n="lider_vice">Vice-líder</h3>
+              <!-- Nome próprio: não traduzir -->
               <div class="lider-nome">Samuel Nóbrega</div>
             </div>
           </div>
@@ -227,13 +304,18 @@
       <section id="coordenadores" class="coordenadores">
         <div class="container">
           <div class="section-title reveal">
-            <h2>Nossos <span class="highlight">Coordenadores</span></h2>
-            <p>A equipe que organiza e inspira</p>
+            <h2>
+              <span data-i18n="coord_titulo_1">Nossos</span>
+              <span class="highlight" data-i18n="coord_titulo_2"
+                >Coordenadores</span
+              >
+            </h2>
+            <p data-i18n="coord_sub">A equipe que organiza e inspira</p>
           </div>
           <div class="curso-grid">
             <div class="curso-card reveal tilt-element">
               <i class="fa-solid fa-photo-film"></i>
-              <h3>Coordenador de Mídia</h3>
+              <h3 data-i18n="coord_midia">Coordenador de Mídia</h3>
               <div class="lider-nome">Williams</div>
             </div>
             <div
@@ -241,7 +323,7 @@
               style="transition-delay: 0.1s"
             >
               <i class="fa-solid fa-pen-ruler"></i>
-              <h3>Coordenador de Design</h3>
+              <h3 data-i18n="coord_design">Coordenador de Design</h3>
               <div class="lider-nome">Kleber</div>
             </div>
             <div
@@ -250,28 +332,31 @@
             >
               <i class="fa-brands fa-html5"></i>
               <i class="fa-brands fa-css3-alt"></i>
-              <h3>Coordenadores de html e css</h3>
+              <h3 data-i18n="coord_html_css">Coordenadores de html e css</h3>
               <div class="lider-nome">Jonas e Ayslan</div>
             </div>
-            <!-- AJUSTE DE DELAY (0.3s) -->
             <div
               class="curso-card reveal tilt-element"
               style="transition-delay: 0.3s"
             >
               <i class="fa-solid fa-clock"></i>
-              <h3>Em breve</h3>
-              <div class="lider-nome">Novo coordenador em breve...</div>
+              <h3 data-i18n="coord_em_breve">Em breve</h3>
+              <div class="lider-nome" data-i18n="coord_em_breve_desc">
+                Novo coordenador em breve...
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Galeria da Turma -->
       <section id="galeria" class="galeria">
         <div class="container">
           <div class="section-title reveal">
-            <h2>Galeria da <span class="highlight">Turma</span></h2>
-            <p>Momentos que construímos juntos</p>
+            <h2>
+              <span data-i18n="galeria_titulo_1">Galeria da</span>
+              <span class="highlight" data-i18n="galeria_titulo_2">Turma</span>
+            </h2>
+            <p data-i18n="galeria_sub">Momentos que construímos juntos</p>
           </div>
           <div class="galeria-grid">
             <div class="galeria-item reveal">
@@ -292,30 +377,30 @@
         </div>
       </section>
 
-      <!-- Projetos -->
       <section id="projetos" class="projetos">
         <div class="container">
           <div class="section-title reveal">
-            <h2>Nossos Projetos</h2>
-            <p>O que estamos construindo</p>
+            <h2 data-i18n="projetos_titulo">Nossos Projetos</h2>
+            <p data-i18n="projetos_sub">O que estamos construindo</p>
           </div>
           <div id="projetos-container" class="projetos-grid">
-            <div class="loading-projetos">Carregando projetos do GitHub...</div>
+            <div class="loading-projetos" data-i18n="projetos_carregando">
+              Carregando projetos do GitHub...
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- Tecnologias -->
       <section id="tecnologias" class="tecnologias">
         <div class="container">
           <div class="section-title reveal">
-            <h2>Nossa Stack</h2>
-            <p>Ferramentas que dominamos</p>
+            <h2 data-i18n="tech_titulo">Nossa Stack</h2>
+            <p data-i18n="tech_sub">Ferramentas que dominamos</p>
           </div>
           <div class="empty-state reveal">
             <i class="fa-solid fa-microchip"></i>
-            <h3>Sem tecnologias disponíveis no momento</h3>
-            <p>
+            <h3 data-i18n="tech_vazio_t">Sem tecnologias disponíveis no momento</h3>
+            <p data-i18n="tech_vazio_p">
               Nossa jornada está apenas começando. Logo adicionaremos as
               linguagens e frameworks que farão parte do nosso arsenal.
             </p>
@@ -323,24 +408,23 @@
         </div>
       </section>
 
-      <!-- Contato -->
       <section id="contato" class="contato">
         <div class="container">
           <div class="section-title reveal">
-            <h2>Contato</h2>
-            <p>Onde nos encontrar</p>
+            <h2 data-i18n="contato_titulo">Contato</h2>
+            <p data-i18n="contato_sub">Onde nos encontrar</p>
           </div>
           <div class="contato-grid">
             <div class="contato-card reveal tilt-element">
               <div class="card-header">
                 <i class="fa-solid fa-building-columns"></i>
-                <h3>Instituição</h3>
+                <h3 data-i18n="contato_inst_t">Instituição</h3>
               </div>
               <div class="card-body">
                 <h4>IFRN - Campus Caicó</h4>
                 <p>
-                  <i class="fa-solid fa-location-dot"></i> Rodovia RN 288, s/n -
-                  Nova Caicó, RN<br />CEP: 59300-000
+                  <i class="fa-solid fa-location-dot"></i>
+                  Rodovia RN 288, s/n - Nova Caicó, RN<br />CEP: 59300-000
                 </p>
                 <p>
                   <i class="fa-solid fa-phone"></i> (84) 4005-4102
@@ -357,11 +441,11 @@
             >
               <div class="card-header">
                 <i class="fa-solid fa-users"></i>
-                <h3>Pessoal (Turma 2V)</h3>
+                <h3 data-i18n="contato_turma_t">Pessoal (Turma 2V)</h3>
               </div>
               <div class="card-body">
-                <h4>Fale com a Turma</h4>
-                <p>
+                <h4 data-i18n="contato_fale_t">Fale com a Turma</h4>
+                <p data-i18n="contato_fale_p">
                   Siga-nos nas redes sociais ou envie uma mensagem direta para
                   parcerias e troca de ideias.
                 </p>
@@ -395,10 +479,11 @@
         </div>
       </section>
 
-      <!-- Mascote -->
       <section id="mascote" class="mascote-section">
         <div class="mascote-container reveal">
-          <h2 class="mascote-title">🐾 <span>Nosso Mascote</span> 🤖</h2>
+          <h2 class="mascote-title">
+            🐾 <span data-i18n="mascote_titulo">Nosso Mascote</span> 🤖
+          </h2>
           <div class="mascote-wrapper">
             <div class="mascote-imagem">
               <img
@@ -408,11 +493,13 @@
                 class="mascote-flutuante"
                 id="mascoteImg"
               />
-              <p class="mascote-clique">✨ Clique no mascote! ✨</p>
+              <p class="mascote-clique" data-i18n="mascote_clique">
+                ✨ Clique no mascote! ✨
+              </p>
             </div>
             <div class="mascote-info">
-              <h3>Conheça nosso mascote!</h3>
-              <p>
+              <h3 data-i18n="mascote_conheca">Conheça nosso mascote!</h3>
+              <p data-i18n="mascote_desc">
                 Ele representa a energia, criatividade e inovação da turma 2V.
                 Sempre pronto para novos desafios no mundo da tecnologia!
               </p>
@@ -420,20 +507,22 @@
               <div class="mascote-stats">
                 <div class="mascote-stat">
                   <i class="fa-solid fa-heart"></i>
-                  <span id="mascote-likes">0</span> / 1.000.000 carinhos
+                  <span id="mascote-likes">0</span>
+                  <span data-i18n="mascote_carinhos">/ 1.000.000 carinhos</span>
                 </div>
                 <div class="mascote-stat">
                   <i class="fa-solid fa-comment"></i>
-                  <span id="mascote-mensagens">0</span> mensagens
+                  <span id="mascote-mensagens">0</span>
+                  <span data-i18n="mascote_mensagens">mensagens</span>
                 </div>
               </div>
 
               <div class="progresso-container">
                 <div class="progresso-label">
-                  <span
-                    ><i class="fa-solid fa-chart-line"></i> Progresso para 1
-                    MILHÃO</span
-                  >
+                  <span>
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span data-i18n="mascote_progresso">Progresso para 1 MILHÃO</span>
+                  </span>
                   <span id="progresso-texto">0 / 1.000.000</span>
                 </div>
                 <div class="progresso-bar">
@@ -442,7 +531,8 @@
               </div>
 
               <button id="darCarinhoBtn" class="btn-mascote">
-                <i class="fa-solid fa-heart"></i> Dar carinho
+                <i class="fa-solid fa-heart"></i>
+                <span data-i18n="mascote_btn">Dar carinho</span>
               </button>
             </div>
           </div>
@@ -456,14 +546,15 @@
           <i class="fa-solid fa-code-branch"></i> Turma 2V
         </div>
         <p>
-          © <span id="ano">2026</span> - Feito pela turma
+          © <span id="ano">2026</span>
+          <span data-i18n="footer_feito">- Feito pela turma</span>
           <a
             href="https://github.com/infoWeb2026-2V"
             target="_blank"
             rel="noopener noreferrer"
             >InfoWeb2026.2V</a
           >
-          Com Carinho 💜
+          <span data-i18n="footer_carinho">Com Carinho 💜</span>
         </p>
       </div>
     </footer>
@@ -478,7 +569,6 @@
       <i class="fa-solid fa-arrow-up"></i>
     </a>
 
-    <!-- Scripts da Página -->
     <script src="scripts/script.js"></script>
     <script src="scripts/mascote.js"></script>
 
