@@ -51,7 +51,6 @@ const TRADUCOES = {
     stats_sub: "A turma 2V em dados",
     stats_alunos: "Quantos Alunos?",
     stats_linhas: "Linhas de Código",
-    // "Resenhas Feitas" NÃO é traduzida — piada interna
     // Líderes
     lideres_titulo_1: "Nossos",
     lideres_titulo_2: "Líderes",
@@ -102,7 +101,7 @@ const TRADUCOES = {
     mascote_desc:
       "Ele representa a energia, criatividade e inovação da turma 2V. Sempre pronto para novos desafios no mundo da tecnologia!",
     mascote_carinhos: "/ 1.000.000 carinhos",
-    mascote_mensagens: "mensagens",
+    mascote_seus: "Seus:",
     mascote_progresso: "Progresso para 1 MILHÃO",
     mascote_btn: "Dar carinho",
     // Footer
@@ -196,7 +195,7 @@ const TRADUCOES = {
     mascote_desc:
       "It represents the energy, creativity, and innovation of class 2V. Always ready for new challenges in the tech world!",
     mascote_carinhos: "/ 1,000,000 hugs",
-    mascote_mensagens: "messages",
+    mascote_seus: "Yours:",
     mascote_progresso: "Progress to 1 MILLION",
     mascote_btn: "Give a hug",
     footer_feito: "- Made by class",
@@ -289,7 +288,7 @@ const TRADUCOES = {
     mascote_desc:
       "Representa la energía, creatividad e innovación de la clase 2V. ¡Siempre lista para nuevos desafíos en el mundo de la tecnología!",
     mascote_carinhos: "/ 1.000.000 cariños",
-    mascote_mensagens: "mensajes",
+    mascote_seus: "Tuyos:",
     mascote_progresso: "Progreso hacia 1 MILLÓN",
     mascote_btn: "Dar cariño",
     footer_feito: "- Hecho por la clase",
@@ -399,7 +398,7 @@ function aplicarTema(novoTema) {
 // INICIALIZAÇÃO
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
-  // 🎨 Aplica tema e idioma salvos ANTES de tudo
+  // Aplica tema e idioma salvos
   aplicarTema(obterTemaAtual());
   aplicarTraducoes();
 
@@ -433,29 +432,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   setTimeout(typeEffect, 500);
 
-  // 2. Menu Mobile
-  const btnMenu = document.getElementById("btn-menu");
-  const navLinks = document.querySelector(".nav-links");
-  if (btnMenu && navLinks) {
-    const iconMenu = btnMenu.querySelector("i");
-    btnMenu.addEventListener("click", () => {
-      navLinks.classList.toggle("show");
-      if (navLinks.classList.contains("show")) {
-        iconMenu.classList.replace("fa-bars-staggered", "fa-xmark");
-      } else {
-        iconMenu.classList.replace("fa-xmark", "fa-bars-staggered");
-      }
-    });
-    document.querySelectorAll(".nav-links a").forEach((link) => {
-      link.addEventListener("click", () => {
-        navLinks.classList.remove("show");
-        if (iconMenu)
-          iconMenu.classList.replace("fa-xmark", "fa-bars-staggered");
-      });
-    });
-  }
-
-  // 3. Scroll Reveal
+  // 2. Scroll Reveal
   const reveals = document.querySelectorAll(".reveal");
   const revealOnScroll = new IntersectionObserver(
     (entries) => {
@@ -470,7 +447,7 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   reveals.forEach((reveal) => revealOnScroll.observe(reveal));
 
-  // 4. Highlight Menu
+  // 3. Highlight Menu
   const sections = document.querySelectorAll("section");
   const navItems = document.querySelectorAll(".nav-links a");
   window.addEventListener("scroll", () => {
@@ -492,11 +469,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // 5. Ano Dinâmico
+  // 4. Ano Dinâmico
   const spanAno = document.getElementById("ano");
   if (spanAno) spanAno.textContent = new Date().getFullYear();
 
-  // 6. Tema Claro/Escuro (toggle do sol/lua)
+  // 5. Tema Claro/Escuro
   const themeToggleBtn = document.getElementById("theme-toggle");
   if (themeToggleBtn) {
     const themeIcon = themeToggleBtn.querySelector("i");
@@ -517,7 +494,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 6b. Dropdown de idioma
+  // 6. Dropdown de idioma
   document
     .querySelectorAll("#menu-idioma .dropdown-item")
     .forEach(function (btn) {
@@ -526,7 +503,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-  // 6c. Dropdown de tema
+  // 7. Dropdown de tema
   document
     .querySelectorAll("#menu-tema .dropdown-item")
     .forEach(function (btn) {
@@ -550,7 +527,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-  // 7. Botão Voltar ao Topo
+  // 8. Botão Voltar ao Topo
   const backToTopBtn = document.getElementById("back-to-top");
   if (backToTopBtn) {
     window.addEventListener("scroll", () => {
@@ -562,7 +539,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 8. Contadores
+  // 9. Contadores
   const counters = document.querySelectorAll(".counter");
   const statsSection = document.getElementById("estatisticas");
   let animated = false;
@@ -591,7 +568,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 9. Barra de Progresso
+  // 10. Barra de Progresso
   const scrollProgress = document.getElementById("scroll-progress");
   if (scrollProgress) {
     window.addEventListener("scroll", () => {
@@ -603,7 +580,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 10. Partículas
+  // 11. Partículas
   function createParticles() {
     const container = document.getElementById("particles-container");
     if (!container) return;
@@ -623,8 +600,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   createParticles();
 
-  // 11. Efeito Tilt
-  const tiltCards = document.querySelectorAll(".tilt-element");
+  // 12. Efeito Tilt
   function ativarTilt() {
     const cards = document.querySelectorAll(".tilt-element");
     if (window.matchMedia("(min-width: 850px)").matches) {
@@ -653,7 +629,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ativarTilt();
   window.ativarTilt = ativarTilt;
 
-  // 12. Frase do Dia
+  // 13. Frase do Dia
   const frases = [
     {
       texto: "A melhor maneira de prever o futuro é criá-lo.",
@@ -691,7 +667,7 @@ document.addEventListener("DOMContentLoaded", () => {
   exibirFraseAleatoria();
   window.exibirFraseAleatoria = exibirFraseAleatoria;
 
-  // 13. Carregar Projetos do GitHub
+  // 14. Carregar Projetos do GitHub
   async function carregarProjetosGitHub() {
     const container = document.getElementById("projetos-container");
     if (!container) return;
@@ -707,47 +683,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (repos.length === 0) {
         container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fa-regular fa-folder-open"></i>
-                        <h3>${t("projetos_vazio_t")}</h3>
-                        <p>${t("projetos_vazio_p")}</p>
-                    </div>
-                `;
+          <div class="empty-state">
+            <i class="fa-regular fa-folder-open"></i>
+            <h3>${t("projetos_vazio_t")}</h3>
+            <p>${t("projetos_vazio_p")}</p>
+          </div>
+        `;
         return;
       }
 
       container.innerHTML = repos
         .map(
           (repo) => `
-                <div class="projeto-card tilt-element">
-                    <h3><i class="fa-regular fa-bookmark"></i> ${repo.name}</h3>
-                    <p>${repo.description || t("projetos_sem_desc")}</p>
-                    ${
-                      repo.topics && repo.topics.length
-                        ? `
-                        <div class="projeto-tags">
-                            ${repo.topics
-                              .slice(0, 3)
-                              .map(
-                                (topic) =>
-                                  `<span class="projeto-tag">${topic}</span>`
-                              )
-                              .join("")}
-                        </div>
-                    `
-                        : ""
-                    }
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="color: var(--text-muted); font-size: 0.8rem;">
-                            <i class="fa-regular fa-star"></i> ${repo.stargazers_count} 
-                            <i class="fa-solid fa-code-branch" style="margin-left: 10px;"></i> ${repo.forks_count}
-                        </span>
-                        <a href="${repo.html_url}" target="_blank" class="projeto-link">
-                            ${t("projetos_ver_github")} <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                        </a>
-                    </div>
-                </div>
-            `
+        <div class="projeto-card tilt-element">
+          <h3><i class="fa-regular fa-bookmark"></i> ${repo.name}</h3>
+          <p>${repo.description || t("projetos_sem_desc")}</p>
+          ${
+            repo.topics && repo.topics.length
+              ? `
+            <div class="projeto-tags">
+              ${repo.topics
+                .slice(0, 3)
+                .map((topic) => `<span class="projeto-tag">${topic}</span>`)
+                .join("")}
+            </div>
+          `
+              : ""
+          }
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: var(--text-muted); font-size: 0.8rem;">
+              <i class="fa-regular fa-star"></i> ${repo.stargazers_count} 
+              <i class="fa-solid fa-code-branch" style="margin-left: 10px;"></i> ${repo.forks_count}
+            </span>
+            <a href="${repo.html_url}" target="_blank" class="projeto-link">
+              ${t("projetos_ver_github")} <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+          </div>
+        </div>
+      `
         )
         .join("");
 
@@ -755,130 +728,87 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) {
       console.error("Erro ao carregar projetos:", error);
       container.innerHTML = `
-                <div class="empty-state">
-                    <i class="fa-regular fa-folder-open"></i>
-                    <h3>${t("projetos_erro_t")}</h3>
-                    <p>${t("projetos_erro_p")}</p>
-                </div>
-            `;
+        <div class="empty-state">
+          <i class="fa-regular fa-folder-open"></i>
+          <h3>${t("projetos_erro_t")}</h3>
+          <p>${t("projetos_erro_p")}</p>
+        </div>
+      `;
     }
   }
   carregarProjetosGitHub();
   window.carregarProjetosGitHub = carregarProjetosGitHub;
 
-  // 14. Mural de Recados com localStorage
-  const STORAGE_KEY = "mural_recados_2v";
+  // 15. Menu Lateral
+  const btnMenuLateral = document.getElementById("btn-menu");
+  const menuLateral = document.getElementById("menu-lateral");
+  const menuLateralOverlay = document.getElementById("menu-lateral-overlay");
+  const btnFecharMenu = document.getElementById("btn-fechar-menu");
 
-  function carregarRecados() {
-    const recados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    renderizarRecados(recados);
+  function abrirMenuLateral() {
+    menuLateral?.classList.add("aberto");
+    menuLateralOverlay?.classList.add("aberto");
+    menuLateral?.setAttribute("aria-hidden", "false");
+    document.body.classList.add("menu-aberto");
+    btnFecharMenu?.focus();
+  }
+  function fecharMenuLateral() {
+    menuLateral?.classList.remove("aberto");
+    menuLateralOverlay?.classList.remove("aberto");
+    menuLateral?.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("menu-aberto");
+    document.getElementById("btn-menu")?.focus();
   }
 
-  function salvarRecados(recados) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(recados));
-  }
+  btnMenuLateral?.addEventListener("click", abrirMenuLateral);
+  btnFecharMenu?.addEventListener("click", fecharMenuLateral);
+  menuLateralOverlay?.addEventListener("click", fecharMenuLateral);
 
-  function escapeHTML(str) {
-    return str.replace(/[&<>"]/g, function (m) {
-      if (m === "&") return "&amp;";
-      if (m === "<") return "&lt;";
-      if (m === ">") return "&gt;";
-      if (m === '"') return "&quot;";
-      return m;
-    });
-  }
-
-  function formatarData(timestamp) {
-    const data = new Date(timestamp);
-    return data.toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
-
-  function renderizarRecados(recados) {
-    const container = document.getElementById("lista-recados");
-    if (!container) return;
-
-    if (recados.length === 0) {
-      container.innerHTML =
-        '<div class="sem-recados"><i class="fa-regular fa-message"></i> Nenhum recado ainda. Seja o primeiro!</div>';
-      return;
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && menuLateral?.classList.contains("aberto")) {
+      fecharMenuLateral();
     }
+  });
 
-    const recadosOrdenados = [...recados].reverse();
-
-    container.innerHTML = recadosOrdenados
-      .map(
-        (recado) => `
-            <div class="recado-item" data-id="${recado.id}">
-                <div class="recado-header">
-                    <span class="recado-nome"><i class="fa-regular fa-user"></i> ${escapeHTML(
-                      recado.nome
-                    )}</span>
-                    <span class="recado-data">${formatarData(recado.data)}</span>
-                </div>
-                <div class="recado-mensagem">${escapeHTML(recado.mensagem)}</div>
-                <div class="recado-acoes">
-                    <button class="btn-like" data-id="${recado.id}">
-                        <i class="fa-regular fa-heart"></i> <span class="like-count">${
-                          recado.likes || 0
-                        }</span>
-                    </button>
-                </div>
-            </div>
-        `
-      )
-      .join("");
-
-    document.querySelectorAll(".btn-like").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const id = btn.dataset.id;
-        const recados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-        const recado = recados.find((r) => r.id === id);
-        if (recado) {
-          recado.likes = (recado.likes || 0) + 1;
-          salvarRecados(recados);
-          renderizarRecados(recados);
-        }
-      });
+  document.querySelectorAll(".menu-lateral-nav .menu-item").forEach((item) => {
+    item.addEventListener("click", () => {
+      setTimeout(fecharMenuLateral, 100);
     });
-  }
+  });
 
-  function adicionarRecado(nome, mensagem) {
-    const recados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    const novoRecado = {
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
-      nome: nome.trim(),
-      mensagem: mensagem.trim(),
-      data: Date.now(),
-      likes: 0,
-    };
-    recados.push(novoRecado);
-    salvarRecados(recados);
-    renderizarRecados(recados);
-  }
+  // Botão de tema dentro do menu lateral → abre dropdown principal
+  document.getElementById("menu-btn-tema")?.addEventListener("click", () => {
+    const menuTema = document.getElementById("menu-tema");
+    menuTema?.classList.toggle("aberto");
+    const menuIdioma = document.getElementById("menu-idioma");
+    menuIdioma?.classList.remove("aberto");
+  });
 
-  carregarRecados();
+  // Botão de idioma dentro do menu lateral → abre dropdown principal
+  document.getElementById("menu-btn-idioma")?.addEventListener("click", () => {
+    const menuIdioma = document.getElementById("menu-idioma");
+    menuIdioma?.classList.toggle("aberto");
+    const menuTema = document.getElementById("menu-tema");
+    menuTema?.classList.remove("aberto");
+  });
 
-  const form = document.getElementById("form-recado");
-  if (form) {
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const nome = document.getElementById("recado-nome").value;
-      const mensagem = document.getElementById("recado-mensagem").value;
-      if (nome && mensagem) {
-        adicionarRecado(nome, mensagem);
-        form.reset();
-      }
-    });
-  }
+  // Fecha dropdowns ao clicar fora
+  document.addEventListener("click", (e) => {
+    if (
+      !e.target.closest("#menu-idioma") &&
+      !e.target.closest("#menu-btn-idioma")
+    ) {
+      document.getElementById("menu-idioma")?.classList.remove("aberto");
+    }
+    if (
+      !e.target.closest("#menu-tema") &&
+      !e.target.closest("#menu-btn-tema")
+    ) {
+      document.getElementById("menu-tema")?.classList.remove("aberto");
+    }
+  });
 
-  // 15. Easter Egg no Console
+  // 16. Easter Egg no Console
   console.log(
     "%c🐾 Turma 2V - IFRN Caicó",
     "font-size: 16px; font-weight: bold; color: #8B5EDD;"

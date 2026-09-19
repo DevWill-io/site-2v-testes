@@ -1250,6 +1250,8 @@ window.forceLogout = function () {
     "suapToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=" +
     window.location.hostname +
     "; path=/;";
+  localStorage.removeItem("matricula_suap");
+  document.cookie = "matricula=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   localStorage.removeItem("suapToken");
   sessionStorage.clear();
   window.location.replace(window.location.origin + "/login.html");
@@ -3148,6 +3150,11 @@ document.addEventListener("DOMContentLoaded", function () {
       if (userMatEl) userMatEl.textContent = matriculaSuap;
       window.usuarioLogado.nome = nomeParaExibicao(nomeSuap);
       window.usuarioLogado.matricula = matriculaSuap;
+      // 🆕 Salva pra outros scripts (mascote) usarem
+      try {
+        localStorage.setItem("matricula_suap", matriculaSuap);
+        document.cookie = `matricula=${matriculaSuap}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`;
+      } catch (e) {}
       window.usuarioLogado.foto = fotoUrl;
       window.usuarioLogado.fotoOriginal = fotoUrl;
 
