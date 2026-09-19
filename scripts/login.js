@@ -113,10 +113,8 @@ const TRADUCOES = {
     instalar_app: "Instalar app",
     idioma: "Idioma",
     tema: "Tema",
-    // Mensagens dinâmicas
     carregando_periodos: "Carregando períodos...",
     aguardando_dados: "Aguardando dados do SUAP...",
-    // Legenda do calendário
     cal_provas: "Provas e avaliações",
     cal_trabalhos: "Trabalhos e listas",
     cal_feriados: "Feriados e recessos",
@@ -359,7 +357,6 @@ const IDIOMA_PADRAO = "pt-BR";
 function obterIdiomaAtual() {
   var lang = localStorage.getItem("idioma");
   if (lang && IDIOMAS_SUPORTADOS.includes(lang)) return lang;
-  // Detecta do navegador
   var nav = (navigator.language || "pt-BR").toLowerCase();
   if (nav.startsWith("en")) return "en";
   if (nav.startsWith("es")) return "es";
@@ -375,39 +372,30 @@ function aplicarTraducoes() {
   var lang = obterIdiomaAtual();
   document.documentElement.setAttribute("lang", lang);
 
-  // [data-i18n]
   document.querySelectorAll("[data-i18n]").forEach(function (el) {
     var chave = el.getAttribute("data-i18n");
     var texto = t(chave);
     if (texto) el.textContent = texto;
   });
 
-  // [data-i18n-placeholder]
   document.querySelectorAll("[data-i18n-placeholder]").forEach(function (el) {
     var chave = el.getAttribute("data-i18n-placeholder");
     var texto = t(chave);
     if (texto) el.setAttribute("placeholder", texto);
   });
 
-  // [data-i18n-title]
   document.querySelectorAll("[data-i18n-title]").forEach(function (el) {
     var chave = el.getAttribute("data-i18n-title");
     var texto = t(chave);
     if (texto) el.setAttribute("title", texto);
   });
 
-  // Marca o idioma ativo no dropdown
   document.querySelectorAll("#menu-idioma .dropdown-item").forEach(function (btn) {
     btn.classList.toggle("ativo", btn.dataset.idioma === lang);
   });
 
-  // Atualiza título da página
   document.title = t("titulo_pagina");
-
-  // Re-renderiza legenda do calendário se existir
-  if (typeof renderizarLegendaCalendario === "function") {
-    renderizarLegendaCalendario();
-  }
+  if (typeof renderizarLegendaCalendario === "function") renderizarLegendaCalendario();
 }
 
 function trocarIdioma(novoIdioma) {
@@ -425,45 +413,33 @@ const TEMAS_DISPONIVEIS = ["roxo", "azul", "verde", "rosa", "laranja"];
 const TEMA_PADRAO = "roxo";
 
 function obterTemaAtual() {
-  var t = localStorage.getItem("tema-cor");
-  return TEMAS_DISPONIVEIS.includes(t) ? t : TEMA_PADRAO;
+  var tema = localStorage.getItem("tema-cor");
+  return TEMAS_DISPONIVEIS.includes(tema) ? tema : TEMA_PADRAO;
 }
 
 function aplicarTema(novoTema) {
   if (!TEMAS_DISPONIVEIS.includes(novoTema)) novoTema = TEMA_PADRAO;
-  // Remove todas as classes de tema
-  TEMAS_DISPONIVEIS.forEach(function (t) {
-    document.body.classList.remove("tema-" + t);
-  });
+  TEMAS_DISPONIVEIS.forEach(function (t) { document.body.classList.remove("tema-" + t); });
   document.body.classList.add("tema-" + novoTema);
   localStorage.setItem("tema-cor", novoTema);
 
-  // Atualiza o theme-color do PWA
   var meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
-    var cores = {
-      roxo: "#8b5edd",
-      azul: "#3b82f6",
-      verde: "#10b981",
-      rosa: "#ec4899",
-      laranja: "#f97316",
-    };
+    var cores = { roxo: "#8b5edd", azul: "#3b82f6", verde: "#10b981", rosa: "#ec4899", laranja: "#f97316" };
     meta.setAttribute("content", cores[novoTema] || "#8b5edd");
   }
 
-  // Marca ativo no dropdown
   document.querySelectorAll("#menu-tema .dropdown-item").forEach(function (btn) {
     btn.classList.toggle("ativo", btn.dataset.tema === novoTema);
   });
 
-  // Redesenha gráfico
-  if (window.__graficoEvolucao && typeof desenharGraficoEvolucao === "function") {
-    desenharGraficoEvolucao();
+  if (typeof desenharGraficoEvolucao === "function") {
+    setTimeout(desenharGraficoEvolucao, 60);
   }
 }
 
 // ==========================================
-// 📱 PWA — INSTALAÇÃO
+// 📱 PWA
 // ==========================================
 var __deferredPrompt = null;
 
@@ -490,21 +466,18 @@ function instalarPWA() {
   }
   __deferredPrompt.prompt();
   __deferredPrompt.userChoice.then(function (choice) {
-    if (choice.outcome === "accepted") {
-      if (typeof exibirToast === "function") exibirToast("Instalando app...", "sucesso");
+    if (choice.outcome === "accepted" && typeof exibirToast === "function") {
+      exibirToast("Instalando app...", "sucesso");
     }
     __deferredPrompt = null;
   });
 }
 
-// Registra service worker
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
-    navigator.serviceWorker.register("/sw.js").then(function (reg) {
-      console.log("[PWA] SW registrado:", reg.scope);
-    }).catch(function (err) {
-      console.warn("[PWA] Falha ao registrar SW:", err);
-    });
+    navigator.serviceWorker.register("/sw.js")
+      .then(function (reg) { console.log("[PWA] SW registrado:", reg.scope); })
+      .catch(function (err) { console.warn("[PWA] Falha ao registrar SW:", err); });
   });
 }
 
@@ -522,9 +495,9 @@ const REGRAS_CORES_CALENDARIO = [
 const COR_PADRAO_CALENDARIO = { cor: "#8b5edd", textoKey: "cal_outros" };
 
 function corDoEvento(titulo) {
-  var t = String(titulo || "").toLowerCase();
+  var t2 = String(titulo || "").toLowerCase();
   for (var i = 0; i < REGRAS_CORES_CALENDARIO.length; i++) {
-    if (REGRAS_CORES_CALENDARIO[i].regex.test(t)) return REGRAS_CORES_CALENDARIO[i].cor;
+    if (REGRAS_CORES_CALENDARIO[i].regex.test(t2)) return REGRAS_CORES_CALENDARIO[i].cor;
   }
   return COR_PADRAO_CALENDARIO.cor;
 }
@@ -534,11 +507,7 @@ function renderizarLegendaCalendario() {
   if (!container) return;
   var todas = REGRAS_CORES_CALENDARIO.concat([COR_PADRAO_CALENDARIO]);
   container.innerHTML = todas.map(function (item) {
-    return `
-      <div class="legenda-item">
-        <span class="legenda-cor" style="background:${item.cor}"></span>
-        <span class="legenda-texto">${escaparHTML(t(item.textoKey))}</span>
-      </div>`;
+    return `<div class="legenda-item"><span class="legenda-cor" style="background:${item.cor}"></span><span class="legenda-texto">${escaparHTML(t(item.textoKey))}</span></div>`;
   }).join("");
 }
 
@@ -572,12 +541,9 @@ let bancoDePerfis = [];
 let filtroRecadoTexto = "";
 let filtroPerfilTexto = "";
 
-// Auxiliares
 function escaparHTML(texto) {
   if (!texto) return "";
-  return String(texto)
-    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+  return String(texto).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
 function converterLinks(textoEscapado) {
@@ -648,38 +614,33 @@ function calcularTempoRestante(timestampCriacao, duracaoHoras) {
     return `Expira em ${minRestantes} min`;
   }
 }
+
 // ==========================================
-// 1. TEMA CLARO/ESCURO
+// TEMA CLARO/ESCURO
 // ==========================================
 const themeToggle = document.getElementById("theme-toggle");
 if (themeToggle) {
   const themeIcon = themeToggle.querySelector("i");
   let currentTheme = localStorage.getItem("theme");
-  if (!currentTheme) {
-    currentTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-  }
+  if (!currentTheme) currentTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
   if (currentTheme === "light") {
     document.body.classList.add("light-theme");
     if (themeIcon) themeIcon.classList.replace("fa-moon", "fa-sun");
   }
   themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("light-theme");
-    let theme = "dark";
-    if (document.body.classList.contains("light-theme")) {
-      theme = "light";
-      if (themeIcon) themeIcon.classList.replace("fa-moon", "fa-sun");
-    } else {
-      if (themeIcon) themeIcon.classList.replace("fa-sun", "fa-moon");
+    let theme = document.body.classList.contains("light-theme") ? "light" : "dark";
+    if (themeIcon) {
+      if (theme === "light") themeIcon.classList.replace("fa-moon", "fa-sun");
+      else themeIcon.classList.replace("fa-sun", "fa-moon");
     }
     localStorage.setItem("theme", theme);
-    if (window.__graficoEvolucao && typeof desenharGraficoEvolucao === "function") {
-      desenharGraficoEvolucao();
-    }
+    if (window.__graficoEvolucao && typeof desenharGraficoEvolucao === "function") desenharGraficoEvolucao();
   });
 }
 
 // ==========================================
-// 2. FIREBASE LISTENERS
+// FIREBASE LISTENERS
 // ==========================================
 onValue(recadosRef, (snapshot) => {
   bancoDeRecados = [];
@@ -690,11 +651,8 @@ onValue(recadosRef, (snapshot) => {
     const timestampCriacao = recado.timestamp || agora;
     const duracaoHoras = recado.duracao_horas || (recado.duracao_dias ? recado.duracao_dias * 24 : 7 * 24);
     const tempoDeVidaMs = duracaoHoras * 60 * 60 * 1000;
-    if (agora - timestampCriacao > tempoDeVidaMs) {
-      remove(ref(db, "mural_recados/" + id));
-    } else {
-      bancoDeRecados.push({ id, ...recado, timestampCriacao, duracaoHoras });
-    }
+    if (agora - timestampCriacao > tempoDeVidaMs) remove(ref(db, "mural_recados/" + id));
+    else bancoDeRecados.push({ id, ...recado, timestampCriacao, duracaoHoras });
   });
   window.renderizarMural();
   if (typeof gerarNotificacoesRecados === "function") gerarNotificacoesRecados();
@@ -709,17 +667,14 @@ onValue(perfisRef, (snapshot) => {
   window.renderizarPerfis();
   if (window.usuarioLogado.matricula) {
     const meuPerfil = bancoDePerfis.find(
-      (p) => String(p.matricula) === String(window.usuarioLogado.matricula) ||
-             String(p.id) === String(window.usuarioLogado.matricula)
+      (p) => String(p.matricula) === String(window.usuarioLogado.matricula) || String(p.id) === String(window.usuarioLogado.matricula)
     );
-    if (meuPerfil && typeof window.aplicarPerfilNoCard === "function") {
-      window.aplicarPerfilNoCard(meuPerfil);
-    }
+    if (meuPerfil && typeof window.aplicarPerfilNoCard === "function") window.aplicarPerfilNoCard(meuPerfil);
   }
 });
 
 // ==========================================
-// 3. ENVIO DE RECADOS
+// ENVIO DE RECADOS
 // ==========================================
 const formRecado = document.getElementById("form-recado");
 if (formRecado) {
@@ -760,7 +715,7 @@ if (recadoMensagemInput) {
 }
 
 // ==========================================
-// 4. MURAL — GLOBAIS
+// MURAL — GLOBAIS
 // ==========================================
 const inputBuscaMural = document.getElementById("busca-recados");
 if (inputBuscaMural) {
@@ -801,10 +756,8 @@ window.abrirModalPerfil = function (identificador) {
   if (matEl) matEl.textContent = perfil.matricula || perfil.id || "Não informada";
   if (acessoEl) acessoEl.textContent = perfil.ultimoAcesso ? new Date(perfil.ultimoAcesso).toLocaleString("pt-BR") : t("nao_registrado");
   if (bioEl) {
-    if (perfil.bio && String(perfil.bio).trim()) {
-      bioEl.textContent = perfil.bio;
-      bioEl.classList.remove("is-hidden");
-    } else { bioEl.textContent = ""; bioEl.classList.add("is-hidden"); }
+    if (perfil.bio && String(perfil.bio).trim()) { bioEl.textContent = perfil.bio; bioEl.classList.remove("is-hidden"); }
+    else { bioEl.textContent = ""; bioEl.classList.add("is-hidden"); }
   }
   if (redesEl) {
     const links = montarLinksRedes(perfil.redes);
@@ -861,26 +814,19 @@ window.renderizarMural = function () {
       const ehAutorCom = com.autor_matricula === window.usuarioLogado.matricula;
       const btnDelCom = ehAutorCom || ehAdmin
         ? `<button type="button" style="background:none;border:none;color:#ff4757;cursor:pointer;font-size:0.8em;" onclick="excluirComentario('${recado.id}','${com.cId}')"><i class="fa-solid fa-xmark"></i></button>` : "";
-      htmlComentarios += `
-        <div class="comentario-item" style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.05);padding:6px 10px;border-radius:6px;margin-top:5px;font-size:0.85em;">
-          <div style="flex:1;"><strong>${escaparHTML(com.autor_nome)}:</strong> ${converterLinks(escaparHTML(com.texto))}</div>
-          ${btnDelCom}
-        </div>`;
+      htmlComentarios += `<div class="comentario-item" style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.05);padding:6px 10px;border-radius:6px;margin-top:5px;font-size:0.85em;"><div style="flex:1;"><strong>${escaparHTML(com.autor_nome)}:</strong> ${converterLinks(escaparHTML(com.texto))}</div>${btnDelCom}</div>`;
     });
     const div = document.createElement("div");
     div.className = "recado-item";
     div.innerHTML = `
       <div class="recado-header">
         <span class="recado-nome">${nomeSeguro}</span>
-        <span class="recado-data" title="${textoExpiracao}">
-          <i class="fa-regular fa-clock" style="font-size:0.85em;margin-right:3px;"></i>${recado.data}${tagEditado} • <small style="opacity:0.8;">${textoExpiracao}</small>
-        </span>
+        <span class="recado-data" title="${textoExpiracao}"><i class="fa-regular fa-clock" style="font-size:0.85em;margin-right:3px;"></i>${recado.data}${tagEditado} • <small style="opacity:0.8;">${textoExpiracao}</small></span>
       </div>
       <p class="recado-mensagem">${mensagemComLinks}</p>
       ${anexoHTML}
       <div class="recado-acoes" style="margin-top:10px;display:flex;gap:8px;align-items:center;">
-        ${btnEditar}
-        ${btnExcluir}
+        ${btnEditar}${btnExcluir}
         <button type="button" class="btn-like" style="${corCoracao}" onclick="curtirRecado('${recado.id}')"><i class="${iconeCoracao}"></i> ${totalLikes}</button>
         <button type="button" class="btn-like" onclick="alternarComentarios('${recado.id}')" title="Comentários"><i class="fa-regular fa-comment"></i> ${totalComentarios}</button>
       </div>
@@ -922,9 +868,7 @@ window.excluirComentario = function (recadoId, comentarioId) {
       const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
       const ehAutor = com.autor_matricula === window.usuarioLogado.matricula;
       if (!ehAutor && !ehAdmin) { exibirToast("Sem permissão.", "erro"); return; }
-      if (confirm("Excluir este comentário?")) {
-        remove(itemRef).then(() => exibirToast("Comentário removido.", "sucesso"));
-      }
+      if (confirm("Excluir este comentário?")) remove(itemRef).then(() => exibirToast("Comentário removido.", "sucesso"));
     }
   });
 };
@@ -954,10 +898,7 @@ window.renderizarPerfis = function () {
     card.style.cursor = "pointer";
     const nomeExibir = perfil.nomeCompleto || perfil.nome || "Usuário sem nome";
     const fotoFinal = perfil.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random`;
-    card.innerHTML = `
-      <div class="perfil-avatar"><img src="${escaparHTML(fotoFinal)}" alt="${escaparHTML(nomeExibir)}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random'" /></div>
-      <div class="perfil-info"><h4 class="perfil-nome">${escaparHTML(nomeExibir)}</h4><span class="perfil-matricula">${escaparHTML(matriculaParaExibicao(perfil.matricula || perfil.id))}</span></div>
-    `;
+    card.innerHTML = `<div class="perfil-avatar"><img src="${escaparHTML(fotoFinal)}" alt="${escaparHTML(nomeExibir)}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random'" /></div><div class="perfil-info"><h4 class="perfil-nome">${escaparHTML(nomeExibir)}</h4><span class="perfil-matricula">${escaparHTML(matriculaParaExibicao(perfil.matricula || perfil.id))}</span></div>`;
     container.appendChild(card);
   });
 };
@@ -977,9 +918,7 @@ window.editarRecado = function (id) {
         const tempoAtualStr = horasAtuais % 24 === 0 ? horasAtuais / 24 + "d" : horasAtuais + "h";
         const novosDiasInput = prompt('2/2 - Duração (ex: 5h, 12h, 2d, 15d)', tempoAtualStr);
         let novasHoras = horasAtuais;
-        if (novosDiasInput !== null && novosDiasInput.trim() !== "") {
-          novasHoras = parseDuracaoParaHoras(novosDiasInput);
-        }
+        if (novosDiasInput !== null && novosDiasInput.trim() !== "") novasHoras = parseDuracaoParaHoras(novosDiasInput);
         update(itemRef, { mensagem: escaparHTML(novaMensagem.trim()), duracao_horas: novasHoras, editado: true })
           .then(() => exibirToast("Recado atualizado!", "sucesso"))
           .catch((err) => exibirToast("Erro: " + err.message, "erro"));
@@ -1028,7 +967,7 @@ window.forceLogout = function () {
 };
 
 // ==========================================
-// 4.5. EDIÇÃO DE PERFIL
+// EDIÇÃO DE PERFIL
 // ==========================================
 const CHAVE_STORAGE_PERFIL = "perfil_custom_";
 const MAX_FOTO_BYTES = 500 * 1024;
@@ -1247,16 +1186,12 @@ async function salvarPerfilEditado() {
     window.aplicarPerfilNoCard(perfilAtualizado);
     exibirToast("Perfil atualizado!", "sucesso");
     window.fecharModalEditarPerfil();
-  } catch (err) {
-    exibirToast("Erro: " + err.message, "erro");
-  } finally {
-    btnSalvar.disabled = false;
-    btnSalvar.innerHTML = textoOriginal;
-  }
+  } catch (err) { exibirToast("Erro: " + err.message, "erro"); }
+  finally { btnSalvar.disabled = false; btnSalvar.innerHTML = textoOriginal; }
 }
 
 // ==========================================
-// 5. SUAP E BOLETIM
+// SUAP E BOLETIM
 // ==========================================
 var suap = new SuapClient(SUAP_URL, CLIENT_ID, REDIRECT_URI, SCOPE);
 suap.init();
@@ -1281,14 +1216,8 @@ function atualizarStatusNotas(mensagem, tipo) {
 function obterEtapasDaDisciplina(disciplina) {
   if (disciplina.segundo_semestre === true) return { tipo: "Semestral", etapas: [3, 4] };
   if (disciplina.segundo_semestre === false) return { tipo: "Semestral", etapas: [1, 2] };
-  var tem12 = [1, 2].some(function (n) {
-    var e = disciplina["nota_etapa_" + n];
-    return formatarNota(e && typeof e === "object" ? e.nota : e) !== null;
-  });
-  var tem34 = [3, 4].some(function (n) {
-    var e = disciplina["nota_etapa_" + n];
-    return formatarNota(e && typeof e === "object" ? e.nota : e) !== null;
-  });
+  var tem12 = [1, 2].some(function (n) { var e = disciplina["nota_etapa_" + n]; return formatarNota(e && typeof e === "object" ? e.nota : e) !== null; });
+  var tem34 = [3, 4].some(function (n) { var e = disciplina["nota_etapa_" + n]; return formatarNota(e && typeof e === "object" ? e.nota : e) !== null; });
   if (tem34 && !tem12) return { tipo: "Semestral", etapas: [3, 4] };
   if (tem12 && tem34) return { tipo: "Anual", etapas: [1, 2, 3, 4] };
   if (tem12) {
@@ -1296,13 +1225,10 @@ function obterEtapasDaDisciplina(disciplina) {
     if (temCampo34) return { tipo: "Anual", etapas: [1, 2, 3, 4] };
     return { tipo: "Semestral", etapas: [1, 2] };
   }
-  if (("nota_etapa_3" in disciplina) || ("nota_etapa_4" in disciplina)) {
-    return { tipo: "Anual", etapas: [1, 2, 3, 4] };
-  }
+  if (("nota_etapa_3" in disciplina) || ("nota_etapa_4" in disciplina)) return { tipo: "Anual", etapas: [1, 2, 3, 4] };
   return { tipo: "Semestral", etapas: [1, 2] };
 }
 
-// Estado da calculadora
 var __notasCache = [];
 var __metaAtual = 60;
 var __filtroAtivo = "todas";
@@ -1319,10 +1245,7 @@ const LIMITE_FALTAS_ALERTA = 0.20;
 const CARGA_HORARIA_PADRAO = 60;
 
 function getCodigoDisc(d) { return String(d.codigo_diario || d.disciplina || d.id || "disc").trim(); }
-function metaEfetiva(d) {
-  var cod = getCodigoDisc(d);
-  return __metasDisciplinas[cod] != null ? __metasDisciplinas[cod] : __metaAtual;
-}
+function metaEfetiva(d) { var cod = getCodigoDisc(d); return __metasDisciplinas[cod] != null ? __metasDisciplinas[cod] : __metaAtual; }
 function classificarStatusNota(media, faltas, meta) {
   var limite = CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT;
   if (faltas > limite) return "reprovado";
@@ -1333,10 +1256,7 @@ function classificarStatusNota(media, faltas, meta) {
 }
 
 function calcularMediaSimples(d, etapas, simulacao) {
-  var notas = etapas.map(function (n) {
-    var etapa = d["nota_etapa_" + n];
-    return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa);
-  });
+  var notas = etapas.map(function (n) { var etapa = d["nota_etapa_" + n]; return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa); });
   var preenchidasReais = notas.filter(function (v) { return v !== null; });
   var somaReal = preenchidasReais.reduce(function (a, b) { return a + b; }, 0);
   var temEtapaAberta = preenchidasReais.length < etapas.length;
@@ -1366,10 +1286,8 @@ function calcularProjecaoDisciplina(notasPreenchidas, totalEtapas, soma, meta) {
 function carregarMetasDisciplinas() {
   var mat = window.usuarioLogado.matricula;
   if (!mat) return;
-  try {
-    var local = localStorage.getItem(MATRICULA_STORAGE_KEY());
-    if (local) __metasDisciplinas = JSON.parse(local) || {};
-  } catch (e) { __metasDisciplinas = {}; }
+  try { var local = localStorage.getItem(MATRICULA_STORAGE_KEY()); if (local) __metasDisciplinas = JSON.parse(local) || {}; }
+  catch (e) { __metasDisciplinas = {}; }
   get(ref(db, "metas_disciplinas/" + mat)).then(function (snap) {
     var dados = snap.val();
     if (dados && typeof dados === "object") {
@@ -1403,8 +1321,7 @@ function ordenarDisciplinas(lista) {
       vb = calcularMediaSimples(b, obterEtapasDaDisciplina(b).etapas, __simulacoes[getCodigoDisc(b)]).media;
       va = va === null ? -1 : va; vb = vb === null ? -1 : vb;
     } else if (__sortKey === "faltas") {
-      va = Number(a.numero_faltas) || 0;
-      vb = Number(b.numero_faltas) || 0;
+      va = Number(a.numero_faltas) || 0; vb = Number(b.numero_faltas) || 0;
     } else if (__sortKey === "status") {
       var ordem = { reprovado: 0, recuperacao: 1, aprovado: 2 };
       var ma = calcularMediaSimples(a, obterEtapasDaDisciplina(a).etapas, __simulacoes[getCodigoDisc(a)]).media;
@@ -1461,14 +1378,9 @@ function alertaDeFaltas(disciplinas) {
   var limiteAlerta = CARGA_HORARIA_PADRAO * LIMITE_FALTAS_ALERTA;
   disciplinas.forEach(function (d) {
     var faltas = Number(d.numero_faltas) || 0;
-    if (faltas >= limiteReprov && faltas > alertaMax) {
-      alertaMax = faltas;
-      discCritica = { nome: d.disciplina || d.codigo_diario, faltas, nivel: "danger" };
-    } else if (faltas >= limiteAlerta && (!discCritica || discCritica.nivel !== "danger")) {
-      if (faltas > alertaMax) {
-        alertaMax = faltas;
-        discCritica = { nome: d.disciplina || d.codigo_diario, faltas, nivel: "warn" };
-      }
+    if (faltas >= limiteReprov && faltas > alertaMax) { alertaMax = faltas; discCritica = { nome: d.disciplina || d.codigo_diario, faltas, nivel: "danger" }; }
+    else if (faltas >= limiteAlerta && (!discCritica || discCritica.nivel !== "danger")) {
+      if (faltas > alertaMax) { alertaMax = faltas; discCritica = { nome: d.disciplina || d.codigo_diario, faltas, nivel: "warn" }; }
     }
   });
   if (!discCritica) return;
@@ -1524,72 +1436,98 @@ function renderizarHistorico() {
       else if (diff < -0.3) trendHTML = `<span class="periodo-trend down"><i class="fa-solid fa-arrow-down"></i> ${diff.toFixed(1)}</span>`;
       else trendHTML = `<span class="periodo-trend eq"><i class="fa-solid fa-minus"></i> estável</span>`;
     }
-    return `
-      <div class="historico-card">
-        <span class="periodo-label">${escaparHTML(h.periodo)}</span>
-        <span class="periodo-media">${h.media !== null ? h.media.toFixed(1) : "—"}</span>
-        <span class="periodo-info">${h.disciplinas} disciplina(s)</span>
-        ${trendHTML}
-      </div>`;
+    return `<div class="historico-card"><span class="periodo-label">${escaparHTML(h.periodo)}</span><span class="periodo-media">${h.media !== null ? h.media.toFixed(1) : "—"}</span><span class="periodo-info">${h.disciplinas} disciplina(s)</span>${trendHTML}</div>`;
   }).join("");
 }
 
+// ==========================================
+// GRÁFICO DE EVOLUÇÃO
+// ==========================================
 window.__graficoEvolucao = null;
 
 function desenharGraficoEvolucao() {
   var canvas = document.getElementById("grafico-evolucao");
   var panel = document.getElementById("evolucao-panel");
-  if (!canvas || !panel) return;
-  var comMedia = __historicoPeriodos.filter(function (h) { return h.media !== null; });
+
+  if (!canvas || !panel) { console.warn("[evolução] canvas ou panel não encontrados"); return; }
+
+  if (typeof Chart === "undefined") {
+    console.warn("[evolução] Chart.js não carregado");
+    panel.classList.add("is-hidden");
+    return;
+  }
+
+  var comMedia = (__historicoPeriodos || []).filter(function (h) {
+    return h && h.media !== null && h.media !== undefined;
+  });
+
+  console.log("[evolução] Períodos com média:", comMedia.length);
+
   if (comMedia.length === 0) { panel.classList.add("is-hidden"); return; }
+
   panel.classList.remove("is-hidden");
+
   var ordenado = __historicoPeriodos.slice().sort(function (a, b) { return a.periodo.localeCompare(b.periodo); });
   var labels = ordenado.map(function (h) { return h.periodo; });
   var dados = ordenado.map(function (h) { return h.media !== null ? h.media : 0; });
+
   if (window.__graficoEvolucao) {
     try { window.__graficoEvolucao.destroy(); } catch (e) {}
     window.__graficoEvolucao = null;
   }
-  var estilo = getComputedStyle(document.documentElement);
+
+  var estilo = getComputedStyle(document.body);
   var corAccent = estilo.getPropertyValue("--accent-strong").trim() || "#8b5edd";
   var corAccent2 = estilo.getPropertyValue("--accent").trim() || "#cebdec";
   var corTexto = estilo.getPropertyValue("--text-muted").trim() || "#b8a8d9";
   var corGrade = estilo.getPropertyValue("--border-color").trim() || "rgba(206,189,236,0.18)";
   var corMeta = estilo.getPropertyValue("--warning").trim() || "#f59e0b";
+
   var ctx = canvas.getContext("2d");
   var gradient = ctx.createLinearGradient(0, 0, 0, 260);
   gradient.addColorStop(0, corAccent + "cc");
   gradient.addColorStop(1, corAccent + "08");
-  window.__graficoEvolucao = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: labels,
-      datasets: [
-        { label: "Média", data: dados, borderColor: corAccent, backgroundColor: gradient, borderWidth: 3, pointBackgroundColor: corAccent2, pointBorderColor: corAccent, pointBorderWidth: 2, pointRadius: 6, pointHoverRadius: 9, tension: 0.35, fill: true },
-        { label: "Meta", data: labels.map(function () { return __metaAtual; }), borderColor: corMeta, borderWidth: 2, borderDash: [6, 6], pointRadius: 0, fill: false },
-      ],
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: "index", intersect: false },
-      plugins: {
-        legend: { labels: { color: corTexto, font: { family: "Inter", size: 12, weight: "600" }, usePointStyle: true } },
-        tooltip: { backgroundColor: "rgba(0,0,0,0.85)", titleFont: { family: "Inter", size: 13 }, bodyFont: { family: "Inter", size: 12 }, padding: 10, cornerRadius: 8, callbacks: { label: function (context) { return context.dataset.label + ": " + context.parsed.y.toFixed(1); } } },
+
+  try {
+    window.__graficoEvolucao = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: [
+          { label: "Média", data: dados, borderColor: corAccent, backgroundColor: gradient, borderWidth: 3, pointBackgroundColor: corAccent2, pointBorderColor: corAccent, pointBorderWidth: 2, pointRadius: 6, pointHoverRadius: 9, tension: 0.35, fill: true },
+          { label: "Meta", data: labels.map(function () { return __metaAtual; }), borderColor: corMeta, borderWidth: 2, borderDash: [6, 6], pointRadius: 0, fill: false },
+        ],
       },
-      scales: {
-        y: { beginAtZero: true, max: 100, ticks: { color: corTexto, font: { family: "Inter", size: 11 }, stepSize: 20 }, grid: { color: corGrade, drawBorder: false } },
-        x: { ticks: { color: corTexto, font: { family: "Inter", size: 11, weight: "600" } }, grid: { display: false } },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { labels: { color: corTexto, font: { family: "Inter", size: 12, weight: "600" }, usePointStyle: true } },
+          tooltip: { backgroundColor: "rgba(0,0,0,0.85)", titleFont: { family: "Inter", size: 13 }, bodyFont: { family: "Inter", size: 12 }, padding: 10, cornerRadius: 8, callbacks: { label: function (context) { return context.dataset.label + ": " + context.parsed.y.toFixed(1); } } },
+        },
+        scales: {
+          y: { beginAtZero: true, max: 100, ticks: { color: corTexto, font: { family: "Inter", size: 11 }, stepSize: 20 }, grid: { color: corGrade, drawBorder: false } },
+          x: { ticks: { color: corTexto, font: { family: "Inter", size: 11, weight: "600" } }, grid: { display: false } },
+        },
       },
-    },
-  });
+    });
+    console.log("[evolução] Gráfico renderizado");
+  } catch (err) {
+    console.error("[evolução] Erro ao criar gráfico:", err);
+    panel.classList.add("is-hidden");
+  }
 }
 
+// ==========================================
+// RENDERIZAR TABELA
+// ==========================================
 function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   var corpo = document.getElementById("lista-notas");
   if (!corpo) return;
   var metaInput = document.getElementById("meta-notas");
   var meta = metaInput ? (formatarNota(metaInput.value) || 60) : 60;
   __metaAtual = meta;
+
   if (apenasLinhaCodigo && __notasCache.length) {
     var tr = corpo.querySelector(`tr[data-codigo="${CSS.escape(apenasLinhaCodigo)}"]`);
     if (tr) {
@@ -1597,13 +1535,16 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
       if (d) { atualizarLinhaNota(tr, d, meta); atualizarResumoNotas(__notasCache); return; }
     }
   }
+
   __notasCache = disciplinas || [];
   corpo.innerHTML = "";
+
   if (!__notasCache.length) {
     corpo.innerHTML = '<tr><td colspan="8" class="notas-vazia"><i class="fa-solid fa-inbox"></i><span>Nenhuma disciplina neste período.</span></td></tr>';
     atualizarResumoNotas([]);
     return;
   }
+
   var visiveis = __notasCache.filter(function (d) {
     if (__filtroAtivo === "todas") return true;
     var etapas = obterEtapasDaDisciplina(d).etapas;
@@ -1613,17 +1554,21 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
     if (__filtroAtivo === "risco") return st !== "aprovado";
     return st === __filtroAtivo;
   });
+
   if (!visiveis.length) {
     corpo.innerHTML = '<tr><td colspan="8" class="notas-vazia"><i class="fa-solid fa-filter-circle-xmark"></i><span>Nenhuma disciplina neste filtro.</span></td></tr>';
     atualizarResumoNotas(__notasCache);
     return;
   }
+
   visiveis = ordenarDisciplinas(visiveis);
+
   var grupos = { Semestral: [], Anual: [] };
   visiveis.forEach(function (d) {
     var cfg = obterEtapasDaDisciplina(d);
     grupos[cfg.tipo].push({ disciplina: d, etapas: cfg.etapas });
   });
+
   ["Semestral", "Anual"].forEach(function (tipo) {
     if (!grupos[tipo].length) return;
     var linhaGrupo = document.createElement("tr");
@@ -1633,15 +1578,12 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
     linhaGrupo.addEventListener("click", function () {
       __gruposColapsados[tipo] = !__gruposColapsados[tipo];
       linhaGrupo.classList.toggle("colapsado", __gruposColapsados[tipo]);
-      document.querySelectorAll(`tr[data-grupo-linha="${tipo}"]`).forEach(function (tr) {
-        tr.style.display = __gruposColapsados[tipo] ? "none" : "";
-      });
+      document.querySelectorAll(`tr[data-grupo-linha="${tipo}"]`).forEach(function (tr) { tr.style.display = __gruposColapsados[tipo] ? "none" : ""; });
     });
     corpo.appendChild(linhaGrupo);
-    grupos[tipo].forEach(function (item) {
-      corpo.appendChild(criarLinhaNota(item.disciplina, item.etapas, tipo, meta));
-    });
+    grupos[tipo].forEach(function (item) { corpo.appendChild(criarLinhaNota(item.disciplina, item.etapas, tipo, meta)); });
   });
+
   atualizarResumoNotas(__notasCache);
   alertaDeFaltas(__notasCache);
   bindSimuladores(corpo);
@@ -1654,10 +1596,7 @@ function criarLinhaNota(d, etapas, tipo, meta) {
   var metaDisc = metaEfetiva(d);
   var calc = calcularMediaSimples(d, etapas, sim);
   var media = calc.media;
-  var notasEtapas = etapas.map(function (n) {
-    var etapa = d["nota_etapa_" + n];
-    return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa);
-  });
+  var notasEtapas = etapas.map(function (n) { var etapa = d["nota_etapa_" + n]; return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa); });
   var status = classificarStatusNota(media, faltas, metaDisc);
   var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, etapas.length, calc.somaComSim, metaDisc);
   var faltasClasse = faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT ? "critico" : faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_ALERTA ? "alerta" : "";
@@ -1728,7 +1667,7 @@ function atualizarLinhaNota(tr, d, meta) {
           input.insertAdjacentElement("afterend", span);
         }
       }
-    } else if (resultadoEl) { resultadoEl.remove(); }
+    } else if (resultadoEl) resultadoEl.remove();
   }
 }
 
@@ -1800,19 +1739,14 @@ function exportarCSV() {
     var meta = metaEfetiva(d);
     var st = classificarStatusNota(calc.media, faltas, meta);
     var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, cfg.etapas.length, calc.somaComSim, meta);
-    linhas.push([
-      (d.disciplina || d.codigo_diario || "").replace(/;/g, ","), cfg.tipo,
-      cfg.etapas.map(function (n) { var e = d["nota_etapa_" + n]; return textoNota(formatarNota(e && typeof e === "object" ? e.nota : e)); }).join(" | "),
-      textoNota(calc.media), meta, faltas, proj.texto, st
-    ].join(";"));
+    linhas.push([(d.disciplina || d.codigo_diario || "").replace(/;/g, ","), cfg.tipo, cfg.etapas.map(function (n) { var e = d["nota_etapa_" + n]; return textoNota(formatarNota(e && typeof e === "object" ? e.nota : e)); }).join(" | "), textoNota(calc.media), meta, faltas, proj.texto, st].join(";"));
   });
   var csv = "\uFEFF" + linhas.join("\n");
   var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   var url = URL.createObjectURL(blob);
   var a = document.createElement("a");
   var periodo = (document.getElementById("periodo-notas")?.value || "boletim").replace("/", ".");
-  a.href = url;
-  a.download = "boletim_" + periodo + ".csv";
+  a.href = url; a.download = "boletim_" + periodo + ".csv";
   document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
   exibirToast("CSV exportado!", "sucesso");
@@ -1840,14 +1774,7 @@ function exportarPDF() {
     });
   });
   var w = window.open("", "_blank");
-  w.document.write(`
-    <!doctype html><html><head><meta charset="utf-8"><title>Boletim ${escaparHTML(nome)}</title>
-    <style>*{font-family:'Segoe UI',Arial,sans-serif;}body{padding:30px;color:#222;}h1{font-size:20px;margin:0 0 4px;}.sub{color:#666;font-size:12px;margin-bottom:20px;}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;}th,td{border:1px solid #ccc;padding:6px 8px;text-align:left;}th{background:#f3f0fa;}tr.grupo td{background:#ece7f8;font-size:13px;}.rodape{margin-top:24px;font-size:10px;color:#999;text-align:center;}@media print{body{padding:10px;}}</style></head><body>
-    <h1>Boletim Acadêmico — ${escaparHTML(nome)}</h1>
-    <div class="sub">Matrícula: ${escaparHTML(mat)} • Período: ${escaparHTML(periodo)} • Emitido em ${new Date().toLocaleString("pt-BR")}</div>
-    <table><thead><tr><th>Disciplina</th><th>Etapas</th><th>Média</th><th>Faltas</th><th>Projeção</th><th>Status</th></tr></thead><tbody>${linhasHTML}</tbody></table>
-    <div class="rodape">Gerado pelo Portal InfoWeb 2V — IFRN</div>
-    <script>window.onload=()=>setTimeout(()=>window.print(),300);<\/script></body></html>`);
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Boletim ${escaparHTML(nome)}</title><style>*{font-family:'Segoe UI',Arial,sans-serif;}body{padding:30px;color:#222;}h1{font-size:20px;margin:0 0 4px;}.sub{color:#666;font-size:12px;margin-bottom:20px;}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;}th,td{border:1px solid #ccc;padding:6px 8px;text-align:left;}th{background:#f3f0fa;}tr.grupo td{background:#ece7f8;font-size:13px;}.rodape{margin-top:24px;font-size:10px;color:#999;text-align:center;}@media print{body{padding:10px;}}</style></head><body><h1>Boletim Acadêmico — ${escaparHTML(nome)}</h1><div class="sub">Matrícula: ${escaparHTML(mat)} • Período: ${escaparHTML(periodo)} • Emitido em ${new Date().toLocaleString("pt-BR")}</div><table><thead><tr><th>Disciplina</th><th>Etapas</th><th>Média</th><th>Faltas</th><th>Projeção</th><th>Status</th></tr></thead><tbody>${linhasHTML}</tbody></table><div class="rodape">Gerado pelo Portal InfoWeb 2V — IFRN</div><script>window.onload=()=>setTimeout(()=>window.print(),300);<\/script></body></html>`);
   w.document.close();
 }
 
@@ -1893,7 +1820,9 @@ function carregarPeriodosNotas() {
   );
 }
 
-// Notificações
+// ==========================================
+// NOTIFICAÇÕES
+// ==========================================
 const CHAVE_NOTIF_LIDAS = () => "notif_lidas_" + (window.usuarioLogado.matricula || "anon");
 let __notificacoes = [];
 
@@ -1901,10 +1830,7 @@ function gerarNotificacoesRecados() {
   var mat = window.usuarioLogado.matricula;
   if (!mat) return;
   var lidas = {};
-  try {
-    var raw = localStorage.getItem(CHAVE_NOTIF_LIDAS());
-    lidas = raw ? JSON.parse(raw) : {};
-  } catch (e) { lidas = {}; }
+  try { var raw = localStorage.getItem(CHAVE_NOTIF_LIDAS()); lidas = raw ? JSON.parse(raw) : {}; } catch (e) { lidas = {}; }
   __notificacoes = [];
   bancoDeRecados.forEach(function (r) {
     if (r.autor_matricula === mat) return;
@@ -1930,10 +1856,7 @@ function atualizarBadgeNotificacoes() {
 function renderizarPainelNotificacoes() {
   var lista = document.getElementById("lista-notificacoes");
   if (!lista) return;
-  if (__notificacoes.length === 0) {
-    lista.innerHTML = `<p class="notif-vazio">${escaparHTML(t("sem_notif"))}</p>`;
-    return;
-  }
+  if (__notificacoes.length === 0) { lista.innerHTML = `<p class="notif-vazio">${escaparHTML(t("sem_notif"))}</p>`; return; }
   lista.innerHTML = __notificacoes.map(function (n) {
     var dataStr = new Date(n.data).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
     return `<div class="notif-item ${n.lida ? "" : "nao-lida"}" data-id="${n.id}"><div class="notif-icone"><i class="${n.icone}"></i></div><div class="notif-corpo"><div class="notif-titulo">${escaparHTML(n.titulo)}</div><div class="notif-descricao">${escaparHTML(n.descricao)}</div><div class="notif-data">${dataStr}</div></div></div>`;
@@ -1950,10 +1873,7 @@ function renderizarPainelNotificacoes() {
 
 function marcarNotificacaoLida(id) {
   var lidas = {};
-  try {
-    var raw = localStorage.getItem(CHAVE_NOTIF_LIDAS());
-    lidas = raw ? JSON.parse(raw) : {};
-  } catch (e) { lidas = {}; }
+  try { var raw = localStorage.getItem(CHAVE_NOTIF_LIDAS()); lidas = raw ? JSON.parse(raw) : {}; } catch (e) { lidas = {}; }
   lidas[id] = true;
   localStorage.setItem(CHAVE_NOTIF_LIDAS(), JSON.stringify(lidas));
   __notificacoes.forEach(function (n) { if (n.id === id) n.lida = true; });
@@ -1969,6 +1889,9 @@ function marcarTodasLidas() {
   renderizarPainelNotificacoes();
 }
 
+// ==========================================
+// PRÓXIMOS EVENTOS
+// ==========================================
 function renderizarProximosEventos(eventos) {
   var container = document.getElementById("proximos-eventos-lista");
   if (!container) return;
@@ -2007,18 +1930,7 @@ function renderizarProximosEventos(eventos) {
     else if (diffDias <= 3) { classeCard += " destaque"; badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`; }
     else badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`;
     var cor = ev.backgroundColor || ev.borderColor || "#8b5edd";
-    return `
-      <div class="${classeCard}" style="border-left-color:${cor}">
-        <div class="evento-data" style="background:${cor}22">
-          <span class="evento-dia" style="color:${cor}">${String(dia).padStart(2, "0")}</span>
-          <span class="evento-mes">${mes}</span>
-        </div>
-        <div class="evento-info">
-          <div class="evento-titulo">${escaparHTML(ev.title || "Sem título")}</div>
-          <div class="evento-descricao">${inicio.toLocaleDateString("pt-BR", { weekday: "long" })}</div>
-          ${badgeHTML}
-        </div>
-      </div>`;
+    return `<div class="${classeCard}" style="border-left-color:${cor}"><div class="evento-data" style="background:${cor}22"><span class="evento-dia" style="color:${cor}">${String(dia).padStart(2, "0")}</span><span class="evento-mes">${mes}</span></div><div class="evento-info"><div class="evento-titulo">${escaparHTML(ev.title || "Sem título")}</div><div class="evento-descricao">${inicio.toLocaleDateString("pt-BR", { weekday: "long" })}</div>${badgeHTML}</div></div>`;
   }).join("");
 }
 
@@ -2035,9 +1947,7 @@ function initCalculadoraNotas() {
   const elMetaValor = document.getElementById("meta-valor");
   if (elMeta && !elMeta.dataset.bound) {
     elMeta.dataset.bound = "1";
-    elMeta.addEventListener("input", function (e) {
-      if (elMetaValor) elMetaValor.textContent = e.target.value;
-    });
+    elMeta.addEventListener("input", function (e) { if (elMetaValor) elMetaValor.textContent = e.target.value; });
     elMeta.addEventListener("change", function (e) {
       __metaAtual = Number(e.target.value) || 60;
       if (__notasCache.length) renderizarNotas(__notasCache);
@@ -2092,20 +2002,16 @@ function initCalculadoraNotas() {
   document.getElementById("btn-marcar-lidas")?.addEventListener("click", marcarTodasLidas);
   document.addEventListener("click", function (e) {
     if (!painelNotif || painelNotif.classList.contains("is-hidden")) return;
-    if (!e.target.closest("#painel-notificacoes") && !e.target.closest("#btn-notificacoes")) {
-      painelNotif.classList.add("is-hidden");
-    }
+    if (!e.target.closest("#painel-notificacoes") && !e.target.closest("#btn-notificacoes")) painelNotif.classList.add("is-hidden");
   });
   carregarMetasDisciplinas();
 }
 
 // ==========================================
-// 6. INICIALIZAÇÃO
+// INICIALIZAÇÃO
 // ==========================================
 document.addEventListener("DOMContentLoaded", function () {
-  // Aplica tema de cor salvo
   aplicarTema(obterTemaAtual());
-  // Aplica i18n
   aplicarTraducoes();
 
   filtroRecadoTexto = "";
@@ -2114,12 +2020,10 @@ document.addEventListener("DOMContentLoaded", function () {
   initCalculadoraNotas();
   renderizarLegendaCalendario();
 
-  // Dropdown de idioma
   document.querySelectorAll("#menu-idioma .dropdown-item").forEach(function (btn) {
     btn.addEventListener("click", function () { trocarIdioma(btn.dataset.idioma); });
   });
 
-  // Dropdown de tema
   document.querySelectorAll("#menu-tema .dropdown-item").forEach(function (btn) {
     btn.addEventListener("click", function () {
       var tema = btn.dataset.tema;
@@ -2141,16 +2045,12 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Botão instalar PWA
   document.getElementById("btn-instalar-app")?.addEventListener("click", instalarPWA);
 
-  // Botão login
   const btnLogin = document.getElementById("suap-login-button");
   if (btnLogin) btnLogin.setAttribute("href", suap.getLoginURL());
   const btnLogout = document.getElementById("suap-logout-button");
-  if (btnLogout) {
-    btnLogout.addEventListener("click", function (e) { e.preventDefault(); window.forceLogout(); });
-  }
+  if (btnLogout) btnLogout.addEventListener("click", function (e) { e.preventDefault(); window.forceLogout(); });
   const anoEl = document.getElementById("ano");
   if (anoEl) anoEl.textContent = new Date().getFullYear();
 
@@ -2180,15 +2080,10 @@ document.addEventListener("DOMContentLoaded", function () {
         eventsSet: function (eventos) {
           renderizarProximosEventos(eventos);
           setTimeout(function () {
-            document.querySelectorAll(".fc-event").forEach(function (el) {
-              pintarElementoEvento(el, el.innerText || "");
-            });
+            document.querySelectorAll(".fc-event").forEach(function (el) { pintarElementoEvento(el, el.innerText || ""); });
           }, 50);
         },
-        eventClick: function (arg) {
-          window.open(arg.event.url, "_blank");
-          arg.jsEvent.preventDefault();
-        },
+        eventClick: function (arg) { window.open(arg.event.url, "_blank"); arg.jsEvent.preventDefault(); },
       });
       calendar.render();
       var observer = new MutationObserver(function () {
@@ -2207,10 +2102,7 @@ document.addEventListener("DOMContentLoaded", function () {
       var fotoUrl = "";
       if (fotoPath) {
         if (fotoPath.startsWith("http://") || fotoPath.startsWith("https://")) fotoUrl = fotoPath;
-        else {
-          var fotoBaseUrl = "https://suap.ifrn.edu.br";
-          fotoUrl = fotoBaseUrl + (fotoPath.startsWith("/") ? "" : "/") + fotoPath;
-        }
+        else { var fotoBaseUrl = "https://suap.ifrn.edu.br"; fotoUrl = fotoBaseUrl + (fotoPath.startsWith("/") ? "" : "/") + fotoPath; }
       } else {
         fotoUrl = "https://ui-avatars.com/api/?name=" + encodeURIComponent(dados_suap.nome_usual || dados_suap.nome) + "&background=random";
       }

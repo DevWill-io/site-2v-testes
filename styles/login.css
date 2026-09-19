@@ -2,9 +2,11 @@
    CSS Exclusivo para a Página de Login - SUAP | Turma 2V IFRN
    =================================================================== */
 
-/* ---------- TEMAS DE COR (variáveis customizáveis) ---------- */
+/* ==========================================
+   TEMAS DE COR — variáveis no BODY (não :root)
+   ========================================== */
 :root {
-  --tema-h: 265; /* matiz do tema (roxo por padrão) */
+  --tema-h: 265;
   --tema-s: 60%;
   --tema-l: 62%;
 
@@ -12,8 +14,6 @@
   --bg-surface: #240a5e;
   --bg-card: #2d1470;
   --bg-elevated: #351a80;
-  --accent: hsl(var(--tema-h), calc(var(--tema-s) - 20%), 85%);
-  --accent-strong: hsl(var(--tema-h), var(--tema-s), var(--tema-l));
   --text-main: #ffffff;
   --text-muted: #b8a8d9;
   --success: #10b981;
@@ -23,6 +23,11 @@
   --shadow-soft: rgba(0, 0, 0, 0.2);
   --border-color: rgba(255, 255, 255, 0.18);
   --transition: all 0.3s ease;
+}
+
+body {
+  --accent: hsl(var(--tema-h), calc(var(--tema-s) - 20%), 85%);
+  --accent-strong: hsl(var(--tema-h), var(--tema-s), var(--tema-l));
 
   --fc-button-bg-color: var(--accent-strong);
   --fc-button-border-color: var(--accent-strong);
@@ -38,7 +43,6 @@
   --fc-event-border-color: var(--accent-strong);
 }
 
-/* 🎨 TEMAS CLAROS */
 body.light-theme {
   --bg-base: #f4f7f9;
   --bg-surface: #ffffff;
@@ -60,17 +64,15 @@ body.light-theme {
   --fc-button-active-border-color: hsl(var(--tema-h), var(--tema-s), 30%);
   --fc-today-bg-color: hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.15);
   --fc-border-color: rgba(15, 23, 42, 0.1);
-  --fc-neutral-text-color: var(--text-main);
 }
 
-/* 🎨 TEMAS DE COR */
+/* 🎨 APLICAÇÃO DOS TEMAS */
 body.tema-roxo    { --tema-h: 265; --tema-s: 60%; --tema-l: 62%; }
 body.tema-azul    { --tema-h: 215; --tema-s: 85%; --tema-l: 55%; }
 body.tema-verde   { --tema-h: 155; --tema-s: 65%; --tema-l: 45%; }
 body.tema-rosa    { --tema-h: 330; --tema-s: 75%; --tema-l: 60%; }
 body.tema-laranja { --tema-h: 25;  --tema-s: 90%; --tema-l: 55%; }
 
-/* Sobrescreve --text-muted com matiz coerente quando muda o tema */
 body.tema-azul    { --text-muted: hsl(215, 30%, 72%); }
 body.tema-verde   { --text-muted: hsl(155, 25%, 70%); }
 body.tema-rosa    { --text-muted: hsl(330, 30%, 78%); }
@@ -153,7 +155,6 @@ body.light-theme.tema-laranja .login-header { background: rgba(255, 255, 255, 0.
 .btn-voltar { font-size: 0.9rem; font-weight: 500; color: var(--text-muted); display: flex; align-items: center; gap: 8px; transition: var(--transition); margin-left: 4px; }
 .btn-voltar:hover { color: var(--accent); }
 
-/* Sino */
 .btn-notificacoes { position: relative; }
 .badge-notif {
   position: absolute; top: 2px; right: 2px;
@@ -170,17 +171,14 @@ body.light-theme.tema-laranja .login-header { background: rgba(255, 255, 255, 0.
 body.light-theme .badge-notif { border-color: #fff; }
 @keyframes pulseBadge { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
-/* Botão instalar app */
-.btn-instalar-app {
-  animation: bounceInstall 2s ease-in-out infinite;
-}
+.btn-instalar-app { animation: bounceInstall 2s ease-in-out infinite; }
 @keyframes bounceInstall {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-3px); }
 }
 
 /* ===================================================================
-   DROPDOWNS (idioma e tema)
+   DROPDOWNS
    =================================================================== */
 .menu-dropdown { position: relative; }
 .dropdown-content {
@@ -221,24 +219,12 @@ body.light-theme .badge-notif { border-color: #fff; }
   cursor: pointer;
   transition: var(--transition);
 }
-.dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--accent);
-}
+.dropdown-item:hover { background: rgba(255, 255, 255, 0.08); color: var(--accent); }
 body.light-theme .dropdown-item:hover { background: rgba(15, 23, 42, 0.06); }
-.dropdown-item.ativo {
-  background: var(--accent-strong);
-  color: #fff;
-}
-.dropdown-separator {
-  height: 1px;
-  background: var(--border-color);
-  margin: 6px 8px;
-}
+.dropdown-item.ativo { background: var(--accent-strong); color: #fff; }
+.dropdown-separator { height: 1px; background: var(--border-color); margin: 6px 8px; }
 .tema-swatch {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
+  width: 16px; height: 16px; border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   flex-shrink: 0;
 }
@@ -248,7 +234,6 @@ body.light-theme .dropdown-item:hover { background: rgba(15, 23, 42, 0.06); }
 .tema-swatch-rosa    { background: linear-gradient(135deg, #f472b6, #db2777); }
 .tema-swatch-laranja { background: linear-gradient(135deg, #fb923c, #ea580c); }
 
-/* Painel de notificações */
 .painel-notificacoes {
   position: fixed;
   top: 80px; right: 5%;
