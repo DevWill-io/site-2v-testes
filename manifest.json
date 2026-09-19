@@ -1,15 +1,41 @@
 {
-  "name": "Site Turma 2v",
+  "name": "Portal InfoWeb 2V — IFRN",
   "short_name": "InfoWeb 2V",
-  "start_url": "index.html",
+  "description": "Portal acadêmico da turma InfoWeb 2V do IFRN — Notas, agenda, mural e membros.",
+  "start_url": "/login.html",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "background_color": "#19004b",
+  "theme_color": "#8b5edd",
+  "lang": "pt-BR",
+  "categories": ["education", "productivity"],
   "icons": [
     {
-      "src": "img/icone.png",
+      "src": "/img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/img/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Minhas Notas",
+      "short_name": "Notas",
+      "url": "/login.html#notas",
+      "icons": [{ "src": "/img/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mural",
+      "short_name": "Mural",
+      "url": "/login.html#mural",
+      "icons": [{ "src": "/img/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
