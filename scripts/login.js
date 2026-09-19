@@ -2449,6 +2449,9 @@ function carregarBoletim(ano, periodo) {
       atualizarHistoricoComDisciplinas(disciplinas, label, ano);
       var total = resposta.count || disciplinas.length;
       atualizarStatusNotas(total + " disciplina(s) carregada(s).", "sucesso");
+
+      // 🆕 SALVA RESUMO NO FIREBASE (para a Sala dos Professores)
+      salvarResumoBoletimFirebase(ano, periodo, disciplinas);
     },
     function (xhr) {
       renderizarNotas([]);
@@ -2764,14 +2767,22 @@ async function carregarSalaProfessores() {
   if (!tbody) return;
 
   try {
-    const perfisSnap = await get(perfisRef);
-    const perfis = perfisSnap.val() || {};
+    // Busca perfis, carinhos e resumos em paralelo
+    const [perfisSnap, carinhosSnap, resumosSnap, recadosSnap] = await Promise.all([
+      get(perfisRef),
+      get(ref(db, "mascote/por_aluno")),
+      get(ref(db, "resumo_boletim")),
+      get(ref(db, "mural_recados")),
+    ]);
 
-    const carinhosSnap = await get(ref(db, "mascote/por_aluno"));
+    const perfis = perfisSnap.val() || {};
     const carinhos = carinhosSnap.val() || {};
+    const resumos = resumosSnap.val() || {};
+    const totalRecados = recadosSnap.exists() ? Object.keys(recadosSnap.val()).length : 0;
 
     const alunos = Object.keys(perfis).map((mat) => {
       const p = perfis[mat] || {};
+      const r = resumos[mat] || {};
       return {
         matricula: mat,
         nome: p.nome || p.nomeCompleto || "Aluno " + mat.slice(-4),
@@ -2779,8 +2790,11 @@ async function carregarSalaProfessores() {
         foto: p.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.nome || mat)}&background=random`,
         carinhos: Number(carinhos[mat]) || 0,
         ultimoAcesso: p.ultimoAcesso || 0,
-        bio: p.bio || "",
-        redes: p.redes || {},
+        // 🆕 dados do boletim
+        mediaGeral: typeof r.mediaGeral === "number" ? r.mediaGeral : null,
+        faltasTotais: typeof r.faltasTotais === "number" ? r.faltasTotais : null,
+        periodo: r.periodo || "—",
+        atualizadoEm: r.atualizadoEm || 0,
       };
     });
 
@@ -2804,6 +2818,20 @@ async function carregarSalaProfessores() {
             statusLabel = `${diasSemAcesso}d sem acesso`;
           }
 
+          // Média com cor
+          let mediaHTML = '<span style="color:var(--text-muted)">—</span>';
+          if (a.mediaGeral !== null) {
+            const cor = a.mediaGeral >= 60 ? "var(--success)" : a.mediaGeral >= 40 ? "var(--warning)" : "var(--danger)";
+            mediaHTML = `<strong style="color:${cor}">${a.mediaGeral.toFixed(1)}</strong>`;
+          }
+
+          // Faltas com alerta
+          let faltasHTML = '<span style="color:var(--text-muted)">—</span>';
+          if (a.faltasTotais !== null) {
+            const cor = a.faltasTotais > 15 ? "var(--danger)" : a.faltasTotais > 10 ? "var(--warning)" : "var(--text-main)";
+            faltasHTML = `<span style="color:${cor};font-weight:600">${a.faltasTotais}</span>`;
+          }
+
           return `
             <tr data-nome="${a.nome.toLowerCase()}" data-mat="${a.matricula}">
               <td>
@@ -2813,8 +2841,8 @@ async function carregarSalaProfessores() {
                 </div>
               </td>
               <td>${a.matricula}</td>
-              <td>—</td>
-              <td>—</td>
+              <td>${mediaHTML}</td>
+              <td>${faltasHTML}</td>
               <td><i class="fa-solid fa-heart" style="color:#ff6b6b;font-size:0.8rem;"></i> ${a.carinhos.toLocaleString("pt-BR")}</td>
               <td><span class="sala-badge ${statusClasse}">${statusLabel}</span></td>
             </tr>`;
@@ -2822,10 +2850,8 @@ async function carregarSalaProfessores() {
         .join("");
     }
 
+    // Stats
     const totalCarinhos = Object.values(carinhos).reduce((a, b) => a + (Number(b) || 0), 0);
-    const recadosSnap = await get(ref(db, "mural_recados"));
-    const totalRecados = recadosSnap.exists() ? Object.keys(recadosSnap.val()).length : 0;
-
     document.getElementById("sala-stat-total-carinhos").textContent = totalCarinhos.toLocaleString("pt-BR");
     document.getElementById("sala-stat-total-recados").textContent = totalRecados;
     document.getElementById("sala-stat-total-alunos").textContent = alunos.length;
@@ -2835,6 +2861,7 @@ async function carregarSalaProfessores() {
       ? `${top.nome} (${top.carinhos})`
       : "—";
 
+    // Lista de engajamento
     const engajamentoLista = document.getElementById("sala-engajamento-lista");
     if (engajamentoLista) {
       const ordenados = [...alunos].sort((a, b) => b.carinhos - a.carinhos).slice(0, 10);
@@ -2854,6 +2881,7 @@ async function carregarSalaProfessores() {
         .join("") || '<p class="sala-vazio-msg">Sem dados de engajamento ainda.</p>';
     }
 
+    // Bind busca
     const buscaInput = document.getElementById("sala-busca-aluno");
     if (buscaInput && !buscaInput.dataset.bound) {
       buscaInput.dataset.bound = "1";
@@ -2867,6 +2895,7 @@ async function carregarSalaProfessores() {
       });
     }
 
+    // Bind tabs
     document.querySelectorAll(".sala-tab").forEach((tab) => {
       if (tab.dataset.bound) return;
       tab.dataset.bound = "1";
@@ -3206,3 +3235,49 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+// ==========================================
+// 🆕 SALVA RESUMO DO BOLETIM PARA A SALA
+// ==========================================
+function salvarResumoBoletimFirebase(ano, periodo, disciplinas) {
+  var mat = window.usuarioLogado.matricula;
+  if (!mat || mat === "Matrícula não disponível") return;
+  if (!disciplinas || !disciplinas.length) return;
+
+  try {
+    // Calcula média geral + total de faltas
+    var somaMedias = 0;
+    var contMedias = 0;
+    var faltasTotais = 0;
+
+    disciplinas.forEach(function (d) {
+      var etapas = obterEtapasDaDisciplina(d).etapas;
+      var notas = etapas.map(function (n) {
+        var e = d["nota_etapa_" + n];
+        return formatarNota(e && typeof e === "object" ? e.nota : e);
+      });
+      var preenchidas = notas.filter(function (v) { return v !== null; });
+      var soma = preenchidas.reduce(function (a, b) { return a + b; }, 0);
+      var mediaApi = formatarNota(d.media_disciplina);
+      var media = preenchidas.length ? soma / preenchidas.length : mediaApi;
+
+      if (media !== null) { somaMedias += media; contMedias++; }
+      faltasTotais += Number(d.numero_faltas) || 0;
+    });
+
+    var mediaGeral = contMedias ? somaMedias / contMedias : null;
+
+    // Salva no Firebase
+    update(ref(db, "resumo_boletim/" + mat), {
+      mediaGeral: mediaGeral,
+      faltasTotais: faltasTotais,
+      disciplinasCount: disciplinas.length,
+      periodo: ano + "." + periodo,
+      atualizadoEm: Date.now(),
+    }).catch(function (err) {
+      console.warn("[resumo boletim] erro:", err);
+    });
+  } catch (e) {
+    console.warn("[resumo boletim] exceção:", e);
+  }
+}
