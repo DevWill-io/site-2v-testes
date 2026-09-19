@@ -249,7 +249,7 @@ if (recadoMensagemInput) {
 }
 
 // ==========================================
-// 4. MÉTODOS GLOBAIS DO MURAL
+// 4. MURAL — MÉTODOS GLOBAIS
 // ==========================================
 const inputBuscaMural = document.getElementById("busca-recados");
 if (inputBuscaMural) {
@@ -819,17 +819,42 @@ function atualizarStatusNotas(mensagem, tipo) {
   status.innerHTML = `<i class="fa-solid ${icones[variante] || icones.info}"></i> ${mensagem}`;
 }
 
+/* ---------- Detecção robusta Semestral/Anual ---------- */
 function obterEtapasDaDisciplina(disciplina) {
-  var etapas = [1, 2, 3, 4];
-  var possuiNotaSegundoSemestre = [3, 4].some(function (numeroEtapa) {
-    var etapa = disciplina["nota_etapa_" + numeroEtapa];
-    return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa) !== null;
+  // 1) Se o SUAP manda explicitamente, respeita
+  if (disciplina.segundo_semestre === true) {
+    return { tipo: "Semestral", etapas: [3, 4] };
+  }
+  if (disciplina.segundo_semestre === false) {
+    return { tipo: "Semestral", etapas: [1, 2] };
+  }
+
+  // 2) Fallback: verifica notas lançadas
+  var tem12 = [1, 2].some(function (n) {
+    var e = disciplina["nota_etapa_" + n];
+    return formatarNota(e && typeof e === "object" ? e.nota : e) !== null;
   });
-  if (disciplina.segundo_semestre === true || possuiNotaSegundoSemestre) {
-    return {
-      tipo: disciplina.segundo_semestre === true ? "Semestral" : "Anual",
-      etapas: disciplina.segundo_semestre === true ? [3, 4] : etapas,
-    };
+  var tem34 = [3, 4].some(function (n) {
+    var e = disciplina["nota_etapa_" + n];
+    return formatarNota(e && typeof e === "object" ? e.nota : e) !== null;
+  });
+
+  // 3) Só tem nota em 3/4 → semestral do 2º
+  if (tem34 && !tem12) return { tipo: "Semestral", etapas: [3, 4] };
+
+  // 4) Tem nota nos dois blocos → ANUAL
+  if (tem12 && tem34) return { tipo: "Anual", etapas: [1, 2, 3, 4] };
+
+  // 5) Só tem em 1/2
+  if (tem12) {
+    var temCampo34 = ("nota_etapa_3" in disciplina) || ("nota_etapa_4" in disciplina);
+    if (temCampo34) return { tipo: "Anual", etapas: [1, 2, 3, 4] };
+    return { tipo: "Semestral", etapas: [1, 2] };
+  }
+
+  // 6) Nenhuma nota: se tem campos 3/4 declarados → anual
+  if (("nota_etapa_3" in disciplina) || ("nota_etapa_4" in disciplina)) {
+    return { tipo: "Anual", etapas: [1, 2, 3, 4] };
   }
   return { tipo: "Semestral", etapas: [1, 2] };
 }
@@ -878,20 +903,35 @@ function calcularMediaSimples(d, etapas, simulacao) {
     var etapa = d["nota_etapa_" + n];
     return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa);
   });
-  var preenchidas = notas.filter(function (v) { return v !== null; });
-  var soma = preenchidas.reduce(function (a, b) { return a + b; }, 0);
 
-  if (simulacao != null && preenchidas.length < etapas.length) {
-    var comSim = preenchidas.concat([simulacao]);
+  var preenchidasReais = notas.filter(function (v) { return v !== null; });
+  var somaReal = preenchidasReais.reduce(function (a, b) { return a + b; }, 0);
+
+  var temEtapaAberta = preenchidasReais.length < etapas.length;
+  var usarSimulacao = (simulacao != null) && temEtapaAberta;
+
+  if (usarSimulacao) {
+    var comSim = preenchidasReais.concat([simulacao]);
     var somaSim = comSim.reduce(function (a, b) { return a + b; }, 0);
-    return { media: somaSim / comSim.length, preenchidas: comSim.length, soma: somaSim, simulando: true };
+    return {
+      media: somaSim / comSim.length,
+      preenchidasReais: preenchidasReais.length,
+      preenchidasComSim: comSim.length,
+      somaReal: somaReal,
+      somaComSim: somaSim,
+      temEtapaAberta: temEtapaAberta,
+      simulando: true,
+    };
   }
 
   var mediaApi = formatarNota(d.media_disciplina);
   return {
-    media: preenchidas.length ? soma / preenchidas.length : mediaApi,
-    preenchidas: preenchidas.length,
-    soma: soma,
+    media: preenchidasReais.length ? somaReal / preenchidasReais.length : mediaApi,
+    preenchidasReais: preenchidasReais.length,
+    preenchidasComSim: preenchidasReais.length,
+    somaReal: somaReal,
+    somaComSim: somaReal,
+    temEtapaAberta: temEtapaAberta,
     simulando: false,
   };
 }
@@ -912,7 +952,7 @@ function calcularProjecaoDisciplina(notasPreenchidas, totalEtapas, soma, meta) {
 }
 
 // ==========================================
-// 5.3 METAS POR DISCIPLINA (Firebase + local)
+// 5.3 METAS POR DISCIPLINA
 // ==========================================
 function carregarMetasDisciplinas() {
   var mat = window.usuarioLogado.matricula;
@@ -1046,8 +1086,8 @@ function alertaDeFaltas(disciplinas) {
   banner.innerHTML = discCritica.nivel === "danger"
     ? `<i class="fa-solid fa-triangle-exclamation"></i><span><strong>Atenção!</strong> Você está com <strong>${discCritica.faltas} faltas</strong> em <em>${escaparHTML(discCritica.nome)}</em> — próximo do limite de reprovação por falta (${limiteReprov}).</span>`
     : `<i class="fa-solid fa-circle-exclamation"></i><span><strong>Cuidado:</strong> ${discCritica.faltas} faltas em <em>${escaparHTML(discCritica.nome)}</em>. Fique atento!</span>`;
-  var ref = panel.querySelector(".notas-controls");
-  if (ref) panel.insertBefore(banner, ref);
+  var refEl = panel.querySelector(".notas-controls");
+  if (refEl) panel.insertBefore(banner, refEl);
   else panel.insertBefore(banner, panel.firstChild);
 }
 
@@ -1103,15 +1143,27 @@ function renderizarHistorico() {
 // ==========================================
 // 5.6 RENDERIZAR TABELA
 // ==========================================
-function renderizarNotas(disciplinas) {
+function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   var corpo = document.getElementById("lista-notas");
   if (!corpo) return;
 
   var metaInput = document.getElementById("meta-notas");
   var meta = metaInput ? (formatarNota(metaInput.value) || 60) : 60;
   __metaAtual = meta;
-  __notasCache = disciplinas || [];
 
+  if (apenasLinhaCodigo && __notasCache.length) {
+    var tr = corpo.querySelector(`tr[data-codigo="${CSS.escape(apenasLinhaCodigo)}"]`);
+    if (tr) {
+      var d = __notasCache.find(function (x) { return getCodigoDisc(x) === apenasLinhaCodigo; });
+      if (d) {
+        atualizarLinhaNota(tr, d, meta);
+        atualizarResumoNotas(__notasCache);
+        return;
+      }
+    }
+  }
+
+  __notasCache = disciplinas || [];
   corpo.innerHTML = "";
 
   if (!__notasCache.length) {
@@ -1120,7 +1172,6 @@ function renderizarNotas(disciplinas) {
     return;
   }
 
-  // Filtro
   var visiveis = __notasCache.filter(function (d) {
     if (__filtroAtivo === "todas") return true;
     var etapas = obterEtapasDaDisciplina(d).etapas;
@@ -1162,85 +1213,160 @@ function renderizarNotas(disciplinas) {
     corpo.appendChild(linhaGrupo);
 
     grupos[tipo].forEach(function (item) {
-      var d = item.disciplina;
-      var codigo = getCodigoDisc(d);
-      var sim = __simulacoes[codigo];
-      var faltas = Number(d.numero_faltas) || 0;
-      var metaDisc = metaEfetiva(d);
-
-      var calc = calcularMediaSimples(d, item.etapas, sim);
-      var media = calc.media;
-      var notasEtapas = item.etapas.map(function (n) {
-        var etapa = d["nota_etapa_" + n];
-        return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa);
-      });
-
-      var status = classificarStatusNota(media, faltas, metaDisc);
-      var proj = calcularProjecaoDisciplina(calc.preenchidas, item.etapas.length, calc.soma, metaDisc);
-      var faltasClasse = faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT ? "critico"
-                        : faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_ALERTA ? "alerta" : "";
-
-      var badgeLabel = {
-        aprovado: '<i class="fa-solid fa-check"></i> Aprovado',
-        recuperacao: '<i class="fa-solid fa-rotate"></i> Recuperação',
-        reprovado: '<i class="fa-solid fa-xmark"></i> Reprovado',
-      }[status];
-
-      var linhaRisco = (status === "reprovado" || faltasClasse === "critico") ? "linha-risco" : "";
-      var linhaSim = calc.simulando ? "simulando" : "";
-
-      var etapasHTML = notasEtapas.map(function (n) {
-        return '<span class="etapa-pill">' + textoNota(n) + '</span>';
-      }).join("");
-
-      var percentual = media !== null ? Math.min(media, 100) : 0;
-      var mediaHTML =
-        '<div class="media-cell">' +
-          '<span>' + textoNota(media) + '</span>' +
-          '<div class="media-bar">' +
-            '<div class="media-bar-fill ' + status + '" style="width:' + percentual + '%"></div>' +
-          '</div>' +
-        '</div>';
-
-      var temEtapaEmAberto = calc.preenchidas < item.etapas.length;
-      var simuladorHTML = temEtapaEmAberto
-        ? `<div class="simulador-cell">
-             <input type="number" class="simulador-input" data-codigo="${escaparHTML(codigo)}"
-                    min="0" max="100" step="0.1" placeholder="Nota"
-                    value="${sim != null ? sim : ''}" />
-             ${calc.simulando ? `<span class="simulador-resultado ${status === 'aprovado' ? 'ok' : status === 'recuperacao' ? 'mid' : 'ruim'}">${textoNota(media)}</span>` : ''}
-           </div>`
-        : '<span style="color:var(--text-muted);font-size:.8rem;">Fechada</span>';
-
-      var metaCustom = __metasDisciplinas[codigo] != null;
-      var metaHTML = `<button type="button" class="btn-meta-disciplina ${metaCustom ? 'customizada' : ''}"
-                        data-codigo="${escaparHTML(codigo)}"
-                        data-nome="${escaparHTML(d.disciplina || codigo)}"
-                        title="Meta individual: ${metaDisc}">🎯</button>`;
-
-      var linha = document.createElement("tr");
-      linha.className = [linhaRisco, linhaSim].filter(Boolean).join(" ");
-      linha.dataset.grupoLinha = tipo;
-
-      linha.innerHTML =
-        '<td><strong>' + escaparHTML(d.disciplina || d.codigo_diario || "Disciplina sem nome") + '</strong></td>' +
-        '<td><div class="etapas-cell">' + (etapasHTML || '<span class="etapa-pill">—</span>') + '</div></td>' +
-        '<td>' + mediaHTML + '</td>' +
-        '<td><span class="faltas-cell ' + faltasClasse + '">' + faltas + '</span></td>' +
-        '<td><span class="projecao-cell ' + proj.classe + '">' + proj.texto + '</span></td>' +
-        '<td><span class="badge badge-' + status + '">' + badgeLabel + '</span></td>' +
-        '<td>' + simuladorHTML + '</td>' +
-        '<td>' + metaHTML + '</td>';
-
-      corpo.appendChild(linha);
+      var tr = criarLinhaNota(item.disciplina, item.etapas, tipo, meta);
+      corpo.appendChild(tr);
     });
   });
 
   atualizarResumoNotas(__notasCache);
   alertaDeFaltas(__notasCache);
+  bindSimuladores(corpo);
+}
 
-  // Simulador bind
+/* ---------- Criar uma linha ---------- */
+function criarLinhaNota(d, etapas, tipo, meta) {
+  var codigo = getCodigoDisc(d);
+  var sim = __simulacoes[codigo];
+  var faltas = Number(d.numero_faltas) || 0;
+  var metaDisc = metaEfetiva(d);
+
+  var calc = calcularMediaSimples(d, etapas, sim);
+  var media = calc.media;
+  var notasEtapas = etapas.map(function (n) {
+    var etapa = d["nota_etapa_" + n];
+    return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa);
+  });
+
+  var status = classificarStatusNota(media, faltas, metaDisc);
+  var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, etapas.length, calc.somaComSim, metaDisc);
+  var faltasClasse = faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT ? "critico"
+                    : faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_ALERTA ? "alerta" : "";
+
+  var badgeLabel = {
+    aprovado: '<i class="fa-solid fa-check"></i> Aprovado',
+    recuperacao: '<i class="fa-solid fa-rotate"></i> Recuperação',
+    reprovado: '<i class="fa-solid fa-xmark"></i> Reprovado',
+  }[status];
+
+  var linhaRisco = (status === "reprovado" || faltasClasse === "critico") ? "linha-risco" : "";
+  var linhaSim = calc.simulando ? "simulando" : "";
+
+  var etapasHTML = notasEtapas.map(function (n) {
+    return '<span class="etapa-pill">' + textoNota(n) + '</span>';
+  }).join("");
+
+  var percentual = media !== null ? Math.min(media, 100) : 0;
+  var mediaHTML =
+    '<div class="media-cell">' +
+      '<span>' + textoNota(media) + '</span>' +
+      '<div class="media-bar">' +
+        '<div class="media-bar-fill ' + status + '" style="width:' + percentual + '%"></div>' +
+      '</div>' +
+    '</div>';
+
+  var temEtapaEmAberto = calc.temEtapaAberta;
+  var simuladorHTML = temEtapaEmAberto
+    ? `<div class="simulador-cell">
+         <input type="number" class="simulador-input" data-codigo="${escaparHTML(codigo)}"
+                min="0" max="100" step="0.1" placeholder="Nota"
+                value="${sim != null ? sim : ''}" />
+         ${calc.simulando ? `<span class="simulador-resultado ${status === 'aprovado' ? 'ok' : status === 'recuperacao' ? 'mid' : 'ruim'}">${textoNota(media)}</span>` : ''}
+       </div>`
+    : '<span style="color:var(--text-muted);font-size:.8rem;">Fechada</span>';
+
+  var metaCustom = __metasDisciplinas[codigo] != null;
+  var metaHTML = `<button type="button" class="btn-meta-disciplina ${metaCustom ? 'customizada' : ''}"
+                    data-codigo="${escaparHTML(codigo)}"
+                    data-nome="${escaparHTML(d.disciplina || codigo)}"
+                    title="Meta individual: ${metaDisc}">🎯</button>`;
+
+  var tr = document.createElement("tr");
+  tr.className = [linhaRisco, linhaSim].filter(Boolean).join(" ");
+  tr.dataset.grupoLinha = tipo;
+  tr.dataset.codigo = codigo;
+
+  tr.innerHTML =
+    '<td class="td-disciplina"><strong>' + escaparHTML(d.disciplina || d.codigo_diario || "Disciplina sem nome") + '</strong></td>' +
+    '<td><div class="etapas-cell">' + (etapasHTML || '<span class="etapa-pill">—</span>') + '</div></td>' +
+    '<td class="td-media">' + mediaHTML + '</td>' +
+    '<td class="td-faltas"><span class="faltas-cell ' + faltasClasse + '">' + faltas + '</span></td>' +
+    '<td class="td-projecao"><span class="projecao-cell ' + proj.classe + '">' + proj.texto + '</span></td>' +
+    '<td class="td-status"><span class="badge badge-' + status + '">' + badgeLabel + '</span></td>' +
+    '<td class="td-simulador">' + simuladorHTML + '</td>' +
+    '<td class="td-meta">' + metaHTML + '</td>';
+
+  return tr;
+}
+
+/* ---------- Update cirúrgico ---------- */
+function atualizarLinhaNota(tr, d, meta) {
+  var codigo = getCodigoDisc(d);
+  var sim = __simulacoes[codigo];
+  var faltas = Number(d.numero_faltas) || 0;
+  var metaDisc = metaEfetiva(d);
+  var etapas = obterEtapasDaDisciplina(d).etapas;
+
+  var calc = calcularMediaSimples(d, etapas, sim);
+  var media = calc.media;
+  var status = classificarStatusNota(media, faltas, metaDisc);
+  var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, etapas.length, calc.somaComSim, metaDisc);
+
+  tr.classList.toggle("linha-risco", status === "reprovado" || faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT);
+  tr.classList.toggle("simulando", calc.simulando);
+
+  var tdMedia = tr.querySelector(".td-media");
+  if (tdMedia) {
+    var percentual = media !== null ? Math.min(media, 100) : 0;
+    tdMedia.innerHTML =
+      '<div class="media-cell">' +
+        '<span>' + textoNota(media) + '</span>' +
+        '<div class="media-bar">' +
+          '<div class="media-bar-fill ' + status + '" style="width:' + percentual + '%"></div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  var tdProj = tr.querySelector(".td-projecao");
+  if (tdProj) tdProj.innerHTML = '<span class="projecao-cell ' + proj.classe + '">' + proj.texto + '</span>';
+
+  var tdStatus = tr.querySelector(".td-status");
+  if (tdStatus) {
+    var badgeLabel = {
+      aprovado: '<i class="fa-solid fa-check"></i> Aprovado',
+      recuperacao: '<i class="fa-solid fa-rotate"></i> Recuperação',
+      reprovado: '<i class="fa-solid fa-xmark"></i> Reprovado',
+    }[status];
+    tdStatus.innerHTML = '<span class="badge badge-' + status + '">' + badgeLabel + '</span>';
+  }
+
+  var tdSim = tr.querySelector(".td-simulador");
+  if (tdSim) {
+    var resultadoEl = tdSim.querySelector(".simulador-resultado");
+    if (calc.simulando) {
+      var classeRes = status === 'aprovado' ? 'ok' : status === 'recuperacao' ? 'mid' : 'ruim';
+      if (resultadoEl) {
+        resultadoEl.className = 'simulador-resultado ' + classeRes;
+        resultadoEl.textContent = textoNota(media);
+      } else {
+        var input = tdSim.querySelector(".simulador-input");
+        if (input) {
+          var span = document.createElement("span");
+          span.className = "simulador-resultado " + classeRes;
+          span.textContent = textoNota(media);
+          input.insertAdjacentElement("afterend", span);
+        }
+      }
+    } else if (resultadoEl) {
+      resultadoEl.remove();
+    }
+  }
+}
+
+/* ---------- Bind inputs ---------- */
+function bindSimuladores(corpo) {
   corpo.querySelectorAll(".simulador-input").forEach(function (input) {
+    if (input.dataset.bound) return;
+    input.dataset.bound = "1";
     input.addEventListener("input", function () {
       var cod = input.dataset.codigo;
       var val = input.value.trim();
@@ -1249,14 +1375,18 @@ function renderizarNotas(disciplinas) {
         var num = Number(String(val).replace(",", "."));
         if (Number.isFinite(num)) __simulacoes[cod] = Math.max(0, Math.min(100, num));
       }
-      renderizarNotas(__notasCache);
-      var novo = document.querySelector(`.simulador-input[data-codigo="${CSS.escape(cod)}"]`);
-      if (novo) { novo.focus(); novo.setSelectionRange(novo.value.length, novo.value.length); }
+      var tr = input.closest("tr");
+      var d = __notasCache.find(function (x) { return getCodigoDisc(x) === cod; });
+      if (tr && d) {
+        atualizarLinhaNota(tr, d, __metaAtual);
+        atualizarResumoNotas(__notasCache);
+      }
     });
   });
 
-  // Meta individual bind
   corpo.querySelectorAll(".btn-meta-disciplina").forEach(function (btn) {
+    if (btn.dataset.bound) return;
+    btn.dataset.bound = "1";
     btn.addEventListener("click", function () {
       abrirModalMetaDisciplina(btn.dataset.codigo, btn.dataset.nome);
     });
@@ -1316,7 +1446,7 @@ function exportarCSV() {
     var faltas = Number(d.numero_faltas) || 0;
     var meta = metaEfetiva(d);
     var st = classificarStatusNota(calc.media, faltas, meta);
-    var proj = calcularProjecaoDisciplina(calc.preenchidas, cfg.etapas.length, calc.soma, meta);
+    var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, cfg.etapas.length, calc.somaComSim, meta);
 
     linhas.push([
       (d.disciplina || d.codigo_diario || "").replace(/;/g, ","),
@@ -1364,7 +1494,7 @@ function exportarPDF() {
       var faltas = Number(d.numero_faltas) || 0;
       var meta = metaEfetiva(d);
       var st = classificarStatusNota(calc.media, faltas, meta);
-      var proj = calcularProjecaoDisciplina(calc.preenchidas, cfg.etapas.length, calc.soma, meta);
+      var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, cfg.etapas.length, calc.somaComSim, meta);
       var cor = st === "aprovado" ? "#10b981" : st === "recuperacao" ? "#f59e0b" : "#ff4757";
       linhasHTML += `
         <tr>
@@ -1458,7 +1588,7 @@ function carregarPeriodosNotas() {
 }
 
 // ==========================================
-// 5.10 LISTENERS DA CALCULADORA
+// 5.10 LISTENERS
 // ==========================================
 function initCalculadoraNotas() {
   const elPeriodo = document.getElementById("periodo-notas");
@@ -1624,7 +1754,6 @@ document.addEventListener("DOMContentLoaded", function () {
           update(perfilAlunoRef, payload).then(() => { window.carregarPerfilUsuario(matriculaSuap); });
         });
 
-        // Recarrega metas agora que temos matrícula
         carregarMetasDisciplinas();
       }
 
