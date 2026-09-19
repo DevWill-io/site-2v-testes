@@ -7,6 +7,40 @@ var SUAP_URL = "https://suap.ifrn.edu.br";
 var SCOPE = "identificacao email documentos_pessoais";
 
 // ==========================================
+// 🎨 REGRAS DE CORES DO CALENDÁRIO (Single Source of Truth)
+// ==========================================
+const REGRAS_CORES_CALENDARIO = [
+  { regex: /prova|avalia|exame|teste/i, cor: "#ff4757", texto: "Provas e avaliações" },
+  { regex: /trabalho|projeto|entrega|lista|seminario|seminário/i, cor: "#f59e0b", texto: "Trabalhos e listas" },
+  { regex: /feriado|recesso|f[eé]rias|ponto facultativo/i, cor: "#10b981", texto: "Feriados e recessos" },
+  { regex: /reuni[aã]o|aula|encontro|palestra/i, cor: "#7c3aed", texto: "Reuniões e aulas" },
+  { regex: /jogo|esporte|campeonato|torneio/i, cor: "#06b6d4", texto: "Esportes e jogos" },
+  { regex: /festa|evento|apresenta|show/i, cor: "#ec4899", texto: "Festas e eventos" },
+];
+const COR_PADRAO_CALENDARIO = { cor: "#8b5edd", texto: "Outros eventos" };
+
+function corDoEvento(titulo) {
+  var t = String(titulo || "").toLowerCase();
+  for (var i = 0; i < REGRAS_CORES_CALENDARIO.length; i++) {
+    if (REGRAS_CORES_CALENDARIO[i].regex.test(t)) return REGRAS_CORES_CALENDARIO[i].cor;
+  }
+  return COR_PADRAO_CALENDARIO.cor;
+}
+
+function renderizarLegendaCalendario() {
+  var container = document.getElementById("calendario-legenda");
+  if (!container) return;
+  var todas = REGRAS_CORES_CALENDARIO.concat([COR_PADRAO_CALENDARIO]);
+  container.innerHTML = todas.map(function (item) {
+    return `
+      <div class="legenda-item">
+        <span class="legenda-cor" style="background:${item.cor}"></span>
+        <span class="legenda-texto">${item.texto}</span>
+      </div>`;
+  }).join("");
+}
+
+// ==========================================
 // 0. FIREBASE
 // ==========================================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
@@ -1752,6 +1786,7 @@ document.addEventListener("DOMContentLoaded", function () {
   filtroPerfilTexto = "";
   inicializarModalEditarPerfil();
   initCalculadoraNotas();
+  renderizarLegendaCalendario();
 
   const btnLogin = document.getElementById("suap-login-button");
   if (btnLogin) btnLogin.setAttribute("href", suap.getLoginURL());
@@ -1770,30 +1805,11 @@ document.addEventListener("DOMContentLoaded", function () {
     carregarPeriodosNotas();
 
     // ============================================
-    // 🎨 CALENDÁRIO COM CORES POR PALAVRA-CHAVE
+    // 🎨 CALENDÁRIO COM CORES (usa REGRAS_CORES_CALENDARIO)
     // ============================================
     var calendarEl = document.getElementById("calendar");
     if (calendarEl && typeof FullCalendar !== "undefined") {
 
-      // 🎨 Regras: regex → cor
-      var REGRAS_CORES = [
-        { regex: /prova|avalia|exame|teste/i, cor: "#ff4757" },      // Vermelho
-        { regex: /trabalho|projeto|entrega|lista|seminario|seminário/i, cor: "#f59e0b" }, // Laranja
-        { regex: /feriado|recesso|f[eé]rias|ponto facultativo/i, cor: "#10b981" }, // Verde
-        { regex: /reuni[aã]o|aula|encontro|palestra/i, cor: "#7c3aed" }, // Roxo
-        { regex: /jogo|esporte|campeonato|torneio/i, cor: "#06b6d4" }, // Ciano
-        { regex: /festa|evento|apresenta|show/i, cor: "#ec4899" }, // Rosa
-      ];
-
-      function corDoEvento(titulo) {
-        var t = String(titulo || "").toLowerCase();
-        for (var i = 0; i < REGRAS_CORES.length; i++) {
-          if (REGRAS_CORES[i].regex.test(t)) return REGRAS_CORES[i].cor;
-        }
-        return "#8b5edd"; // roxo padrão
-      }
-
-      // Aplica cor em um elemento de evento
       function pintarElementoEvento(el, titulo) {
         var cor = corDoEvento(titulo);
         el.style.setProperty("background-color", cor, "important");
@@ -1809,15 +1825,12 @@ document.addEventListener("DOMContentLoaded", function () {
         googleCalendarApiKey: "AIzaSyB9XFKFwtZNQJrN2Kh7UPZxraPXEwqFytw",
         events: "acb20a08d58749d48304dbda5c87bfb7f0671483ecc4ed942683ad5a1307e78d@group.calendar.google.com",
 
-        // Pinta assim que o evento é montado
         eventDidMount: function (info) {
           pintarElementoEvento(info.el, info.event.title);
         },
 
-        // Reforça após cada render (o Google Calendar pode sobrescrever depois)
         eventsSet: function (eventos) {
           renderizarProximosEventos(eventos);
-          // Re-pinta todos os eventos visíveis
           setTimeout(function () {
             document.querySelectorAll(".fc-event").forEach(function (el) {
               pintarElementoEvento(el, el.innerText || "");
@@ -1832,8 +1845,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
       calendar.render();
 
-      // MutationObserver: garante que mesmo se o FullCalendar re-renderizar,
-      // as cores continuam aplicadas (o plugin do Google sobrescreve às vezes).
       var observer = new MutationObserver(function () {
         document.querySelectorAll(".fc-event").forEach(function (el) {
           var texto = el.innerText || "";
