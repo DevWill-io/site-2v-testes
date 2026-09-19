@@ -12,6 +12,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.11/index.global.min.js"></script>
+    <!-- 🆕 Chart.js para o gráfico de evolução -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600&family=Poppins:wght@600;700;800&display=swap"
@@ -31,6 +33,17 @@
         <i class="fa-solid fa-code-branch"></i>InfoWeb<span>- 2V</span>
       </a>
       <div class="header-actions">
+        <!-- 🆕 Sino de notificações (aparece só logado) -->
+        <button
+          id="btn-notificacoes"
+          class="btn-theme btn-notificacoes is-hidden"
+          aria-label="Notificações"
+          title="Notificações"
+        >
+          <i class="fa-regular fa-bell"></i>
+          <span id="badge-notificacoes" class="badge-notif is-hidden">0</span>
+        </button>
+
         <button id="theme-toggle" class="btn-theme" aria-label="Alternar tema">
           <i class="fa-solid fa-moon"></i>
         </button>
@@ -95,6 +108,20 @@
         </div>
       </div>
     </main>
+
+    <!-- ============================================
+         PAINEL DE PRÓXIMOS EVENTOS 🆕
+         ============================================ -->
+    <section
+      id="proximos-eventos"
+      class="proximos-eventos is-authenticated is-hidden"
+    >
+      <div class="container">
+        <div id="proximos-eventos-lista" class="proximos-eventos-lista">
+          <!-- Preenchido via JS -->
+        </div>
+      </div>
+    </section>
 
     <!-- ============================================
          CALCULADORA DE NOTAS V3
@@ -217,6 +244,20 @@
             <span><i class="dot dot-reprovado"></i> Reprovado</span>
             <span style="margin-left:auto;opacity:.8;">🧪 Simulador • 🎯 Meta individual</span>
           </div>
+        </div>
+
+        <!-- 🆕 GRÁFICO DE EVOLUÇÃO -->
+        <div class="evolucao-panel is-hidden" id="evolucao-panel">
+          <div class="evolucao-header">
+            <h3><i class="fa-solid fa-chart-line"></i> Evolução das Médias</h3>
+            <p class="evolucao-sub">Sua média por período letivo</p>
+          </div>
+          <div class="evolucao-chart-wrap">
+            <canvas id="grafico-evolucao"></canvas>
+          </div>
+          <p class="evolucao-vazio is-hidden" id="evolucao-vazio">
+            Carregue mais períodos para ver a evolução.
+          </p>
         </div>
 
         <div class="historico-panel is-hidden" id="historico-panel">
@@ -665,7 +706,7 @@
       </div>
     </div>
 
-    <!-- MODAL META POR DISCIPLINA (criado via JS, mas deixamos o container) -->
+    <!-- MODAL META POR DISCIPLINA -->
     <div id="modal-meta-disciplina" class="modal-overlay is-hidden">
       <div class="modal-content modal-meta" onclick="event.stopPropagation()">
         <button type="button" class="modal-close" data-fechar>&times;</button>
@@ -679,6 +720,19 @@
           <button type="button" class="btn-reset-meta" data-reset>Usar meta global</button>
           <button type="button" class="button is-success" data-salvar>Salvar</button>
         </div>
+      </div>
+    </div>
+
+    <!-- 🆕 PAINEL DE NOTIFICAÇÕES (dropdown) -->
+    <div id="painel-notificacoes" class="painel-notificacoes is-hidden">
+      <div class="painel-notif-header">
+        <strong><i class="fa-regular fa-bell"></i> Notificações</strong>
+        <button type="button" id="btn-marcar-lidas" class="btn-acao">
+          <i class="fa-solid fa-check-double"></i> Marcar todas
+        </button>
+      </div>
+      <div id="lista-notificacoes" class="lista-notificacoes">
+        <p class="notif-vazio">Sem notificações.</p>
       </div>
     </div>
 
