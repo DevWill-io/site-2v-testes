@@ -104,56 +104,104 @@
 
     <!-- CALCULADORA DE NOTAS -->
     <section id="notas" class="notas is-authenticated is-hidden">
-      <div class="container">
-        <div class="section-title">
-          <h2>Calculadora de <span class="highlight">Notas</span></h2>
-          <p>Boletim atualizado diretamente pelo SUAP</p>
-        </div>
-        <div class="notas-panel">
-          <div class="notas-controls">
-            <label for="periodo-notas">Período letivo</label>
-            <select id="periodo-notas" disabled>
-              <option value="">Carregando períodos...</option>
-            </select>
-            <label for="meta-notas">Meta de média</label>
-            <input
-              id="meta-notas"
-              type="number"
-              min="0"
-              max="100"
-              step="0.1"
-              value="60"
-            />
-            <button id="atualizar-notas" type="button" class="button is-link">
-              <i class="fa-solid fa-rotate"></i> Atualizar
-            </button>
-          </div>
-          <p id="notas-status" class="notas-status" role="status">
-            Aguardando dados do SUAP...
-          </p>
-          <div class="notas-table-wrapper">
-            <table class="tabela-notas">
-              <thead>
-                <tr>
-                  <th>Disciplina</th>
-                  <th>Etapas</th>
-                  <th>Média</th>
-                  <th>Faltas</th>
-                  <th>Projeção</th>
-                </tr>
-              </thead>
-              <tbody id="lista-notas">
-                <tr>
-                  <td colspan="5" class="notas-vazia">
-                    Faça login para carregar suas notas.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+  <div class="container">
+    <div class="section-title">
+      <h2>Calculadora de <span class="highlight">Notas</span></h2>
+      <p>Boletim atualizado diretamente pelo SUAP</p>
+    </div>
+
+    <!-- 🆕 CARDS DE RESUMO -->
+    <div class="notas-resumo">
+      <div class="resumo-card">
+        <i class="fa-solid fa-chart-line"></i>
+        <span class="resumo-label">Média Geral</span>
+        <strong id="resumo-media" class="resumo-valor">—</strong>
       </div>
-    </section>
+      <div class="resumo-card">
+        <i class="fa-solid fa-book"></i>
+        <span class="resumo-label">Disciplinas</span>
+        <strong id="resumo-disciplinas" class="resumo-valor">—</strong>
+      </div>
+      <div class="resumo-card">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span class="resumo-label">Em Risco</span>
+        <strong id="resumo-risco" class="resumo-valor">—</strong>
+      </div>
+      <div class="resumo-card">
+        <i class="fa-solid fa-user-xmark"></i>
+        <span class="resumo-label">Faltas Totais</span>
+        <strong id="resumo-faltas" class="resumo-valor">—</strong>
+      </div>
+    </div>
+
+    <div class="notas-panel">
+      <!-- 🆕 CONTROLES MELHORADOS -->
+      <div class="notas-controls">
+        <div class="control-group">
+          <label for="periodo-notas">Período letivo</label>
+          <select id="periodo-notas" disabled>
+            <option value="">Carregando períodos...</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="meta-notas">
+            Meta de média: <span id="meta-valor">60</span>
+          </label>
+          <input
+            id="meta-notas"
+            type="range"
+            min="0"
+            max="100"
+            step="5"
+            value="60"
+          />
+        </div>
+
+        <button id="atualizar-notas" type="button" class="button is-link">
+          <i class="fa-solid fa-rotate"></i> Atualizar
+        </button>
+      </div>
+
+      <!-- 🆕 STATUS COM LOADING -->
+      <p id="notas-status" class="notas-status" role="status">
+        <i class="fa-solid fa-circle-info"></i>
+        Aguardando dados do SUAP...
+      </p>
+
+      <!-- 🆕 TABELA RESPONSIVA -->
+      <div class="notas-table-wrapper">
+        <table class="tabela-notas">
+          <thead>
+            <tr>
+              <th>Disciplina</th>
+              <th>Etapas</th>
+              <th>Média</th>
+              <th>Faltas</th>
+              <th>Projeção</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="lista-notas">
+            <tr>
+              <td colspan="6" class="notas-vazia">
+                <i class="fa-solid fa-lock"></i>
+                Faça login para carregar suas notas.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 🆕 LEGENDA -->
+      <div class="notas-legenda">
+        <span><i class="dot dot-aprovado"></i> Aprovado</span>
+        <span><i class="dot dot-recuperacao"></i> Recuperação</span>
+        <span><i class="dot dot-reprovado"></i> Reprovado</span>
+      </div>
+    </div>
+  </div>
+</section>
 
     <!-- QUADRO DE HORÁRIOS -->
     <section id="horarios" class="horarios is-authenticated is-hidden">
