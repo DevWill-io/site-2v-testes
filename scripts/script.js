@@ -739,13 +739,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const menuLateralOverlay = document.getElementById("menu-lateral-overlay");
   const btnFecharMenu = document.getElementById("btn-fechar-menu");
 
-  function abrirMenuLateral() {
+ function abrirMenuLateral() {
     menuLateral?.classList.add("aberto");
     menuLateralOverlay?.classList.add("aberto");
     menuLateral?.setAttribute("aria-hidden", "false");
     document.body.classList.add("menu-aberto");
-    btnFecharMenu?.focus();
-  }
+    // 🆕 dá blur pra remover foco fantasma do botão
+    btnMenuLateral?.blur();
+    setTimeout(() => btnFecharMenu?.focus(), 100);
+}
   function fecharMenuLateral() {
     menuLateral?.classList.remove("aberto");
     menuLateralOverlay?.classList.remove("aberto");
@@ -755,8 +757,12 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("submenu-tema")?.classList.remove("aberto");
     document.getElementById("menu-btn-idioma")?.setAttribute("aria-expanded", "false");
     document.getElementById("menu-btn-tema")?.setAttribute("aria-expanded", "false");
-    document.getElementById("btn-menu")?.focus();
-  }
+        // 🆕 blur pra remover foco fantasma
+    const btnMenuEl = document.getElementById("btn-menu");
+    if (btnMenuEl) {
+        btnMenuEl.blur();
+    }
+}
 
   btnMenuLateral?.addEventListener("click", abrirMenuLateral);
   btnFecharMenu?.addEventListener("click", fecharMenuLateral);

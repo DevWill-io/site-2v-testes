@@ -1,38 +1,59 @@
 /* ==========================================
-   🔇 REMOVE O FUNDO AZUL DE CLIQUE EM TUDO
+   🔇 REMOVE O FUNDO AZUL DE CLIQUE + CURSOR "|"
    ========================================== */
+
+/* Remove o highlight azul (mobile) */
 * {
-    -webkit-tap-highlight-color: transparent !important;
-    -webkit-touch-callout: none;
-    outline: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
-a, button, input, textarea, select, [role="button"] {
-    -webkit-tap-highlight-color: transparent !important;
-    outline: none !important;
+a, button, input, textarea, select, [role="button"], label {
+    -webkit-tap-highlight-color: transparent;
 }
 
+/* Remove o contorno de foco padrão (mas mantém acessibilidade) */
 a:focus,
 button:focus,
 input:focus,
 textarea:focus,
 select:focus,
-[role="button"]:focus,
-a:focus-visible,
-button:focus-visible {
-    outline: none !important;
-    box-shadow: none;
-    -webkit-tap-highlight-color: transparent;
+[role="button"]:focus {
+    outline: none;
 }
 
-/* Mantém acessibilidade por teclado (só quando navega com TAB) */
+/* Só mostra contorno quando navega por teclado (TAB) */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
-select:focus-visible {
-    outline: 2px solid var(--accent) !important;
+select:focus-visible,
+[role="button"]:focus-visible {
+    outline: 2px solid var(--accent, #8b5edd);
     outline-offset: 2px;
+}
+
+/* 🔇 Remove o cursor "|" de piscar em tudo que NÃO é texto */
+html, body {
+    caret-color: transparent;
+}
+
+/* MAS permite o cursor de texto em campos de digitação */
+input, textarea, [contenteditable="true"] {
+    caret-color: auto;
+}
+
+/* Remove seleção de texto ao clicar em botões/links (não seleciona "fantasma") */
+button, a, label, [role="button"],
+.navbar, .menu-lateral, .menu-item, .menu-acao-btn,
+.btn-theme, .btn-menu-hamburguer, .btn-fechar-menu {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Permite seleção de texto no conteúdo (parágrafos, etc) */
+p, h1, h2, h3, h4, h5, h6, span, li, .recado-mensagem, .projeto-card p {
+    user-select: text;
+    -webkit-user-select: text;
 }
 
 /* ==========================================
@@ -277,14 +298,14 @@ a { text-decoration: none; color: inherit; }
 .tema-swatch-laranja { background: linear-gradient(135deg, #fb923c, #ea580c); }
 
 /* ==========================================
-   MENU LATERAL
+   MENU LATERAL — versão robusta
    ========================================== */
 .menu-lateral-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -295,12 +316,14 @@ a { text-decoration: none; color: inherit; }
     visibility: visible;
 }
 
+/* Drawer base */
 .menu-lateral {
     position: fixed;
     top: 0;
     right: 0;
     width: min(360px, 90vw);
     height: 100vh;
+    height: 100dvh;
     background: var(--bg-surface);
     border-left: 1px solid var(--border-color);
     box-shadow: -10px 0 40px rgba(0, 0, 0, 0.4);
@@ -310,25 +333,16 @@ a { text-decoration: none; color: inherit; }
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    overscroll-behavior: contain;
 }
 .menu-lateral.aberto {
     transform: translateX(0);
 }
 
-/* 🖥️ Drawer DESKTOP — mais largo, elegante */
+/* 🖥️ Desktop — um pouco mais largo */
 @media (min-width: 1101px) {
     .menu-lateral {
-        width: min(480px, 42vw);
-        box-shadow: -20px 0 60px rgba(0, 0, 0, 0.35);
-        background: linear-gradient(
-            180deg,
-            var(--bg-surface) 0%,
-            color-mix(in srgb, var(--bg-surface) 92%, var(--accent-strong) 8%) 100%
-        );
-    }
-    .menu-lateral-overlay {
-        background: rgba(0, 0, 0, 0.45);
-        backdrop-filter: blur(6px);
+        width: 420px;
     }
 }
 
@@ -338,15 +352,7 @@ a { text-decoration: none; color: inherit; }
     align-items: center;
     padding: 20px 22px;
     border-bottom: 1px solid var(--border-color);
-    position: sticky;
-    top: 0;
-    background: var(--bg-surface);
-    z-index: 2;
-}
-@media (min-width: 1101px) {
-    .menu-lateral-header {
-        padding: 26px 28px;
-    }
+    flex-shrink: 0;
 }
 .menu-lateral-titulo {
     font-family: 'Poppins', sans-serif;
@@ -371,6 +377,7 @@ a { text-decoration: none; color: inherit; }
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 .btn-fechar-menu:hover {
     background: hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.15);
@@ -379,17 +386,12 @@ a { text-decoration: none; color: inherit; }
 }
 
 .menu-lateral-nav {
-    flex: 1;
+    flex: 1 1 auto;
     padding: 12px;
     display: flex;
     flex-direction: column;
     gap: 4px;
-}
-@media (min-width: 1101px) {
-    .menu-lateral-nav {
-        padding: 16px 20px;
-        gap: 6px;
-    }
+    overflow-y: auto;
 }
 
 .menu-item {
@@ -401,9 +403,10 @@ a { text-decoration: none; color: inherit; }
     color: var(--text-main);
     font-weight: 500;
     font-size: 0.95rem;
-    transition: all 0.22s ease;
+    transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
     text-decoration: none;
     position: relative;
+    border-left: 3px solid transparent;
 }
 .menu-item-icone {
     display: flex;
@@ -414,18 +417,19 @@ a { text-decoration: none; color: inherit; }
     border-radius: 10px;
     background: hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.12);
     flex-shrink: 0;
-    transition: all 0.22s ease;
+    transition: background 0.2s ease, transform 0.2s ease;
 }
 .menu-item-icone i {
     color: var(--accent);
     font-size: 1rem;
-    transition: all 0.22s ease;
+    transition: color 0.2s ease;
 }
 .menu-item-texto {
     display: flex;
     flex-direction: column;
     gap: 2px;
     min-width: 0;
+    flex: 1;
 }
 .menu-item-titulo {
     font-weight: 600;
@@ -442,23 +446,20 @@ a { text-decoration: none; color: inherit; }
     text-overflow: ellipsis;
 }
 
-.menu-item:hover,
-.menu-item:focus-visible {
+.menu-item:hover {
     background: hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.12);
     transform: translateX(4px);
 }
 .menu-item:hover .menu-item-icone {
     background: var(--accent-strong);
-    transform: scale(1.05);
 }
 .menu-item:hover .menu-item-icone i {
     color: #fff;
 }
 
 .menu-item.active {
-    background: hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.18);
-    border-left: 3px solid var(--accent);
-    padding-left: 11px;
+    background: hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.15);
+    border-left-color: var(--accent);
 }
 .menu-item.active .menu-item-icone {
     background: var(--accent-strong);
@@ -467,41 +468,14 @@ a { text-decoration: none; color: inherit; }
     color: #fff;
 }
 
-@media (min-width: 1101px) {
-    .menu-item {
-        padding: 14px 16px;
-        gap: 16px;
-    }
-    .menu-item-icone {
-        width: 46px;
-        height: 46px;
-        border-radius: 12px;
-    }
-    .menu-item-icone i {
-        font-size: 1.1rem;
-    }
-    .menu-item-titulo {
-        font-size: 1rem;
-    }
-    .menu-item-desc {
-        font-size: 0.82rem;
-    }
-}
-
 .menu-lateral-footer {
     padding: 16px 20px 22px;
     border-top: 1px solid var(--border-color);
-    background: rgba(0, 0, 0, 0.15);
-    position: sticky;
-    bottom: 0;
+    background: rgba(0, 0, 0, 0.12);
+    flex-shrink: 0;
 }
 body.light-theme .menu-lateral-footer {
     background: rgba(0, 0, 0, 0.02);
-}
-@media (min-width: 1101px) {
-    .menu-lateral-footer {
-        padding: 20px 24px 26px;
-    }
 }
 
 .menu-lateral-acoes {
@@ -524,7 +498,7 @@ body.light-theme .menu-lateral-footer {
     font-size: 0.78rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.22s ease;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 .menu-acao-btn i {
     font-size: 1.2rem;
@@ -551,20 +525,20 @@ body.light-theme .menu-lateral-footer {
     background: hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.12);
     color: var(--accent);
     font-size: 1rem;
-    transition: all 0.25s ease;
+    transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
 }
 .menu-lateral-redes a:hover {
     background: var(--accent);
     color: var(--bg-base);
-    transform: translateY(-3px) rotate(-5deg);
+    transform: translateY(-3px);
 }
 
-/* Submenus internos do menu lateral */
+/* Submenus internos */
 .menu-submenu {
     max-height: 0;
     overflow: hidden;
     opacity: 0;
-    transition: max-height 0.35s ease, opacity 0.25s ease, margin 0.25s ease;
+    transition: max-height 0.3s ease, opacity 0.2s ease, margin 0.2s ease;
     margin-top: 0;
     background: rgba(0, 0, 0, 0.15);
     border-radius: 12px;
@@ -594,7 +568,7 @@ body.light-theme .menu-submenu {
     font-size: 0.92rem;
     text-align: left;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease;
     margin-bottom: 4px;
 }
 .menu-submenu-item:hover {
@@ -648,7 +622,7 @@ body.light-theme .submenu-titulo-modo {
     font-family: inherit;
     font-size: 0.82rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease;
     text-align: left;
 }
 .submenu-cor:hover {
@@ -685,7 +659,7 @@ body.light-theme .submenu-titulo-modo {
     font-size: 0.82rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease;
 }
 .submenu-modo:hover {
     background: hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.15);
