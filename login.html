@@ -10,11 +10,9 @@
     />
     <title>Login SUAP | Turma 2V IFRN</title>
 
-    <!-- Links do Calendário -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.11/index.global.min.js"></script>
 
-    <!-- Fontes e Ícones -->
     <link
       href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600&family=Poppins:wght@600;700;800&display=swap"
       rel="stylesheet"
@@ -25,7 +23,6 @@
     />
     <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
 
-    <!-- CSS Exclusivo de Login -->
     <link rel="stylesheet" href="styles/login.css" />
   </head>
   <body>
@@ -49,7 +46,6 @@
           <h1 class="login-card-title">Portal SUAP</h1>
           <p class="login-card-subtitle">Área de autenticação acadêmica</p>
 
-          <!-- Estado: Não autenticado -->
           <div class="is-anonymous is-hidden content login-prompt">
             <p>
               Acesse com suas credenciais institucionais do IFRN para integrar e
@@ -60,7 +56,6 @@
             </a>
           </div>
 
-          <!-- Estado: Autenticado com Sucesso -->
           <div class="is-authenticated is-hidden content login-success">
             <div class="success-header">
               <i class="fa-solid fa-circle-check"></i>
@@ -68,7 +63,6 @@
               <p>Sessão ativa e conectada ao SUAP.</p>
             </div>
 
-            <!-- Perfil do Usuário -->
             <div id="user-profile-info" class="user-profile-card">
               <img id="user-foto" src="" alt="Foto SUAP" class="user-avatar" />
               <div class="user-details">
@@ -102,7 +96,9 @@
       </div>
     </main>
 
-    <!-- CALCULADORA DE NOTAS -->
+    <!-- ============================================
+         CALCULADORA DE NOTAS V3
+         ============================================ -->
     <section id="notas" class="notas is-authenticated is-hidden">
       <div class="container">
         <div class="section-title">
@@ -110,7 +106,6 @@
           <p>Boletim atualizado diretamente pelo SUAP</p>
         </div>
 
-        <!-- 🆕 CARDS DE RESUMO -->
         <div class="notas-resumo">
           <div class="resumo-card">
             <i class="fa-solid fa-chart-line"></i>
@@ -135,9 +130,8 @@
         </div>
 
         <div class="notas-panel">
-          <!-- CONTROLES -->
           <div class="notas-controls">
-            <label for="periodo-notas">Período letivo</label>
+            <label for="periodo-notas">Período</label>
             <select id="periodo-notas" disabled>
               <option value="">Carregando períodos...</option>
             </select>
@@ -159,11 +153,20 @@
             </button>
           </div>
 
-          <!-- 🆕 FILTROS RÁPIDOS -->
-          <div class="notas-filtros" role="tablist">
-            <button type="button" class="filtro-chip ativo" data-filtro="todas">
-              Todas
+          <div class="notas-acoes">
+            <button type="button" id="btn-export-csv" class="btn-acao">
+              <i class="fa-solid fa-file-csv"></i> Exportar CSV
             </button>
+            <button type="button" id="btn-export-pdf" class="btn-acao">
+              <i class="fa-solid fa-file-pdf"></i> Exportar PDF
+            </button>
+            <button type="button" id="btn-limpar-simulador" class="btn-acao">
+              <i class="fa-solid fa-eraser"></i> Limpar simulador
+            </button>
+          </div>
+
+          <div class="notas-filtros" role="tablist">
+            <button type="button" class="filtro-chip ativo" data-filtro="todas">Todas</button>
             <button type="button" class="filtro-chip" data-filtro="aprovado">
               <i class="fa-solid fa-check"></i> Aprovadas
             </button>
@@ -184,20 +187,22 @@
           </p>
 
           <div class="notas-table-wrapper">
-            <table class="tabela-notas">
+            <table class="tabela-notas" id="tabela-notas">
               <thead>
                 <tr>
-                  <th>Disciplina</th>
+                  <th data-sort="nome" class="sortable">Disciplina <i class="fa-solid fa-sort"></i></th>
                   <th>Etapas</th>
-                  <th>Média</th>
-                  <th>Faltas</th>
+                  <th data-sort="media" class="sortable">Média <i class="fa-solid fa-sort"></i></th>
+                  <th data-sort="faltas" class="sortable">Faltas <i class="fa-solid fa-sort"></i></th>
                   <th>Projeção</th>
-                  <th>Status</th>
+                  <th data-sort="status" class="sortable">Status <i class="fa-solid fa-sort"></i></th>
+                  <th title="Simulador: digite uma nota hipotética na próxima etapa">🧪 E se...?</th>
+                  <th title="Meta individual">🎯</th>
                 </tr>
               </thead>
               <tbody id="lista-notas">
                 <tr>
-                  <td colspan="6" class="notas-vazia">
+                  <td colspan="8" class="notas-vazia">
                     <i class="fa-solid fa-lock"></i>
                     Faça login para carregar suas notas.
                   </td>
@@ -210,6 +215,19 @@
             <span><i class="dot dot-aprovado"></i> Aprovado</span>
             <span><i class="dot dot-recuperacao"></i> Recuperação</span>
             <span><i class="dot dot-reprovado"></i> Reprovado</span>
+            <span style="margin-left:auto;opacity:.8;">🧪 Simulador • 🎯 Meta individual</span>
+          </div>
+        </div>
+
+        <div class="historico-panel is-hidden" id="historico-panel">
+          <div class="historico-header">
+            <h3><i class="fa-solid fa-clock-rotate-left"></i> Histórico de Períodos</h3>
+            <button type="button" id="btn-toggle-historico" class="btn-acao">
+              <i class="fa-solid fa-chevron-up"></i>
+            </button>
+          </div>
+          <div id="historico-content" class="historico-content">
+            <p class="historico-vazio">Carregue pelo menos 2 períodos para comparar.</p>
           </div>
         </div>
       </div>
@@ -401,7 +419,7 @@
       </div>
     </section>
 
-    <!-- COLEGAS DE TURMA (PERFIS SUAP) -->
+    <!-- MEMBROS -->
     <section id="perfis" class="perfis is-authenticated is-hidden">
       <div class="container">
         <div class="section-title reveal">
@@ -430,7 +448,7 @@
       </div>
     </section>
 
-    <!-- AGENDA DA TURMA -->
+    <!-- AGENDA -->
     <section id="agenda" class="agenda is-authenticated is-hidden">
       <div class="container">
         <div class="section-title reveal">
@@ -444,7 +462,7 @@
       </div>
     </section>
 
-    <!-- MODAL DE PERFIL DO ALUNO -->
+    <!-- MODAL PERFIL -->
     <div
       id="modal-perfil"
       class="modal-overlay is-hidden"
@@ -493,7 +511,7 @@
       </div>
     </div>
 
-    <!-- MODAL DE EDIÇÃO DE PERFIL -->
+    <!-- MODAL EDITAR PERFIL -->
     <div
       id="modal-editar-perfil"
       class="modal-overlay is-hidden"
@@ -647,7 +665,23 @@
       </div>
     </div>
 
-    <!-- FOOTER -->
+    <!-- MODAL META POR DISCIPLINA (criado via JS, mas deixamos o container) -->
+    <div id="modal-meta-disciplina" class="modal-overlay is-hidden">
+      <div class="modal-content modal-meta" onclick="event.stopPropagation()">
+        <button type="button" class="modal-close" data-fechar>&times;</button>
+        <h2 class="modal-title"><i class="fa-solid fa-bullseye"></i> Meta individual</h2>
+        <p class="meta-disciplina-nome"></p>
+        <div class="meta-slider-wrap">
+          <input type="range" min="0" max="100" step="5" />
+          <span class="meta-num"></span>
+        </div>
+        <div class="meta-actions">
+          <button type="button" class="btn-reset-meta" data-reset>Usar meta global</button>
+          <button type="button" class="button is-success" data-salvar>Salvar</button>
+        </div>
+      </div>
+    </div>
+
     <footer class="login-footer">
       <p>
         © <span id="ano">2026</span> - Feito pela turma
@@ -661,7 +695,6 @@
       </p>
     </footer>
 
-    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
