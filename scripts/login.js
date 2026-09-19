@@ -131,7 +131,6 @@ function calcularTempoRestante(timestampCriacao, duracaoHoras) {
 const themeToggle = document.getElementById("theme-toggle");
 if (themeToggle) {
   const themeIcon = themeToggle.querySelector("i");
-  // 🆕 Detecta preferência do sistema se nunca escolheu
   let currentTheme = localStorage.getItem("theme");
   if (!currentTheme) {
     currentTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
@@ -150,7 +149,6 @@ if (themeToggle) {
       if (themeIcon) themeIcon.classList.replace("fa-sun", "fa-moon");
     }
     localStorage.setItem("theme", theme);
-    // 🆕 Redesenha gráfico com cores do tema atual
     if (window.__graficoEvolucao) desenharGraficoEvolucao();
   });
 }
@@ -174,7 +172,6 @@ onValue(recadosRef, (snapshot) => {
     }
   });
   window.renderizarMural();
-  // 🆕 Atualiza notificações
   if (typeof gerarNotificacoesRecados === "function") gerarNotificacoesRecados();
 });
 
@@ -1006,7 +1003,6 @@ function atualizarHistoricoComDisciplinas(disciplinas, periodoLabel, ano) {
   renderizarHistorico();
   var panel = document.getElementById("historico-panel");
   if (panel) panel.classList.remove("is-hidden");
-  // 🆕 Atualiza gráfico
   desenharGraficoEvolucao();
 }
 
@@ -1041,135 +1037,73 @@ function renderizarHistorico() {
 }
 
 // ==========================================
-// 🆕 5.5b GRÁFICO DE EVOLUÇÃO
+// 5.6 GRÁFICO
 // ==========================================
 window.__graficoEvolucao = null;
 
 function desenharGraficoEvolucao() {
   var canvas = document.getElementById("grafico-evolucao");
   var panel = document.getElementById("evolucao-panel");
-  var vazio = document.getElementById("evolucao-vazio");
   if (!canvas || !panel) return;
-
-  // Só mostra o painel se tiver pelo menos 1 período com média
   var comMedia = __historicoPeriodos.filter(function (h) { return h.media !== null; });
-  if (comMedia.length === 0) {
-    panel.classList.add("is-hidden");
-    return;
-  }
+  if (comMedia.length === 0) { panel.classList.add("is-hidden"); return; }
   panel.classList.remove("is-hidden");
-
-  if (comMedia.length === 1) {
-    // Mostra só uma barra solitária
-    if (vazio) vazio.classList.add("is-hidden");
-  } else {
-    if (vazio) vazio.classList.add("is-hidden");
-  }
-
-  // Ordena cronologicamente (mais antigo → mais novo)
   var ordenado = __historicoPeriodos.slice().sort(function (a, b) { return a.periodo.localeCompare(b.periodo); });
   var labels = ordenado.map(function (h) { return h.periodo; });
   var dados = ordenado.map(function (h) { return h.media !== null ? h.media : 0; });
-
-  // Se já existe gráfico, destrói antes de recriar (senão buga)
   if (window.__graficoEvolucao) {
     try { window.__graficoEvolucao.destroy(); } catch (e) {}
     window.__graficoEvolucao = null;
   }
-
-  // Cores do tema atual
   var estilo = getComputedStyle(document.documentElement);
   var corAccent = estilo.getPropertyValue("--accent-strong").trim() || "#8b5edd";
   var corAccent2 = estilo.getPropertyValue("--accent").trim() || "#cebdec";
   var corTexto = estilo.getPropertyValue("--text-muted").trim() || "#b8a8d9";
   var corGrade = estilo.getPropertyValue("--border-color").trim() || "rgba(206,189,236,0.18)";
   var corMeta = estilo.getPropertyValue("--warning").trim() || "#f59e0b";
-
   var ctx = canvas.getContext("2d");
   var gradient = ctx.createLinearGradient(0, 0, 0, 260);
   gradient.addColorStop(0, corAccent + "cc");
   gradient.addColorStop(1, corAccent + "08");
-
   window.__graficoEvolucao = new Chart(ctx, {
     type: "line",
     data: {
       labels: labels,
       datasets: [
         {
-          label: "Média",
-          data: dados,
-          borderColor: corAccent,
-          backgroundColor: gradient,
-          borderWidth: 3,
-          pointBackgroundColor: corAccent2,
-          pointBorderColor: corAccent,
-          pointBorderWidth: 2,
-          pointRadius: 6,
-          pointHoverRadius: 9,
-          tension: 0.35,
-          fill: true,
+          label: "Média", data: dados,
+          borderColor: corAccent, backgroundColor: gradient, borderWidth: 3,
+          pointBackgroundColor: corAccent2, pointBorderColor: corAccent, pointBorderWidth: 2,
+          pointRadius: 6, pointHoverRadius: 9, tension: 0.35, fill: true,
         },
         {
-          label: "Meta",
-          data: labels.map(function () { return __metaAtual; }),
-          borderColor: corMeta,
-          borderWidth: 2,
-          borderDash: [6, 6],
-          pointRadius: 0,
-          fill: false,
+          label: "Meta", data: labels.map(function () { return __metaAtual; }),
+          borderColor: corMeta, borderWidth: 2, borderDash: [6, 6], pointRadius: 0, fill: false,
         },
       ],
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive: true, maintainAspectRatio: false,
       interaction: { mode: "index", intersect: false },
       plugins: {
-        legend: {
-          labels: {
-            color: corTexto,
-            font: { family: "Inter", size: 12, weight: "600" },
-            usePointStyle: true,
-          },
-        },
+        legend: { labels: { color: corTexto, font: { family: "Inter", size: 12, weight: "600" }, usePointStyle: true } },
         tooltip: {
           backgroundColor: "rgba(0,0,0,0.85)",
-          titleFont: { family: "Inter", size: 13 },
-          bodyFont: { family: "Inter", size: 12 },
-          padding: 10,
-          cornerRadius: 8,
-          callbacks: {
-            label: function (context) {
-              return context.dataset.label + ": " + context.parsed.y.toFixed(1);
-            },
-          },
+          titleFont: { family: "Inter", size: 13 }, bodyFont: { family: "Inter", size: 12 },
+          padding: 10, cornerRadius: 8,
+          callbacks: { label: function (context) { return context.dataset.label + ": " + context.parsed.y.toFixed(1); } },
         },
       },
       scales: {
-        y: {
-          beginAtZero: true,
-          max: 100,
-          ticks: {
-            color: corTexto,
-            font: { family: "Inter", size: 11 },
-            stepSize: 20,
-          },
-          grid: { color: corGrade, drawBorder: false },
-        },
-        x: {
-          ticks: {
-            color: corTexto,
-            font: { family: "Inter", size: 11, weight: "600" },
-          },
-          grid: { display: false },
-        },
+        y: { beginAtZero: true, max: 100, ticks: { color: corTexto, font: { family: "Inter", size: 11 }, stepSize: 20 }, grid: { color: corGrade, drawBorder: false } },
+        x: { ticks: { color: corTexto, font: { family: "Inter", size: 11, weight: "600" } }, grid: { display: false } },
       },
     },
   });
 }
 
 // ==========================================
-// 5.6 RENDERIZAR TABELA
+// 5.7 RENDERIZAR TABELA
 // ==========================================
 function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   var corpo = document.getElementById("lista-notas");
@@ -1182,11 +1116,7 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
     var tr = corpo.querySelector(`tr[data-codigo="${CSS.escape(apenasLinhaCodigo)}"]`);
     if (tr) {
       var d = __notasCache.find(function (x) { return getCodigoDisc(x) === apenasLinhaCodigo; });
-      if (d) {
-        atualizarLinhaNota(tr, d, meta);
-        atualizarResumoNotas(__notasCache);
-        return;
-      }
+      if (d) { atualizarLinhaNota(tr, d, meta); atualizarResumoNotas(__notasCache); return; }
     }
   }
 
@@ -1319,10 +1249,8 @@ function atualizarLinhaNota(tr, d, meta) {
   var media = calc.media;
   var status = classificarStatusNota(media, faltas, metaDisc);
   var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, etapas.length, calc.somaComSim, metaDisc);
-
   tr.classList.toggle("linha-risco", status === "reprovado" || faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT);
   tr.classList.toggle("simulando", calc.simulando);
-
   var tdMedia = tr.querySelector(".td-media");
   if (tdMedia) {
     var percentual = media !== null ? Math.min(media, 100) : 0;
@@ -1396,7 +1324,7 @@ function bindSimuladores(corpo) {
 }
 
 // ==========================================
-// 5.7 MODAL META
+// 5.8 MODAL META
 // ==========================================
 function abrirModalMetaDisciplina(codigo, nome) {
   var modal = document.getElementById("modal-meta-disciplina");
@@ -1432,7 +1360,7 @@ function abrirModalMetaDisciplina(codigo, nome) {
 }
 
 // ==========================================
-// 5.8 EXPORT CSV / PDF
+// 5.9 EXPORT
 // ==========================================
 function exportarCSV() {
   if (!__notasCache.length) { exibirToast("Nada para exportar.", "erro"); return; }
@@ -1529,7 +1457,7 @@ function exportarPDF() {
 }
 
 // ==========================================
-// 5.9 CARREGAR BOLETIM
+// 5.10 CARREGAR BOLETIM
 // ==========================================
 function carregarBoletim(ano, periodo) {
   atualizarStatusNotas("Buscando notas no SUAP...", "loading");
@@ -1574,7 +1502,7 @@ function carregarPeriodosNotas() {
 }
 
 // ==========================================
-// 🆕 5.9b NOTIFICAÇÕES
+// 5.11 NOTIFICAÇÕES
 // ==========================================
 const CHAVE_NOTIF_LIDAS = () => "notif_lidas_" + (window.usuarioLogado.matricula || "anon");
 let __notificacoes = [];
@@ -1587,18 +1515,13 @@ function gerarNotificacoesRecados() {
     var raw = localStorage.getItem(CHAVE_NOTIF_LIDAS());
     lidas = raw ? JSON.parse(raw) : {};
   } catch (e) { lidas = {}; }
-
   __notificacoes = [];
   bancoDeRecados.forEach(function (r) {
-    // Só notifica se não for do próprio usuário
     if (r.autor_matricula === mat) return;
-    // Só notifica recados recentes (últimos 30 dias)
     var idade = Date.now() - (r.timestampCriacao || 0);
     if (idade > 30 * 24 * 60 * 60 * 1000) return;
-
     __notificacoes.push({
-      id: r.id,
-      tipo: "recado",
+      id: r.id, tipo: "recado",
       icone: "fa-regular fa-comment-dots",
       titulo: "Novo recado de " + nomeParaExibicao(r.autor_nome),
       descricao: (r.mensagem || "").slice(0, 80) + ((r.mensagem || "").length > 80 ? "..." : ""),
@@ -1606,8 +1529,6 @@ function gerarNotificacoesRecados() {
       lida: !!lidas[r.id],
     });
   });
-
-  // Ordena mais recentes primeiro
   __notificacoes.sort(function (a, b) { return b.data - a.data; });
   atualizarBadgeNotificacoes();
 }
@@ -1648,8 +1569,6 @@ function renderizarPainelNotificacoes() {
         </div>
       </div>`;
   }).join("");
-
-  // Clique marca como lida e rola até o recado
   lista.querySelectorAll(".notif-item").forEach(function (el) {
     el.addEventListener("click", function () {
       var id = el.dataset.id;
@@ -1682,18 +1601,15 @@ function marcarTodasLidas() {
 }
 
 // ==========================================
-// 🆕 5.9c PRÓXIMOS EVENTOS (via FullCalendar)
+// 5.12 PRÓXIMOS EVENTOS
 // ==========================================
 function renderizarProximosEventos(eventos) {
   var container = document.getElementById("proximos-eventos-lista");
   if (!container) return;
-
   var hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
   var em7dias = new Date(hoje);
   em7dias.setDate(em7dias.getDate() + 7);
-
-  // Filtra próximos 7 dias, ordena por data
   var proximos = eventos
     .filter(function (ev) {
       var inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
@@ -1706,20 +1622,17 @@ function renderizarProximosEventos(eventos) {
       return da - db;
     })
     .slice(0, 4);
-
   if (proximos.length === 0) {
     container.innerHTML = "";
     document.getElementById("proximos-eventos")?.classList.add("is-hidden");
     return;
   }
   document.getElementById("proximos-eventos")?.classList.remove("is-hidden");
-
   var MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
   container.innerHTML = proximos.map(function (ev) {
     var inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
     var dia = inicio.getDate();
     var mes = MESES[inicio.getMonth()];
-
     var diffDias = Math.floor((inicio - hoje) / (1000 * 60 * 60 * 24));
     var classeCard = "evento-card";
     var badgeHTML = "";
@@ -1735,10 +1648,7 @@ function renderizarProximosEventos(eventos) {
     } else {
       badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`;
     }
-
-    // Cor do evento
     var cor = ev.backgroundColor || ev.borderColor || "#8b5edd";
-
     return `
       <div class="${classeCard}" style="border-left-color:${cor}">
         <div class="evento-data" style="background:${cor}22">
@@ -1747,7 +1657,7 @@ function renderizarProximosEventos(eventos) {
         </div>
         <div class="evento-info">
           <div class="evento-titulo">${escaparHTML(ev.title || "Sem título")}</div>
-          <div class="evento-descricao">${inicio.toLocaleDateString("pt-BR", { weekday: "long" })}${ev.extendedProps?.location ? " • " + escaparHTML(ev.extendedProps.location) : ""}</div>
+          <div class="evento-descricao">${inicio.toLocaleDateString("pt-BR", { weekday: "long" })}</div>
           ${badgeHTML}
         </div>
       </div>`;
@@ -1755,7 +1665,7 @@ function renderizarProximosEventos(eventos) {
 }
 
 // ==========================================
-// 5.10 LISTENERS
+// 5.13 LISTENERS
 // ==========================================
 function initCalculadoraNotas() {
   const elPeriodo = document.getElementById("periodo-notas");
@@ -1814,8 +1724,6 @@ function initCalculadoraNotas() {
   document.getElementById("btn-toggle-historico")?.addEventListener("click", function () {
     document.getElementById("historico-panel")?.classList.toggle("colapsado");
   });
-
-  // 🆕 Notificações
   const btnNotif = document.getElementById("btn-notificacoes");
   const painelNotif = document.getElementById("painel-notificacoes");
   if (btnNotif && !btnNotif.dataset.bound) {
@@ -1827,14 +1735,12 @@ function initCalculadoraNotas() {
     });
   }
   document.getElementById("btn-marcar-lidas")?.addEventListener("click", marcarTodasLidas);
-  // Fecha painel clicando fora
   document.addEventListener("click", function (e) {
     if (!painelNotif || painelNotif.classList.contains("is-hidden")) return;
     if (!e.target.closest("#painel-notificacoes") && !e.target.closest("#btn-notificacoes")) {
       painelNotif.classList.add("is-hidden");
     }
   });
-
   carregarMetasDisciplinas();
 }
 
@@ -1863,25 +1769,37 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".is-authenticated").forEach(function (el) { el.classList.remove("is-hidden"); });
     carregarPeriodosNotas();
 
-    // 🆕 CALENDÁRIO COM CORES CUSTOMIZADAS
+    // ============================================
+    // 🎨 CALENDÁRIO COM CORES POR PALAVRA-CHAVE
+    // ============================================
     var calendarEl = document.getElementById("calendar");
     if (calendarEl && typeof FullCalendar !== "undefined") {
-      // Mapa colorId do Google → paleta do site
-      var MAPA_CORES_GOOGLE = {
-        "1": "#8b5edd",  // Lavanda
-        "2": "#10b981",  // Sálvia
-        "3": "#7c3aed",  // Uva
-        "4": "#ff4757",  // Flamingo
-        "5": "#f59e0b",  // Banana
-        "6": "#f97316",  // Tangerina
-        "7": "#06b6d4",  // Pavão
-        "8": "#64748b",  // Grafite
-        "9": "#3b82f6",  // Mirtilo
-        "10": "#22c55e", // Manjericão
-        "11": "#ef4444", // Tomate
-      };
 
-      var eventosCache = [];
+      // 🎨 Regras: regex → cor
+      var REGRAS_CORES = [
+        { regex: /prova|avalia|exame|teste/i, cor: "#ff4757" },      // Vermelho
+        { regex: /trabalho|projeto|entrega|lista|seminario|seminário/i, cor: "#f59e0b" }, // Laranja
+        { regex: /feriado|recesso|f[eé]rias|ponto facultativo/i, cor: "#10b981" }, // Verde
+        { regex: /reuni[aã]o|aula|encontro|palestra/i, cor: "#7c3aed" }, // Roxo
+        { regex: /jogo|esporte|campeonato|torneio/i, cor: "#06b6d4" }, // Ciano
+        { regex: /festa|evento|apresenta|show/i, cor: "#ec4899" }, // Rosa
+      ];
+
+      function corDoEvento(titulo) {
+        var t = String(titulo || "").toLowerCase();
+        for (var i = 0; i < REGRAS_CORES.length; i++) {
+          if (REGRAS_CORES[i].regex.test(t)) return REGRAS_CORES[i].cor;
+        }
+        return "#8b5edd"; // roxo padrão
+      }
+
+      // Aplica cor em um elemento de evento
+      function pintarElementoEvento(el, titulo) {
+        var cor = corDoEvento(titulo);
+        el.style.setProperty("background-color", cor, "important");
+        el.style.setProperty("border-color", cor, "important");
+        el.style.setProperty("color", "#ffffff", "important");
+      }
 
       var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: "dayGridMonth",
@@ -1891,22 +1809,20 @@ document.addEventListener("DOMContentLoaded", function () {
         googleCalendarApiKey: "AIzaSyB9XFKFwtZNQJrN2Kh7UPZxraPXEwqFytw",
         events: "acb20a08d58749d48304dbda5c87bfb7f0671483ecc4ed942683ad5a1307e78d@group.calendar.google.com",
 
-        // 🆕 Cores aplicadas por evento
+        // Pinta assim que o evento é montado
         eventDidMount: function (info) {
-          var colorId = info.event.extendedProps?.colorId ||
-                        info.event._def?.extendedProps?.colorId;
-          var cor = MAPA_CORES_GOOGLE[colorId];
-          if (cor) {
-            info.el.style.backgroundColor = cor;
-            info.el.style.borderColor = cor;
-            info.el.style.color = "#ffffff";
-          }
+          pintarElementoEvento(info.el, info.event.title);
         },
 
-        // 🆕 Captura eventos após renderizar
+        // Reforça após cada render (o Google Calendar pode sobrescrever depois)
         eventsSet: function (eventos) {
-          eventosCache = eventos;
           renderizarProximosEventos(eventos);
+          // Re-pinta todos os eventos visíveis
+          setTimeout(function () {
+            document.querySelectorAll(".fc-event").forEach(function (el) {
+              pintarElementoEvento(el, el.innerText || "");
+            });
+          }, 50);
         },
 
         eventClick: function (arg) {
@@ -1915,9 +1831,21 @@ document.addEventListener("DOMContentLoaded", function () {
         },
       });
       calendar.render();
+
+      // MutationObserver: garante que mesmo se o FullCalendar re-renderizar,
+      // as cores continuam aplicadas (o plugin do Google sobrescreve às vezes).
+      var observer = new MutationObserver(function () {
+        document.querySelectorAll(".fc-event").forEach(function (el) {
+          var texto = el.innerText || "";
+          var cor = corDoEvento(texto);
+          var atual = el.style.getPropertyValue("background-color");
+          if (atual !== cor) pintarElementoEvento(el, texto);
+        });
+      });
+      observer.observe(calendarEl, { childList: true, subtree: true, attributes: true, attributeFilter: ["style"] });
     }
 
-    // SUAP — dados do usuário
+    // SUAP
     var scope = suap.getToken().getScope();
     suap.getResource(scope, function (dados_suap) {
       var fotoPath = dados_suap.url_foto_150x200 || dados_suap.url_foto_75x100 || dados_suap.foto || "";
@@ -1957,7 +1885,6 @@ document.addEventListener("DOMContentLoaded", function () {
           update(perfilAlunoRef, payload).then(() => { window.carregarPerfilUsuario(matriculaSuap); });
         });
         carregarMetasDisciplinas();
-        // 🆕 Gera notificações iniciais
         gerarNotificacoesRecados();
       }
 
