@@ -16,6 +16,8 @@ const TRADUCOES = {
     nav_contato: "Contato",
     nav_mascote: "Mascote",
     // Ações do header
+    cor_tema: "Cor do tema",
+    modo: "Modo",  
     idioma: "Idioma",
     tema: "Tema",
     cor_roxo: "Roxo",
@@ -120,6 +122,8 @@ const TRADUCOES = {
     nav_projetos: "Projects",
     nav_contato: "Contact",
     nav_mascote: "Mascot",
+    cor_tema: "Theme color",
+    modo: "Mode",
     idioma: "Language",
     tema: "Theme",
     cor_roxo: "Purple",
@@ -214,6 +218,8 @@ const TRADUCOES = {
     nav_contato: "Contacto",
     nav_mascote: "Mascota",
     idioma: "Idioma",
+    cor_tema: "Color del tema",
+    modo: "Modo",
     tema: "Tema",
     cor_roxo: "Morado",
     cor_azul: "Azul",
@@ -739,7 +745,7 @@ document.addEventListener("DOMContentLoaded", () => {
   carregarProjetosGitHub();
   window.carregarProjetosGitHub = carregarProjetosGitHub;
 
-  // 15. Menu Lateral
+    // 15. Menu Lateral
   const btnMenuLateral = document.getElementById("btn-menu");
   const menuLateral = document.getElementById("menu-lateral");
   const menuLateralOverlay = document.getElementById("menu-lateral-overlay");
@@ -757,6 +763,11 @@ document.addEventListener("DOMContentLoaded", () => {
     menuLateralOverlay?.classList.remove("aberto");
     menuLateral?.setAttribute("aria-hidden", "true");
     document.body.classList.remove("menu-aberto");
+    // Fecha submenus também
+    document.getElementById("submenu-idioma")?.classList.remove("aberto");
+    document.getElementById("submenu-tema")?.classList.remove("aberto");
+    document.getElementById("menu-btn-idioma")?.setAttribute("aria-expanded", "false");
+    document.getElementById("menu-btn-tema")?.setAttribute("aria-expanded", "false");
     document.getElementById("btn-menu")?.focus();
   }
 
@@ -770,43 +781,104 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Fecha ao clicar num item do menu (exceto botões de ação)
   document.querySelectorAll(".menu-lateral-nav .menu-item").forEach((item) => {
     item.addEventListener("click", () => {
       setTimeout(fecharMenuLateral, 100);
     });
   });
 
-  // Botão de tema dentro do menu lateral → abre dropdown principal
-  document.getElementById("menu-btn-tema")?.addEventListener("click", () => {
-    const menuTema = document.getElementById("menu-tema");
-    menuTema?.classList.toggle("aberto");
-    const menuIdioma = document.getElementById("menu-idioma");
-    menuIdioma?.classList.remove("aberto");
+  // 🆕 SUBMENU IDIOMA
+  const btnSubmenuIdioma = document.getElementById("menu-btn-idioma");
+  const submenuIdioma = document.getElementById("submenu-idioma");
+  const btnSubmenuTema = document.getElementById("menu-btn-tema");
+  const submenuTema = document.getElementById("submenu-tema");
+
+  btnSubmenuIdioma?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const aberto = submenuIdioma?.classList.toggle("aberto");
+    btnSubmenuIdioma.setAttribute("aria-expanded", aberto ? "true" : "false");
+    // Fecha o outro
+    submenuTema?.classList.remove("aberto");
+    btnSubmenuTema?.setAttribute("aria-expanded", "false");
   });
 
-  // Botão de idioma dentro do menu lateral → abre dropdown principal
-  document.getElementById("menu-btn-idioma")?.addEventListener("click", () => {
-    const menuIdioma = document.getElementById("menu-idioma");
-    menuIdioma?.classList.toggle("aberto");
-    const menuTema = document.getElementById("menu-tema");
-    menuTema?.classList.remove("aberto");
+  btnSubmenuTema?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const aberto = submenuTema?.classList.toggle("aberto");
+    btnSubmenuTema.setAttribute("aria-expanded", aberto ? "true" : "false");
+    // Fecha o outro
+    submenuIdioma?.classList.remove("aberto");
+    btnSubmenuIdioma?.setAttribute("aria-expanded", "false");
+    // Marca o modo atual
+    const modoAtual = document.body.classList.contains("light-theme") ? "claro" : "escuro";
+    document.querySelectorAll(".submenu-modo").forEach((b) => {
+      b.classList.toggle("ativo", b.dataset.tema === modoAtual);
+    });
   });
 
-  // Fecha dropdowns ao clicar fora
-  document.addEventListener("click", (e) => {
-    if (
-      !e.target.closest("#menu-idioma") &&
-      !e.target.closest("#menu-btn-idioma")
-    ) {
-      document.getElementById("menu-idioma")?.classList.remove("aberto");
-    }
-    if (
-      !e.target.closest("#menu-tema") &&
-      !e.target.closest("#menu-btn-tema")
-    ) {
-      document.getElementById("menu-tema")?.classList.remove("aberto");
-    }
+  // 🆕 Itens do submenu de idioma
+  document.querySelectorAll("#submenu-idioma .menu-submenu-item").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      trocarIdioma(btn.dataset.idioma);
+      marcarAtivosMenuLateral();
+    });
   });
+
+  // 🆕 Cores do submenu de tema
+  document.querySelectorAll("#submenu-tema .submenu-cor").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tema = btn.dataset.tema;
+      aplicarTema(tema);
+      marcarAtivosMenuLateral();
+    });
+  });
+
+  // 🆕 Modos claro/escuro no submenu
+  document.querySelectorAll("#submenu-tema .submenu-modo").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const modo = btn.dataset.tema;
+      const themeToggleBtnRef = document.getElementById("theme-toggle");
+      const themeIconRef = themeToggleBtnRef?.querySelector("i");
+      if (modo === "claro") {
+        document.body.classList.add("light-theme");
+        localStorage.setItem("theme", "light");
+        if (themeIconRef) themeIconRef.classList.replace("fa-moon", "fa-sun");
+      } else {
+        document.body.classList.remove("light-theme");
+        localStorage.setItem("theme", "dark");
+        if (themeIconRef) themeIconRef.classList.replace("fa-sun", "fa-moon");
+      }
+      marcarAtivosMenuLateral();
+    });
+  });
+
+  // 🆕 Marca ativos no menu lateral
+  function marcarAtivosMenuLateral() {
+    // Idioma
+    const idiomaAtual = obterIdiomaAtual();
+    document.querySelectorAll("#submenu-idioma .menu-submenu-item").forEach((b) => {
+      b.classList.toggle("ativo", b.dataset.idioma === idiomaAtual);
+    });
+    // Cor
+    const temaAtual = obterTemaAtual();
+    document.querySelectorAll("#submenu-tema .submenu-cor").forEach((b) => {
+      b.classList.toggle("ativo", b.dataset.tema === temaAtual);
+    });
+    // Modo
+    const modoAtual = document.body.classList.contains("light-theme") ? "claro" : "escuro";
+    document.querySelectorAll("#submenu-tema .submenu-modo").forEach((b) => {
+      b.classList.toggle("ativo", b.dataset.tema === modoAtual);
+    });
+  }
+  marcarAtivosMenuLateral();
+
+  // Quando trocar tema pelo header (desktop), atualiza o menu lateral também
+  const _aplicarTemaOrig = aplicarTema;
+  window.aplicarTema = function (t) {
+    _aplicarTemaOrig(t);
+    marcarAtivosMenuLateral();
+  };
 
   // 16. Easter Egg no Console
   console.log(
@@ -818,15 +890,4 @@ document.addEventListener("DOMContentLoaded", () => {
     "font-size: 12px; color: #CEBDEC;"
   );
   console.log('%cDá um "carinho" no mascote aí embaixo!', "font-size: 12px;");
-});
-
-// Preloader
-window.addEventListener("load", () => {
-  const preloader = document.getElementById("preloader");
-  if (preloader) {
-    preloader.style.opacity = "0";
-    setTimeout(() => {
-      preloader.style.display = "none";
-    }, 500);
-  }
 });

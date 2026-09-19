@@ -45,6 +45,9 @@
       <div class="spinner"></div>
     </div>
 
+    <!-- ==========================================
+         NAVBAR
+         ========================================== -->
     <nav class="navbar">
       <div class="nav-container">
         <a href="#inicio" class="logo">
@@ -68,7 +71,8 @@
         </div>
 
         <div class="header-actions">
-          <div class="menu-dropdown" id="menu-idioma">
+          <!-- Idiomas e temas SÓ no desktop (escondidos no mobile via .only-desktop) -->
+          <div class="menu-dropdown only-desktop" id="menu-idioma">
             <button class="btn-theme btn-idioma" aria-label="Idioma" data-i18n-title="idioma">
               <i class="fa-solid fa-globe"></i>
             </button>
@@ -79,7 +83,7 @@
             </div>
           </div>
 
-          <div class="menu-dropdown" id="menu-tema">
+          <div class="menu-dropdown only-desktop" id="menu-tema">
             <button class="btn-theme btn-paleta" aria-label="Tema" data-i18n-title="tema">
               <i class="fa-solid fa-palette"></i>
             </button>
@@ -116,7 +120,7 @@
             </div>
           </div>
 
-          <button id="theme-toggle" class="btn-theme" aria-label="Alternar tema">
+          <button id="theme-toggle" class="btn-theme only-desktop" aria-label="Alternar tema">
             <i class="fa-solid fa-moon"></i>
           </button>
 
@@ -127,7 +131,9 @@
       </div>
     </nav>
 
-    <!-- MENU LATERAL -->
+    <!-- ==========================================
+         MENU LATERAL
+         ========================================== -->
     <div id="menu-lateral-overlay" class="menu-lateral-overlay"></div>
     <aside id="menu-lateral" class="menu-lateral" aria-hidden="true">
       <div class="menu-lateral-header">
@@ -186,17 +192,80 @@
         </a>
       </nav>
 
+      <!-- AÇÕES: IDIOMA E TEMA -->
       <div class="menu-lateral-footer">
         <div class="menu-lateral-acoes">
-          <button type="button" class="menu-acao-btn" id="menu-btn-idioma">
+          <button type="button" class="menu-acao-btn" id="menu-btn-idioma" aria-expanded="false">
             <i class="fa-solid fa-globe"></i>
             <span data-i18n="idioma">Idioma</span>
           </button>
-          <button type="button" class="menu-acao-btn" id="menu-btn-tema">
+          <button type="button" class="menu-acao-btn" id="menu-btn-tema" aria-expanded="false">
             <i class="fa-solid fa-palette"></i>
             <span data-i18n="tema">Tema</span>
           </button>
         </div>
+
+        <!-- SUBMENU IDIOMA -->
+        <div class="menu-submenu" id="submenu-idioma">
+          <button type="button" class="menu-submenu-item" data-idioma="pt-BR">
+            <span class="submenu-flag">🇧🇷</span>
+            <span>Português</span>
+          </button>
+          <button type="button" class="menu-submenu-item" data-idioma="en">
+            <span class="submenu-flag">🇺🇸</span>
+            <span>English</span>
+          </button>
+          <button type="button" class="menu-submenu-item" data-idioma="es">
+            <span class="submenu-flag">🇪🇸</span>
+            <span>Español</span>
+          </button>
+        </div>
+
+        <!-- SUBMENU TEMA -->
+        <div class="menu-submenu" id="submenu-tema">
+          <div class="submenu-titulo">
+            <i class="fa-solid fa-swatchbook"></i>
+            <span data-i18n="cor_tema">Cor do tema</span>
+          </div>
+          <div class="submenu-cores">
+            <button type="button" class="submenu-cor" data-tema="roxo" title="Roxo">
+              <span class="tema-swatch tema-swatch-roxo"></span>
+              <span data-i18n="cor_roxo">Roxo</span>
+            </button>
+            <button type="button" class="submenu-cor" data-tema="azul" title="Azul">
+              <span class="tema-swatch tema-swatch-azul"></span>
+              <span data-i18n="cor_azul">Azul</span>
+            </button>
+            <button type="button" class="submenu-cor" data-tema="verde" title="Verde">
+              <span class="tema-swatch tema-swatch-verde"></span>
+              <span data-i18n="cor_verde">Verde</span>
+            </button>
+            <button type="button" class="submenu-cor" data-tema="rosa" title="Rosa">
+              <span class="tema-swatch tema-swatch-rosa"></span>
+              <span data-i18n="cor_rosa">Rosa</span>
+            </button>
+            <button type="button" class="submenu-cor" data-tema="laranja" title="Laranja">
+              <span class="tema-swatch tema-swatch-laranja"></span>
+              <span data-i18n="cor_laranja">Laranja</span>
+            </button>
+          </div>
+
+          <div class="submenu-titulo submenu-titulo-modo">
+            <i class="fa-solid fa-circle-half-stroke"></i>
+            <span data-i18n="modo">Modo</span>
+          </div>
+          <div class="submenu-modos">
+            <button type="button" class="submenu-modo" data-tema="claro">
+              <i class="fa-solid fa-sun"></i>
+              <span data-i18n="modo_claro">Claro</span>
+            </button>
+            <button type="button" class="submenu-modo" data-tema="escuro">
+              <i class="fa-solid fa-moon"></i>
+              <span data-i18n="modo_escuro">Escuro</span>
+            </button>
+          </div>
+        </div>
+
         <div class="menu-lateral-redes">
           <a href="https://github.com/infoWeb2026-2V" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
             <i class="fa-brands fa-github"></i>
