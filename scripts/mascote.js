@@ -35,21 +35,25 @@ const MATRICULA_STORAGE_KEY = "mascote_matricula_temp";
 // ==========================================
 // 🎭 AVATARES DO MASCOTE
 // ==========================================
+// ==========================================
+// 🎭 AVATARES DO MASCOTE
+// ==========================================
 const AVATARES = {
   padrao: "🐾",
-  dev: "💻",
-  ninja: "🥷",
-  mago: "🧙",
-  astronauta: "🚀",
+  genio: "🧠",
   pirata: "🏴‍☠️",
-  rei: "👑",
-  dragao: "🐉",
-  gato: "😺",
-  unicornio: "🦄",
   alien: "👽",
-  robo: "🤖",
 };
 
+// 🖼️ Imagens reais de cada avatar
+const IMAGENS_MASCOTE = {
+  padrao: "img/MascotePadrao.png",
+  genio: "img/MascoteGenio.png",
+  pirata: "img/MascotePirata.png",
+  alien: "img/MascoteAlien.png",
+};
+
+const IMAGEM_MASCOTE_PADRAO = "img/MascotePadrao.png";
 // ==========================================
 // ESTADO
 // ==========================================
@@ -59,6 +63,8 @@ let podeClicar = true;
 let somLigado = localStorage.getItem("mascote_som") !== "off";
 let marcosAnteriores = new Set();
 let avatarAtual = localStorage.getItem("mascote_avatar") || "padrao";
+// Aplica a imagem correta assim que a página abre
+setTimeout(mostrarAvatarFlutuante, 100);
 let perfisCache = {};
 let rankingDataCache = {};
 
@@ -190,34 +196,24 @@ function emojiCoracao() {
 }
 
 function mostrarAvatarFlutuante() {
-  let badge = document.getElementById("mascote-avatar-badge");
-  if (!badge) {
-    badge = document.createElement("div");
-    badge.id = "mascote-avatar-badge";
-    badge.style.cssText = `
-      position: absolute;
-      top: -10px;
-      right: -10px;
-      background: var(--accent-strong, #8b5edd);
-      color: #fff;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      border: 3px solid var(--bg-surface, #240a5e);
-      z-index: 5;
-      transition: transform 0.3s ease;
-    `;
-    if (mascoteImagem) {
-      mascoteImagem.style.position = "relative";
-      mascoteImagem.appendChild(badge);
+  // 🎯 Troca a IMAGEM principal do mascote
+  if (mascoteImg) {
+    const novaSrc = IMAGENS_MASCOTE[avatarAtual] || IMAGEM_MASCOTE_PADRAO;
+
+    // Só troca se for diferente (evita repaint desnecessário)
+    if (mascoteImg.getAttribute("src") !== novaSrc) {
+      // Efeito suave ao trocar
+      mascoteImg.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+      mascoteImg.style.opacity = "0";
+      mascoteImg.style.transform = "scale(0.85)";
+
+      setTimeout(() => {
+        mascoteImg.src = novaSrc;
+        mascoteImg.style.opacity = "1";
+        mascoteImg.style.transform = "scale(1)";
+      }, 250);
     }
   }
-  badge.textContent = emojiCoracao();
 }
 mostrarAvatarFlutuante();
 
