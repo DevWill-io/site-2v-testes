@@ -7,6 +7,8 @@ const TRADUCOES = {
     titulo_pagina_login: "Login SUAP | Turma 2V IFRN",
 
     /* ===== MENU LATERAL / NAV ===== */
+    nav_inicio: "Início",
+    nav_inicio_desc: "Página inicial",
     menu: "Menu",
     nav_inicio: "Início",
     nav_curso: "O Curso",
@@ -294,6 +296,8 @@ const TRADUCOES = {
     titulo_pagina: "Class 2V | 1st Year IT IFRN",
     titulo_pagina_login: "SUAP Login | Class 2V IFRN",
 
+    nav_inicio: "Home",
+    nav_inicio_desc: "Homepage",
     menu: "Menu",
     nav_inicio: "Home",
     nav_curso: "The Course",
@@ -558,6 +562,8 @@ const TRADUCOES = {
     titulo_pagina: "Clase 2V | 1º Año Informática IFRN",
     titulo_pagina_login: "Login SUAP | Clase 2V IFRN",
 
+    nav_inicio: "Inicio",
+    nav_inicio_desc: "Página de inicio",
     menu: "Menú",
     nav_inicio: "Inicio",
     nav_curso: "El Curso",

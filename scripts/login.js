@@ -134,6 +134,8 @@ const TRADUCOES_LOGIN = {
     nav_mascote_desc: "Interaja com ele",
     nav_sala: "Sala dos Professores",
     nav_sala_desc: "Acesso restrito",
+    nav_inicio: "Início",
+    nav_inicio_desc: "Página inicial",
 
     calc_titulo_1: "Calculadora de",
     calc_titulo_2: "Notas",
@@ -293,6 +295,8 @@ const TRADUCOES_LOGIN = {
     marcar_todas: "Mark all",
     sem_notif: "No notifications.",
 
+    nav_inicio: "Home",
+    nav_inicio_desc: "Homepage",
     menu: "Menu",
     nav_notas: "Grades",
     nav_notas_desc: "Your calculator",
@@ -467,6 +471,9 @@ const TRADUCOES_LOGIN = {
     marcar_todas: "Marcar todas",
     sem_notif: "Sin notificaciones.",
 
+
+    nav_inicio: "Inicio",
+    nav_inicio_desc: "Página de inicio",
     menu: "Menú",
     nav_notas: "Notas",
     nav_notas_desc: "Tu calculadora",
