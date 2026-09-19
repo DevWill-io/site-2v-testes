@@ -7,6 +7,83 @@ var SUAP_URL = "https://suap.ifrn.edu.br";
 var SCOPE = "identificacao email documentos_pessoais";
 
 // ==========================================
+// 🎨 HELPERS DE COR (Canvas precisa de hex/rgb clássico)
+// ==========================================
+/**
+ * Converte qualquer cor CSS para HEX (#rrggbb).
+ * Aceita: #rgb, #rrggbb, #rrggbbaa, rgb(), rgba(), hsl(), hsla() (clássico e moderno).
+ */
+function corParaHex(cor, fallback) {
+  fallback = fallback || "#8b5edd";
+  if (!cor) return fallback;
+  cor = String(cor).trim();
+
+  if (/^#[0-9a-f]{6}$/i.test(cor)) return cor;
+  if (/^#[0-9a-f]{3}$/i.test(cor)) {
+    return "#" + cor[1] + cor[1] + cor[2] + cor[2] + cor[3] + cor[3];
+  }
+  if (/^#[0-9a-f]{8}$/i.test(cor)) return cor.slice(0, 7);
+
+  var mRgb = cor.match(/^rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)/i);
+  if (mRgb) {
+    var r = parseInt(mRgb[1], 10),
+      g = parseInt(mRgb[2], 10),
+      b = parseInt(mRgb[3], 10);
+    return (
+      "#" +
+      [r, g, b]
+        .map(function (n) {
+          return n.toString(16).padStart(2, "0");
+        })
+        .join("")
+    );
+  }
+
+  var mHsl = cor.match(/^hsla?\(\s*([\d.]+)[\s,]+([\d.]+)%[\s,]+([\d.]+)%/i);
+  if (mHsl) {
+    var h = parseFloat(mHsl[1]) / 360;
+    var s = parseFloat(mHsl[2]) / 100;
+    var l = parseFloat(mHsl[3]) / 100;
+    var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    var p = 2 * l - q;
+    function hue2rgb(p, q, t) {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    }
+    var rr = Math.round(hue2rgb(p, q, h + 1 / 3) * 255);
+    var gg = Math.round(hue2rgb(p, q, h) * 255);
+    var bb = Math.round(hue2rgb(p, q, h - 1 / 3) * 255);
+    return (
+      "#" +
+      [rr, gg, bb]
+        .map(function (n) {
+          return n.toString(16).padStart(2, "0");
+        })
+        .join("")
+    );
+  }
+
+  return fallback;
+}
+
+function corParaCanvas(cor, fallback) {
+  return corParaHex(cor, fallback);
+}
+
+function addStopSeguro(gradient, posicao, cor, fallback) {
+  try {
+    gradient.addColorStop(posicao, corParaCanvas(cor, fallback));
+  } catch (err) {
+    console.warn("[gradient] cor inválida:", cor, "→ usando fallback");
+    gradient.addColorStop(posicao, fallback || "#8b5edd");
+  }
+}
+
+// ==========================================
 // 🌐 i18n — DICIONÁRIO DE TRADUÇÕES
 // ==========================================
 const TRADUCOES = {
@@ -365,7 +442,11 @@ function obterIdiomaAtual() {
 
 function t(chave) {
   var lang = obterIdiomaAtual();
-  return (TRADUCOES[lang] && TRADUCOES[lang][chave]) || TRADUCOES[IDIOMA_PADRAO][chave] || chave;
+  return (
+    (TRADUCOES[lang] && TRADUCOES[lang][chave]) ||
+    TRADUCOES[IDIOMA_PADRAO][chave] ||
+    chave
+  );
 }
 
 function aplicarTraducoes() {
@@ -390,12 +471,15 @@ function aplicarTraducoes() {
     if (texto) el.setAttribute("title", texto);
   });
 
-  document.querySelectorAll("#menu-idioma .dropdown-item").forEach(function (btn) {
-    btn.classList.toggle("ativo", btn.dataset.idioma === lang);
-  });
+  document
+    .querySelectorAll("#menu-idioma .dropdown-item")
+    .forEach(function (btn) {
+      btn.classList.toggle("ativo", btn.dataset.idioma === lang);
+    });
 
   document.title = t("titulo_pagina");
-  if (typeof renderizarLegendaCalendario === "function") renderizarLegendaCalendario();
+  if (typeof renderizarLegendaCalendario === "function")
+    renderizarLegendaCalendario();
 }
 
 function trocarIdioma(novoIdioma) {
@@ -419,13 +503,21 @@ function obterTemaAtual() {
 
 function aplicarTema(novoTema) {
   if (!TEMAS_DISPONIVEIS.includes(novoTema)) novoTema = TEMA_PADRAO;
-  TEMAS_DISPONIVEIS.forEach(function (t) { document.body.classList.remove("tema-" + t); });
+  TEMAS_DISPONIVEIS.forEach(function (t) {
+    document.body.classList.remove("tema-" + t);
+  });
   document.body.classList.add("tema-" + novoTema);
   localStorage.setItem("tema-cor", novoTema);
 
   var meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
-    var cores = { roxo: "#8b5edd", azul: "#3b82f6", verde: "#10b981", rosa: "#ec4899", laranja: "#f97316" };
+    var cores = {
+      roxo: "#8b5edd",
+      azul: "#3b82f6",
+      verde: "#10b981",
+      rosa: "#ec4899",
+      laranja: "#f97316",
+    };
     meta.setAttribute("content", cores[novoTema] || "#8b5edd");
   }
 
@@ -454,13 +546,17 @@ window.addEventListener("appinstalled", function () {
   __deferredPrompt = null;
   var btn = document.getElementById("btn-instalar-app");
   if (btn) btn.classList.add("is-hidden");
-  if (typeof exibirToast === "function") exibirToast("App instalado! 🎉", "sucesso");
+  if (typeof exibirToast === "function")
+    exibirToast("App instalado! 🎉", "sucesso");
 });
 
 function instalarPWA() {
   if (!__deferredPrompt) {
     if (typeof exibirToast === "function") {
-      exibirToast("Para instalar, use o menu do navegador > 'Adicionar à tela inicial'.", "info");
+      exibirToast(
+        "Para instalar, use o menu do navegador > 'Adicionar à tela inicial'.",
+        "info"
+      );
     }
     return;
   }
@@ -475,9 +571,14 @@ function instalarPWA() {
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
-    navigator.serviceWorker.register("/sw.js")
-      .then(function (reg) { console.log("[PWA] SW registrado:", reg.scope); })
-      .catch(function (err) { console.warn("[PWA] Falha ao registrar SW:", err); });
+    navigator.serviceWorker
+      .register("/sw.js")
+      .then(function (reg) {
+        console.log("[PWA] SW registrado:", reg.scope);
+      })
+      .catch(function (err) {
+        console.warn("[PWA] Falha ao registrar SW:", err);
+      });
   });
 }
 
@@ -486,18 +587,39 @@ if ("serviceWorker" in navigator) {
 // ==========================================
 const REGRAS_CORES_CALENDARIO = [
   { regex: /prova|avalia|exame|teste/i, cor: "#ff4757", textoKey: "cal_provas" },
-  { regex: /trabalho|projeto|entrega|lista|seminario|seminário/i, cor: "#f59e0b", textoKey: "cal_trabalhos" },
-  { regex: /feriado|recesso|f[eé]rias|ponto facultativo/i, cor: "#10b981", textoKey: "cal_feriados" },
-  { regex: /reuni[aã]o|aula|encontro|palestra/i, cor: "#7c3aed", textoKey: "cal_reunioes" },
-  { regex: /jogo|esporte|campeonato|torneio/i, cor: "#06b6d4", textoKey: "cal_esportes" },
-  { regex: /festa|evento|apresenta|show/i, cor: "#ec4899", textoKey: "cal_festas" },
+  {
+    regex: /trabalho|projeto|entrega|lista|seminario|seminário/i,
+    cor: "#f59e0b",
+    textoKey: "cal_trabalhos",
+  },
+  {
+    regex: /feriado|recesso|f[eé]rias|ponto facultativo/i,
+    cor: "#10b981",
+    textoKey: "cal_feriados",
+  },
+  {
+    regex: /reuni[aã]o|aula|encontro|palestra/i,
+    cor: "#7c3aed",
+    textoKey: "cal_reunioes",
+  },
+  {
+    regex: /jogo|esporte|campeonato|torneio/i,
+    cor: "#06b6d4",
+    textoKey: "cal_esportes",
+  },
+  {
+    regex: /festa|evento|apresenta|show/i,
+    cor: "#ec4899",
+    textoKey: "cal_festas",
+  },
 ];
 const COR_PADRAO_CALENDARIO = { cor: "#8b5edd", textoKey: "cal_outros" };
 
 function corDoEvento(titulo) {
   var t2 = String(titulo || "").toLowerCase();
   for (var i = 0; i < REGRAS_CORES_CALENDARIO.length; i++) {
-    if (REGRAS_CORES_CALENDARIO[i].regex.test(t2)) return REGRAS_CORES_CALENDARIO[i].cor;
+    if (REGRAS_CORES_CALENDARIO[i].regex.test(t2))
+      return REGRAS_CORES_CALENDARIO[i].cor;
   }
   return COR_PADRAO_CALENDARIO.cor;
 }
@@ -506,9 +628,11 @@ function renderizarLegendaCalendario() {
   var container = document.getElementById("calendario-legenda");
   if (!container) return;
   var todas = REGRAS_CORES_CALENDARIO.concat([COR_PADRAO_CALENDARIO]);
-  container.innerHTML = todas.map(function (item) {
-    return `<div class="legenda-item"><span class="legenda-cor" style="background:${item.cor}"></span><span class="legenda-texto">${escaparHTML(t(item.textoKey))}</span></div>`;
-  }).join("");
+  container.innerHTML = todas
+    .map(function (item) {
+      return `<div class="legenda-item"><span class="legenda-cor" style="background:${item.cor}"></span><span class="legenda-texto">${escaparHTML(t(item.textoKey))}</span></div>`;
+    })
+    .join("");
 }
 
 // ==========================================
@@ -516,7 +640,13 @@ function renderizarLegendaCalendario() {
 // ==========================================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import {
-  getDatabase, ref, onValue, push, update, remove, get,
+  getDatabase,
+  ref,
+  onValue,
+  push,
+  update,
+  remove,
+  get,
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
 const firebaseConfig = {
@@ -543,7 +673,12 @@ let filtroPerfilTexto = "";
 
 function escaparHTML(texto) {
   if (!texto) return "";
-  return String(texto).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+  return String(texto)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function converterLinks(textoEscapado) {
@@ -563,13 +698,18 @@ function exibirToast(mensagem, tipo = "info") {
     document.body.appendChild(toastContainer);
   }
   const toast = document.createElement("div");
-  const corBg = tipo === "erro" ? "#ff4757" : tipo === "sucesso" ? "#2ed573" : "#2f3542";
+  const corBg =
+    tipo === "erro" ? "#ff4757" : tipo === "sucesso" ? "#2ed573" : "#2f3542";
   toast.style.cssText = `background:${corBg};color:#fff;padding:12px 20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-size:0.9em;pointer-events:auto;opacity:0;transform:translateY(20px);transition:all 0.3s ease;font-family:sans-serif;`;
   toast.textContent = mensagem;
   toastContainer.appendChild(toast);
-  setTimeout(() => { toast.style.opacity = "1"; toast.style.transform = "translateY(0)"; }, 10);
   setTimeout(() => {
-    toast.style.opacity = "0"; toast.style.transform = "translateY(20px)";
+    toast.style.opacity = "1";
+    toast.style.transform = "translateY(0)";
+  }, 10);
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(20px)";
     setTimeout(() => toast.remove(), 300);
   }, 3500);
 }
@@ -622,20 +762,29 @@ const themeToggle = document.getElementById("theme-toggle");
 if (themeToggle) {
   const themeIcon = themeToggle.querySelector("i");
   let currentTheme = localStorage.getItem("theme");
-  if (!currentTheme) currentTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  if (!currentTheme)
+    currentTheme = window.matchMedia("(prefers-color-scheme: light)").matches
+      ? "light"
+      : "dark";
   if (currentTheme === "light") {
     document.body.classList.add("light-theme");
     if (themeIcon) themeIcon.classList.replace("fa-moon", "fa-sun");
   }
   themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("light-theme");
-    let theme = document.body.classList.contains("light-theme") ? "light" : "dark";
+    let theme = document.body.classList.contains("light-theme")
+      ? "light"
+      : "dark";
     if (themeIcon) {
       if (theme === "light") themeIcon.classList.replace("fa-moon", "fa-sun");
       else themeIcon.classList.replace("fa-sun", "fa-moon");
     }
     localStorage.setItem("theme", theme);
-    if (window.__graficoEvolucao && typeof desenharGraficoEvolucao === "function") desenharGraficoEvolucao();
+    if (
+      window.__graficoEvolucao &&
+      typeof desenharGraficoEvolucao === "function"
+    )
+      desenharGraficoEvolucao();
   });
 }
 
@@ -649,13 +798,18 @@ onValue(recadosRef, (snapshot) => {
     const recado = childSnapshot.val();
     const id = childSnapshot.key;
     const timestampCriacao = recado.timestamp || agora;
-    const duracaoHoras = recado.duracao_horas || (recado.duracao_dias ? recado.duracao_dias * 24 : 7 * 24);
+    const duracaoHoras =
+      recado.duracao_horas ||
+      (recado.duracao_dias ? recado.duracao_dias * 24 : 7 * 24);
     const tempoDeVidaMs = duracaoHoras * 60 * 60 * 1000;
-    if (agora - timestampCriacao > tempoDeVidaMs) remove(ref(db, "mural_recados/" + id));
-    else bancoDeRecados.push({ id, ...recado, timestampCriacao, duracaoHoras });
+    if (agora - timestampCriacao > tempoDeVidaMs)
+      remove(ref(db, "mural_recados/" + id));
+    else
+      bancoDeRecados.push({ id, ...recado, timestampCriacao, duracaoHoras });
   });
   window.renderizarMural();
-  if (typeof gerarNotificacoesRecados === "function") gerarNotificacoesRecados();
+  if (typeof gerarNotificacoesRecados === "function")
+    gerarNotificacoesRecados();
 });
 
 onValue(perfisRef, (snapshot) => {
@@ -667,9 +821,12 @@ onValue(perfisRef, (snapshot) => {
   window.renderizarPerfis();
   if (window.usuarioLogado.matricula) {
     const meuPerfil = bancoDePerfis.find(
-      (p) => String(p.matricula) === String(window.usuarioLogado.matricula) || String(p.id) === String(window.usuarioLogado.matricula)
+      (p) =>
+        String(p.matricula) === String(window.usuarioLogado.matricula) ||
+        String(p.id) === String(window.usuarioLogado.matricula)
     );
-    if (meuPerfil && typeof window.aplicarPerfilNoCard === "function") window.aplicarPerfilNoCard(meuPerfil);
+    if (meuPerfil && typeof window.aplicarPerfilNoCard === "function")
+      window.aplicarPerfilNoCard(meuPerfil);
   }
 });
 
@@ -684,25 +841,36 @@ if (formRecado) {
     const linkInput = document.getElementById("recado-link");
     const selectDuracao = document.getElementById("recado-duracao");
     const mensagemBruta = msgInput ? msgInput.value.trim() : "";
-    if (!mensagemBruta) { exibirToast("Escreva uma mensagem antes de enviar!", "erro"); return; }
+    if (!mensagemBruta) {
+      exibirToast("Escreva uma mensagem antes de enviar!", "erro");
+      return;
+    }
     const mensagemSegura = escaparHTML(mensagemBruta);
     const linkAnexo = linkInput ? escaparHTML(linkInput.value.trim()) : "";
     const nomeSeguro = escaparHTML(window.usuarioLogado.nome);
     const valorInputDuracao = selectDuracao ? selectDuracao.value : "7d";
     const duracaoTotalHoras = parseDuracaoParaHoras(valorInputDuracao);
     push(recadosRef, {
-      autor_nome: nomeSeguro, autor_matricula: window.usuarioLogado.matricula,
-      mensagem: mensagemSegura, link_anexo: linkAnexo,
+      autor_nome: nomeSeguro,
+      autor_matricula: window.usuarioLogado.matricula,
+      mensagem: mensagemSegura,
+      link_anexo: linkAnexo,
       data: new Date().toLocaleDateString("pt-BR"),
-      timestamp: Date.now(), duracao_horas: duracaoTotalHoras,
-      likes: [], comentarios: {},
-    }).then(() => {
-      exibirToast("Recado publicado com sucesso!", "sucesso");
-      if (msgInput) msgInput.value = "";
-      if (linkInput) linkInput.value = "";
-      const contador = document.getElementById("contador-caracteres");
-      if (contador) contador.textContent = "0";
-    }).catch((err) => exibirToast("Erro ao enviar recado: " + err.message, "erro"));
+      timestamp: Date.now(),
+      duracao_horas: duracaoTotalHoras,
+      likes: [],
+      comentarios: {},
+    })
+      .then(() => {
+        exibirToast("Recado publicado com sucesso!", "sucesso");
+        if (msgInput) msgInput.value = "";
+        if (linkInput) linkInput.value = "";
+        const contador = document.getElementById("contador-caracteres");
+        if (contador) contador.textContent = "0";
+      })
+      .catch((err) =>
+        exibirToast("Erro ao enviar recado: " + err.message, "erro")
+      );
   });
 }
 
@@ -742,7 +910,10 @@ window.abrirModalPerfil = function (identificador) {
     const alvo = String(identificador || "").trim();
     return mat === alvo || id === alvo;
   });
-  if (!perfil) { exibirToast("Perfil não encontrado.", "erro"); return; }
+  if (!perfil) {
+    exibirToast("Perfil não encontrado.", "erro");
+    return;
+  }
   const imgEl = document.getElementById("modal-perfil-foto");
   const nomeEl = document.getElementById("modal-perfil-nome");
   const matEl = document.getElementById("modal-perfil-matricula");
@@ -750,21 +921,39 @@ window.abrirModalPerfil = function (identificador) {
   const bioEl = document.getElementById("modal-perfil-bio");
   const redesEl = document.getElementById("modal-perfil-redes");
   const nomeExibir = perfil.nomeCompleto || perfil.nome || "Não informado";
-  const fotoExibir = perfil.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random`;
+  const fotoExibir =
+    perfil.foto ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random`;
   if (imgEl) imgEl.src = fotoExibir;
   if (nomeEl) nomeEl.textContent = nomeExibir;
   if (matEl) matEl.textContent = perfil.matricula || perfil.id || "Não informada";
-  if (acessoEl) acessoEl.textContent = perfil.ultimoAcesso ? new Date(perfil.ultimoAcesso).toLocaleString("pt-BR") : t("nao_registrado");
+  if (acessoEl)
+    acessoEl.textContent = perfil.ultimoAcesso
+      ? new Date(perfil.ultimoAcesso).toLocaleString("pt-BR")
+      : t("nao_registrado");
   if (bioEl) {
-    if (perfil.bio && String(perfil.bio).trim()) { bioEl.textContent = perfil.bio; bioEl.classList.remove("is-hidden"); }
-    else { bioEl.textContent = ""; bioEl.classList.add("is-hidden"); }
+    if (perfil.bio && String(perfil.bio).trim()) {
+      bioEl.textContent = perfil.bio;
+      bioEl.classList.remove("is-hidden");
+    } else {
+      bioEl.textContent = "";
+      bioEl.classList.add("is-hidden");
+    }
   }
   if (redesEl) {
     const links = montarLinksRedes(perfil.redes);
     if (links.length > 0) {
-      redesEl.innerHTML = links.map((l) => `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}" class="modal-rede-link"><i class="${l.icone}"></i></a>`).join("");
+      redesEl.innerHTML = links
+        .map(
+          (l) =>
+            `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}" class="modal-rede-link"><i class="${l.icone}"></i></a>`
+        )
+        .join("");
       redesEl.classList.remove("is-hidden");
-    } else { redesEl.innerHTML = ""; redesEl.classList.add("is-hidden"); }
+    } else {
+      redesEl.innerHTML = "";
+      redesEl.classList.add("is-hidden");
+    }
   }
   modal.classList.remove("is-hidden");
 };
@@ -785,56 +974,92 @@ window.renderizarMural = function () {
     return msg.includes(filtroRecadoTexto) || autor.includes(filtroRecadoTexto);
   });
   if (recadosFiltrados.length === 0) {
-    lista.innerHTML = '<p class="sem-recados" style="text-align:center;opacity:0.7;padding:15px;">Nenhum recado encontrado.</p>';
+    lista.innerHTML =
+      '<p class="sem-recados" style="text-align:center;opacity:0.7;padding:15px;">Nenhum recado encontrado.</p>';
     return;
   }
   const recadosReversos = [...recadosFiltrados].reverse();
   const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
   recadosReversos.forEach((recado) => {
-    const jaCurtiu = recado.likes && recado.likes.includes(window.usuarioLogado.matricula);
-    const iconeCoracao = jaCurtiu ? "fa-solid fa-heart" : "fa-regular fa-heart";
+    const jaCurtiu =
+      recado.likes && recado.likes.includes(window.usuarioLogado.matricula);
+    const iconeCoracao = jaCurtiu
+      ? "fa-solid fa-heart"
+      : "fa-regular fa-heart";
     const corCoracao = jaCurtiu ? "color: #ff4757;" : "";
     const totalLikes = recado.likes ? recado.likes.length : 0;
-    const textoExpiracao = calcularTempoRestante(recado.timestampCriacao, recado.duracaoHoras);
+    const textoExpiracao = calcularTempoRestante(
+      recado.timestampCriacao,
+      recado.duracaoHoras
+    );
     const ehAutor = recado.autor_matricula === window.usuarioLogado.matricula;
-    const btnExcluir = ehAutor || ehAdmin
-      ? `<button type="button" class="btn-like" style="color: #ff4757;" onclick="excluirRecado('${recado.id}')"><i class="fa-solid fa-trash"></i></button>` : "";
-    const btnEditar = ehAutor || ehAdmin
-      ? `<button type="button" class="btn-like" style="color: #eccc68;" onclick="editarRecado('${recado.id}')"><i class="fa-solid fa-pen"></i></button>` : "";
+    const btnExcluir =
+      ehAutor || ehAdmin
+        ? `<button type="button" class="btn-like" style="color: #ff4757;" onclick="excluirRecado('${recado.id}')"><i class="fa-solid fa-trash"></i></button>`
+        : "";
+    const btnEditar =
+      ehAutor || ehAdmin
+        ? `<button type="button" class="btn-like" style="color: #eccc68;" onclick="editarRecado('${recado.id}')"><i class="fa-solid fa-pen"></i></button>`
+        : "";
     const mensagemComLinks = converterLinks(escaparHTML(recado.mensagem));
     const nomeSeguro = escaparHTML(nomeParaExibicao(recado.autor_nome));
-    const tagEditado = recado.editado ? ' <small style="opacity:0.6;font-style:italic;">(editado)</small>' : "";
+    const tagEditado = recado.editado
+      ? ' <small style="opacity:0.6;font-style:italic;">(editado)</small>'
+      : "";
     const anexoHTML = recado.link_anexo
-      ? `<div class="recado-anexo" style="margin-top:8px;"><a href="${recado.link_anexo}" target="_blank" rel="noopener noreferrer" style="font-size:0.85em;color:#70a1ff;text-decoration:underline;"><i class="fa-solid fa-paperclip"></i> Ver anexo</a></div>` : "";
+      ? `<div class="recado-anexo" style="margin-top:8px;"><a href="${recado.link_anexo}" target="_blank" rel="noopener noreferrer" style="font-size:0.85em;color:#70a1ff;text-decoration:underline;"><i class="fa-solid fa-paperclip"></i> Ver anexo</a></div>`
+      : "";
     const comentariosObj = recado.comentarios || {};
-    const listaComentarios = Object.keys(comentariosObj).map((cId) => ({ cId, ...comentariosObj[cId] }));
+    const listaComentarios = Object.keys(comentariosObj).map((cId) => ({
+      cId,
+      ...comentariosObj[cId],
+    }));
     const totalComentarios = listaComentarios.length;
     let htmlComentarios = "";
     listaComentarios.forEach((com) => {
-      const ehAutorCom = com.autor_matricula === window.usuarioLogado.matricula;
-      const btnDelCom = ehAutorCom || ehAdmin
-        ? `<button type="button" style="background:none;border:none;color:#ff4757;cursor:pointer;font-size:0.8em;" onclick="excluirComentario('${recado.id}','${com.cId}')"><i class="fa-solid fa-xmark"></i></button>` : "";
-      htmlComentarios += `<div class="comentario-item" style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.05);padding:6px 10px;border-radius:6px;margin-top:5px;font-size:0.85em;"><div style="flex:1;"><strong>${escaparHTML(com.autor_nome)}:</strong> ${converterLinks(escaparHTML(com.texto))}</div>${btnDelCom}</div>`;
+      const ehAutorCom =
+        com.autor_matricula === window.usuarioLogado.matricula;
+      const btnDelCom =
+        ehAutorCom || ehAdmin
+          ? `<button type="button" style="background:none;border:none;color:#ff4757;cursor:pointer;font-size:0.8em;" onclick="excluirComentario('${recado.id}','${com.cId}')"><i class="fa-solid fa-xmark"></i></button>`
+          : "";
+      htmlComentarios += `<div class="comentario-item" style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.05);padding:6px 10px;border-radius:6px;margin-top:5px;font-size:0.85em;"><div style="flex:1;"><strong>${escaparHTML(
+        com.autor_nome
+      )}:</strong> ${converterLinks(
+        escaparHTML(com.texto)
+      )}</div>${btnDelCom}</div>`;
     });
     const div = document.createElement("div");
     div.className = "recado-item";
     div.innerHTML = `
       <div class="recado-header">
         <span class="recado-nome">${nomeSeguro}</span>
-        <span class="recado-data" title="${textoExpiracao}"><i class="fa-regular fa-clock" style="font-size:0.85em;margin-right:3px;"></i>${recado.data}${tagEditado} • <small style="opacity:0.8;">${textoExpiracao}</small></span>
+        <span class="recado-data" title="${textoExpiracao}"><i class="fa-regular fa-clock" style="font-size:0.85em;margin-right:3px;"></i>${
+          recado.data
+        }${tagEditado} • <small style="opacity:0.8;">${textoExpiracao}</small></span>
       </div>
       <p class="recado-mensagem">${mensagemComLinks}</p>
       ${anexoHTML}
       <div class="recado-acoes" style="margin-top:10px;display:flex;gap:8px;align-items:center;">
         ${btnEditar}${btnExcluir}
-        <button type="button" class="btn-like" style="${corCoracao}" onclick="curtirRecado('${recado.id}')"><i class="${iconeCoracao}"></i> ${totalLikes}</button>
-        <button type="button" class="btn-like" onclick="alternarComentarios('${recado.id}')" title="Comentários"><i class="fa-regular fa-comment"></i> ${totalComentarios}</button>
+        <button type="button" class="btn-like" style="${corCoracao}" onclick="curtirRecado('${
+      recado.id
+    }')"><i class="${iconeCoracao}"></i> ${totalLikes}</button>
+        <button type="button" class="btn-like" onclick="alternarComentarios('${
+          recado.id
+        }')" title="Comentários"><i class="fa-regular fa-comment"></i> ${totalComentarios}</button>
       </div>
-      <div id="box-comentarios-${recado.id}" class="box-comentarios" style="display:none;margin-top:12px;border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;">
+      <div id="box-comentarios-${
+        recado.id
+      }" class="box-comentarios" style="display:none;margin-top:12px;border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;">
         <div id="lista-comentarios-${recado.id}">${htmlComentarios}</div>
         <div style="display:flex;gap:5px;margin-top:8px;">
-          <input type="text" id="input-comentario-${recado.id}" placeholder="Escreva um comentário..." style="flex:1;padding:6px 10px;border-radius:4px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:inherit;font-size:0.85em;" />
-          <button type="button" onclick="adicionarComentario('${recado.id}')" style="padding:6px 12px;border-radius:4px;border:none;background:#70a1ff;color:white;cursor:pointer;font-size:0.85em;">Enviar</button>
+          <input type="text" id="input-comentario-${
+            recado.id
+          }" placeholder="Escreva um comentário..." style="flex:1;padding:6px 10px;border-radius:4px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:inherit;font-size:0.85em;" />
+          <button type="button" onclick="adicionarComentario('${
+            recado.id
+          }')" style="padding:6px 12px;border-radius:4px;border:none;background:#70a1ff;color:white;cursor:pointer;font-size:0.85em;">Enviar</button>
         </div>
       </div>
     `;
@@ -851,24 +1076,41 @@ window.adicionarComentario = function (recadoId) {
   const inputEl = document.getElementById(`input-comentario-${recadoId}`);
   if (!inputEl) return;
   const texto = inputEl.value.trim();
-  if (!texto) { exibirToast("Escreva um comentário antes de enviar.", "erro"); return; }
+  if (!texto) {
+    exibirToast("Escreva um comentário antes de enviar.", "erro");
+    return;
+  }
   push(ref(db, `mural_recados/${recadoId}/comentarios`), {
     autor_nome: escaparHTML(window.usuarioLogado.nome),
     autor_matricula: window.usuarioLogado.matricula,
-    texto: escaparHTML(texto), timestamp: Date.now(),
-  }).then(() => { exibirToast("Comentário adicionado!", "sucesso"); inputEl.value = ""; })
+    texto: escaparHTML(texto),
+    timestamp: Date.now(),
+  })
+    .then(() => {
+      exibirToast("Comentário adicionado!", "sucesso");
+      inputEl.value = "";
+    })
     .catch((err) => exibirToast("Erro: " + err.message, "erro"));
 };
 
 window.excluirComentario = function (recadoId, comentarioId) {
-  const itemRef = ref(db, `mural_recados/${recadoId}/comentarios/${comentarioId}`);
+  const itemRef = ref(
+    db,
+    `mural_recados/${recadoId}/comentarios/${comentarioId}`
+  );
   get(itemRef).then((snapshot) => {
     const com = snapshot.val();
     if (com) {
       const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
       const ehAutor = com.autor_matricula === window.usuarioLogado.matricula;
-      if (!ehAutor && !ehAdmin) { exibirToast("Sem permissão.", "erro"); return; }
-      if (confirm("Excluir este comentário?")) remove(itemRef).then(() => exibirToast("Comentário removido.", "sucesso"));
+      if (!ehAutor && !ehAdmin) {
+        exibirToast("Sem permissão.", "erro");
+        return;
+      }
+      if (confirm("Excluir este comentário?"))
+        remove(itemRef).then(() =>
+          exibirToast("Comentário removido.", "sucesso")
+        );
     }
   });
 };
@@ -885,9 +1127,14 @@ window.renderizarPerfis = function () {
     return nome.includes(filtro) || mat.includes(filtro);
   });
   const contadorEl = document.getElementById("contador-membros");
-  if (contadorEl) contadorEl.textContent = `${bancoDePerfis.length} membro(s) cadastrado(s)`;
+  if (contadorEl)
+    contadorEl.textContent = `${bancoDePerfis.length} membro(s) cadastrado(s)`;
   if (perfisFiltrados.length === 0) {
-    container.innerHTML = `<p class="sem-perfis" style="text-align:center;opacity:0.7;padding:20px;grid-column:1/-1;">${bancoDePerfis.length === 0 ? "Nenhum membro cadastrado ainda." : "Nenhum perfil corresponde ao filtro."}</p>`;
+    container.innerHTML = `<p class="sem-perfis" style="text-align:center;opacity:0.7;padding:20px;grid-column:1/-1;">${
+      bancoDePerfis.length === 0
+        ? "Nenhum membro cadastrado ainda."
+        : "Nenhum perfil corresponde ao filtro."
+    }</p>`;
     return;
   }
   perfisFiltrados.forEach((perfil) => {
@@ -897,8 +1144,22 @@ window.renderizarPerfis = function () {
     card.setAttribute("onclick", `abrirModalPerfil('${identificador}')`);
     card.style.cursor = "pointer";
     const nomeExibir = perfil.nomeCompleto || perfil.nome || "Usuário sem nome";
-    const fotoFinal = perfil.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random`;
-    card.innerHTML = `<div class="perfil-avatar"><img src="${escaparHTML(fotoFinal)}" alt="${escaparHTML(nomeExibir)}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random'" /></div><div class="perfil-info"><h4 class="perfil-nome">${escaparHTML(nomeExibir)}</h4><span class="perfil-matricula">${escaparHTML(matriculaParaExibicao(perfil.matricula || perfil.id))}</span></div>`;
+    const fotoFinal =
+      perfil.foto ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(
+        nomeExibir
+      )}&background=random`;
+    card.innerHTML = `<div class="perfil-avatar"><img src="${escaparHTML(
+      fotoFinal
+    )}" alt="${escaparHTML(
+      nomeExibir
+    )}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(
+      nomeExibir
+    )}&background=random'" /></div><div class="perfil-info"><h4 class="perfil-nome">${escaparHTML(
+      nomeExibir
+    )}</h4><span class="perfil-matricula">${escaparHTML(
+      matriculaParaExibicao(perfil.matricula || perfil.id)
+    )}</span></div>`;
     container.appendChild(card);
   });
 };
@@ -910,16 +1171,35 @@ window.editarRecado = function (id) {
     if (recado) {
       const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
       const ehAutor = recado.autor_matricula === window.usuarioLogado.matricula;
-      if (!ehAutor && !ehAdmin) { exibirToast("Sem permissão.", "erro"); return; }
-      const textoAtual = recado.mensagem.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#039;/g, "'");
+      if (!ehAutor && !ehAdmin) {
+        exibirToast("Sem permissão.", "erro");
+        return;
+      }
+      const textoAtual = recado.mensagem
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'");
       const novaMensagem = prompt("1/2 - Edite a sua mensagem:", textoAtual);
       if (novaMensagem !== null && novaMensagem.trim() !== "") {
-        const horasAtuais = recado.duracao_horas || (recado.duracao_dias ? recado.duracao_dias * 24 : 168);
-        const tempoAtualStr = horasAtuais % 24 === 0 ? horasAtuais / 24 + "d" : horasAtuais + "h";
-        const novosDiasInput = prompt('2/2 - Duração (ex: 5h, 12h, 2d, 15d)', tempoAtualStr);
+        const horasAtuais =
+          recado.duracao_horas ||
+          (recado.duracao_dias ? recado.duracao_dias * 24 : 168);
+        const tempoAtualStr =
+          horasAtuais % 24 === 0 ? horasAtuais / 24 + "d" : horasAtuais + "h";
+        const novosDiasInput = prompt(
+          "2/2 - Duração (ex: 5h, 12h, 2d, 15d)",
+          tempoAtualStr
+        );
         let novasHoras = horasAtuais;
-        if (novosDiasInput !== null && novosDiasInput.trim() !== "") novasHoras = parseDuracaoParaHoras(novosDiasInput);
-        update(itemRef, { mensagem: escaparHTML(novaMensagem.trim()), duracao_horas: novasHoras, editado: true })
+        if (novosDiasInput !== null && novosDiasInput.trim() !== "")
+          novasHoras = parseDuracaoParaHoras(novosDiasInput);
+        update(itemRef, {
+          mensagem: escaparHTML(novaMensagem.trim()),
+          duracao_horas: novasHoras,
+          editado: true,
+        })
           .then(() => exibirToast("Recado atualizado!", "sucesso"))
           .catch((err) => exibirToast("Erro: " + err.message, "erro"));
       }
@@ -948,9 +1228,14 @@ window.excluirRecado = function (id) {
     if (recado) {
       const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
       const ehAutor = recado.autor_matricula === window.usuarioLogado.matricula;
-      if (!ehAutor && !ehAdmin) { exibirToast("Sem permissão.", "erro"); return; }
+      if (!ehAutor && !ehAdmin) {
+        exibirToast("Sem permissão.", "erro");
+        return;
+      }
       if (confirm("Excluir este recado?")) {
-        remove(itemRef).then(() => exibirToast("Recado excluído.", "sucesso")).catch((err) => exibirToast("Erro: " + err.message, "erro"));
+        remove(itemRef)
+          .then(() => exibirToast("Recado excluído.", "sucesso"))
+          .catch((err) => exibirToast("Erro: " + err.message, "erro"));
       }
     }
   });
@@ -959,8 +1244,12 @@ window.excluirRecado = function (id) {
 window.forceLogout = function () {
   if (typeof suap !== "undefined") suap.logout();
   document.cookie = "suapToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  document.cookie = "suapToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/login;";
-  document.cookie = "suapToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=" + window.location.hostname + "; path=/;";
+  document.cookie =
+    "suapToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/login;";
+  document.cookie =
+    "suapToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=" +
+    window.location.hostname +
+    "; path=/;";
   localStorage.removeItem("suapToken");
   sessionStorage.clear();
   window.location.replace(window.location.origin + "/login.html");
@@ -974,38 +1263,75 @@ const MAX_FOTO_BYTES = 500 * 1024;
 let perfilUsuarioAtual = null;
 
 function limparArroba(valor) {
-  return String(valor || "").trim().replace(/^@+/, "").replace(/\s+/g, "");
+  return String(valor || "")
+    .trim()
+    .replace(/^@+/, "")
+    .replace(/\s+/g, "");
 }
 
 function montarLinksRedes(redes) {
   if (!redes) return [];
   const links = [];
-  if (redes.tiktok) links.push({ url: `https://tiktok.com/@${limparArroba(redes.tiktok)}`, icone: "fa-brands fa-tiktok", titulo: "TikTok" });
-  if (redes.instagram) links.push({ url: `https://instagram.com/${limparArroba(redes.instagram)}`, icone: "fa-brands fa-instagram", titulo: "Instagram" });
-  if (redes.github) links.push({ url: `https://github.com/${limparArroba(redes.github)}`, icone: "fa-brands fa-github", titulo: "GitHub" });
-  if (redes.email) links.push({ url: `mailto:${redes.email}`, icone: "fa-solid fa-envelope", titulo: "Email" });
-  if (redes.site) links.push({ url: redes.site, icone: "fa-solid fa-globe", titulo: "Site" });
+  if (redes.tiktok)
+    links.push({
+      url: `https://tiktok.com/@${limparArroba(redes.tiktok)}`,
+      icone: "fa-brands fa-tiktok",
+      titulo: "TikTok",
+    });
+  if (redes.instagram)
+    links.push({
+      url: `https://instagram.com/${limparArroba(redes.instagram)}`,
+      icone: "fa-brands fa-instagram",
+      titulo: "Instagram",
+    });
+  if (redes.github)
+    links.push({
+      url: `https://github.com/${limparArroba(redes.github)}`,
+      icone: "fa-brands fa-github",
+      titulo: "GitHub",
+    });
+  if (redes.email)
+    links.push({
+      url: `mailto:${redes.email}`,
+      icone: "fa-solid fa-envelope",
+      titulo: "Email",
+    });
+  if (redes.site)
+    links.push({ url: redes.site, icone: "fa-solid fa-globe", titulo: "Site" });
   return links;
 }
 
 function comprimirImagem(file, maxLado = 500, qualidade = 0.82) {
   return new Promise((resolve, reject) => {
-    if (!file.type.startsWith("image/")) { reject(new Error("Arquivo não é uma imagem.")); return; }
+    if (!file.type.startsWith("image/")) {
+      reject(new Error("Arquivo não é uma imagem."));
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
       img.onload = () => {
         let { width, height } = img;
-        if (width > height && width > maxLado) { height = Math.round((height * maxLado) / width); width = maxLado; }
-        else if (height > maxLado) { width = Math.round((width * maxLado) / height); height = maxLado; }
+        if (width > height && width > maxLado) {
+          height = Math.round((height * maxLado) / width);
+          width = maxLado;
+        } else if (height > maxLado) {
+          width = Math.round((width * maxLado) / height);
+          height = maxLado;
+        }
         const canvas = document.createElement("canvas");
-        canvas.width = width; canvas.height = height;
+        canvas.width = width;
+        canvas.height = height;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
         let qualidadeAtual = qualidade;
         let dataUrl = canvas.toDataURL("image/jpeg", qualidadeAtual);
         let tentativas = 0;
-        while (dataUrl.length * 0.75 > MAX_FOTO_BYTES && tentativas < 5 && qualidadeAtual > 0.4) {
+        while (
+          dataUrl.length * 0.75 > MAX_FOTO_BYTES &&
+          tentativas < 5 &&
+          qualidadeAtual > 0.4
+        ) {
           qualidadeAtual -= 0.12;
           dataUrl = canvas.toDataURL("image/jpeg", qualidadeAtual);
           tentativas++;
@@ -1021,15 +1347,23 @@ function comprimirImagem(file, maxLado = 500, qualidade = 0.82) {
 }
 
 function salvarPerfilLocal(matricula, perfil) {
-  try { localStorage.setItem(CHAVE_STORAGE_PERFIL + matricula, JSON.stringify(perfil)); }
-  catch (e) { console.warn("Falha ao salvar no localStorage:", e); }
+  try {
+    localStorage.setItem(
+      CHAVE_STORAGE_PERFIL + matricula,
+      JSON.stringify(perfil)
+    );
+  } catch (e) {
+    console.warn("Falha ao salvar no localStorage:", e);
+  }
 }
 
 function lerPerfilLocal(matricula) {
   try {
     const raw = localStorage.getItem(CHAVE_STORAGE_PERFIL + matricula);
     return raw ? JSON.parse(raw) : null;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 window.aplicarPerfilNoCard = function (perfil) {
@@ -1040,20 +1374,36 @@ window.aplicarPerfilNoCard = function (perfil) {
   const bioEl = document.getElementById("user-bio");
   const redesEl = document.getElementById("user-redes");
   if (fotoEl && perfil.foto) fotoEl.src = perfil.foto;
-  if (nomeEl) nomeEl.textContent = perfil.nomeCompleto || perfil.nome || window.usuarioLogado.nome || "Usuário";
+  if (nomeEl)
+    nomeEl.textContent =
+      perfil.nomeCompleto || perfil.nome || window.usuarioLogado.nome || "Usuário";
   if (bioEl) {
-    if (perfil.bio) { bioEl.textContent = perfil.bio; bioEl.classList.remove("is-hidden"); }
-    else { bioEl.textContent = ""; bioEl.classList.add("is-hidden"); }
+    if (perfil.bio) {
+      bioEl.textContent = perfil.bio;
+      bioEl.classList.remove("is-hidden");
+    } else {
+      bioEl.textContent = "";
+      bioEl.classList.add("is-hidden");
+    }
   }
   if (redesEl) {
     const links = montarLinksRedes(perfil.redes);
-    redesEl.innerHTML = links.map((l) => `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}"><i class="${l.icone}"></i></a>`).join("");
+    redesEl.innerHTML = links
+      .map(
+        (l) =>
+          `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}"><i class="${l.icone}"></i></a>`
+      )
+      .join("");
   }
   if (perfil.foto) window.usuarioLogado.foto = perfil.foto;
   if (perfil.nome) window.usuarioLogado.nome = perfil.nome;
   const btn = document.getElementById("btn-editar-perfil");
   const label = document.getElementById("btn-editar-perfil-label");
-  if (btn && label) { btn.disabled = false; label.textContent = t("editar_perfil"); btn.title = "Personalize seu perfil"; }
+  if (btn && label) {
+    btn.disabled = false;
+    label.textContent = t("editar_perfil");
+    btn.title = "Personalize seu perfil";
+  }
 };
 
 window.carregarPerfilUsuario = function (matricula) {
@@ -1066,44 +1416,71 @@ window.carregarPerfilUsuario = function (matricula) {
       if (!dados) return local;
       const perfilFinal = {
         nome: dados.nome || (local && local.nome) || window.usuarioLogado.nome,
-        nomeCompleto: dados.nomeCompleto || (local && local.nomeCompleto) || "",
+        nomeCompleto:
+          dados.nomeCompleto || (local && local.nomeCompleto) || "",
         matricula: dados.matricula || matricula,
         foto: dados.foto || (local && local.foto) || window.usuarioLogado.foto,
         bio: dados.bio || (local && local.bio) || "",
         redes: dados.redes || (local && local.redes) || {},
-        perfilEditadoEm: dados.perfilEditadoEm || (local && local.perfilEditadoEm) || 0,
+        perfilEditadoEm:
+          dados.perfilEditadoEm || (local && local.perfilEditadoEm) || 0,
         ultimoAcesso: dados.ultimoAcesso || Date.now(),
       };
       window.aplicarPerfilNoCard(perfilFinal);
       salvarPerfilLocal(matricula, perfilFinal);
       return perfilFinal;
     })
-    .catch((err) => { console.warn("Firebase off, usando local:", err); return local; });
+    .catch((err) => {
+      console.warn("Firebase off, usando local:", err);
+      return local;
+    });
 };
 
 window.abrirModalEditarPerfil = function () {
-  if (!perfilUsuarioAtual) { exibirToast("Perfil ainda não carregado.", "erro"); return; }
+  if (!perfilUsuarioAtual) {
+    exibirToast("Perfil ainda não carregado.", "erro");
+    return;
+  }
   const bloqueioEl = document.getElementById("edit-perfil-bloqueio");
   const btnSalvar = document.getElementById("btn-salvar-perfil");
   const inputFoto = document.getElementById("edit-foto-input");
   document.getElementById("edit-nome").value = perfilUsuarioAtual.nome || "";
   document.getElementById("edit-bio").value = perfilUsuarioAtual.bio || "";
-  document.getElementById("edit-bio-count").textContent = (perfilUsuarioAtual.bio || "").length;
+  document.getElementById("edit-bio-count").textContent = (
+    perfilUsuarioAtual.bio || ""
+  ).length;
   const redes = perfilUsuarioAtual.redes || {};
-  document.getElementById("edit-tiktok").value = redes.tiktok ? "@" + limparArroba(redes.tiktok) : "";
-  document.getElementById("edit-instagram").value = redes.instagram ? "@" + limparArroba(redes.instagram) : "";
-  document.getElementById("edit-github").value = redes.github ? "@" + limparArroba(redes.github) : "";
+  document.getElementById("edit-tiktok").value = redes.tiktok
+    ? "@" + limparArroba(redes.tiktok)
+    : "";
+  document.getElementById("edit-instagram").value = redes.instagram
+    ? "@" + limparArroba(redes.instagram)
+    : "";
+  document.getElementById("edit-github").value = redes.github
+    ? "@" + limparArroba(redes.github)
+    : "";
   document.getElementById("edit-email").value = redes.email || "";
   document.getElementById("edit-site").value = redes.site || "";
-  document.getElementById("edit-avatar-preview").src = perfilUsuarioAtual.foto || "";
-  if (inputFoto) { inputFoto.value = ""; delete inputFoto.dataset.novaFoto; delete inputFoto.dataset.restaurar; inputFoto.disabled = false; }
+  document.getElementById("edit-avatar-preview").src =
+    perfilUsuarioAtual.foto || "";
+  if (inputFoto) {
+    inputFoto.value = "";
+    delete inputFoto.dataset.novaFoto;
+    delete inputFoto.dataset.restaurar;
+    inputFoto.disabled = false;
+  }
   if (bloqueioEl) bloqueioEl.classList.add("is-hidden");
   if (btnSalvar) btnSalvar.disabled = false;
-  document.querySelectorAll("#form-editar-perfil input, #form-editar-perfil textarea").forEach((el) => (el.disabled = false));
+  document
+    .querySelectorAll("#form-editar-perfil input, #form-editar-perfil textarea")
+    .forEach((el) => (el.disabled = false));
   const btnRestaurar = document.getElementById("btn-restaurar-foto");
   if (btnRestaurar) btnRestaurar.disabled = false;
   const btnUpload = document.querySelector(".btn-upload");
-  if (btnUpload) { btnUpload.style.pointerEvents = "auto"; btnUpload.style.opacity = "1"; }
+  if (btnUpload) {
+    btnUpload.style.pointerEvents = "auto";
+    btnUpload.style.opacity = "1";
+  }
   document.getElementById("modal-editar-perfil")?.classList.remove("is-hidden");
 };
 
@@ -1113,27 +1490,38 @@ window.fecharModalEditarPerfil = function () {
 
 function inicializarModalEditarPerfil() {
   const btnEditar = document.getElementById("btn-editar-perfil");
-  if (btnEditar) btnEditar.addEventListener("click", window.abrirModalEditarPerfil);
+  if (btnEditar)
+    btnEditar.addEventListener("click", window.abrirModalEditarPerfil);
   const inputFoto = document.getElementById("edit-foto-input");
   if (inputFoto) {
     inputFoto.addEventListener("change", async (e) => {
       const file = e.target.files[0];
       if (!file) return;
-      if (file.size > 5 * 1024 * 1024) { exibirToast("Imagem muito grande (máx 5MB).", "erro"); return; }
+      if (file.size > 5 * 1024 * 1024) {
+        exibirToast("Imagem muito grande (máx 5MB).", "erro");
+        return;
+      }
       try {
         const dataUrl = await comprimirImagem(file);
         document.getElementById("edit-avatar-preview").src = dataUrl;
         inputFoto.dataset.novaFoto = dataUrl;
         delete inputFoto.dataset.restaurar;
-      } catch (err) { exibirToast("Erro: " + err.message, "erro"); }
+      } catch (err) {
+        exibirToast("Erro: " + err.message, "erro");
+      }
     });
   }
   const btnRestaurar = document.getElementById("btn-restaurar-foto");
   if (btnRestaurar) {
     btnRestaurar.addEventListener("click", () => {
-      const fotoOriginal = window.usuarioLogado.fotoOriginal || window.usuarioLogado.foto;
+      const fotoOriginal =
+        window.usuarioLogado.fotoOriginal || window.usuarioLogado.foto;
       document.getElementById("edit-avatar-preview").src = fotoOriginal;
-      if (inputFoto) { delete inputFoto.dataset.novaFoto; inputFoto.dataset.restaurar = "1"; inputFoto.value = ""; }
+      if (inputFoto) {
+        delete inputFoto.dataset.novaFoto;
+        inputFoto.dataset.restaurar = "1";
+        inputFoto.value = "";
+      }
     });
   }
   const bioInput = document.getElementById("edit-bio");
@@ -1145,22 +1533,41 @@ function inicializarModalEditarPerfil() {
     });
   }
   const form = document.getElementById("form-editar-perfil");
-  if (form) form.addEventListener("submit", async (e) => { e.preventDefault(); await salvarPerfilEditado(); });
+  if (form)
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      await salvarPerfilEditado();
+    });
   const modal = document.getElementById("modal-editar-perfil");
-  if (modal) modal.addEventListener("click", (e) => { if (e.target === modal) window.fecharModalEditarPerfil(); });
+  if (modal)
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) window.fecharModalEditarPerfil();
+    });
 }
 
 async function salvarPerfilEditado() {
   const matricula = window.usuarioLogado.matricula;
-  if (!matricula) { exibirToast("Matrícula não encontrada.", "erro"); return; }
+  if (!matricula) {
+    exibirToast("Matrícula não encontrada.", "erro");
+    return;
+  }
   const inputFoto = document.getElementById("edit-foto-input");
   let fotoFinal;
-  if (inputFoto && inputFoto.dataset.restaurar === "1") fotoFinal = window.usuarioLogado.fotoOriginal || window.usuarioLogado.foto;
-  else if (inputFoto && inputFoto.dataset.novaFoto) fotoFinal = inputFoto.dataset.novaFoto;
+  if (inputFoto && inputFoto.dataset.restaurar === "1")
+    fotoFinal = window.usuarioLogado.fotoOriginal || window.usuarioLogado.foto;
+  else if (inputFoto && inputFoto.dataset.novaFoto)
+    fotoFinal = inputFoto.dataset.novaFoto;
   else fotoFinal = perfilUsuarioAtual.foto || window.usuarioLogado.foto;
   const nome = document.getElementById("edit-nome").value.trim();
-  if (!nome) { exibirToast("Informe um nome.", "erro"); return; }
-  const bio = document.getElementById("edit-bio").value.replace(/[\r\n]+/g, " ").trim().slice(0, 160);
+  if (!nome) {
+    exibirToast("Informe um nome.", "erro");
+    return;
+  }
+  const bio = document
+    .getElementById("edit-bio")
+    .value.replace(/[\r\n]+/g, " ")
+    .trim()
+    .slice(0, 160);
   const redes = {
     tiktok: limparArroba(document.getElementById("edit-tiktok").value),
     instagram: limparArroba(document.getElementById("edit-instagram").value),
@@ -1168,26 +1575,42 @@ async function salvarPerfilEditado() {
     email: document.getElementById("edit-email").value.trim(),
     site: document.getElementById("edit-site").value.trim(),
   };
-  if (redes.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(redes.email)) { exibirToast("Email inválido.", "erro"); return; }
-  if (redes.site && !/^https?:\/\/.+/.test(redes.site)) { exibirToast("Site deve começar com http:// ou https://", "erro"); return; }
+  if (redes.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(redes.email)) {
+    exibirToast("Email inválido.", "erro");
+    return;
+  }
+  if (redes.site && !/^https?:\/\/.+/.test(redes.site)) {
+    exibirToast("Site deve começar com http:// ou https://", "erro");
+    return;
+  }
   const agora = Date.now();
   const perfilAtualizado = {
-    nome, nomeCompleto: perfilUsuarioAtual.nomeCompleto || window.usuarioLogado.nome,
-    matricula, foto: fotoFinal, bio, redes,
-    perfilEditadoEm: agora, ultimoAcesso: agora,
+    nome,
+    nomeCompleto: perfilUsuarioAtual.nomeCompleto || window.usuarioLogado.nome,
+    matricula,
+    foto: fotoFinal,
+    bio,
+    redes,
+    perfilEditadoEm: agora,
+    ultimoAcesso: agora,
   };
   const btnSalvar = document.getElementById("btn-salvar-perfil");
   const textoOriginal = btnSalvar.innerHTML;
   btnSalvar.disabled = true;
-  btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+  btnSalvar.innerHTML =
+    '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
   try {
     await update(ref(db, "perfis_alunos/" + matricula), perfilAtualizado);
     salvarPerfilLocal(matricula, perfilAtualizado);
     window.aplicarPerfilNoCard(perfilAtualizado);
     exibirToast("Perfil atualizado!", "sucesso");
     window.fecharModalEditarPerfil();
-  } catch (err) { exibirToast("Erro: " + err.message, "erro"); }
-  finally { btnSalvar.disabled = false; btnSalvar.innerHTML = textoOriginal; }
+  } catch (err) {
+    exibirToast("Erro: " + err.message, "erro");
+  } finally {
+    btnSalvar.disabled = false;
+    btnSalvar.innerHTML = textoOriginal;
+  }
 }
 
 // ==========================================
@@ -1202,30 +1625,50 @@ function formatarNota(valor) {
   return Number.isFinite(nota) ? nota : null;
 }
 
-function textoNota(valor) { return valor === null ? "-" : valor.toFixed(1); }
+function textoNota(valor) {
+  return valor === null ? "-" : valor.toFixed(1);
+}
 
 function atualizarStatusNotas(mensagem, tipo) {
   var status = document.getElementById("notas-status");
   if (!status) return;
-  var variante = tipo === true ? "erro" : (typeof tipo === "string" ? tipo : "info");
-  var icones = { info: "fa-circle-info", loading: "fa-spinner", sucesso: "fa-circle-check", erro: "fa-circle-exclamation" };
-  status.className = "notas-status" + (variante === "loading" ? " loading" : (variante === "info" ? "" : " " + variante));
-  status.innerHTML = `<i class="fa-solid ${icones[variante] || icones.info}"></i> <span>${escaparHTML(mensagem)}</span>`;
+  var variante = tipo === true ? "erro" : typeof tipo === "string" ? tipo : "info";
+  var icones = {
+    info: "fa-circle-info",
+    loading: "fa-spinner",
+    sucesso: "fa-circle-check",
+    erro: "fa-circle-exclamation",
+  };
+  status.className =
+    "notas-status" +
+    (variante === "loading" ? " loading" : variante === "info" ? "" : " " + variante);
+  status.innerHTML = `<i class="fa-solid ${
+    icones[variante] || icones.info
+  }"></i> <span>${escaparHTML(mensagem)}</span>`;
 }
 
 function obterEtapasDaDisciplina(disciplina) {
-  if (disciplina.segundo_semestre === true) return { tipo: "Semestral", etapas: [3, 4] };
-  if (disciplina.segundo_semestre === false) return { tipo: "Semestral", etapas: [1, 2] };
-  var tem12 = [1, 2].some(function (n) { var e = disciplina["nota_etapa_" + n]; return formatarNota(e && typeof e === "object" ? e.nota : e) !== null; });
-  var tem34 = [3, 4].some(function (n) { var e = disciplina["nota_etapa_" + n]; return formatarNota(e && typeof e === "object" ? e.nota : e) !== null; });
+  if (disciplina.segundo_semestre === true)
+    return { tipo: "Semestral", etapas: [3, 4] };
+  if (disciplina.segundo_semestre === false)
+    return { tipo: "Semestral", etapas: [1, 2] };
+  var tem12 = [1, 2].some(function (n) {
+    var e = disciplina["nota_etapa_" + n];
+    return formatarNota(e && typeof e === "object" ? e.nota : e) !== null;
+  });
+  var tem34 = [3, 4].some(function (n) {
+    var e = disciplina["nota_etapa_" + n];
+    return formatarNota(e && typeof e === "object" ? e.nota : e) !== null;
+  });
   if (tem34 && !tem12) return { tipo: "Semestral", etapas: [3, 4] };
   if (tem12 && tem34) return { tipo: "Anual", etapas: [1, 2, 3, 4] };
   if (tem12) {
-    var temCampo34 = ("nota_etapa_3" in disciplina) || ("nota_etapa_4" in disciplina);
+    var temCampo34 = "nota_etapa_3" in disciplina || "nota_etapa_4" in disciplina;
     if (temCampo34) return { tipo: "Anual", etapas: [1, 2, 3, 4] };
     return { tipo: "Semestral", etapas: [1, 2] };
   }
-  if (("nota_etapa_3" in disciplina) || ("nota_etapa_4" in disciplina)) return { tipo: "Anual", etapas: [1, 2, 3, 4] };
+  if ("nota_etapa_3" in disciplina || "nota_etapa_4" in disciplina)
+    return { tipo: "Anual", etapas: [1, 2, 3, 4] };
   return { tipo: "Semestral", etapas: [1, 2] };
 }
 
@@ -1239,13 +1682,21 @@ var __metasDisciplinas = {};
 var __gruposColapsados = { Semestral: false, Anual: false };
 var __historicoPeriodos = [];
 
-const MATRICULA_STORAGE_KEY = () => "metas_disc_" + (window.usuarioLogado.matricula || "anon");
+const MATRICULA_STORAGE_KEY = () =>
+  "metas_disc_" + (window.usuarioLogado.matricula || "anon");
 const LIMITE_FALTAS_PCT = 0.25;
-const LIMITE_FALTAS_ALERTA = 0.20;
+const LIMITE_FALTAS_ALERTA = 0.2;
 const CARGA_HORARIA_PADRAO = 60;
 
-function getCodigoDisc(d) { return String(d.codigo_diario || d.disciplina || d.id || "disc").trim(); }
-function metaEfetiva(d) { var cod = getCodigoDisc(d); return __metasDisciplinas[cod] != null ? __metasDisciplinas[cod] : __metaAtual; }
+function getCodigoDisc(d) {
+  return String(d.codigo_diario || d.disciplina || d.id || "disc").trim();
+}
+function metaEfetiva(d) {
+  var cod = getCodigoDisc(d);
+  return __metasDisciplinas[cod] != null
+    ? __metasDisciplinas[cod]
+    : __metaAtual;
+}
 function classificarStatusNota(media, faltas, meta) {
   var limite = CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT;
   if (faltas > limite) return "reprovado";
@@ -1256,26 +1707,54 @@ function classificarStatusNota(media, faltas, meta) {
 }
 
 function calcularMediaSimples(d, etapas, simulacao) {
-  var notas = etapas.map(function (n) { var etapa = d["nota_etapa_" + n]; return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa); });
-  var preenchidasReais = notas.filter(function (v) { return v !== null; });
-  var somaReal = preenchidasReais.reduce(function (a, b) { return a + b; }, 0);
+  var notas = etapas.map(function (n) {
+    var etapa = d["nota_etapa_" + n];
+    return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa);
+  });
+  var preenchidasReais = notas.filter(function (v) {
+    return v !== null;
+  });
+  var somaReal = preenchidasReais.reduce(function (a, b) {
+    return a + b;
+  }, 0);
   var temEtapaAberta = preenchidasReais.length < etapas.length;
-  var usarSimulacao = (simulacao != null) && temEtapaAberta;
+  var usarSimulacao = simulacao != null && temEtapaAberta;
   if (usarSimulacao) {
     var comSim = preenchidasReais.concat([simulacao]);
-    var somaSim = comSim.reduce(function (a, b) { return a + b; }, 0);
-    return { media: somaSim / comSim.length, preenchidasReais: preenchidasReais.length, preenchidasComSim: comSim.length, somaReal, somaComSim: somaSim, temEtapaAberta, simulando: true };
+    var somaSim = comSim.reduce(function (a, b) {
+      return a + b;
+    }, 0);
+    return {
+      media: somaSim / comSim.length,
+      preenchidasReais: preenchidasReais.length,
+      preenchidasComSim: comSim.length,
+      somaReal,
+      somaComSim: somaSim,
+      temEtapaAberta,
+      simulando: true,
+    };
   }
   var mediaApi = formatarNota(d.media_disciplina);
-  return { media: preenchidasReais.length ? somaReal / preenchidasReais.length : mediaApi, preenchidasReais: preenchidasReais.length, preenchidasComSim: preenchidasReais.length, somaReal, somaComSim: somaReal, temEtapaAberta, simulando: false };
+  return {
+    media: preenchidasReais.length ? somaReal / preenchidasReais.length : mediaApi,
+    preenchidasReais: preenchidasReais.length,
+    preenchidasComSim: preenchidasReais.length,
+    somaReal,
+    somaComSim: somaReal,
+    temEtapaAberta,
+    simulando: false,
+  };
 }
 
 function calcularProjecaoDisciplina(notasPreenchidas, totalEtapas, soma, meta) {
   var faltantes = totalEtapas - notasPreenchidas;
   if (faltantes <= 0) {
     var mediaFinal = notasPreenchidas ? soma / notasPreenchidas : null;
-    if (mediaFinal === null) return { texto: "Sem notas", classe: "projecao-alerta" };
-    return mediaFinal >= meta ? { texto: "Meta atingida", classe: "projecao-ok" } : { texto: "Abaixo da meta", classe: "projecao-ruim" };
+    if (mediaFinal === null)
+      return { texto: "Sem notas", classe: "projecao-alerta" };
+    return mediaFinal >= meta
+      ? { texto: "Meta atingida", classe: "projecao-ok" }
+      : { texto: "Abaixo da meta", classe: "projecao-ruim" };
   }
   var necessaria = (meta * totalEtapas - soma) / faltantes;
   if (necessaria <= 0) return { texto: "Meta garantida", classe: "projecao-ok" };
@@ -1286,23 +1765,42 @@ function calcularProjecaoDisciplina(notasPreenchidas, totalEtapas, soma, meta) {
 function carregarMetasDisciplinas() {
   var mat = window.usuarioLogado.matricula;
   if (!mat) return;
-  try { var local = localStorage.getItem(MATRICULA_STORAGE_KEY()); if (local) __metasDisciplinas = JSON.parse(local) || {}; }
-  catch (e) { __metasDisciplinas = {}; }
-  get(ref(db, "metas_disciplinas/" + mat)).then(function (snap) {
-    var dados = snap.val();
-    if (dados && typeof dados === "object") {
-      __metasDisciplinas = dados;
-      try { localStorage.setItem(MATRICULA_STORAGE_KEY(), JSON.stringify(dados)); } catch (e) {}
-      if (__notasCache.length) renderizarNotas(__notasCache);
-    }
-  }).catch(function (err) { console.warn("[metas] firebase:", err); });
+  try {
+    var local = localStorage.getItem(MATRICULA_STORAGE_KEY());
+    if (local) __metasDisciplinas = JSON.parse(local) || {};
+  } catch (e) {
+    __metasDisciplinas = {};
+  }
+  get(ref(db, "metas_disciplinas/" + mat))
+    .then(function (snap) {
+      var dados = snap.val();
+      if (dados && typeof dados === "object") {
+        __metasDisciplinas = dados;
+        try {
+          localStorage.setItem(MATRICULA_STORAGE_KEY(), JSON.stringify(dados));
+        } catch (e) {}
+        if (__notasCache.length) renderizarNotas(__notasCache);
+      }
+    })
+    .catch(function (err) {
+      console.warn("[metas] firebase:", err);
+    });
 }
 
 function salvarMetasDisciplinas() {
   var mat = window.usuarioLogado.matricula;
   if (!mat) return Promise.resolve();
-  try { localStorage.setItem(MATRICULA_STORAGE_KEY(), JSON.stringify(__metasDisciplinas)); } catch (e) {}
-  return update(ref(db, "metas_disciplinas/" + mat), __metasDisciplinas).catch(function (err) { console.warn("[metas] save:", err); });
+  try {
+    localStorage.setItem(
+      MATRICULA_STORAGE_KEY(),
+      JSON.stringify(__metasDisciplinas)
+    );
+  } catch (e) {}
+  return update(ref(db, "metas_disciplinas/" + mat), __metasDisciplinas).catch(
+    function (err) {
+      console.warn("[metas] save:", err);
+    }
+  );
 }
 
 function ordenarDisciplinas(lista) {
@@ -1317,15 +1815,33 @@ function ordenarDisciplinas(lista) {
       return __sortDir === "asc" ? va.localeCompare(vb) : vb.localeCompare(va);
     }
     if (__sortKey === "media") {
-      va = calcularMediaSimples(a, obterEtapasDaDisciplina(a).etapas, __simulacoes[getCodigoDisc(a)]).media;
-      vb = calcularMediaSimples(b, obterEtapasDaDisciplina(b).etapas, __simulacoes[getCodigoDisc(b)]).media;
-      va = va === null ? -1 : va; vb = vb === null ? -1 : vb;
+      va = calcularMediaSimples(
+        a,
+        obterEtapasDaDisciplina(a).etapas,
+        __simulacoes[getCodigoDisc(a)]
+      ).media;
+      vb = calcularMediaSimples(
+        b,
+        obterEtapasDaDisciplina(b).etapas,
+        __simulacoes[getCodigoDisc(b)]
+      ).media;
+      va = va === null ? -1 : va;
+      vb = vb === null ? -1 : vb;
     } else if (__sortKey === "faltas") {
-      va = Number(a.numero_faltas) || 0; vb = Number(b.numero_faltas) || 0;
+      va = Number(a.numero_faltas) || 0;
+      vb = Number(b.numero_faltas) || 0;
     } else if (__sortKey === "status") {
       var ordem = { reprovado: 0, recuperacao: 1, aprovado: 2 };
-      var ma = calcularMediaSimples(a, obterEtapasDaDisciplina(a).etapas, __simulacoes[getCodigoDisc(a)]).media;
-      var mb = calcularMediaSimples(b, obterEtapasDaDisciplina(b).etapas, __simulacoes[getCodigoDisc(b)]).media;
+      var ma = calcularMediaSimples(
+        a,
+        obterEtapasDaDisciplina(a).etapas,
+        __simulacoes[getCodigoDisc(a)]
+      ).media;
+      var mb = calcularMediaSimples(
+        b,
+        obterEtapasDaDisciplina(b).etapas,
+        __simulacoes[getCodigoDisc(b)]
+      ).media;
       va = ordem[classificarStatusNota(ma, Number(a.numero_faltas) || 0, meta)];
       vb = ordem[classificarStatusNota(mb, Number(b.numero_faltas) || 0, meta)];
     }
@@ -1338,11 +1854,17 @@ function ordenarDisciplinas(lista) {
 
 function aplicarSort(key) {
   if (__sortKey === key) __sortDir = __sortDir === "asc" ? "desc" : "asc";
-  else { __sortKey = key; __sortDir = key === "media" ? "desc" : "asc"; }
-  document.querySelectorAll(".tabela-notas thead th.sortable").forEach(function (th) {
-    th.classList.remove("sort-asc", "sort-desc");
-    if (th.dataset.sort === __sortKey) th.classList.add(__sortDir === "asc" ? "sort-asc" : "sort-desc");
-  });
+  else {
+    __sortKey = key;
+    __sortDir = key === "media" ? "desc" : "asc";
+  }
+  document
+    .querySelectorAll(".tabela-notas thead th.sortable")
+    .forEach(function (th) {
+      th.classList.remove("sort-asc", "sort-desc");
+      if (th.dataset.sort === __sortKey)
+        th.classList.add(__sortDir === "asc" ? "sort-asc" : "sort-desc");
+    });
   if (__notasCache.length) renderizarNotas(__notasCache);
 }
 
@@ -1353,18 +1875,25 @@ function atualizarResumoNotas(disciplinas) {
   var elFaltas = document.getElementById("resumo-faltas");
   if (!elMedia && !elDisc && !elRisco && !elFaltas) return;
   var total = disciplinas.length;
-  var somaMedias = 0, contMedias = 0, faltasTotais = 0, emRisco = 0;
+  var somaMedias = 0,
+    contMedias = 0,
+    faltasTotais = 0,
+    emRisco = 0;
   disciplinas.forEach(function (d) {
     var etapas = obterEtapasDaDisciplina(d).etapas;
     var calc = calcularMediaSimples(d, etapas, __simulacoes[getCodigoDisc(d)]);
     var faltas = Number(d.numero_faltas) || 0;
-    if (calc.media !== null) { somaMedias += calc.media; contMedias++; }
+    if (calc.media !== null) {
+      somaMedias += calc.media;
+      contMedias++;
+    }
     faltasTotais += faltas;
     var st = classificarStatusNota(calc.media, faltas, metaEfetiva(d));
     if (st !== "aprovado") emRisco++;
   });
   var mediaGeral = contMedias ? somaMedias / contMedias : null;
-  if (elMedia) elMedia.textContent = mediaGeral !== null ? mediaGeral.toFixed(1) : "—";
+  if (elMedia)
+    elMedia.textContent = mediaGeral !== null ? mediaGeral.toFixed(1) : "—";
   if (elDisc) elDisc.textContent = total || "—";
   if (elRisco) elRisco.textContent = emRisco;
   if (elFaltas) elFaltas.textContent = faltasTotais;
@@ -1373,14 +1902,31 @@ function atualizarResumoNotas(disciplinas) {
 function alertaDeFaltas(disciplinas) {
   var antigo = document.querySelector(".alerta-faltas");
   if (antigo) antigo.remove();
-  var alertaMax = 0, discCritica = null;
+  var alertaMax = 0,
+    discCritica = null;
   var limiteReprov = CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT;
   var limiteAlerta = CARGA_HORARIA_PADRAO * LIMITE_FALTAS_ALERTA;
   disciplinas.forEach(function (d) {
     var faltas = Number(d.numero_faltas) || 0;
-    if (faltas >= limiteReprov && faltas > alertaMax) { alertaMax = faltas; discCritica = { nome: d.disciplina || d.codigo_diario, faltas, nivel: "danger" }; }
-    else if (faltas >= limiteAlerta && (!discCritica || discCritica.nivel !== "danger")) {
-      if (faltas > alertaMax) { alertaMax = faltas; discCritica = { nome: d.disciplina || d.codigo_diario, faltas, nivel: "warn" }; }
+    if (faltas >= limiteReprov && faltas > alertaMax) {
+      alertaMax = faltas;
+      discCritica = {
+        nome: d.disciplina || d.codigo_diario,
+        faltas,
+        nivel: "danger",
+      };
+    } else if (
+      faltas >= limiteAlerta &&
+      (!discCritica || discCritica.nivel !== "danger")
+    ) {
+      if (faltas > alertaMax) {
+        alertaMax = faltas;
+        discCritica = {
+          nome: d.disciplina || d.codigo_diario,
+          faltas,
+          nivel: "warn",
+        };
+      }
     }
   });
   if (!discCritica) return;
@@ -1388,9 +1934,16 @@ function alertaDeFaltas(disciplinas) {
   if (!panel) return;
   var banner = document.createElement("div");
   banner.className = "alerta-faltas " + discCritica.nivel;
-  banner.innerHTML = discCritica.nivel === "danger"
-    ? `<i class="fa-solid fa-triangle-exclamation"></i><span><strong>Atenção!</strong> ${discCritica.faltas} faltas em <em>${escaparHTML(discCritica.nome)}</em> — próximo do limite (${limiteReprov}).</span>`
-    : `<i class="fa-solid fa-circle-exclamation"></i><span><strong>Cuidado:</strong> ${discCritica.faltas} faltas em <em>${escaparHTML(discCritica.nome)}</em>.</span>`;
+  banner.innerHTML =
+    discCritica.nivel === "danger"
+      ? `<i class="fa-solid fa-triangle-exclamation"></i><span><strong>Atenção!</strong> ${
+          discCritica.faltas
+        } faltas em <em>${escaparHTML(
+          discCritica.nome
+        )}</em> — próximo do limite (${limiteReprov}).</span>`
+      : `<i class="fa-solid fa-circle-exclamation"></i><span><strong>Cuidado:</strong> ${
+          discCritica.faltas
+        } faltas em <em>${escaparHTML(discCritica.nome)}</em>.</span>`;
   var refEl = panel.querySelector(".notas-controls");
   if (refEl) panel.insertBefore(banner, refEl);
   else panel.insertBefore(banner, panel.firstChild);
@@ -1398,18 +1951,31 @@ function alertaDeFaltas(disciplinas) {
 
 function atualizarHistoricoComDisciplinas(disciplinas, periodoLabel, ano) {
   if (!disciplinas || !disciplinas.length) return;
-  var soma = 0, cont = 0;
+  var soma = 0,
+    cont = 0;
   disciplinas.forEach(function (d) {
     var etapas = obterEtapasDaDisciplina(d).etapas;
     var calc = calcularMediaSimples(d, etapas, null);
-    if (calc.media !== null) { soma += calc.media; cont++; }
+    if (calc.media !== null) {
+      soma += calc.media;
+      cont++;
+    }
   });
   var media = cont ? soma / cont : null;
-  var idx = __historicoPeriodos.findIndex(function (h) { return h.periodo === periodoLabel; });
-  var entry = { periodo: periodoLabel, media, disciplinas: disciplinas.length, ano };
+  var idx = __historicoPeriodos.findIndex(function (h) {
+    return h.periodo === periodoLabel;
+  });
+  var entry = {
+    periodo: periodoLabel,
+    media,
+    disciplinas: disciplinas.length,
+    ano,
+  };
   if (idx >= 0) __historicoPeriodos[idx] = entry;
   else __historicoPeriodos.push(entry);
-  __historicoPeriodos.sort(function (a, b) { return b.periodo.localeCompare(a.periodo); });
+  __historicoPeriodos.sort(function (a, b) {
+    return b.periodo.localeCompare(a.periodo);
+  });
   renderizarHistorico();
   var panel = document.getElementById("historico-panel");
   if (panel) panel.classList.remove("is-hidden");
@@ -1420,24 +1986,48 @@ function renderizarHistorico() {
   var container = document.getElementById("historico-content");
   if (!container) return;
   if (__historicoPeriodos.length < 1) {
-    container.innerHTML = `<p class="historico-vazio">${escaparHTML(t("historico_vazio"))}</p>`;
+    container.innerHTML = `<p class="historico-vazio">${escaparHTML(
+      t("historico_vazio")
+    )}</p>`;
     return;
   }
-  var cronologico = __historicoPeriodos.slice().sort(function (a, b) { return a.periodo.localeCompare(b.periodo); });
+  var cronologico = __historicoPeriodos.slice().sort(function (a, b) {
+    return a.periodo.localeCompare(b.periodo);
+  });
   var mapa = {};
   cronologico.forEach(function (h, i) {
-    mapa[h.periodo] = i > 0 ? (h.media !== null && cronologico[i - 1].media !== null ? h.media - cronologico[i - 1].media : null) : null;
+    mapa[h.periodo] =
+      i > 0
+        ? h.media !== null && cronologico[i - 1].media !== null
+          ? h.media - cronologico[i - 1].media
+          : null
+        : null;
   });
-  container.innerHTML = __historicoPeriodos.map(function (h) {
-    var diff = mapa[h.periodo];
-    var trendHTML = "";
-    if (diff !== null && diff !== undefined) {
-      if (diff > 0.3) trendHTML = `<span class="periodo-trend up"><i class="fa-solid fa-arrow-up"></i> +${diff.toFixed(1)}</span>`;
-      else if (diff < -0.3) trendHTML = `<span class="periodo-trend down"><i class="fa-solid fa-arrow-down"></i> ${diff.toFixed(1)}</span>`;
-      else trendHTML = `<span class="periodo-trend eq"><i class="fa-solid fa-minus"></i> estável</span>`;
-    }
-    return `<div class="historico-card"><span class="periodo-label">${escaparHTML(h.periodo)}</span><span class="periodo-media">${h.media !== null ? h.media.toFixed(1) : "—"}</span><span class="periodo-info">${h.disciplinas} disciplina(s)</span>${trendHTML}</div>`;
-  }).join("");
+  container.innerHTML = __historicoPeriodos
+    .map(function (h) {
+      var diff = mapa[h.periodo];
+      var trendHTML = "";
+      if (diff !== null && diff !== undefined) {
+        if (diff > 0.3)
+          trendHTML = `<span class="periodo-trend up"><i class="fa-solid fa-arrow-up"></i> +${diff.toFixed(
+            1
+          )}</span>`;
+        else if (diff < -0.3)
+          trendHTML = `<span class="periodo-trend down"><i class="fa-solid fa-arrow-down"></i> ${diff.toFixed(
+            1
+          )}</span>`;
+        else
+          trendHTML = `<span class="periodo-trend eq"><i class="fa-solid fa-minus"></i> estável</span>`;
+      }
+      return `<div class="historico-card"><span class="periodo-label">${escaparHTML(
+        h.periodo
+      )}</span><span class="periodo-media">${
+        h.media !== null ? h.media.toFixed(1) : "—"
+      }</span><span class="periodo-info">${
+        h.disciplinas
+      } disciplina(s)</span>${trendHTML}</div>`;
+    })
+    .join("");
 }
 
 // ==========================================
@@ -1449,7 +2039,10 @@ function desenharGraficoEvolucao() {
   var canvas = document.getElementById("grafico-evolucao");
   var panel = document.getElementById("evolucao-panel");
 
-  if (!canvas || !panel) { console.warn("[evolução] canvas ou panel não encontrados"); return; }
+  if (!canvas || !panel) {
+    console.warn("[evolução] canvas ou panel não encontrados");
+    return;
+  }
 
   if (typeof Chart === "undefined") {
     console.warn("[evolução] Chart.js não carregado");
@@ -1463,30 +2056,56 @@ function desenharGraficoEvolucao() {
 
   console.log("[evolução] Períodos com média:", comMedia.length);
 
-  if (comMedia.length === 0) { panel.classList.add("is-hidden"); return; }
+  if (comMedia.length === 0) {
+    panel.classList.add("is-hidden");
+    return;
+  }
 
   panel.classList.remove("is-hidden");
 
-  var ordenado = __historicoPeriodos.slice().sort(function (a, b) { return a.periodo.localeCompare(b.periodo); });
-  var labels = ordenado.map(function (h) { return h.periodo; });
-  var dados = ordenado.map(function (h) { return h.media !== null ? h.media : 0; });
+  var ordenado = __historicoPeriodos.slice().sort(function (a, b) {
+    return a.periodo.localeCompare(b.periodo);
+  });
+  var labels = ordenado.map(function (h) {
+    return h.periodo;
+  });
+  var dados = ordenado.map(function (h) {
+    return h.media !== null ? h.media : 0;
+  });
 
   if (window.__graficoEvolucao) {
-    try { window.__graficoEvolucao.destroy(); } catch (e) {}
+    try {
+      window.__graficoEvolucao.destroy();
+    } catch (e) {}
     window.__graficoEvolucao = null;
   }
 
+  // 🎨 Normaliza as cores para HEX (Canvas não aceita hsl moderno)
   var estilo = getComputedStyle(document.body);
-  var corAccent = estilo.getPropertyValue("--accent-strong").trim() || "#8b5edd";
-  var corAccent2 = estilo.getPropertyValue("--accent").trim() || "#cebdec";
-  var corTexto = estilo.getPropertyValue("--text-muted").trim() || "#b8a8d9";
+  var corAccent = corParaHex(
+    estilo.getPropertyValue("--accent-strong").trim(),
+    "#8b5edd"
+  );
+  var corAccent2 = corParaHex(
+    estilo.getPropertyValue("--accent").trim(),
+    "#cebdec"
+  );
+  var corTexto = corParaHex(
+    estilo.getPropertyValue("--text-muted").trim(),
+    "#b8a8d9"
+  );
   var corGrade = estilo.getPropertyValue("--border-color").trim() || "rgba(206,189,236,0.18)";
-  var corMeta = estilo.getPropertyValue("--warning").trim() || "#f59e0b";
+  var corMeta = corParaHex(
+    estilo.getPropertyValue("--warning").trim(),
+    "#f59e0b"
+  );
 
   var ctx = canvas.getContext("2d");
   var gradient = ctx.createLinearGradient(0, 0, 0, 260);
-  gradient.addColorStop(0, corAccent + "cc");
-  gradient.addColorStop(1, corAccent + "08");
+
+  // Usa hex + alpha concatenado (seguro)
+  addStopSeguro(gradient, 0, corAccent + "cc", "rgba(139,94,221,0.8)");
+  addStopSeguro(gradient, 1, corAccent + "08", "rgba(139,94,221,0.03)");
 
   try {
     window.__graficoEvolucao = new Chart(ctx, {
@@ -1494,24 +2113,80 @@ function desenharGraficoEvolucao() {
       data: {
         labels: labels,
         datasets: [
-          { label: "Média", data: dados, borderColor: corAccent, backgroundColor: gradient, borderWidth: 3, pointBackgroundColor: corAccent2, pointBorderColor: corAccent, pointBorderWidth: 2, pointRadius: 6, pointHoverRadius: 9, tension: 0.35, fill: true },
-          { label: "Meta", data: labels.map(function () { return __metaAtual; }), borderColor: corMeta, borderWidth: 2, borderDash: [6, 6], pointRadius: 0, fill: false },
+          {
+            label: "Média",
+            data: dados,
+            borderColor: corAccent,
+            backgroundColor: gradient,
+            borderWidth: 3,
+            pointBackgroundColor: corAccent2,
+            pointBorderColor: corAccent,
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 9,
+            tension: 0.35,
+            fill: true,
+          },
+          {
+            label: "Meta",
+            data: labels.map(function () {
+              return __metaAtual;
+            }),
+            borderColor: corMeta,
+            borderWidth: 2,
+            borderDash: [6, 6],
+            pointRadius: 0,
+            fill: false,
+          },
         ],
       },
       options: {
-        responsive: true, maintainAspectRatio: false,
+        responsive: true,
+        maintainAspectRatio: false,
         interaction: { mode: "index", intersect: false },
         plugins: {
-          legend: { labels: { color: corTexto, font: { family: "Inter", size: 12, weight: "600" }, usePointStyle: true } },
-          tooltip: { backgroundColor: "rgba(0,0,0,0.85)", titleFont: { family: "Inter", size: 13 }, bodyFont: { family: "Inter", size: 12 }, padding: 10, cornerRadius: 8, callbacks: { label: function (context) { return context.dataset.label + ": " + context.parsed.y.toFixed(1); } } },
+          legend: {
+            labels: {
+              color: corTexto,
+              font: { family: "Inter", size: 12, weight: "600" },
+              usePointStyle: true,
+            },
+          },
+          tooltip: {
+            backgroundColor: "rgba(0,0,0,0.85)",
+            titleFont: { family: "Inter", size: 13 },
+            bodyFont: { family: "Inter", size: 12 },
+            padding: 10,
+            cornerRadius: 8,
+            callbacks: {
+              label: function (context) {
+                return context.dataset.label + ": " + context.parsed.y.toFixed(1);
+              },
+            },
+          },
         },
         scales: {
-          y: { beginAtZero: true, max: 100, ticks: { color: corTexto, font: { family: "Inter", size: 11 }, stepSize: 20 }, grid: { color: corGrade, drawBorder: false } },
-          x: { ticks: { color: corTexto, font: { family: "Inter", size: 11, weight: "600" } }, grid: { display: false } },
+          y: {
+            beginAtZero: true,
+            max: 100,
+            ticks: {
+              color: corTexto,
+              font: { family: "Inter", size: 11 },
+              stepSize: 20,
+            },
+            grid: { color: corGrade, drawBorder: false },
+          },
+          x: {
+            ticks: {
+              color: corTexto,
+              font: { family: "Inter", size: 11, weight: "600" },
+            },
+            grid: { display: false },
+          },
         },
       },
     });
-    console.log("[evolução] Gráfico renderizado");
+    console.log("[evolução] Gráfico renderizado com", labels.length, "períodos");
   } catch (err) {
     console.error("[evolução] Erro ao criar gráfico:", err);
     panel.classList.add("is-hidden");
@@ -1525,14 +2200,22 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   var corpo = document.getElementById("lista-notas");
   if (!corpo) return;
   var metaInput = document.getElementById("meta-notas");
-  var meta = metaInput ? (formatarNota(metaInput.value) || 60) : 60;
+  var meta = metaInput ? formatarNota(metaInput.value) || 60 : 60;
   __metaAtual = meta;
 
   if (apenasLinhaCodigo && __notasCache.length) {
-    var tr = corpo.querySelector(`tr[data-codigo="${CSS.escape(apenasLinhaCodigo)}"]`);
+    var tr = corpo.querySelector(
+      `tr[data-codigo="${CSS.escape(apenasLinhaCodigo)}"]`
+    );
     if (tr) {
-      var d = __notasCache.find(function (x) { return getCodigoDisc(x) === apenasLinhaCodigo; });
-      if (d) { atualizarLinhaNota(tr, d, meta); atualizarResumoNotas(__notasCache); return; }
+      var d = __notasCache.find(function (x) {
+        return getCodigoDisc(x) === apenasLinhaCodigo;
+      });
+      if (d) {
+        atualizarLinhaNota(tr, d, meta);
+        atualizarResumoNotas(__notasCache);
+        return;
+      }
     }
   }
 
@@ -1540,7 +2223,8 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   corpo.innerHTML = "";
 
   if (!__notasCache.length) {
-    corpo.innerHTML = '<tr><td colspan="8" class="notas-vazia"><i class="fa-solid fa-inbox"></i><span>Nenhuma disciplina neste período.</span></td></tr>';
+    corpo.innerHTML =
+      '<tr><td colspan="8" class="notas-vazia"><i class="fa-solid fa-inbox"></i><span>Nenhuma disciplina neste período.</span></td></tr>';
     atualizarResumoNotas([]);
     return;
   }
@@ -1556,7 +2240,8 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   });
 
   if (!visiveis.length) {
-    corpo.innerHTML = '<tr><td colspan="8" class="notas-vazia"><i class="fa-solid fa-filter-circle-xmark"></i><span>Nenhuma disciplina neste filtro.</span></td></tr>';
+    corpo.innerHTML =
+      '<tr><td colspan="8" class="notas-vazia"><i class="fa-solid fa-filter-circle-xmark"></i><span>Nenhuma disciplina neste filtro.</span></td></tr>';
     atualizarResumoNotas(__notasCache);
     return;
   }
@@ -1572,16 +2257,29 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   ["Semestral", "Anual"].forEach(function (tipo) {
     if (!grupos[tipo].length) return;
     var linhaGrupo = document.createElement("tr");
-    linhaGrupo.className = "notas-grupo" + (__gruposColapsados[tipo] ? " colapsado" : "");
+    linhaGrupo.className =
+      "notas-grupo" + (__gruposColapsados[tipo] ? " colapsado" : "");
     linhaGrupo.dataset.grupo = tipo;
-    linhaGrupo.innerHTML = `<th colspan="8">${tipo === "Semestral" ? "Matérias Semestrais" : "Matérias Anuais"}<span class="grupo-contador">${grupos[tipo].length} disciplina(s)</span></th>`;
+    linhaGrupo.innerHTML = `<th colspan="8">${
+      tipo === "Semestral" ? "Matérias Semestrais" : "Matérias Anuais"
+    }<span class="grupo-contador">${
+      grupos[tipo].length
+    } disciplina(s)</span></th>`;
     linhaGrupo.addEventListener("click", function () {
       __gruposColapsados[tipo] = !__gruposColapsados[tipo];
       linhaGrupo.classList.toggle("colapsado", __gruposColapsados[tipo]);
-      document.querySelectorAll(`tr[data-grupo-linha="${tipo}"]`).forEach(function (tr) { tr.style.display = __gruposColapsados[tipo] ? "none" : ""; });
+      document
+        .querySelectorAll(`tr[data-grupo-linha="${tipo}"]`)
+        .forEach(function (tr) {
+          tr.style.display = __gruposColapsados[tipo] ? "none" : "";
+        });
     });
     corpo.appendChild(linhaGrupo);
-    grupos[tipo].forEach(function (item) { corpo.appendChild(criarLinhaNota(item.disciplina, item.etapas, tipo, meta)); });
+    grupos[tipo].forEach(function (item) {
+      corpo.appendChild(
+        criarLinhaNota(item.disciplina, item.etapas, tipo, meta)
+      );
+    });
   });
 
   atualizarResumoNotas(__notasCache);
@@ -1596,35 +2294,104 @@ function criarLinhaNota(d, etapas, tipo, meta) {
   var metaDisc = metaEfetiva(d);
   var calc = calcularMediaSimples(d, etapas, sim);
   var media = calc.media;
-  var notasEtapas = etapas.map(function (n) { var etapa = d["nota_etapa_" + n]; return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa); });
+  var notasEtapas = etapas.map(function (n) {
+    var etapa = d["nota_etapa_" + n];
+    return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa);
+  });
   var status = classificarStatusNota(media, faltas, metaDisc);
-  var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, etapas.length, calc.somaComSim, metaDisc);
-  var faltasClasse = faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT ? "critico" : faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_ALERTA ? "alerta" : "";
-  var badgeLabel = { aprovado: '<i class="fa-solid fa-check"></i> ' + t("leg_aprovado"), recuperacao: '<i class="fa-solid fa-rotate"></i> ' + t("leg_recuperacao"), reprovado: '<i class="fa-solid fa-xmark"></i> ' + t("leg_reprovado") }[status];
-  var linhaRisco = (status === "reprovado" || faltasClasse === "critico") ? "linha-risco" : "";
+  var proj = calcularProjecaoDisciplina(
+    calc.preenchidasComSim,
+    etapas.length,
+    calc.somaComSim,
+    metaDisc
+  );
+  var faltasClasse =
+    faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT
+      ? "critico"
+      : faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_ALERTA
+      ? "alerta"
+      : "";
+  var badgeLabel = {
+    aprovado: '<i class="fa-solid fa-check"></i> ' + t("leg_aprovado"),
+    recuperacao: '<i class="fa-solid fa-rotate"></i> ' + t("leg_recuperacao"),
+    reprovado: '<i class="fa-solid fa-xmark"></i> ' + t("leg_reprovado"),
+  }[status];
+  var linhaRisco =
+    status === "reprovado" || faltasClasse === "critico" ? "linha-risco" : "";
   var linhaSim = calc.simulando ? "simulando" : "";
-  var etapasHTML = notasEtapas.map(function (n) { return '<span class="etapa-pill">' + textoNota(n) + '</span>'; }).join("");
+  var etapasHTML = notasEtapas
+    .map(function (n) {
+      return '<span class="etapa-pill">' + textoNota(n) + "</span>";
+    })
+    .join("");
   var percentual = media !== null ? Math.min(media, 100) : 0;
-  var mediaHTML = '<div class="media-cell"><span>' + textoNota(media) + '</span><div class="media-bar"><div class="media-bar-fill ' + status + '" style="width:' + percentual + '%"></div></div></div>';
+  var mediaHTML =
+    '<div class="media-cell"><span>' +
+    textoNota(media) +
+    '</span><div class="media-bar"><div class="media-bar-fill ' +
+    status +
+    '" style="width:' +
+    percentual +
+    '%"></div></div></div>';
   var temEtapaEmAberto = calc.temEtapaAberta;
   var simuladorHTML = temEtapaEmAberto
-    ? `<div class="simulador-cell"><input type="number" class="simulador-input" data-codigo="${escaparHTML(codigo)}" min="0" max="100" step="0.1" placeholder="Nota" value="${sim != null ? sim : ''}" />${calc.simulando ? `<span class="simulador-resultado ${status === 'aprovado' ? 'ok' : status === 'recuperacao' ? 'mid' : 'ruim'}">${textoNota(media)}</span>` : ''}</div>`
+    ? `<div class="simulador-cell"><input type="number" class="simulador-input" data-codigo="${escaparHTML(
+        codigo
+      )}" min="0" max="100" step="0.1" placeholder="Nota" value="${
+        sim != null ? sim : ""
+      }" />${
+        calc.simulando
+          ? `<span class="simulador-resultado ${
+              status === "aprovado"
+                ? "ok"
+                : status === "recuperacao"
+                ? "mid"
+                : "ruim"
+            }">${textoNota(media)}</span>`
+          : ""
+      }</div>`
     : '<span style="color:var(--text-muted);font-size:.8rem;">Fechada</span>';
   var metaCustom = __metasDisciplinas[codigo] != null;
-  var metaHTML = `<button type="button" class="btn-meta-disciplina ${metaCustom ? 'customizada' : ''}" data-codigo="${escaparHTML(codigo)}" data-nome="${escaparHTML(d.disciplina || codigo)}" title="Meta: ${metaDisc}">🎯</button>`;
+  var metaHTML = `<button type="button" class="btn-meta-disciplina ${
+    metaCustom ? "customizada" : ""
+  }" data-codigo="${escaparHTML(codigo)}" data-nome="${escaparHTML(
+    d.disciplina || codigo
+  )}" title="Meta: ${metaDisc}">🎯</button>`;
   var tr = document.createElement("tr");
   tr.className = [linhaRisco, linhaSim].filter(Boolean).join(" ");
   tr.dataset.grupoLinha = tipo;
   tr.dataset.codigo = codigo;
   tr.innerHTML =
-    '<td class="td-disciplina"><strong>' + escaparHTML(d.disciplina || d.codigo_diario || "Disciplina") + '</strong></td>' +
-    '<td><div class="etapas-cell">' + (etapasHTML || '<span class="etapa-pill">—</span>') + '</div></td>' +
-    '<td class="td-media">' + mediaHTML + '</td>' +
-    '<td class="td-faltas"><span class="faltas-cell ' + faltasClasse + '">' + faltas + '</span></td>' +
-    '<td class="td-projecao"><span class="projecao-cell ' + proj.classe + '">' + proj.texto + '</span></td>' +
-    '<td class="td-status"><span class="badge badge-' + status + '">' + badgeLabel + '</span></td>' +
-    '<td class="td-simulador">' + simuladorHTML + '</td>' +
-    '<td class="td-meta">' + metaHTML + '</td>';
+    '<td class="td-disciplina"><strong>' +
+    escaparHTML(d.disciplina || d.codigo_diario || "Disciplina") +
+    "</strong></td>" +
+    '<td><div class="etapas-cell">' +
+    (etapasHTML || '<span class="etapa-pill">—</span>') +
+    "</div></td>" +
+    '<td class="td-media">' +
+    mediaHTML +
+    "</td>" +
+    '<td class="td-faltas"><span class="faltas-cell ' +
+    faltasClasse +
+    '">' +
+    faltas +
+    "</span></td>" +
+    '<td class="td-projecao"><span class="projecao-cell ' +
+    proj.classe +
+    '">' +
+    proj.texto +
+    "</span></td>" +
+    '<td class="td-status"><span class="badge badge-' +
+    status +
+    '">' +
+    badgeLabel +
+    "</span></td>" +
+    '<td class="td-simulador">' +
+    simuladorHTML +
+    "</td>" +
+    '<td class="td-meta">' +
+    metaHTML +
+    "</td>";
   return tr;
 }
 
@@ -1637,28 +2404,57 @@ function atualizarLinhaNota(tr, d, meta) {
   var calc = calcularMediaSimples(d, etapas, sim);
   var media = calc.media;
   var status = classificarStatusNota(media, faltas, metaDisc);
-  var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, etapas.length, calc.somaComSim, metaDisc);
-  tr.classList.toggle("linha-risco", status === "reprovado" || faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT);
+  var proj = calcularProjecaoDisciplina(
+    calc.preenchidasComSim,
+    etapas.length,
+    calc.somaComSim,
+    metaDisc
+  );
+  tr.classList.toggle(
+    "linha-risco",
+    status === "reprovado" || faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT
+  );
   tr.classList.toggle("simulando", calc.simulando);
   var tdMedia = tr.querySelector(".td-media");
   if (tdMedia) {
     var percentual = media !== null ? Math.min(media, 100) : 0;
-    tdMedia.innerHTML = '<div class="media-cell"><span>' + textoNota(media) + '</span><div class="media-bar"><div class="media-bar-fill ' + status + '" style="width:' + percentual + '%"></div></div></div>';
+    tdMedia.innerHTML =
+      '<div class="media-cell"><span>' +
+      textoNota(media) +
+      '</span><div class="media-bar"><div class="media-bar-fill ' +
+      status +
+      '" style="width:' +
+      percentual +
+      '%"></div></div></div>';
   }
   var tdProj = tr.querySelector(".td-projecao");
-  if (tdProj) tdProj.innerHTML = '<span class="projecao-cell ' + proj.classe + '">' + proj.texto + '</span>';
+  if (tdProj)
+    tdProj.innerHTML =
+      '<span class="projecao-cell ' +
+      proj.classe +
+      '">' +
+      proj.texto +
+      "</span>";
   var tdStatus = tr.querySelector(".td-status");
   if (tdStatus) {
-    var badgeLabel = { aprovado: '<i class="fa-solid fa-check"></i> ' + t("leg_aprovado"), recuperacao: '<i class="fa-solid fa-rotate"></i> ' + t("leg_recuperacao"), reprovado: '<i class="fa-solid fa-xmark"></i> ' + t("leg_reprovado") }[status];
-    tdStatus.innerHTML = '<span class="badge badge-' + status + '">' + badgeLabel + '</span>';
+    var badgeLabel = {
+      aprovado: '<i class="fa-solid fa-check"></i> ' + t("leg_aprovado"),
+      recuperacao: '<i class="fa-solid fa-rotate"></i> ' + t("leg_recuperacao"),
+      reprovado: '<i class="fa-solid fa-xmark"></i> ' + t("leg_reprovado"),
+    }[status];
+    tdStatus.innerHTML =
+      '<span class="badge badge-' + status + '">' + badgeLabel + "</span>";
   }
   var tdSim = tr.querySelector(".td-simulador");
   if (tdSim) {
     var resultadoEl = tdSim.querySelector(".simulador-resultado");
     if (calc.simulando) {
-      var classeRes = status === 'aprovado' ? 'ok' : status === 'recuperacao' ? 'mid' : 'ruim';
-      if (resultadoEl) { resultadoEl.className = 'simulador-resultado ' + classeRes; resultadoEl.textContent = textoNota(media); }
-      else {
+      var classeRes =
+        status === "aprovado" ? "ok" : status === "recuperacao" ? "mid" : "ruim";
+      if (resultadoEl) {
+        resultadoEl.className = "simulador-resultado " + classeRes;
+        resultadoEl.textContent = textoNota(media);
+      } else {
         var input = tdSim.querySelector(".simulador-input");
         if (input) {
           var span = document.createElement("span");
@@ -1681,31 +2477,42 @@ function bindSimuladores(corpo) {
       if (val === "") delete __simulacoes[cod];
       else {
         var num = Number(String(val).replace(",", "."));
-        if (Number.isFinite(num)) __simulacoes[cod] = Math.max(0, Math.min(100, num));
+        if (Number.isFinite(num))
+          __simulacoes[cod] = Math.max(0, Math.min(100, num));
       }
       var tr = input.closest("tr");
-      var d = __notasCache.find(function (x) { return getCodigoDisc(x) === cod; });
-      if (tr && d) { atualizarLinhaNota(tr, d, __metaAtual); atualizarResumoNotas(__notasCache); }
+      var d = __notasCache.find(function (x) {
+        return getCodigoDisc(x) === cod;
+      });
+      if (tr && d) {
+        atualizarLinhaNota(tr, d, __metaAtual);
+        atualizarResumoNotas(__notasCache);
+      }
     });
   });
   corpo.querySelectorAll(".btn-meta-disciplina").forEach(function (btn) {
     if (btn.dataset.bound) return;
     btn.dataset.bound = "1";
-    btn.addEventListener("click", function () { abrirModalMetaDisciplina(btn.dataset.codigo, btn.dataset.nome); });
+    btn.addEventListener("click", function () {
+      abrirModalMetaDisciplina(btn.dataset.codigo, btn.dataset.nome);
+    });
   });
 }
 
 function abrirModalMetaDisciplina(codigo, nome) {
   var modal = document.getElementById("modal-meta-disciplina");
   if (!modal) return;
-  var atual = __metasDisciplinas[codigo] != null ? __metasDisciplinas[codigo] : __metaAtual;
+  var atual =
+    __metasDisciplinas[codigo] != null ? __metasDisciplinas[codigo] : __metaAtual;
   var rangeInput = modal.querySelector('input[type="range"]');
   var numEl = modal.querySelector(".meta-num");
   var nomeEl = modal.querySelector(".meta-disciplina-nome");
   nomeEl.textContent = nome;
   rangeInput.value = atual;
   numEl.textContent = atual;
-  rangeInput.oninput = function () { numEl.textContent = rangeInput.value; };
+  rangeInput.oninput = function () {
+    numEl.textContent = rangeInput.value;
+  };
   var btnReset = modal.querySelector("[data-reset]");
   var btnSalvar = modal.querySelector("[data-salvar]");
   var btnFechar = modal.querySelector("[data-fechar]");
@@ -1723,65 +2530,154 @@ function abrirModalMetaDisciplina(codigo, nome) {
     if (__notasCache.length) renderizarNotas(__notasCache);
     exibirToast("Meta salva (" + rangeInput.value + ").", "sucesso");
   };
-  btnFechar.onclick = function () { modal.classList.add("is-hidden"); };
-  modal.onclick = function (e) { if (e.target === modal) modal.classList.add("is-hidden"); };
+  btnFechar.onclick = function () {
+    modal.classList.add("is-hidden");
+  };
+  modal.onclick = function (e) {
+    if (e.target === modal) modal.classList.add("is-hidden");
+  };
   modal.classList.remove("is-hidden");
 }
 
 function exportarCSV() {
-  if (!__notasCache.length) { exibirToast("Nada para exportar.", "erro"); return; }
+  if (!__notasCache.length) {
+    exibirToast("Nada para exportar.", "erro");
+    return;
+  }
   var linhas = [];
-  linhas.push(["Disciplina", "Tipo", "Etapas", "Média", "Meta", "Faltas", "Projeção", "Status"].join(";"));
+  linhas.push(
+    ["Disciplina", "Tipo", "Etapas", "Média", "Meta", "Faltas", "Projeção", "Status"].join(
+      ";"
+    )
+  );
   __notasCache.forEach(function (d) {
     var cfg = obterEtapasDaDisciplina(d);
-    var calc = calcularMediaSimples(d, cfg.etapas, __simulacoes[getCodigoDisc(d)]);
+    var calc = calcularMediaSimples(
+      d,
+      cfg.etapas,
+      __simulacoes[getCodigoDisc(d)]
+    );
     var faltas = Number(d.numero_faltas) || 0;
     var meta = metaEfetiva(d);
     var st = classificarStatusNota(calc.media, faltas, meta);
-    var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, cfg.etapas.length, calc.somaComSim, meta);
-    linhas.push([(d.disciplina || d.codigo_diario || "").replace(/;/g, ","), cfg.tipo, cfg.etapas.map(function (n) { var e = d["nota_etapa_" + n]; return textoNota(formatarNota(e && typeof e === "object" ? e.nota : e)); }).join(" | "), textoNota(calc.media), meta, faltas, proj.texto, st].join(";"));
+    var proj = calcularProjecaoDisciplina(
+      calc.preenchidasComSim,
+      cfg.etapas.length,
+      calc.somaComSim,
+      meta
+    );
+    linhas.push(
+      [
+        (d.disciplina || d.codigo_diario || "").replace(/;/g, ","),
+        cfg.tipo,
+        cfg.etapas
+          .map(function (n) {
+            var e = d["nota_etapa_" + n];
+            return textoNota(
+              formatarNota(e && typeof e === "object" ? e.nota : e)
+            );
+          })
+          .join(" | "),
+        textoNota(calc.media),
+        meta,
+        faltas,
+        proj.texto,
+        st,
+      ].join(";")
+    );
   });
   var csv = "\uFEFF" + linhas.join("\n");
   var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   var url = URL.createObjectURL(blob);
   var a = document.createElement("a");
-  var periodo = (document.getElementById("periodo-notas")?.value || "boletim").replace("/", ".");
-  a.href = url; a.download = "boletim_" + periodo + ".csv";
-  document.body.appendChild(a); a.click(); a.remove();
+  var periodo = (
+    document.getElementById("periodo-notas")?.value || "boletim"
+  ).replace("/", ".");
+  a.href = url;
+  a.download = "boletim_" + periodo + ".csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
   URL.revokeObjectURL(url);
   exibirToast("CSV exportado!", "sucesso");
 }
 
 function exportarPDF() {
-  if (!__notasCache.length) { exibirToast("Nada para exportar.", "erro"); return; }
+  if (!__notasCache.length) {
+    exibirToast("Nada para exportar.", "erro");
+    return;
+  }
   var periodo = document.getElementById("periodo-notas")?.value || "";
   var nome = window.usuarioLogado.nome || "Aluno";
   var mat = window.usuarioLogado.matricula || "";
   var linhasHTML = "";
   ["Semestral", "Anual"].forEach(function (tipo) {
-    var doTipo = __notasCache.filter(function (d) { return obterEtapasDaDisciplina(d).tipo === tipo; });
+    var doTipo = __notasCache.filter(function (d) {
+      return obterEtapasDaDisciplina(d).tipo === tipo;
+    });
     if (!doTipo.length) return;
-    linhasHTML += `<tr class="grupo"><td colspan="6"><strong>${tipo === "Semestral" ? "Matérias Semestrais" : "Matérias Anuais"}</strong></td></tr>`;
+    linhasHTML += `<tr class="grupo"><td colspan="6"><strong>${
+      tipo === "Semestral" ? "Matérias Semestrais" : "Matérias Anuais"
+    }</strong></td></tr>`;
     doTipo.forEach(function (d) {
       var cfg = obterEtapasDaDisciplina(d);
-      var calc = calcularMediaSimples(d, cfg.etapas, __simulacoes[getCodigoDisc(d)]);
+      var calc = calcularMediaSimples(
+        d,
+        cfg.etapas,
+        __simulacoes[getCodigoDisc(d)]
+      );
       var faltas = Number(d.numero_faltas) || 0;
       var meta = metaEfetiva(d);
       var st = classificarStatusNota(calc.media, faltas, meta);
-      var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, cfg.etapas.length, calc.somaComSim, meta);
-      var cor = st === "aprovado" ? "#10b981" : st === "recuperacao" ? "#f59e0b" : "#ff4757";
-      linhasHTML += `<tr><td>${escaparHTML(d.disciplina || d.codigo_diario || "")}</td><td>${cfg.etapas.map(function (n) { var e = d["nota_etapa_" + n]; return textoNota(formatarNota(e && typeof e === "object" ? e.nota : e)); }).join(" | ")}</td><td>${textoNota(calc.media)}</td><td>${faltas}</td><td>${proj.texto}</td><td style="color:${cor};font-weight:700">${st}</td></tr>`;
+      var proj = calcularProjecaoDisciplina(
+        calc.preenchidasComSim,
+        cfg.etapas.length,
+        calc.somaComSim,
+        meta
+      );
+      var cor =
+        st === "aprovado"
+          ? "#10b981"
+          : st === "recuperacao"
+          ? "#f59e0b"
+          : "#ff4757";
+      linhasHTML += `<tr><td>${escaparHTML(
+        d.disciplina || d.codigo_diario || ""
+      )}</td><td>${cfg.etapas
+        .map(function (n) {
+          var e = d["nota_etapa_" + n];
+          return textoNota(formatarNota(e && typeof e === "object" ? e.nota : e));
+        })
+        .join(" | ")}</td><td>${textoNota(calc.media)}</td><td>${faltas}</td><td>${
+        proj.texto
+      }</td><td style="color:${cor};font-weight:700">${st}</td></tr>`;
     });
   });
   var w = window.open("", "_blank");
-  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Boletim ${escaparHTML(nome)}</title><style>*{font-family:'Segoe UI',Arial,sans-serif;}body{padding:30px;color:#222;}h1{font-size:20px;margin:0 0 4px;}.sub{color:#666;font-size:12px;margin-bottom:20px;}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;}th,td{border:1px solid #ccc;padding:6px 8px;text-align:left;}th{background:#f3f0fa;}tr.grupo td{background:#ece7f8;font-size:13px;}.rodape{margin-top:24px;font-size:10px;color:#999;text-align:center;}@media print{body{padding:10px;}}</style></head><body><h1>Boletim Acadêmico — ${escaparHTML(nome)}</h1><div class="sub">Matrícula: ${escaparHTML(mat)} • Período: ${escaparHTML(periodo)} • Emitido em ${new Date().toLocaleString("pt-BR")}</div><table><thead><tr><th>Disciplina</th><th>Etapas</th><th>Média</th><th>Faltas</th><th>Projeção</th><th>Status</th></tr></thead><tbody>${linhasHTML}</tbody></table><div class="rodape">Gerado pelo Portal InfoWeb 2V — IFRN</div><script>window.onload=()=>setTimeout(()=>window.print(),300);<\/script></body></html>`);
+  w.document.write(
+    `<!doctype html><html><head><meta charset="utf-8"><title>Boletim ${escaparHTML(
+      nome
+    )}</title><style>*{font-family:'Segoe UI',Arial,sans-serif;}body{padding:30px;color:#222;}h1{font-size:20px;margin:0 0 4px;}.sub{color:#666;font-size:12px;margin-bottom:20px;}table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;}th,td{border:1px solid #ccc;padding:6px 8px;text-align:left;}th{background:#f3f0fa;}tr.grupo td{background:#ece7f8;font-size:13px;}.rodape{margin-top:24px;font-size:10px;color:#999;text-align:center;}@media print{body{padding:10px;}}</style></head><body><h1>Boletim Acadêmico — ${escaparHTML(
+      nome
+    )}</h1><div class="sub">Matrícula: ${escaparHTML(
+      mat
+    )} • Período: ${escaparHTML(
+      periodo
+    )} • Emitido em ${new Date().toLocaleString(
+      "pt-BR"
+    )}</div><table><thead><tr><th>Disciplina</th><th>Etapas</th><th>Média</th><th>Faltas</th><th>Projeção</th><th>Status</th></tr></thead><tbody>${linhasHTML}</tbody></table><div class="rodape">Gerado pelo Portal InfoWeb 2V — IFRN</div><script>window.onload=()=>setTimeout(()=>window.print(),300);<\/script></body></html>`
+  );
   w.document.close();
 }
 
 function carregarBoletim(ano, periodo) {
   atualizarStatusNotas("Buscando notas no SUAP...", "loading");
   suap.getAuthenticatedResource(
-    "/api/ensino/meu-boletim/" + encodeURIComponent(ano) + "/" + encodeURIComponent(periodo) + "/?page=1",
+    "/api/ensino/meu-boletim/" +
+      encodeURIComponent(ano) +
+      "/" +
+      encodeURIComponent(periodo) +
+      "/?page=1",
     function (resposta) {
       var disciplinas = resposta.results || [];
       renderizarNotas(disciplinas);
@@ -1792,7 +2688,10 @@ function carregarBoletim(ano, periodo) {
     },
     function (xhr) {
       renderizarNotas([]);
-      atualizarStatusNotas("Erro ao carregar boletim (HTTP " + xhr.status + ").", "erro");
+      atualizarStatusNotas(
+        "Erro ao carregar boletim (HTTP " + xhr.status + ").",
+        "erro"
+      );
     }
   );
 }
@@ -1813,77 +2712,134 @@ function carregarPeriodosNotas() {
         if (indice === 0) opcao.selected = true;
       });
       seletor.disabled = !periodos.length;
-      if (periodos.length) carregarBoletim(periodos[0].ano_letivo, periodos[0].periodo_letivo);
+      if (periodos.length)
+        carregarBoletim(periodos[0].ano_letivo, periodos[0].periodo_letivo);
       else atualizarStatusNotas("Nenhum período disponível.", "erro");
     },
-    function (xhr) { atualizarStatusNotas("Erro nos períodos (HTTP " + xhr.status + ").", "erro"); }
+    function (xhr) {
+      atualizarStatusNotas("Erro nos períodos (HTTP " + xhr.status + ").", "erro");
+    }
   );
 }
 
 // ==========================================
 // NOTIFICAÇÕES
 // ==========================================
-const CHAVE_NOTIF_LIDAS = () => "notif_lidas_" + (window.usuarioLogado.matricula || "anon");
+const CHAVE_NOTIF_LIDAS = () =>
+  "notif_lidas_" + (window.usuarioLogado.matricula || "anon");
 let __notificacoes = [];
 
 function gerarNotificacoesRecados() {
   var mat = window.usuarioLogado.matricula;
   if (!mat) return;
   var lidas = {};
-  try { var raw = localStorage.getItem(CHAVE_NOTIF_LIDAS()); lidas = raw ? JSON.parse(raw) : {}; } catch (e) { lidas = {}; }
+  try {
+    var raw = localStorage.getItem(CHAVE_NOTIF_LIDAS());
+    lidas = raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    lidas = {};
+  }
   __notificacoes = [];
   bancoDeRecados.forEach(function (r) {
     if (r.autor_matricula === mat) return;
     var idade = Date.now() - (r.timestampCriacao || 0);
     if (idade > 30 * 24 * 60 * 60 * 1000) return;
-    __notificacoes.push({ id: r.id, tipo: "recado", icone: "fa-regular fa-comment-dots", titulo: "Novo recado de " + nomeParaExibicao(r.autor_nome), descricao: (r.mensagem || "").slice(0, 80) + ((r.mensagem || "").length > 80 ? "..." : ""), data: r.timestampCriacao, lida: !!lidas[r.id] });
+    __notificacoes.push({
+      id: r.id,
+      tipo: "recado",
+      icone: "fa-regular fa-comment-dots",
+      titulo: "Novo recado de " + nomeParaExibicao(r.autor_nome),
+      descricao:
+        (r.mensagem || "").slice(0, 80) +
+        ((r.mensagem || "").length > 80 ? "..." : ""),
+      data: r.timestampCriacao,
+      lida: !!lidas[r.id],
+    });
   });
-  __notificacoes.sort(function (a, b) { return b.data - a.data; });
+  __notificacoes.sort(function (a, b) {
+    return b.data - a.data;
+  });
   atualizarBadgeNotificacoes();
 }
 
 function atualizarBadgeNotificacoes() {
   var btn = document.getElementById("btn-notificacoes");
   var badge = document.getElementById("badge-notificacoes");
-  var naoLidas = __notificacoes.filter(function (n) { return !n.lida; }).length;
+  var naoLidas = __notificacoes.filter(function (n) {
+    return !n.lida;
+  }).length;
   if (btn) btn.classList.remove("is-hidden");
   if (badge) {
-    if (naoLidas > 0) { badge.textContent = naoLidas > 9 ? "9+" : naoLidas; badge.classList.remove("is-hidden"); }
-    else badge.classList.add("is-hidden");
+    if (naoLidas > 0) {
+      badge.textContent = naoLidas > 9 ? "9+" : naoLidas;
+      badge.classList.remove("is-hidden");
+    } else badge.classList.add("is-hidden");
   }
 }
 
 function renderizarPainelNotificacoes() {
   var lista = document.getElementById("lista-notificacoes");
   if (!lista) return;
-  if (__notificacoes.length === 0) { lista.innerHTML = `<p class="notif-vazio">${escaparHTML(t("sem_notif"))}</p>`; return; }
-  lista.innerHTML = __notificacoes.map(function (n) {
-    var dataStr = new Date(n.data).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
-    return `<div class="notif-item ${n.lida ? "" : "nao-lida"}" data-id="${n.id}"><div class="notif-icone"><i class="${n.icone}"></i></div><div class="notif-corpo"><div class="notif-titulo">${escaparHTML(n.titulo)}</div><div class="notif-descricao">${escaparHTML(n.descricao)}</div><div class="notif-data">${dataStr}</div></div></div>`;
-  }).join("");
+  if (__notificacoes.length === 0) {
+    lista.innerHTML = `<p class="notif-vazio">${escaparHTML(
+      t("sem_notif")
+    )}</p>`;
+    return;
+  }
+  lista.innerHTML = __notificacoes
+    .map(function (n) {
+      var dataStr = new Date(n.data).toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      return `<div class="notif-item ${
+        n.lida ? "" : "nao-lida"
+      }" data-id="${n.id}"><div class="notif-icone"><i class="${
+        n.icone
+      }"></i></div><div class="notif-corpo"><div class="notif-titulo">${escaparHTML(
+        n.titulo
+      )}</div><div class="notif-descricao">${escaparHTML(
+        n.descricao
+      )}</div><div class="notif-data">${dataStr}</div></div></div>`;
+    })
+    .join("");
   lista.querySelectorAll(".notif-item").forEach(function (el) {
     el.addEventListener("click", function () {
       var id = el.dataset.id;
       marcarNotificacaoLida(id);
       document.getElementById("mural")?.scrollIntoView({ behavior: "smooth" });
-      document.getElementById("painel-notificacoes")?.classList.add("is-hidden");
+      document
+        .getElementById("painel-notificacoes")
+        ?.classList.add("is-hidden");
     });
   });
 }
 
 function marcarNotificacaoLida(id) {
   var lidas = {};
-  try { var raw = localStorage.getItem(CHAVE_NOTIF_LIDAS()); lidas = raw ? JSON.parse(raw) : {}; } catch (e) { lidas = {}; }
+  try {
+    var raw = localStorage.getItem(CHAVE_NOTIF_LIDAS());
+    lidas = raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    lidas = {};
+  }
   lidas[id] = true;
   localStorage.setItem(CHAVE_NOTIF_LIDAS(), JSON.stringify(lidas));
-  __notificacoes.forEach(function (n) { if (n.id === id) n.lida = true; });
+  __notificacoes.forEach(function (n) {
+    if (n.id === id) n.lida = true;
+  });
   atualizarBadgeNotificacoes();
   renderizarPainelNotificacoes();
 }
 
 function marcarTodasLidas() {
   var lidas = {};
-  __notificacoes.forEach(function (n) { lidas[n.id] = true; n.lida = true; });
+  __notificacoes.forEach(function (n) {
+    lidas[n.id] = true;
+    n.lida = true;
+  });
   localStorage.setItem(CHAVE_NOTIF_LIDAS(), JSON.stringify(lidas));
   atualizarBadgeNotificacoes();
   renderizarPainelNotificacoes();
@@ -1917,21 +2873,41 @@ function renderizarProximosEventos(eventos) {
     return;
   }
   document.getElementById("proximos-eventos")?.classList.remove("is-hidden");
-  var MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-  container.innerHTML = proximos.map(function (ev) {
-    var inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
-    var dia = inicio.getDate();
-    var mes = MESES[inicio.getMonth()];
-    var diffDias = Math.floor((inicio - hoje) / (1000 * 60 * 60 * 24));
-    var classeCard = "evento-card";
-    var badgeHTML = "";
-    if (diffDias === 0) { classeCard += " hoje"; badgeHTML = '<span class="evento-badge hoje"><i class="fa-solid fa-fire"></i> HOJE</span>'; }
-    else if (diffDias === 1) { classeCard += " destaque"; badgeHTML = '<span class="evento-badge amanha">Amanhã</span>'; }
-    else if (diffDias <= 3) { classeCard += " destaque"; badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`; }
-    else badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`;
-    var cor = ev.backgroundColor || ev.borderColor || "#8b5edd";
-    return `<div class="${classeCard}" style="border-left-color:${cor}"><div class="evento-data" style="background:${cor}22"><span class="evento-dia" style="color:${cor}">${String(dia).padStart(2, "0")}</span><span class="evento-mes">${mes}</span></div><div class="evento-info"><div class="evento-titulo">${escaparHTML(ev.title || "Sem título")}</div><div class="evento-descricao">${inicio.toLocaleDateString("pt-BR", { weekday: "long" })}</div>${badgeHTML}</div></div>`;
-  }).join("");
+  var MESES = [
+    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+    "Jul", "Ago", "Set", "Out", "Nov", "Dez",
+  ];
+  container.innerHTML = proximos
+    .map(function (ev) {
+      var inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
+      var dia = inicio.getDate();
+      var mes = MESES[inicio.getMonth()];
+      var diffDias = Math.floor((inicio - hoje) / (1000 * 60 * 60 * 24));
+      var classeCard = "evento-card";
+      var badgeHTML = "";
+      if (diffDias === 0) {
+        classeCard += " hoje";
+        badgeHTML =
+          '<span class="evento-badge hoje"><i class="fa-solid fa-fire"></i> HOJE</span>';
+      } else if (diffDias === 1) {
+        classeCard += " destaque";
+        badgeHTML = '<span class="evento-badge amanha">Amanhã</span>';
+      } else if (diffDias <= 3) {
+        classeCard += " destaque";
+        badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`;
+      } else
+        badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`;
+      var cor = ev.backgroundColor || ev.borderColor || "#8b5edd";
+      return `<div class="${classeCard}" style="border-left-color:${cor}"><div class="evento-data" style="background:${cor}22"><span class="evento-dia" style="color:${cor}">${String(
+        dia
+      ).padStart(2, "0")}</span><span class="evento-mes">${mes}</span></div><div class="evento-info"><div class="evento-titulo">${escaparHTML(
+        ev.title || "Sem título"
+      )}</div><div class="evento-descricao">${inicio.toLocaleDateString(
+        "pt-BR",
+        { weekday: "long" }
+      )}</div>${badgeHTML}</div></div>`;
+    })
+    .join("");
 }
 
 function initCalculadoraNotas() {
@@ -1947,7 +2923,9 @@ function initCalculadoraNotas() {
   const elMetaValor = document.getElementById("meta-valor");
   if (elMeta && !elMeta.dataset.bound) {
     elMeta.dataset.bound = "1";
-    elMeta.addEventListener("input", function (e) { if (elMetaValor) elMetaValor.textContent = e.target.value; });
+    elMeta.addEventListener("input", function (e) {
+      if (elMetaValor) elMetaValor.textContent = e.target.value;
+    });
     elMeta.addEventListener("change", function (e) {
       __metaAtual = Number(e.target.value) || 60;
       if (__notasCache.length) renderizarNotas(__notasCache);
@@ -1958,7 +2936,11 @@ function initCalculadoraNotas() {
     if (chip.dataset.bound) return;
     chip.dataset.bound = "1";
     chip.addEventListener("click", function () {
-      document.querySelectorAll(".filtro-chip").forEach(function (c) { c.classList.remove("ativo"); });
+      document
+        .querySelectorAll(".filtro-chip")
+        .forEach(function (c) {
+          c.classList.remove("ativo");
+        });
       chip.classList.add("ativo");
       __filtroAtivo = chip.dataset.filtro || "todas";
       if (__notasCache.length) renderizarNotas(__notasCache);
@@ -1974,21 +2956,29 @@ function initCalculadoraNotas() {
       if (periodo.length === 2) carregarBoletim(periodo[0], periodo[1]);
     });
   }
-  document.querySelectorAll(".tabela-notas thead th.sortable").forEach(function (th) {
-    if (th.dataset.bound) return;
-    th.dataset.bound = "1";
-    th.addEventListener("click", function () { aplicarSort(th.dataset.sort); });
-  });
+  document
+    .querySelectorAll(".tabela-notas thead th.sortable")
+    .forEach(function (th) {
+      if (th.dataset.bound) return;
+      th.dataset.bound = "1";
+      th.addEventListener("click", function () {
+        aplicarSort(th.dataset.sort);
+      });
+    });
   document.getElementById("btn-export-csv")?.addEventListener("click", exportarCSV);
   document.getElementById("btn-export-pdf")?.addEventListener("click", exportarPDF);
-  document.getElementById("btn-limpar-simulador")?.addEventListener("click", function () {
-    __simulacoes = {};
-    if (__notasCache.length) renderizarNotas(__notasCache);
-    exibirToast("Simulações limpas.", "sucesso");
-  });
-  document.getElementById("btn-toggle-historico")?.addEventListener("click", function () {
-    document.getElementById("historico-panel")?.classList.toggle("colapsado");
-  });
+  document
+    .getElementById("btn-limpar-simulador")
+    ?.addEventListener("click", function () {
+      __simulacoes = {};
+      if (__notasCache.length) renderizarNotas(__notasCache);
+      exibirToast("Simulações limpas.", "sucesso");
+    });
+  document
+    .getElementById("btn-toggle-historico")
+    ?.addEventListener("click", function () {
+      document.getElementById("historico-panel")?.classList.toggle("colapsado");
+    });
   const btnNotif = document.getElementById("btn-notificacoes");
   const painelNotif = document.getElementById("painel-notificacoes");
   if (btnNotif && !btnNotif.dataset.bound) {
@@ -2002,7 +2992,11 @@ function initCalculadoraNotas() {
   document.getElementById("btn-marcar-lidas")?.addEventListener("click", marcarTodasLidas);
   document.addEventListener("click", function (e) {
     if (!painelNotif || painelNotif.classList.contains("is-hidden")) return;
-    if (!e.target.closest("#painel-notificacoes") && !e.target.closest("#btn-notificacoes")) painelNotif.classList.add("is-hidden");
+    if (
+      !e.target.closest("#painel-notificacoes") &&
+      !e.target.closest("#btn-notificacoes")
+    )
+      painelNotif.classList.add("is-hidden");
   });
   carregarMetasDisciplinas();
 }
@@ -2021,7 +3015,9 @@ document.addEventListener("DOMContentLoaded", function () {
   renderizarLegendaCalendario();
 
   document.querySelectorAll("#menu-idioma .dropdown-item").forEach(function (btn) {
-    btn.addEventListener("click", function () { trocarIdioma(btn.dataset.idioma); });
+    btn.addEventListener("click", function () {
+      trocarIdioma(btn.dataset.idioma);
+    });
   });
 
   document.querySelectorAll("#menu-tema .dropdown-item").forEach(function (btn) {
@@ -2045,12 +3041,18 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  document.getElementById("btn-instalar-app")?.addEventListener("click", instalarPWA);
+  document
+    .getElementById("btn-instalar-app")
+    ?.addEventListener("click", instalarPWA);
 
   const btnLogin = document.getElementById("suap-login-button");
   if (btnLogin) btnLogin.setAttribute("href", suap.getLoginURL());
   const btnLogout = document.getElementById("suap-logout-button");
-  if (btnLogout) btnLogout.addEventListener("click", function (e) { e.preventDefault(); window.forceLogout(); });
+  if (btnLogout)
+    btnLogout.addEventListener("click", function (e) {
+      e.preventDefault();
+      window.forceLogout();
+    });
   const anoEl = document.getElementById("ano");
   if (anoEl) anoEl.textContent = new Date().getFullYear();
 
@@ -2058,7 +3060,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (window.location.hash.includes("access_token")) {
       history.replaceState(null, null, window.location.pathname);
     }
-    document.querySelectorAll(".is-authenticated").forEach(function (el) { el.classList.remove("is-hidden"); });
+    document.querySelectorAll(".is-authenticated").forEach(function (el) {
+      el.classList.remove("is-hidden");
+    });
     carregarPeriodosNotas();
 
     var calendarEl = document.getElementById("calendar");
@@ -2075,42 +3079,69 @@ document.addEventListener("DOMContentLoaded", function () {
         initialDate: "2026-09-01",
         validRange: { start: "2026-09-01", end: "2026-12-31" },
         googleCalendarApiKey: "AIzaSyB9XFKFwtZNQJrN2Kh7UPZxraPXEwqFytw",
-        events: "acb20a08d58749d48304dbda5c87bfb7f0671483ecc4ed942683ad5a1307e78d@group.calendar.google.com",
-        eventDidMount: function (info) { pintarElementoEvento(info.el, info.event.title); },
+        events:
+          "acb20a08d58749d48304dbda5c87bfb7f0671483ecc4ed942683ad5a1307e78d@group.calendar.google.com",
+        eventDidMount: function (info) {
+          pintarElementoEvento(info.el, info.event.title);
+        },
         eventsSet: function (eventos) {
           renderizarProximosEventos(eventos);
           setTimeout(function () {
-            document.querySelectorAll(".fc-event").forEach(function (el) { pintarElementoEvento(el, el.innerText || ""); });
+            document.querySelectorAll(".fc-event").forEach(function (el) {
+              pintarElementoEvento(el, el.innerText || "");
+            });
           }, 50);
         },
-        eventClick: function (arg) { window.open(arg.event.url, "_blank"); arg.jsEvent.preventDefault(); },
+        eventClick: function (arg) {
+          window.open(arg.event.url, "_blank");
+          arg.jsEvent.preventDefault();
+        },
       });
       calendar.render();
       var observer = new MutationObserver(function () {
         document.querySelectorAll(".fc-event").forEach(function (el) {
           var texto = el.innerText || "";
           var cor = corDoEvento(texto);
-          if (el.style.getPropertyValue("background-color") !== cor) pintarElementoEvento(el, texto);
+          if (el.style.getPropertyValue("background-color") !== cor)
+            pintarElementoEvento(el, texto);
         });
       });
-      observer.observe(calendarEl, { childList: true, subtree: true, attributes: true, attributeFilter: ["style"] });
+      observer.observe(calendarEl, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["style"],
+      });
     }
 
     var scope = suap.getToken().getScope();
     suap.getResource(scope, function (dados_suap) {
-      var fotoPath = dados_suap.url_foto_150x200 || dados_suap.url_foto_75x100 || dados_suap.foto || "";
+      var fotoPath =
+        dados_suap.url_foto_150x200 ||
+        dados_suap.url_foto_75x100 ||
+        dados_suap.foto ||
+        "";
       var fotoUrl = "";
       if (fotoPath) {
-        if (fotoPath.startsWith("http://") || fotoPath.startsWith("https://")) fotoUrl = fotoPath;
-        else { var fotoBaseUrl = "https://suap.ifrn.edu.br"; fotoUrl = fotoBaseUrl + (fotoPath.startsWith("/") ? "" : "/") + fotoPath; }
+        if (fotoPath.startsWith("http://") || fotoPath.startsWith("https://"))
+          fotoUrl = fotoPath;
+        else {
+          var fotoBaseUrl = "https://suap.ifrn.edu.br";
+          fotoUrl =
+            fotoBaseUrl + (fotoPath.startsWith("/") ? "" : "/") + fotoPath;
+        }
       } else {
-        fotoUrl = "https://ui-avatars.com/api/?name=" + encodeURIComponent(dados_suap.nome_usual || dados_suap.nome) + "&background=random";
+        fotoUrl =
+          "https://ui-avatars.com/api/?name=" +
+          encodeURIComponent(dados_suap.nome_usual || dados_suap.nome) +
+          "&background=random";
       }
       const userFotoEl = document.getElementById("user-foto");
       if (userFotoEl) userFotoEl.src = fotoUrl;
       const nomeSuap = dados_suap.nome_usual || dados_suap.nome;
       const nomeCompletoSuap = dados_suap.nome || nomeSuap;
-      const matriculaSuap = dados_suap.matricula || dados_suap.siape || "Matrícula não disponível";
+      const matriculaSuap =
+        dados_suap.matricula || dados_suap.siape || "Matrícula não disponível";
       const userNomeEl = document.getElementById("user-nome");
       if (userNomeEl) userNomeEl.textContent = nomeParaExibicao(nomeSuap);
       const userMatEl = document.getElementById("user-matricula");
@@ -2124,21 +3155,34 @@ document.addEventListener("DOMContentLoaded", function () {
         const perfilAlunoRef = ref(db, "perfis_alunos/" + matriculaSuap);
         get(perfilAlunoRef).then((snap) => {
           const dadosExistentes = snap.val() || {};
-          const payload = { nomeCompleto: nomeCompletoSuap, matricula: matriculaSuap, ultimoAcesso: Date.now() };
-          if (!dadosExistentes.nome || !String(dadosExistentes.nome).trim()) payload.nome = nomeParaExibicao(nomeSuap);
-          if (!dadosExistentes.foto || !String(dadosExistentes.foto).trim()) payload.foto = fotoUrl;
-          update(perfilAlunoRef, payload).then(() => { window.carregarPerfilUsuario(matriculaSuap); });
+          const payload = {
+            nomeCompleto: nomeCompletoSuap,
+            matricula: matriculaSuap,
+            ultimoAcesso: Date.now(),
+          };
+          if (!dadosExistentes.nome || !String(dadosExistentes.nome).trim())
+            payload.nome = nomeParaExibicao(nomeSuap);
+          if (!dadosExistentes.foto || !String(dadosExistentes.foto).trim())
+            payload.foto = fotoUrl;
+          update(perfilAlunoRef, payload).then(() => {
+            window.carregarPerfilUsuario(matriculaSuap);
+          });
         });
         carregarMetasDisciplinas();
         gerarNotificacoesRecados();
       }
 
       const inputRecadoNome = document.getElementById("recado-nome");
-      if (inputRecadoNome) { inputRecadoNome.style.display = "none"; inputRecadoNome.removeAttribute("required"); }
+      if (inputRecadoNome) {
+        inputRecadoNome.style.display = "none";
+        inputRecadoNome.removeAttribute("required");
+      }
       window.renderizarMural();
       window.renderizarPerfis();
     });
   } else {
-    document.querySelectorAll(".is-anonymous").forEach(function (el) { el.classList.remove("is-hidden"); });
+    document.querySelectorAll(".is-anonymous").forEach(function (el) {
+      el.classList.remove("is-hidden");
+    });
   }
 });
