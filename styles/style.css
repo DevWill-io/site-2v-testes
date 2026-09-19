@@ -411,14 +411,166 @@ body.light-theme .menu-lateral-footer {
     transform: translateY(-3px) rotate(-5deg);
 }
 
+/* 🆕 Submenus internos do menu lateral */
+.menu-submenu {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.25s ease, margin 0.25s ease;
+    margin-top: 0;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    padding: 0 12px;
+}
+body.light-theme .menu-submenu {
+    background: rgba(0, 0, 0, 0.03);
+}
+.menu-submenu.aberto {
+    max-height: 420px;
+    opacity: 1;
+    padding: 12px;
+    margin-top: 10px;
+}
+
+.menu-submenu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.92rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 4px;
+}
+.menu-submenu-item:hover {
+    background: hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.15);
+    border-color: var(--accent);
+}
+.menu-submenu-item.ativo {
+    background: var(--accent-strong);
+    color: #fff;
+    font-weight: 700;
+}
+.menu-submenu-item .submenu-flag {
+    font-size: 1.15rem;
+}
+
+.submenu-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--accent);
+    padding: 4px 4px 8px;
+    opacity: 0.9;
+}
+.submenu-titulo-modo {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+body.light-theme .submenu-titulo-modo {
+    border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+.submenu-cores {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+.submenu-cor {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+.submenu-cor:hover {
+    background: hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.15);
+    border-color: var(--accent);
+}
+.submenu-cor.ativo {
+    background: var(--accent-strong);
+    color: #fff;
+    font-weight: 700;
+    border-color: var(--accent);
+}
+.submenu-cor .tema-swatch {
+    width: 14px;
+    height: 14px;
+}
+
+.submenu-modos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+.submenu-modo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.submenu-modo:hover {
+    background: hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.15);
+    border-color: var(--accent);
+}
+.submenu-modo.ativo {
+    background: var(--accent-strong);
+    color: #fff;
+    border-color: var(--accent-strong);
+}
+.submenu-modo i {
+    font-size: 0.95rem;
+}
+
+.menu-acao-btn[aria-expanded="true"] {
+    background: hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.28);
+    border-color: var(--accent);
+}
+.menu-acao-btn[aria-expanded="true"] i {
+    transform: rotate(15deg);
+}
+
+/* Esconde os botões do header no mobile */
+@media (max-width: 1100px) {
+    .only-desktop { display: none !important; }
+    .nav-desktop { display: none; }
+}
+
+/* Esconde o menu lateral no desktop */
 @media (min-width: 1101px) {
     .btn-menu-hamburguer { display: none; }
     .menu-lateral,
     .menu-lateral-overlay { display: none; }
-}
-
-@media (max-width: 1100px) {
-    .nav-desktop { display: none; }
 }
 
 body.menu-aberto { overflow: hidden; }
@@ -831,167 +983,3 @@ body.light-theme .frase-do-dia {
 .btn-like { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; transition: var(--transition); }
 .btn-like:hover { color: var(--danger); transform: scale(1.1); }
 .sem-recados { text-align: center; padding: 40px; color: var(--text-muted); font-style: italic; }
-
-/* ==========================================
-   🆕 AJUSTES DO MENU LATERAL — v2
-   ========================================== */
-
-/* Esconde os botões de idioma/tema/toggle no mobile (só aparecem no menu lateral) */
-@media (max-width: 1100px) {
-    .only-desktop { display: none !important; }
-}
-
-/* Submenus internos do menu lateral */
-.menu-submenu {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: max-height 0.35s ease, opacity 0.25s ease, margin 0.25s ease;
-    margin-top: 0;
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 12px;
-    padding: 0 12px;
-}
-body.light-theme .menu-submenu {
-    background: rgba(0, 0, 0, 0.03);
-}
-
-.menu-submenu.aberto {
-    max-height: 420px;
-    opacity: 1;
-    padding: 12px;
-    margin-top: 10px;
-}
-
-/* Item do submenu (idioma) */
-.menu-submenu-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 10px;
-    background: transparent;
-    border: 1px solid transparent;
-    color: var(--text-main);
-    font-family: inherit;
-    font-size: 0.92rem;
-    text-align: left;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin-bottom: 4px;
-}
-.menu-submenu-item:hover {
-    background: hsl(var(--tema-h, 265), var(--tema-s, 60%), var(--tema-l, 62%) / 0.15);
-    border-color: var(--accent);
-}
-.menu-submenu-item.ativo {
-    background: var(--accent-strong);
-    color: #fff;
-    font-weight: 700;
-}
-.menu-submenu-item .submenu-flag {
-    font-size: 1.15rem;
-}
-
-/* Títulos internos */
-.submenu-titulo {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    color: var(--accent);
-    padding: 4px 4px 8px;
-    opacity: 0.9;
-}
-.submenu-titulo-modo {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-body.light-theme .submenu-titulo-modo {
-    border-top-color: rgba(0, 0, 0, 0.06);
-}
-
-/* Grade de cores */
-.submenu-cores {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-}
-.submenu-cor {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-    border-radius: 8px;
-    background: transparent;
-    border: 1px solid transparent;
-    color: var(--text-main);
-    font-family: inherit;
-    font-size: 0.82rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: left;
-}
-.submenu-cor:hover {
-    background: hsl(var(--tema-h, 265), var(--tema-s, 60%), var(--tema-l, 62%) / 0.15);
-    border-color: var(--accent);
-}
-.submenu-cor.ativo {
-    background: var(--accent-strong);
-    color: #fff;
-    font-weight: 700;
-    border-color: var(--accent);
-}
-.submenu-cor .tema-swatch {
-    width: 14px;
-    height: 14px;
-}
-
-/* Modos claro/escuro */
-.submenu-modos {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-}
-.submenu-modo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 9px 10px;
-    border-radius: 8px;
-    background: transparent;
-    border: 1px solid var(--border-color, rgba(206, 189, 236, 0.2));
-    color: var(--text-main);
-    font-family: inherit;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-.submenu-modo:hover {
-    background: hsl(var(--tema-h, 265), var(--tema-s, 60%), var(--tema-l, 62%) / 0.15);
-    border-color: var(--accent);
-}
-.submenu-modo.ativo {
-    background: var(--accent-strong);
-    color: #fff;
-    border-color: var(--accent-strong);
-}
-.submenu-modo i {
-    font-size: 0.95rem;
-}
-
-/* Roda do botão (quando aberto) */
-.menu-acao-btn[aria-expanded="true"] {
-    background: hsl(var(--tema-h, 265), var(--tema-s, 60%), var(--tema-l, 62%) / 0.28);
-    border-color: var(--accent);
-}
-.menu-acao-btn[aria-expanded="true"] i {
-    transform: rotate(15deg);
-}

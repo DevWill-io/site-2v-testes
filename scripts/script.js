@@ -4,7 +4,6 @@
 const TRADUCOES = {
   "pt-BR": {
     titulo_pagina: "Turma 2V | 1º Ano Informática IFRN",
-    // Navbar
     nav_inicio: "Início",
     nav_curso: "O Curso",
     nav_numeros: "Números",
@@ -15,9 +14,6 @@ const TRADUCOES = {
     nav_projetos: "Projetos",
     nav_contato: "Contato",
     nav_mascote: "Mascote",
-    // Ações do header
-    cor_tema: "Cor do tema",
-    modo: "Modo",  
     idioma: "Idioma",
     tema: "Tema",
     cor_roxo: "Roxo",
@@ -25,16 +21,16 @@ const TRADUCOES = {
     cor_verde: "Verde",
     cor_rosa: "Rosa",
     cor_laranja: "Laranja",
-    modo_claro: "Modo claro",
-    modo_escuro: "Modo escuro",
-    // Hero
+    cor_tema: "Cor do tema",
+    modo: "Modo",
+    modo_claro: "Claro",
+    modo_escuro: "Escuro",
     hero_badge: "IFRN Campus Caicó",
     hero_titulo_1: "A Turma do",
     hero_titulo_2: "Futuro",
     hero_typing_1: "1º Ano de",
     hero_btn_curso: "Conheça o Curso",
     hero_btn_suap: "Acessar SUAP",
-    // Curso
     curso_titulo_1: "Sobre o",
     curso_titulo_2: "Curso",
     curso_sub: "Informática para Internet no IFRN Caicó",
@@ -47,19 +43,16 @@ const TRADUCOES = {
     curso_card3_t: "Nosso Perfil",
     curso_card3_p:
       "Formamos profissionais capazes de atuar em agências de tecnologia, startups e grandes empresas, sempre focados em resolver problemas reais através do raciocínio lógico e da inovação.",
-    // Stats
     stats_titulo_1: "Nossos",
     stats_titulo_2: "Números",
     stats_sub: "A turma 2V em dados",
     stats_alunos: "Quantos Alunos?",
     stats_linhas: "Linhas de Código",
-    // Líderes
     lideres_titulo_1: "Nossos",
     lideres_titulo_2: "Líderes",
     lideres_sub: "Quem representa a turma?",
     lider_lider: "Líder de sala",
     lider_vice: "Vice-líder",
-    // Coordenadores
     coord_titulo_1: "Nossos",
     coord_titulo_2: "Coordenadores",
     coord_sub: "A equipe que organiza e inspira",
@@ -68,11 +61,9 @@ const TRADUCOES = {
     coord_html_css: "Coordenadores de html e css",
     coord_em_breve: "Em breve",
     coord_em_breve_desc: "Novo coordenador em breve...",
-    // Galeria
     galeria_titulo_1: "Galeria da",
     galeria_titulo_2: "Turma",
     galeria_sub: "Momentos que construímos juntos",
-    // Projetos
     projetos_titulo: "Nossos Projetos",
     projetos_sub: "O que estamos construindo",
     projetos_carregando: "Carregando projetos do GitHub...",
@@ -82,13 +73,11 @@ const TRADUCOES = {
     projetos_erro_p: "Verifique sua conexão ou tente novamente mais tarde.",
     projetos_sem_desc: "Sem descrição fornecida.",
     projetos_ver_github: "Ver no GitHub",
-    // Tecnologias
     tech_titulo: "Nossa Stack",
     tech_sub: "Ferramentas que dominamos",
     tech_vazio_t: "Sem tecnologias disponíveis no momento",
     tech_vazio_p:
       "Nossa jornada está apenas começando. Logo adicionaremos as linguagens e frameworks que farão parte do nosso arsenal.",
-    // Contato
     contato_titulo: "Contato",
     contato_sub: "Onde nos encontrar",
     contato_inst_t: "Instituição",
@@ -96,7 +85,6 @@ const TRADUCOES = {
     contato_fale_t: "Fale com a Turma",
     contato_fale_p:
       "Siga-nos nas redes sociais ou envie uma mensagem direta para parcerias e troca de ideias.",
-    // Mascote
     mascote_titulo: "Nosso Mascote",
     mascote_clique: "✨ Clique no mascote! ✨",
     mascote_conheca: "Conheça nosso mascote!",
@@ -106,7 +94,6 @@ const TRADUCOES = {
     mascote_seus: "Seus:",
     mascote_progresso: "Progresso para 1 MILHÃO",
     mascote_btn: "Dar carinho",
-    // Footer
     footer_feito: "- Feito pela turma",
     footer_carinho: "Com Carinho 💜",
   },
@@ -122,8 +109,6 @@ const TRADUCOES = {
     nav_projetos: "Projects",
     nav_contato: "Contact",
     nav_mascote: "Mascot",
-    cor_tema: "Theme color",
-    modo: "Mode",
     idioma: "Language",
     tema: "Theme",
     cor_roxo: "Purple",
@@ -131,8 +116,10 @@ const TRADUCOES = {
     cor_verde: "Green",
     cor_rosa: "Pink",
     cor_laranja: "Orange",
-    modo_claro: "Light mode",
-    modo_escuro: "Dark mode",
+    cor_tema: "Theme color",
+    modo: "Mode",
+    modo_claro: "Light",
+    modo_escuro: "Dark",
     hero_badge: "IFRN Caicó Campus",
     hero_titulo_1: "The Class of the",
     hero_titulo_2: "Future",
@@ -218,16 +205,16 @@ const TRADUCOES = {
     nav_contato: "Contacto",
     nav_mascote: "Mascota",
     idioma: "Idioma",
-    cor_tema: "Color del tema",
-    modo: "Modo",
     tema: "Tema",
     cor_roxo: "Morado",
     cor_azul: "Azul",
     cor_verde: "Verde",
     cor_rosa: "Rosa",
     cor_laranja: "Naranja",
-    modo_claro: "Modo claro",
-    modo_escuro: "Modo oscuro",
+    cor_tema: "Color del tema",
+    modo: "Modo",
+    modo_claro: "Claro",
+    modo_escuro: "Oscuro",
     hero_badge: "IFRN Campus Caicó",
     hero_titulo_1: "La Clase del",
     hero_titulo_2: "Futuro",
@@ -500,7 +487,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 6. Dropdown de idioma
+  // 6. Dropdown de idioma (header - desktop)
   document
     .querySelectorAll("#menu-idioma .dropdown-item")
     .forEach(function (btn) {
@@ -509,7 +496,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-  // 7. Dropdown de tema
+  // 7. Dropdown de tema (header - desktop)
   document
     .querySelectorAll("#menu-tema .dropdown-item")
     .forEach(function (btn) {
@@ -745,7 +732,7 @@ document.addEventListener("DOMContentLoaded", () => {
   carregarProjetosGitHub();
   window.carregarProjetosGitHub = carregarProjetosGitHub;
 
-    // 15. Menu Lateral
+  // 15. Menu Lateral
   const btnMenuLateral = document.getElementById("btn-menu");
   const menuLateral = document.getElementById("menu-lateral");
   const menuLateralOverlay = document.getElementById("menu-lateral-overlay");
@@ -763,7 +750,6 @@ document.addEventListener("DOMContentLoaded", () => {
     menuLateralOverlay?.classList.remove("aberto");
     menuLateral?.setAttribute("aria-hidden", "true");
     document.body.classList.remove("menu-aberto");
-    // Fecha submenus também
     document.getElementById("submenu-idioma")?.classList.remove("aberto");
     document.getElementById("submenu-tema")?.classList.remove("aberto");
     document.getElementById("menu-btn-idioma")?.setAttribute("aria-expanded", "false");
@@ -781,14 +767,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Fecha ao clicar num item do menu (exceto botões de ação)
   document.querySelectorAll(".menu-lateral-nav .menu-item").forEach((item) => {
     item.addEventListener("click", () => {
       setTimeout(fecharMenuLateral, 100);
     });
   });
 
-  // 🆕 SUBMENU IDIOMA
+  // Submenus internos
   const btnSubmenuIdioma = document.getElementById("menu-btn-idioma");
   const submenuIdioma = document.getElementById("submenu-idioma");
   const btnSubmenuTema = document.getElementById("menu-btn-tema");
@@ -798,7 +783,6 @@ document.addEventListener("DOMContentLoaded", () => {
     e.stopPropagation();
     const aberto = submenuIdioma?.classList.toggle("aberto");
     btnSubmenuIdioma.setAttribute("aria-expanded", aberto ? "true" : "false");
-    // Fecha o outro
     submenuTema?.classList.remove("aberto");
     btnSubmenuTema?.setAttribute("aria-expanded", "false");
   });
@@ -807,17 +791,14 @@ document.addEventListener("DOMContentLoaded", () => {
     e.stopPropagation();
     const aberto = submenuTema?.classList.toggle("aberto");
     btnSubmenuTema.setAttribute("aria-expanded", aberto ? "true" : "false");
-    // Fecha o outro
     submenuIdioma?.classList.remove("aberto");
     btnSubmenuIdioma?.setAttribute("aria-expanded", "false");
-    // Marca o modo atual
     const modoAtual = document.body.classList.contains("light-theme") ? "claro" : "escuro";
     document.querySelectorAll(".submenu-modo").forEach((b) => {
       b.classList.toggle("ativo", b.dataset.tema === modoAtual);
     });
   });
 
-  // 🆕 Itens do submenu de idioma
   document.querySelectorAll("#submenu-idioma .menu-submenu-item").forEach((btn) => {
     btn.addEventListener("click", () => {
       trocarIdioma(btn.dataset.idioma);
@@ -825,16 +806,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // 🆕 Cores do submenu de tema
   document.querySelectorAll("#submenu-tema .submenu-cor").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const tema = btn.dataset.tema;
-      aplicarTema(tema);
+      aplicarTema(btn.dataset.tema);
       marcarAtivosMenuLateral();
     });
   });
 
-  // 🆕 Modos claro/escuro no submenu
   document.querySelectorAll("#submenu-tema .submenu-modo").forEach((btn) => {
     btn.addEventListener("click", () => {
       const modo = btn.dataset.tema;
@@ -853,19 +831,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // 🆕 Marca ativos no menu lateral
   function marcarAtivosMenuLateral() {
-    // Idioma
     const idiomaAtual = obterIdiomaAtual();
     document.querySelectorAll("#submenu-idioma .menu-submenu-item").forEach((b) => {
       b.classList.toggle("ativo", b.dataset.idioma === idiomaAtual);
     });
-    // Cor
     const temaAtual = obterTemaAtual();
     document.querySelectorAll("#submenu-tema .submenu-cor").forEach((b) => {
       b.classList.toggle("ativo", b.dataset.tema === temaAtual);
     });
-    // Modo
     const modoAtual = document.body.classList.contains("light-theme") ? "claro" : "escuro";
     document.querySelectorAll("#submenu-tema .submenu-modo").forEach((b) => {
       b.classList.toggle("ativo", b.dataset.tema === modoAtual);
@@ -873,14 +847,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   marcarAtivosMenuLateral();
 
-  // Quando trocar tema pelo header (desktop), atualiza o menu lateral também
-  const _aplicarTemaOrig = aplicarTema;
-  window.aplicarTema = function (t) {
-    _aplicarTemaOrig(t);
-    marcarAtivosMenuLateral();
-  };
-
-  // 16. Easter Egg no Console
+  // 16. Easter Egg
   console.log(
     "%c🐾 Turma 2V - IFRN Caicó",
     "font-size: 16px; font-weight: bold; color: #8B5EDD;"
@@ -890,4 +857,15 @@ document.addEventListener("DOMContentLoaded", () => {
     "font-size: 12px; color: #CEBDEC;"
   );
   console.log('%cDá um "carinho" no mascote aí embaixo!', "font-size: 12px;");
+});
+
+// Preloader
+window.addEventListener("load", () => {
+  const preloader = document.getElementById("preloader");
+  if (preloader) {
+    preloader.style.opacity = "0";
+    setTimeout(() => {
+      preloader.style.display = "none";
+    }, 500);
+  }
 });

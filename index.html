@@ -37,6 +37,17 @@
     <link rel="stylesheet" href="styles/style.css" />
     <link rel="stylesheet" href="styles/mascote.css" />
     <link rel="manifest" href="manifest.json" />
+
+    <!-- 🆕 Fallback do preloader: esconde em 3s mesmo se algum script travar -->
+    <script>
+      setTimeout(function () {
+        var pre = document.getElementById("preloader");
+        if (pre && pre.style.opacity !== "0") {
+          pre.style.opacity = "0";
+          setTimeout(function () { pre.style.display = "none"; }, 500);
+        }
+      }, 3000);
+    </script>
   </head>
   <body>
     <div id="scroll-progress"></div>
