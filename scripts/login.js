@@ -188,7 +188,6 @@ onValue(perfisRef, (snapshot) => {
     const dados = childSnapshot.val() || {};
     bancoDePerfis.push({ id: childSnapshot.key, ...dados });
   });
-  console.log("[perfis_alunos] carregados:", bancoDePerfis.length, bancoDePerfis);
   window.renderizarPerfis();
   if (window.usuarioLogado.matricula) {
     const meuPerfil = bancoDePerfis.find(
@@ -213,10 +212,7 @@ if (formRecado) {
     const linkInput = document.getElementById("recado-link");
     const selectDuracao = document.getElementById("recado-duracao");
     const mensagemBruta = msgInput ? msgInput.value.trim() : "";
-    if (!mensagemBruta) {
-      exibirToast("Escreva uma mensagem antes de enviar!", "erro");
-      return;
-    }
+    if (!mensagemBruta) { exibirToast("Escreva uma mensagem antes de enviar!", "erro"); return; }
     const mensagemSegura = escaparHTML(mensagemBruta);
     const linkAnexo = linkInput ? escaparHTML(linkInput.value.trim()) : "";
     const nomeSeguro = escaparHTML(window.usuarioLogado.nome);
@@ -253,7 +249,7 @@ if (recadoMensagemInput) {
 }
 
 // ==========================================
-// 4. MÉTODOS GLOBAIS
+// 4. MÉTODOS GLOBAIS DO MURAL
 // ==========================================
 const inputBuscaMural = document.getElementById("busca-recados");
 if (inputBuscaMural) {
@@ -280,10 +276,7 @@ window.abrirModalPerfil = function (identificador) {
     const alvo = String(identificador || "").trim();
     return mat === alvo || id === alvo;
   });
-  if (!perfil) {
-    exibirToast("Perfil não encontrado.", "erro");
-    return;
-  }
+  if (!perfil) { exibirToast("Perfil não encontrado.", "erro"); return; }
   const imgEl = document.getElementById("modal-perfil-foto");
   const nomeEl = document.getElementById("modal-perfil-nome");
   const matEl = document.getElementById("modal-perfil-matricula");
@@ -313,10 +306,7 @@ window.abrirModalPerfil = function (identificador) {
     const links = montarLinksRedes(perfil.redes);
     if (links.length > 0) {
       redesEl.innerHTML = links
-        .map(
-          (l) =>
-            `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}" class="modal-rede-link"><i class="${l.icone}"></i></a>`
-        )
+        .map((l) => `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}" class="modal-rede-link"><i class="${l.icone}"></i></a>`)
         .join("");
       redesEl.classList.remove("is-hidden");
     } else {
@@ -422,10 +412,7 @@ window.adicionarComentario = function (recadoId) {
   const inputEl = document.getElementById(`input-comentario-${recadoId}`);
   if (!inputEl) return;
   const texto = inputEl.value.trim();
-  if (!texto) {
-    exibirToast("Escreva um comentário antes de enviar.", "erro");
-    return;
-  }
+  if (!texto) { exibirToast("Escreva um comentário antes de enviar.", "erro"); return; }
   const comentariosRef = ref(db, `mural_recados/${recadoId}/comentarios`);
   push(comentariosRef, {
     autor_nome: escaparHTML(window.usuarioLogado.nome),
@@ -433,10 +420,7 @@ window.adicionarComentario = function (recadoId) {
     texto: escaparHTML(texto),
     timestamp: Date.now(),
   })
-    .then(() => {
-      exibirToast("Comentário adicionado!", "sucesso");
-      inputEl.value = "";
-    })
+    .then(() => { exibirToast("Comentário adicionado!", "sucesso"); inputEl.value = ""; })
     .catch((err) => exibirToast("Erro: " + err.message, "erro"));
 };
 
@@ -447,10 +431,7 @@ window.excluirComentario = function (recadoId, comentarioId) {
     if (com) {
       const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
       const ehAutor = com.autor_matricula === window.usuarioLogado.matricula;
-      if (!ehAutor && !ehAdmin) {
-        exibirToast("Você não tem permissão para excluir este comentário!", "erro");
-        return;
-      }
+      if (!ehAutor && !ehAdmin) { exibirToast("Você não tem permissão para excluir este comentário!", "erro"); return; }
       if (confirm("Deseja excluir este comentário?")) {
         remove(itemRef).then(() => exibirToast("Comentário removido.", "sucesso"));
       }
@@ -506,10 +487,7 @@ window.editarRecado = function (id) {
     if (recado) {
       const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
       const ehAutor = recado.autor_matricula === window.usuarioLogado.matricula;
-      if (!ehAutor && !ehAdmin) {
-        exibirToast("Você não tem permissão para editar este recado!", "erro");
-        return;
-      }
+      if (!ehAutor && !ehAdmin) { exibirToast("Você não tem permissão para editar este recado!", "erro"); return; }
       const textoAtual = recado.mensagem.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#039;/g, "'");
       const novaMensagem = prompt("1/2 - Edite a sua mensagem:", textoAtual);
       if (novaMensagem !== null && novaMensagem.trim() !== "") {
@@ -551,14 +529,9 @@ window.excluirRecado = function (id) {
     if (recado) {
       const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
       const ehAutor = recado.autor_matricula === window.usuarioLogado.matricula;
-      if (!ehAutor && !ehAdmin) {
-        exibirToast("Você não tem permissão para excluir este recado!", "erro");
-        return;
-      }
+      if (!ehAutor && !ehAdmin) { exibirToast("Você não tem permissão para excluir este recado!", "erro"); return; }
       if (confirm("Tem certeza que deseja excluir este recado?")) {
-        remove(itemRef)
-          .then(() => exibirToast("Recado excluído com sucesso.", "sucesso"))
-          .catch((err) => exibirToast("Erro: " + err.message, "erro"));
+        remove(itemRef).then(() => exibirToast("Recado excluído com sucesso.", "sucesso")).catch((err) => exibirToast("Erro: " + err.message, "erro"));
       }
     }
   });
@@ -604,16 +577,10 @@ function comprimirImagem(file, maxLado = 500, qualidade = 0.82) {
       const img = new Image();
       img.onload = () => {
         let { width, height } = img;
-        if (width > height && width > maxLado) {
-          height = Math.round((height * maxLado) / width);
-          width = maxLado;
-        } else if (height > maxLado) {
-          width = Math.round((width * maxLado) / height);
-          height = maxLado;
-        }
+        if (width > height && width > maxLado) { height = Math.round((height * maxLado) / width); width = maxLado; }
+        else if (height > maxLado) { width = Math.round((width * maxLado) / height); height = maxLado; }
         const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = width; canvas.height = height;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
         let qualidadeAtual = qualidade;
@@ -698,17 +665,11 @@ window.carregarPerfilUsuario = function (matricula) {
       salvarPerfilLocal(matricula, perfilFinal);
       return perfilFinal;
     })
-    .catch((err) => {
-      console.warn("Falha ao consultar Firebase, usando local:", err);
-      return local;
-    });
+    .catch((err) => { console.warn("Falha ao consultar Firebase, usando local:", err); return local; });
 };
 
 window.abrirModalEditarPerfil = function () {
-  if (!perfilUsuarioAtual) {
-    exibirToast("Perfil ainda não carregado. Aguarde um instante.", "erro");
-    return;
-  }
+  if (!perfilUsuarioAtual) { exibirToast("Perfil ainda não carregado. Aguarde um instante.", "erro"); return; }
   const bloqueioEl = document.getElementById("edit-perfil-bloqueio");
   const btnSalvar = document.getElementById("btn-salvar-perfil");
   const inputFoto = document.getElementById("edit-foto-input");
@@ -722,12 +683,7 @@ window.abrirModalEditarPerfil = function () {
   document.getElementById("edit-email").value = redes.email || "";
   document.getElementById("edit-site").value = redes.site || "";
   document.getElementById("edit-avatar-preview").src = perfilUsuarioAtual.foto || "";
-  if (inputFoto) {
-    inputFoto.value = "";
-    delete inputFoto.dataset.novaFoto;
-    delete inputFoto.dataset.restaurar;
-    inputFoto.disabled = false;
-  }
+  if (inputFoto) { inputFoto.value = ""; delete inputFoto.dataset.novaFoto; delete inputFoto.dataset.restaurar; inputFoto.disabled = false; }
   if (bloqueioEl) bloqueioEl.classList.add("is-hidden");
   if (btnSalvar) btnSalvar.disabled = false;
   document.querySelectorAll("#form-editar-perfil input, #form-editar-perfil textarea").forEach((el) => (el.disabled = false));
@@ -752,18 +708,13 @@ function inicializarModalEditarPerfil() {
     inputFoto.addEventListener("change", async (e) => {
       const file = e.target.files[0];
       if (!file) return;
-      if (file.size > 5 * 1024 * 1024) {
-        exibirToast("Imagem muito grande (máx 5MB).", "erro");
-        return;
-      }
+      if (file.size > 5 * 1024 * 1024) { exibirToast("Imagem muito grande (máx 5MB).", "erro"); return; }
       try {
         const dataUrl = await comprimirImagem(file);
         document.getElementById("edit-avatar-preview").src = dataUrl;
         inputFoto.dataset.novaFoto = dataUrl;
         delete inputFoto.dataset.restaurar;
-      } catch (err) {
-        exibirToast("Erro ao processar imagem: " + err.message, "erro");
-      }
+      } catch (err) { exibirToast("Erro ao processar imagem: " + err.message, "erro"); }
     });
   }
   const btnRestaurar = document.getElementById("btn-restaurar-foto");
@@ -771,11 +722,7 @@ function inicializarModalEditarPerfil() {
     btnRestaurar.addEventListener("click", () => {
       const fotoOriginal = window.usuarioLogado.fotoOriginal || window.usuarioLogado.foto;
       document.getElementById("edit-avatar-preview").src = fotoOriginal;
-      if (inputFoto) {
-        delete inputFoto.dataset.novaFoto;
-        inputFoto.dataset.restaurar = "1";
-        inputFoto.value = "";
-      }
+      if (inputFoto) { delete inputFoto.dataset.novaFoto; inputFoto.dataset.restaurar = "1"; inputFoto.value = ""; }
     });
   }
   const bioInput = document.getElementById("edit-bio");
@@ -858,13 +805,9 @@ function textoNota(valor) {
   return valor === null ? "-" : valor.toFixed(1);
 }
 
-/* =================================================================
-   🆕 STATUS V2 (com ícones e variantes visuais)
-   ================================================================= */
 function atualizarStatusNotas(mensagem, tipo) {
   var status = document.getElementById("notas-status");
   if (!status) return;
-  // Compatível com chamadas antigas (segundo argumento booleano = erro)
   var variante = tipo === true ? "erro" : (typeof tipo === "string" ? tipo : "info");
   var icones = {
     info: "fa-circle-info",
@@ -891,73 +834,68 @@ function obterEtapasDaDisciplina(disciplina) {
   return { tipo: "Semestral", etapas: [1, 2] };
 }
 
-function adicionarGrupoNotas(corpo, titulo) {
-  var linhaGrupo = document.createElement("tr");
-  linhaGrupo.className = "notas-grupo";
-  var celulaGrupo = document.createElement("th");
-  celulaGrupo.colSpan = 6; // 🆕 6 colunas (era 5)
-  celulaGrupo.textContent = titulo;
-  linhaGrupo.appendChild(celulaGrupo);
-  corpo.appendChild(linhaGrupo);
+// ==========================================
+// 5.1 ESTADO GLOBAL DA CALCULADORA
+// ==========================================
+var __notasCache = [];
+var __metaAtual = 60;
+var __filtroAtivo = "todas";
+var __sortKey = null;
+var __sortDir = "asc";
+var __simulacoes = {};
+var __metasDisciplinas = {};
+var __gruposColapsados = { Semestral: false, Anual: false };
+var __historicoPeriodos = [];
+
+const MATRICULA_STORAGE_KEY = () => "metas_disc_" + (window.usuarioLogado.matricula || "anon");
+const LIMITE_FALTAS_PCT = 0.25;
+const LIMITE_FALTAS_ALERTA = 0.20;
+const CARGA_HORARIA_PADRAO = 60;
+
+// ==========================================
+// 5.2 HELPERS
+// ==========================================
+function getCodigoDisc(d) {
+  return String(d.codigo_diario || d.disciplina || d.id || "disc").trim();
 }
 
-/* =================================================================
-   🆕 CLASSIFICADOR DE STATUS (aprovado/recuperação/reprovado)
-   ================================================================= */
+function metaEfetiva(d) {
+  var cod = getCodigoDisc(d);
+  return __metasDisciplinas[cod] != null ? __metasDisciplinas[cod] : __metaAtual;
+}
+
 function classificarStatusNota(media, faltas, meta) {
-  var LIMITE_FALTAS = 15; // 25% de 60h/aula — ajuste se o SUAP fornecer carga real
-  if (faltas > LIMITE_FALTAS) return "reprovado";
+  var limite = CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT;
+  if (faltas > limite) return "reprovado";
   if (media === null) return "recuperacao";
   if (media >= meta) return "aprovado";
   if (media >= meta * 0.6) return "recuperacao";
   return "reprovado";
 }
 
-/* =================================================================
-   🆕 RESUMO (cards de topo)
-   ================================================================= */
-function atualizarResumoNotas(disciplinas, meta) {
-  var total = disciplinas.length;
-  var somaMedias = 0;
-  var contMedias = 0;
-  var faltasTotais = 0;
-  var emRisco = 0;
-
-  disciplinas.forEach(function (d) {
-    var config = obterEtapasDaDisciplina(d);
-    var notas = config.etapas.map(function (n) {
-      var etapa = d["nota_etapa_" + n];
-      return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa);
-    });
-    var preenchidas = notas.filter(function (v) { return v !== null; });
-    var soma = preenchidas.reduce(function (a, b) { return a + b; }, 0);
-    var mediaApi = formatarNota(d.media_disciplina);
-    var media = preenchidas.length ? soma / preenchidas.length : mediaApi;
-    var faltas = Number(d.numero_faltas) || 0;
-
-    if (media !== null) { somaMedias += media; contMedias++; }
-    faltasTotais += faltas;
-
-    var st = classificarStatusNota(media, faltas, meta);
-    if (st !== "aprovado") emRisco++;
+function calcularMediaSimples(d, etapas, simulacao) {
+  var notas = etapas.map(function (n) {
+    var etapa = d["nota_etapa_" + n];
+    return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa);
   });
+  var preenchidas = notas.filter(function (v) { return v !== null; });
+  var soma = preenchidas.reduce(function (a, b) { return a + b; }, 0);
 
-  var mediaGeral = contMedias ? somaMedias / contMedias : null;
+  if (simulacao != null && preenchidas.length < etapas.length) {
+    var comSim = preenchidas.concat([simulacao]);
+    var somaSim = comSim.reduce(function (a, b) { return a + b; }, 0);
+    return { media: somaSim / comSim.length, preenchidas: comSim.length, soma: somaSim, simulando: true };
+  }
 
-  var elMedia = document.getElementById("resumo-media");
-  var elDisc = document.getElementById("resumo-disciplinas");
-  var elRisco = document.getElementById("resumo-risco");
-  var elFaltas = document.getElementById("resumo-faltas");
-
-  if (elMedia) elMedia.textContent = mediaGeral !== null ? mediaGeral.toFixed(1) : "—";
-  if (elDisc) elDisc.textContent = total || "—";
-  if (elRisco) elRisco.textContent = emRisco;
-  if (elFaltas) elFaltas.textContent = faltasTotais;
+  var mediaApi = formatarNota(d.media_disciplina);
+  return {
+    media: preenchidas.length ? soma / preenchidas.length : mediaApi,
+    preenchidas: preenchidas.length,
+    soma: soma,
+    simulando: false,
+  };
 }
 
-/* =================================================================
-   🆕 PROJEÇÃO (quanto falta para bater a meta)
-   ================================================================= */
 function calcularProjecaoDisciplina(notasPreenchidas, totalEtapas, soma, meta) {
   var faltantes = totalEtapas - notasPreenchidas;
   if (faltantes <= 0) {
@@ -973,35 +911,198 @@ function calcularProjecaoDisciplina(notasPreenchidas, totalEtapas, soma, meta) {
   return { texto: "Precisa " + necessaria.toFixed(1), classe: "projecao-alerta" };
 }
 
-/* =================================================================
-   🆕 ESTADO E FILTROS DA TABELA
-   ================================================================= */
-var __notasCache = [];
-var __metaAtual = 60;
-var __filtroAtivo = "todas";
+// ==========================================
+// 5.3 METAS POR DISCIPLINA (Firebase + local)
+// ==========================================
+function carregarMetasDisciplinas() {
+  var mat = window.usuarioLogado.matricula;
+  if (!mat) return;
+  try {
+    var local = localStorage.getItem(MATRICULA_STORAGE_KEY());
+    if (local) __metasDisciplinas = JSON.parse(local) || {};
+  } catch (e) { __metasDisciplinas = {}; }
 
-function aplicarFiltroNotas(disciplinas, meta) {
-  return disciplinas.filter(function (d) {
-    if (__filtroAtivo === "todas") return true;
-    var config = obterEtapasDaDisciplina(d);
-    var notas = config.etapas.map(function (n) {
-      var etapa = d["nota_etapa_" + n];
-      return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa);
-    });
-    var preenchidas = notas.filter(function (v) { return v !== null; });
-    var soma = preenchidas.reduce(function (a, b) { return a + b; }, 0);
-    var mediaApi = formatarNota(d.media_disciplina);
-    var media = preenchidas.length ? soma / preenchidas.length : mediaApi;
-    var faltas = Number(d.numero_faltas) || 0;
-    var st = classificarStatusNota(media, faltas, meta);
-    if (__filtroAtivo === "risco") return st !== "aprovado";
-    return st === __filtroAtivo;
-  });
+  get(ref(db, "metas_disciplinas/" + mat))
+    .then(function (snap) {
+      var dados = snap.val();
+      if (dados && typeof dados === "object") {
+        __metasDisciplinas = dados;
+        try { localStorage.setItem(MATRICULA_STORAGE_KEY(), JSON.stringify(dados)); } catch (e) {}
+        if (__notasCache.length) renderizarNotas(__notasCache);
+      }
+    })
+    .catch(function (err) { console.warn("[metas] firebase erro:", err); });
 }
 
-/* =================================================================
-   🆕 RENDERIZAR NOTAS V2
-   ================================================================= */
+function salvarMetasDisciplinas() {
+  var mat = window.usuarioLogado.matricula;
+  if (!mat) return Promise.resolve();
+  try { localStorage.setItem(MATRICULA_STORAGE_KEY(), JSON.stringify(__metasDisciplinas)); } catch (e) {}
+  return update(ref(db, "metas_disciplinas/" + mat), __metasDisciplinas)
+    .catch(function (err) { console.warn("[metas] save erro:", err); });
+}
+
+// ==========================================
+// 5.4 ORDENAÇÃO
+// ==========================================
+function ordenarDisciplinas(lista) {
+  if (!__sortKey) return lista;
+  var meta = __metaAtual;
+  var copia = lista.slice();
+  copia.sort(function (a, b) {
+    var va, vb;
+    if (__sortKey === "nome") {
+      va = (a.disciplina || a.codigo_diario || "").toLowerCase();
+      vb = (b.disciplina || b.codigo_diario || "").toLowerCase();
+      return __sortDir === "asc" ? va.localeCompare(vb) : vb.localeCompare(va);
+    }
+    if (__sortKey === "media") {
+      va = calcularMediaSimples(a, obterEtapasDaDisciplina(a).etapas, __simulacoes[getCodigoDisc(a)]).media;
+      vb = calcularMediaSimples(b, obterEtapasDaDisciplina(b).etapas, __simulacoes[getCodigoDisc(b)]).media;
+      va = va === null ? -1 : va; vb = vb === null ? -1 : vb;
+    } else if (__sortKey === "faltas") {
+      va = Number(a.numero_faltas) || 0;
+      vb = Number(b.numero_faltas) || 0;
+    } else if (__sortKey === "status") {
+      var ordem = { reprovado: 0, recuperacao: 1, aprovado: 2 };
+      var ma = calcularMediaSimples(a, obterEtapasDaDisciplina(a).etapas, __simulacoes[getCodigoDisc(a)]).media;
+      var mb = calcularMediaSimples(b, obterEtapasDaDisciplina(b).etapas, __simulacoes[getCodigoDisc(b)]).media;
+      va = ordem[classificarStatusNota(ma, Number(a.numero_faltas) || 0, meta)];
+      vb = ordem[classificarStatusNota(mb, Number(b.numero_faltas) || 0, meta)];
+    }
+    if (va < vb) return __sortDir === "asc" ? -1 : 1;
+    if (va > vb) return __sortDir === "asc" ? 1 : -1;
+    return 0;
+  });
+  return copia;
+}
+
+function aplicarSort(key) {
+  if (__sortKey === key) __sortDir = __sortDir === "asc" ? "desc" : "asc";
+  else { __sortKey = key; __sortDir = key === "media" ? "desc" : "asc"; }
+  document.querySelectorAll(".tabela-notas thead th.sortable").forEach(function (th) {
+    th.classList.remove("sort-asc", "sort-desc");
+    if (th.dataset.sort === __sortKey) th.classList.add(__sortDir === "asc" ? "sort-asc" : "sort-desc");
+  });
+  if (__notasCache.length) renderizarNotas(__notasCache);
+}
+
+// ==========================================
+// 5.5 RESUMO + ALERTA + HISTÓRICO
+// ==========================================
+function atualizarResumoNotas(disciplinas) {
+  var elMedia = document.getElementById("resumo-media");
+  var elDisc = document.getElementById("resumo-disciplinas");
+  var elRisco = document.getElementById("resumo-risco");
+  var elFaltas = document.getElementById("resumo-faltas");
+  if (!elMedia && !elDisc && !elRisco && !elFaltas) return;
+
+  var total = disciplinas.length;
+  var somaMedias = 0, contMedias = 0, faltasTotais = 0, emRisco = 0;
+
+  disciplinas.forEach(function (d) {
+    var etapas = obterEtapasDaDisciplina(d).etapas;
+    var calc = calcularMediaSimples(d, etapas, __simulacoes[getCodigoDisc(d)]);
+    var faltas = Number(d.numero_faltas) || 0;
+    if (calc.media !== null) { somaMedias += calc.media; contMedias++; }
+    faltasTotais += faltas;
+    var st = classificarStatusNota(calc.media, faltas, metaEfetiva(d));
+    if (st !== "aprovado") emRisco++;
+  });
+
+  var mediaGeral = contMedias ? somaMedias / contMedias : null;
+  if (elMedia) elMedia.textContent = mediaGeral !== null ? mediaGeral.toFixed(1) : "—";
+  if (elDisc) elDisc.textContent = total || "—";
+  if (elRisco) elRisco.textContent = emRisco;
+  if (elFaltas) elFaltas.textContent = faltasTotais;
+}
+
+function alertaDeFaltas(disciplinas) {
+  var antigo = document.querySelector(".alerta-faltas");
+  if (antigo) antigo.remove();
+
+  var alertaMax = 0, discCritica = null;
+  var limiteReprov = CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT;
+  var limiteAlerta = CARGA_HORARIA_PADRAO * LIMITE_FALTAS_ALERTA;
+
+  disciplinas.forEach(function (d) {
+    var faltas = Number(d.numero_faltas) || 0;
+    if (faltas >= limiteReprov && faltas > alertaMax) {
+      alertaMax = faltas;
+      discCritica = { nome: d.disciplina || d.codigo_diario, faltas: faltas, nivel: "danger" };
+    } else if (faltas >= limiteAlerta && (!discCritica || discCritica.nivel !== "danger")) {
+      if (faltas > alertaMax) {
+        alertaMax = faltas;
+        discCritica = { nome: d.disciplina || d.codigo_diario, faltas: faltas, nivel: "warn" };
+      }
+    }
+  });
+
+  if (!discCritica) return;
+  var panel = document.querySelector(".notas-panel");
+  if (!panel) return;
+  var banner = document.createElement("div");
+  banner.className = "alerta-faltas " + discCritica.nivel;
+  banner.innerHTML = discCritica.nivel === "danger"
+    ? `<i class="fa-solid fa-triangle-exclamation"></i><span><strong>Atenção!</strong> Você está com <strong>${discCritica.faltas} faltas</strong> em <em>${escaparHTML(discCritica.nome)}</em> — próximo do limite de reprovação por falta (${limiteReprov}).</span>`
+    : `<i class="fa-solid fa-circle-exclamation"></i><span><strong>Cuidado:</strong> ${discCritica.faltas} faltas em <em>${escaparHTML(discCritica.nome)}</em>. Fique atento!</span>`;
+  var ref = panel.querySelector(".notas-controls");
+  if (ref) panel.insertBefore(banner, ref);
+  else panel.insertBefore(banner, panel.firstChild);
+}
+
+function atualizarHistoricoComDisciplinas(disciplinas, periodoLabel, ano) {
+  if (!disciplinas || !disciplinas.length) return;
+  var soma = 0, cont = 0;
+  disciplinas.forEach(function (d) {
+    var etapas = obterEtapasDaDisciplina(d).etapas;
+    var calc = calcularMediaSimples(d, etapas, null);
+    if (calc.media !== null) { soma += calc.media; cont++; }
+  });
+  var media = cont ? soma / cont : null;
+  var idx = __historicoPeriodos.findIndex(function (h) { return h.periodo === periodoLabel; });
+  var entry = { periodo: periodoLabel, media: media, disciplinas: disciplinas.length, ano: ano };
+  if (idx >= 0) __historicoPeriodos[idx] = entry;
+  else __historicoPeriodos.push(entry);
+  __historicoPeriodos.sort(function (a, b) { return b.periodo.localeCompare(a.periodo); });
+  renderizarHistorico();
+  var panel = document.getElementById("historico-panel");
+  if (panel) panel.classList.remove("is-hidden");
+}
+
+function renderizarHistorico() {
+  var container = document.getElementById("historico-content");
+  if (!container) return;
+  if (__historicoPeriodos.length < 1) {
+    container.innerHTML = '<p class="historico-vazio">Carregue pelo menos 1 período para ver o histórico.</p>';
+    return;
+  }
+  var cronologico = __historicoPeriodos.slice().sort(function (a, b) { return a.periodo.localeCompare(b.periodo); });
+  var mapa = {};
+  cronologico.forEach(function (h, i) {
+    mapa[h.periodo] = i > 0 ? (h.media !== null && cronologico[i - 1].media !== null ? h.media - cronologico[i - 1].media : null) : null;
+  });
+  container.innerHTML = __historicoPeriodos.map(function (h) {
+    var diff = mapa[h.periodo];
+    var trendHTML = "";
+    if (diff !== null && diff !== undefined) {
+      if (diff > 0.3) trendHTML = `<span class="periodo-trend up"><i class="fa-solid fa-arrow-up"></i> +${diff.toFixed(1)}</span>`;
+      else if (diff < -0.3) trendHTML = `<span class="periodo-trend down"><i class="fa-solid fa-arrow-down"></i> ${diff.toFixed(1)}</span>`;
+      else trendHTML = `<span class="periodo-trend eq"><i class="fa-solid fa-minus"></i> estável</span>`;
+    }
+    return `
+      <div class="historico-card">
+        <span class="periodo-label">${escaparHTML(h.periodo)}</span>
+        <span class="periodo-media">${h.media !== null ? h.media.toFixed(1) : "—"}</span>
+        <span class="periodo-info">${h.disciplinas} disciplina(s)</span>
+        ${trendHTML}
+      </div>`;
+  }).join("");
+}
+
+// ==========================================
+// 5.6 RENDERIZAR TABELA
+// ==========================================
 function renderizarNotas(disciplinas) {
   var corpo = document.getElementById("lista-notas");
   if (!corpo) return;
@@ -1014,64 +1115,84 @@ function renderizarNotas(disciplinas) {
   corpo.innerHTML = "";
 
   if (!__notasCache.length) {
-    corpo.innerHTML = '<tr><td colspan="6" class="notas-vazia"><i class="fa-solid fa-inbox"></i>Nenhuma disciplina encontrada neste período.</td></tr>';
-    atualizarResumoNotas([], meta);
+    corpo.innerHTML = '<tr><td colspan="8" class="notas-vazia"><i class="fa-solid fa-inbox"></i>Nenhuma disciplina encontrada neste período.</td></tr>';
+    atualizarResumoNotas([]);
     return;
   }
 
-  var disciplinasVisiveis = aplicarFiltroNotas(__notasCache, meta);
+  // Filtro
+  var visiveis = __notasCache.filter(function (d) {
+    if (__filtroAtivo === "todas") return true;
+    var etapas = obterEtapasDaDisciplina(d).etapas;
+    var calc = calcularMediaSimples(d, etapas, __simulacoes[getCodigoDisc(d)]);
+    var faltas = Number(d.numero_faltas) || 0;
+    var st = classificarStatusNota(calc.media, faltas, metaEfetiva(d));
+    if (__filtroAtivo === "risco") return st !== "aprovado";
+    return st === __filtroAtivo;
+  });
 
-  if (!disciplinasVisiveis.length) {
-    corpo.innerHTML = '<tr><td colspan="6" class="notas-vazia"><i class="fa-solid fa-filter-circle-xmark"></i>Nenhuma disciplina neste filtro.</td></tr>';
-    atualizarResumoNotas(__notasCache, meta);
+  if (!visiveis.length) {
+    corpo.innerHTML = '<tr><td colspan="8" class="notas-vazia"><i class="fa-solid fa-filter-circle-xmark"></i>Nenhuma disciplina neste filtro.</td></tr>';
+    atualizarResumoNotas(__notasCache);
     return;
   }
+
+  visiveis = ordenarDisciplinas(visiveis);
 
   var grupos = { Semestral: [], Anual: [] };
-  disciplinasVisiveis.forEach(function (disciplina) {
-    var configuracao = obterEtapasDaDisciplina(disciplina);
-    grupos[configuracao.tipo].push({ disciplina: disciplina, etapas: configuracao.etapas });
+  visiveis.forEach(function (d) {
+    var cfg = obterEtapasDaDisciplina(d);
+    grupos[cfg.tipo].push({ disciplina: d, etapas: cfg.etapas });
   });
 
   ["Semestral", "Anual"].forEach(function (tipo) {
     if (!grupos[tipo].length) return;
-    adicionarGrupoNotas(corpo, tipo === "Semestral" ? "Matérias Semestrais" : "Matérias Anuais");
+
+    var linhaGrupo = document.createElement("tr");
+    linhaGrupo.className = "notas-grupo" + (__gruposColapsados[tipo] ? " colapsado" : "");
+    linhaGrupo.dataset.grupo = tipo;
+    linhaGrupo.innerHTML = `<th colspan="8">${tipo === "Semestral" ? "Matérias Semestrais" : "Matérias Anuais"}<span class="grupo-contador">${grupos[tipo].length} disciplina(s)</span></th>`;
+    linhaGrupo.addEventListener("click", function () {
+      __gruposColapsados[tipo] = !__gruposColapsados[tipo];
+      linhaGrupo.classList.toggle("colapsado", __gruposColapsados[tipo]);
+      document.querySelectorAll(`tr[data-grupo-linha="${tipo}"]`).forEach(function (tr) {
+        tr.style.display = __gruposColapsados[tipo] ? "none" : "";
+      });
+    });
+    corpo.appendChild(linhaGrupo);
 
     grupos[tipo].forEach(function (item) {
-      var disciplina = item.disciplina;
-      var notasEtapas = item.etapas.map(function (numeroEtapa) {
-        var etapa = disciplina["nota_etapa_" + numeroEtapa];
+      var d = item.disciplina;
+      var codigo = getCodigoDisc(d);
+      var sim = __simulacoes[codigo];
+      var faltas = Number(d.numero_faltas) || 0;
+      var metaDisc = metaEfetiva(d);
+
+      var calc = calcularMediaSimples(d, item.etapas, sim);
+      var media = calc.media;
+      var notasEtapas = item.etapas.map(function (n) {
+        var etapa = d["nota_etapa_" + n];
         return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa);
       });
-      var notasPreenchidas = notasEtapas.filter(function (nota) { return nota !== null; });
-      var soma = notasPreenchidas.reduce(function (total, nota) { return total + nota; }, 0);
-      var mediaApi = formatarNota(disciplina.media_disciplina);
-      var media = notasPreenchidas.length ? soma / notasPreenchidas.length : mediaApi;
-      var totalEtapas = item.etapas.length;
-      var faltas = Number(disciplina.numero_faltas) || 0;
 
-      var status = classificarStatusNota(media, faltas, meta);
-      var proj = calcularProjecaoDisciplina(notasPreenchidas.length, totalEtapas, soma, meta);
+      var status = classificarStatusNota(media, faltas, metaDisc);
+      var proj = calcularProjecaoDisciplina(calc.preenchidas, item.etapas.length, calc.soma, metaDisc);
+      var faltasClasse = faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT ? "critico"
+                        : faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_ALERTA ? "alerta" : "";
 
-      // Faltas com alerta visual
-      var faltasClasse = faltas > 15 ? "critico" : (faltas > 10 ? "alerta" : "");
-
-      // Badge
       var badgeLabel = {
         aprovado: '<i class="fa-solid fa-check"></i> Aprovado',
         recuperacao: '<i class="fa-solid fa-rotate"></i> Recuperação',
         reprovado: '<i class="fa-solid fa-xmark"></i> Reprovado',
       }[status];
 
-      // Linha em risco
       var linhaRisco = (status === "reprovado" || faltasClasse === "critico") ? "linha-risco" : "";
+      var linhaSim = calc.simulando ? "simulando" : "";
 
-      // Etapas em pills
       var etapasHTML = notasEtapas.map(function (n) {
         return '<span class="etapa-pill">' + textoNota(n) + '</span>';
       }).join("");
 
-      // Média com barra
       var percentual = media !== null ? Math.min(media, 100) : 0;
       var mediaHTML =
         '<div class="media-cell">' +
@@ -1081,31 +1202,227 @@ function renderizarNotas(disciplinas) {
           '</div>' +
         '</div>';
 
+      var temEtapaEmAberto = calc.preenchidas < item.etapas.length;
+      var simuladorHTML = temEtapaEmAberto
+        ? `<div class="simulador-cell">
+             <input type="number" class="simulador-input" data-codigo="${escaparHTML(codigo)}"
+                    min="0" max="100" step="0.1" placeholder="Nota"
+                    value="${sim != null ? sim : ''}" />
+             ${calc.simulando ? `<span class="simulador-resultado ${status === 'aprovado' ? 'ok' : status === 'recuperacao' ? 'mid' : 'ruim'}">${textoNota(media)}</span>` : ''}
+           </div>`
+        : '<span style="color:var(--text-muted);font-size:.8rem;">Fechada</span>';
+
+      var metaCustom = __metasDisciplinas[codigo] != null;
+      var metaHTML = `<button type="button" class="btn-meta-disciplina ${metaCustom ? 'customizada' : ''}"
+                        data-codigo="${escaparHTML(codigo)}"
+                        data-nome="${escaparHTML(d.disciplina || codigo)}"
+                        title="Meta individual: ${metaDisc}">🎯</button>`;
+
       var linha = document.createElement("tr");
-      if (linhaRisco) linha.className = linhaRisco;
+      linha.className = [linhaRisco, linhaSim].filter(Boolean).join(" ");
+      linha.dataset.grupoLinha = tipo;
 
       linha.innerHTML =
-        '<td><strong>' + escaparHTML(disciplina.disciplina || disciplina.codigo_diario || "Disciplina sem nome") + '</strong></td>' +
+        '<td><strong>' + escaparHTML(d.disciplina || d.codigo_diario || "Disciplina sem nome") + '</strong></td>' +
         '<td><div class="etapas-cell">' + (etapasHTML || '<span class="etapa-pill">—</span>') + '</div></td>' +
         '<td>' + mediaHTML + '</td>' +
         '<td><span class="faltas-cell ' + faltasClasse + '">' + faltas + '</span></td>' +
         '<td><span class="projecao-cell ' + proj.classe + '">' + proj.texto + '</span></td>' +
-        '<td><span class="badge badge-' + status + '">' + badgeLabel + '</span></td>';
+        '<td><span class="badge badge-' + status + '">' + badgeLabel + '</span></td>' +
+        '<td>' + simuladorHTML + '</td>' +
+        '<td>' + metaHTML + '</td>';
 
       corpo.appendChild(linha);
     });
   });
 
-  atualizarResumoNotas(__notasCache, meta);
+  atualizarResumoNotas(__notasCache);
+  alertaDeFaltas(__notasCache);
+
+  // Simulador bind
+  corpo.querySelectorAll(".simulador-input").forEach(function (input) {
+    input.addEventListener("input", function () {
+      var cod = input.dataset.codigo;
+      var val = input.value.trim();
+      if (val === "") delete __simulacoes[cod];
+      else {
+        var num = Number(String(val).replace(",", "."));
+        if (Number.isFinite(num)) __simulacoes[cod] = Math.max(0, Math.min(100, num));
+      }
+      renderizarNotas(__notasCache);
+      var novo = document.querySelector(`.simulador-input[data-codigo="${CSS.escape(cod)}"]`);
+      if (novo) { novo.focus(); novo.setSelectionRange(novo.value.length, novo.value.length); }
+    });
+  });
+
+  // Meta individual bind
+  corpo.querySelectorAll(".btn-meta-disciplina").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      abrirModalMetaDisciplina(btn.dataset.codigo, btn.dataset.nome);
+    });
+  });
 }
 
+// ==========================================
+// 5.7 MODAL META POR DISCIPLINA
+// ==========================================
+function abrirModalMetaDisciplina(codigo, nome) {
+  var modal = document.getElementById("modal-meta-disciplina");
+  if (!modal) return;
+  var atual = __metasDisciplinas[codigo] != null ? __metasDisciplinas[codigo] : __metaAtual;
+  var rangeInput = modal.querySelector('input[type="range"]');
+  var numEl = modal.querySelector(".meta-num");
+  var nomeEl = modal.querySelector(".meta-disciplina-nome");
+  nomeEl.textContent = nome;
+  rangeInput.value = atual;
+  numEl.textContent = atual;
+  rangeInput.oninput = function () { numEl.textContent = rangeInput.value; };
+
+  var btnReset = modal.querySelector("[data-reset]");
+  var btnSalvar = modal.querySelector("[data-salvar]");
+  var btnFechar = modal.querySelector("[data-fechar]");
+
+  btnReset.onclick = function () {
+    delete __metasDisciplinas[codigo];
+    salvarMetasDisciplinas();
+    modal.classList.add("is-hidden");
+    if (__notasCache.length) renderizarNotas(__notasCache);
+    exibirToast("Meta individual removida — usando meta global.", "sucesso");
+  };
+  btnSalvar.onclick = function () {
+    __metasDisciplinas[codigo] = Number(rangeInput.value);
+    salvarMetasDisciplinas();
+    modal.classList.add("is-hidden");
+    if (__notasCache.length) renderizarNotas(__notasCache);
+    exibirToast("Meta individual salva (" + rangeInput.value + ").", "sucesso");
+  };
+  btnFechar.onclick = function () { modal.classList.add("is-hidden"); };
+  modal.onclick = function (e) { if (e.target === modal) modal.classList.add("is-hidden"); };
+
+  modal.classList.remove("is-hidden");
+}
+
+// ==========================================
+// 5.8 EXPORT CSV / PDF
+// ==========================================
+function exportarCSV() {
+  if (!__notasCache.length) { exibirToast("Nada para exportar.", "erro"); return; }
+  var linhas = [];
+  linhas.push(["Disciplina", "Tipo", "Etapas", "Média", "Meta", "Faltas", "Projeção", "Status"].join(";"));
+
+  __notasCache.forEach(function (d) {
+    var cfg = obterEtapasDaDisciplina(d);
+    var calc = calcularMediaSimples(d, cfg.etapas, __simulacoes[getCodigoDisc(d)]);
+    var faltas = Number(d.numero_faltas) || 0;
+    var meta = metaEfetiva(d);
+    var st = classificarStatusNota(calc.media, faltas, meta);
+    var proj = calcularProjecaoDisciplina(calc.preenchidas, cfg.etapas.length, calc.soma, meta);
+
+    linhas.push([
+      (d.disciplina || d.codigo_diario || "").replace(/;/g, ","),
+      cfg.tipo,
+      cfg.etapas.map(function (n) {
+        var e = d["nota_etapa_" + n];
+        return textoNota(formatarNota(e && typeof e === "object" ? e.nota : e));
+      }).join(" | "),
+      textoNota(calc.media),
+      meta,
+      faltas,
+      proj.texto,
+      st
+    ].join(";"));
+  });
+
+  var csv = "\uFEFF" + linhas.join("\n");
+  var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  var periodo = (document.getElementById("periodo-notas")?.value || "boletim").replace("/", ".");
+  a.href = url;
+  a.download = "boletim_" + periodo + ".csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  exibirToast("CSV exportado!", "sucesso");
+}
+
+function exportarPDF() {
+  if (!__notasCache.length) { exibirToast("Nada para exportar.", "erro"); return; }
+  var periodo = document.getElementById("periodo-notas")?.value || "";
+  var nome = window.usuarioLogado.nome || "Aluno";
+  var mat = window.usuarioLogado.matricula || "";
+
+  var linhasHTML = "";
+  ["Semestral", "Anual"].forEach(function (tipo) {
+    var doTipo = __notasCache.filter(function (d) { return obterEtapasDaDisciplina(d).tipo === tipo; });
+    if (!doTipo.length) return;
+    linhasHTML += `<tr class="grupo"><td colspan="6"><strong>${tipo === "Semestral" ? "Matérias Semestrais" : "Matérias Anuais"}</strong></td></tr>`;
+    doTipo.forEach(function (d) {
+      var cfg = obterEtapasDaDisciplina(d);
+      var calc = calcularMediaSimples(d, cfg.etapas, __simulacoes[getCodigoDisc(d)]);
+      var faltas = Number(d.numero_faltas) || 0;
+      var meta = metaEfetiva(d);
+      var st = classificarStatusNota(calc.media, faltas, meta);
+      var proj = calcularProjecaoDisciplina(calc.preenchidas, cfg.etapas.length, calc.soma, meta);
+      var cor = st === "aprovado" ? "#10b981" : st === "recuperacao" ? "#f59e0b" : "#ff4757";
+      linhasHTML += `
+        <tr>
+          <td>${escaparHTML(d.disciplina || d.codigo_diario || "")}</td>
+          <td>${cfg.etapas.map(function (n) {
+            var e = d["nota_etapa_" + n];
+            return textoNota(formatarNota(e && typeof e === "object" ? e.nota : e));
+          }).join(" | ")}</td>
+          <td>${textoNota(calc.media)}</td>
+          <td>${faltas}</td>
+          <td>${proj.texto}</td>
+          <td style="color:${cor};font-weight:700">${st}</td>
+        </tr>`;
+    });
+  });
+
+  var w = window.open("", "_blank");
+  w.document.write(`
+    <!doctype html><html><head><meta charset="utf-8">
+    <title>Boletim ${escaparHTML(nome)}</title>
+    <style>
+      * { font-family: 'Segoe UI', Arial, sans-serif; }
+      body { padding: 30px; color: #222; }
+      h1 { font-size: 20px; margin: 0 0 4px; }
+      .sub { color: #666; font-size: 12px; margin-bottom: 20px; }
+      table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+      th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; }
+      th { background: #f3f0fa; }
+      tr.grupo td { background: #ece7f8; font-size: 13px; }
+      .rodape { margin-top: 24px; font-size: 10px; color: #999; text-align: center; }
+      @media print { body { padding: 10px; } }
+    </style></head><body>
+    <h1>Boletim Acadêmico — ${escaparHTML(nome)}</h1>
+    <div class="sub">Matrícula: ${escaparHTML(mat)} • Período: ${escaparHTML(periodo)} • Emitido em ${new Date().toLocaleString("pt-BR")}</div>
+    <table>
+      <thead><tr><th>Disciplina</th><th>Etapas</th><th>Média</th><th>Faltas</th><th>Projeção</th><th>Status</th></tr></thead>
+      <tbody>${linhasHTML}</tbody>
+    </table>
+    <div class="rodape">Gerado automaticamente pelo Portal InfoWeb 2V — IFRN</div>
+    <script>window.onload = () => setTimeout(() => window.print(), 300);<\/script>
+    </body></html>
+  `);
+  w.document.close();
+}
+
+// ==========================================
+// 5.9 CARREGAR BOLETIM
+// ==========================================
 function carregarBoletim(ano, periodo) {
   atualizarStatusNotas("Buscando notas no SUAP...", "loading");
   suap.getAuthenticatedResource(
     "/api/ensino/meu-boletim/" + encodeURIComponent(ano) + "/" + encodeURIComponent(periodo) + "/?page=1",
     function (resposta) {
-      renderizarNotas(resposta.results || []);
-      var total = resposta.count || (resposta.results || []).length;
+      var disciplinas = resposta.results || [];
+      renderizarNotas(disciplinas);
+      var label = ano + "." + periodo;
+      atualizarHistoricoComDisciplinas(disciplinas, label, ano);
+      var total = resposta.count || disciplinas.length;
       atualizarStatusNotas(total + " disciplina(s) carregada(s).", "sucesso");
     },
     function (xhr) {
@@ -1141,50 +1458,72 @@ function carregarPeriodosNotas() {
 }
 
 // ==========================================
-// 5.1 LISTENERS DA CALCULADORA V2
+// 5.10 LISTENERS DA CALCULADORA
 // ==========================================
+function initCalculadoraNotas() {
+  const elPeriodo = document.getElementById("periodo-notas");
+  if (elPeriodo && !elPeriodo.dataset.bound) {
+    elPeriodo.dataset.bound = "1";
+    elPeriodo.addEventListener("change", function (event) {
+      const partes = event.target.value.split("/");
+      if (partes.length === 2) carregarBoletim(partes[0], partes[1]);
+    });
+  }
 
-// Período
-const elPeriodo = document.getElementById("periodo-notas");
-if (elPeriodo) {
-  elPeriodo.addEventListener("change", function (event) {
-    var partes = event.target.value.split("/");
-    if (partes.length === 2) carregarBoletim(partes[0], partes[1]);
-  });
-}
+  const elMeta = document.getElementById("meta-notas");
+  const elMetaValor = document.getElementById("meta-valor");
+  if (elMeta && !elMeta.dataset.bound) {
+    elMeta.dataset.bound = "1";
+    elMeta.addEventListener("input", function (e) {
+      if (elMetaValor) elMetaValor.textContent = e.target.value;
+    });
+    elMeta.addEventListener("change", function (e) {
+      __metaAtual = Number(e.target.value) || 60;
+      if (__notasCache.length) renderizarNotas(__notasCache);
+    });
+  }
 
-// Meta (slider V2)
-const elMeta = document.getElementById("meta-notas");
-const elMetaValor = document.getElementById("meta-valor");
-if (elMeta) {
-  elMeta.addEventListener("input", function (e) {
-    if (elMetaValor) elMetaValor.textContent = e.target.value;
+  document.querySelectorAll(".filtro-chip").forEach(function (chip) {
+    if (chip.dataset.bound) return;
+    chip.dataset.bound = "1";
+    chip.addEventListener("click", function () {
+      document.querySelectorAll(".filtro-chip").forEach(function (c) { c.classList.remove("ativo"); });
+      chip.classList.add("ativo");
+      __filtroAtivo = chip.dataset.filtro || "todas";
+      if (__notasCache.length) renderizarNotas(__notasCache);
+    });
   });
-  elMeta.addEventListener("change", function (e) {
-    __metaAtual = Number(e.target.value) || 60;
+
+  const elAtualizar = document.getElementById("atualizar-notas");
+  if (elAtualizar && !elAtualizar.dataset.bound) {
+    elAtualizar.dataset.bound = "1";
+    elAtualizar.addEventListener("click", function () {
+      const seletor = document.getElementById("periodo-notas");
+      if (!seletor) return;
+      const periodo = seletor.value.split("/");
+      if (periodo.length === 2) carregarBoletim(periodo[0], periodo[1]);
+    });
+  }
+
+  document.querySelectorAll(".tabela-notas thead th.sortable").forEach(function (th) {
+    if (th.dataset.bound) return;
+    th.dataset.bound = "1";
+    th.addEventListener("click", function () { aplicarSort(th.dataset.sort); });
+  });
+
+  document.getElementById("btn-export-csv")?.addEventListener("click", exportarCSV);
+  document.getElementById("btn-export-pdf")?.addEventListener("click", exportarPDF);
+  document.getElementById("btn-limpar-simulador")?.addEventListener("click", function () {
+    __simulacoes = {};
     if (__notasCache.length) renderizarNotas(__notasCache);
+    exibirToast("Simulações limpas.", "sucesso");
   });
-}
 
-// Filtros
-document.querySelectorAll(".filtro-chip").forEach(function (chip) {
-  chip.addEventListener("click", function () {
-    document.querySelectorAll(".filtro-chip").forEach(function (c) { c.classList.remove("ativo"); });
-    chip.classList.add("ativo");
-    __filtroAtivo = chip.dataset.filtro || "todas";
-    if (__notasCache.length) renderizarNotas(__notasCache);
+  document.getElementById("btn-toggle-historico")?.addEventListener("click", function () {
+    document.getElementById("historico-panel")?.classList.toggle("colapsado");
   });
-});
 
-// Botão atualizar
-const elAtualizar = document.getElementById("atualizar-notas");
-if (elAtualizar) {
-  elAtualizar.addEventListener("click", function () {
-    var seletor = document.getElementById("periodo-notas");
-    if (!seletor) return;
-    var periodo = seletor.value.split("/");
-    if (periodo.length === 2) carregarBoletim(periodo[0], periodo[1]);
-  });
+  carregarMetasDisciplinas();
 }
 
 // ==========================================
@@ -1195,6 +1534,7 @@ document.addEventListener("DOMContentLoaded", function () {
   filtroPerfilTexto = "";
 
   inicializarModalEditarPerfil();
+  initCalculadoraNotas();
 
   const btnLogin = document.getElementById("suap-login-button");
   if (btnLogin) btnLogin.setAttribute("href", suap.getLoginURL());
@@ -1206,6 +1546,9 @@ document.addEventListener("DOMContentLoaded", function () {
       window.forceLogout();
     });
   }
+
+  const anoEl = document.getElementById("ano");
+  if (anoEl) anoEl.textContent = new Date().getFullYear();
 
   if (suap.isAuthenticated()) {
     if (window.location.hash.includes("access_token")) {
@@ -1280,6 +1623,9 @@ document.addEventListener("DOMContentLoaded", function () {
           if (!dadosExistentes.foto || !String(dadosExistentes.foto).trim()) payload.foto = fotoUrl;
           update(perfilAlunoRef, payload).then(() => { window.carregarPerfilUsuario(matriculaSuap); });
         });
+
+        // Recarrega metas agora que temos matrícula
+        carregarMetasDisciplinas();
       }
 
       const inputRecadoNome = document.getElementById("recado-nome");
