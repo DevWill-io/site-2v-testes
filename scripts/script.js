@@ -440,27 +440,28 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   reveals.forEach((reveal) => revealOnScroll.observe(reveal));
 
-  // 3. Highlight Menu
-  const sections = document.querySelectorAll("section");
-  const navItems = document.querySelectorAll(".nav-links a");
-  window.addEventListener("scroll", () => {
+  // 3. Highlight Menu (menu lateral)
+    const sections = document.querySelectorAll("section");
+    const menuItems = document.querySelectorAll(".menu-lateral-nav .menu-item");
+    window.addEventListener("scroll", () => {
+    if (menuItems.length === 0) return;
     let current = "";
     sections.forEach((section) => {
-      const sectionTop = section.offsetTop;
-      if (pageYOffset >= sectionTop - 250) {
+        const sectionTop = section.offsetTop;
+        if (pageYOffset >= sectionTop - 250) {
         current = section.getAttribute("id");
-      }
+        }
     });
-    navItems.forEach((item) => {
-      item.classList.remove("active");
-      if (
+    menuItems.forEach((item) => {
+        item.classList.remove("active");
+        if (
         item.getAttribute("href") &&
         item.getAttribute("href").substring(1) === current
-      ) {
+        ) {
         item.classList.add("active");
-      }
+        }
     });
-  });
+    });
 
   // 4. Ano Dinâmico
   const spanAno = document.getElementById("ano");

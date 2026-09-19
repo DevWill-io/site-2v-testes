@@ -38,7 +38,7 @@
     <link rel="stylesheet" href="styles/mascote.css" />
     <link rel="manifest" href="manifest.json" />
 
-    <!-- 🆕 Fallback do preloader: esconde em 3s mesmo se algum script travar -->
+    <!-- 🆕 Fallback do preloader -->
     <script>
       setTimeout(function () {
         var pre = document.getElementById("preloader");
@@ -65,78 +65,10 @@
           <i class="fa-solid fa-code-branch"></i> InfoWeb<span> - 2V</span>
         </a>
 
-        <div class="nav-desktop">
-          <ul class="nav-links">
-            <li><a href="#inicio" class="active" data-i18n="nav_inicio">Início</a></li>
-            <li><a href="#curso" data-i18n="nav_curso">O Curso</a></li>
-            <li><a href="#estatisticas" data-i18n="nav_numeros">Números</a></li>
-            <li><a href="#lideres" data-i18n="nav_lideres">Líderes</a></li>
-            <li><a href="#coordenadores" data-i18n="nav_coord">Coord.</a></li>
-            <li><a href="login.html" data-i18n="nav_horarios">Horários</a></li>
-            <li><a href="#galeria" data-i18n="nav_galeria">Galeria</a></li>
-            <li><a href="#projetos" data-i18n="nav_projetos">Projetos</a></li>
-            <li><a href="login.html">SUAP</a></li>
-            <li><a href="#contato" data-i18n="nav_contato">Contato</a></li>
-            <li><a href="#mascote" data-i18n="nav_mascote">Mascote</a></li>
-          </ul>
-        </div>
-
         <div class="header-actions">
-          <!-- Idiomas e temas SÓ no desktop (escondidos no mobile via .only-desktop) -->
-          <div class="menu-dropdown only-desktop" id="menu-idioma">
-            <button class="btn-theme btn-idioma" aria-label="Idioma" data-i18n-title="idioma">
-              <i class="fa-solid fa-globe"></i>
-            </button>
-            <div class="dropdown-content">
-              <button type="button" class="dropdown-item" data-idioma="pt-BR">🇧🇷 Português</button>
-              <button type="button" class="dropdown-item" data-idioma="en">🇺🇸 English</button>
-              <button type="button" class="dropdown-item" data-idioma="es">🇪🇸 Español</button>
-            </div>
-          </div>
-
-          <div class="menu-dropdown only-desktop" id="menu-tema">
-            <button class="btn-theme btn-paleta" aria-label="Tema" data-i18n-title="tema">
-              <i class="fa-solid fa-palette"></i>
-            </button>
-            <div class="dropdown-content dropdown-temas">
-              <button type="button" class="dropdown-item" data-tema="roxo">
-                <span class="tema-swatch tema-swatch-roxo"></span>
-                <span data-i18n="cor_roxo">Roxo</span>
-              </button>
-              <button type="button" class="dropdown-item" data-tema="azul">
-                <span class="tema-swatch tema-swatch-azul"></span>
-                <span data-i18n="cor_azul">Azul</span>
-              </button>
-              <button type="button" class="dropdown-item" data-tema="verde">
-                <span class="tema-swatch tema-swatch-verde"></span>
-                <span data-i18n="cor_verde">Verde</span>
-              </button>
-              <button type="button" class="dropdown-item" data-tema="rosa">
-                <span class="tema-swatch tema-swatch-rosa"></span>
-                <span data-i18n="cor_rosa">Rosa</span>
-              </button>
-              <button type="button" class="dropdown-item" data-tema="laranja">
-                <span class="tema-swatch tema-swatch-laranja"></span>
-                <span data-i18n="cor_laranja">Laranja</span>
-              </button>
-              <div class="dropdown-separator"></div>
-              <button type="button" class="dropdown-item" data-tema="claro">
-                <i class="fa-solid fa-sun"></i>
-                <span data-i18n="modo_claro">Modo claro</span>
-              </button>
-              <button type="button" class="dropdown-item" data-tema="escuro">
-                <i class="fa-solid fa-moon"></i>
-                <span data-i18n="modo_escuro">Modo escuro</span>
-              </button>
-            </div>
-          </div>
-
-          <button id="theme-toggle" class="btn-theme only-desktop" aria-label="Alternar tema">
-            <i class="fa-solid fa-moon"></i>
-          </button>
-
-          <button id="btn-menu" class="btn-menu-hamburguer" aria-label="Menu">
+          <button id="btn-menu" class="btn-menu-hamburguer" aria-label="Abrir menu">
             <i class="fa-solid fa-bars-staggered"></i>
+            <span class="btn-menu-label" data-i18n="menu">Menu</span>
           </button>
         </div>
       </div>
@@ -158,48 +90,103 @@
 
       <nav class="menu-lateral-nav">
         <a href="#inicio" class="menu-item">
-          <i class="fa-solid fa-house"></i>
-          <span data-i18n="nav_inicio">Início</span>
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-house"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_inicio">Início</span>
+            <span class="menu-item-desc" data-i18n="nav_inicio_desc">Voltar ao topo</span>
+          </span>
         </a>
         <a href="#curso" class="menu-item">
-          <i class="fa-solid fa-graduation-cap"></i>
-          <span data-i18n="nav_curso">O Curso</span>
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_curso">O Curso</span>
+            <span class="menu-item-desc" data-i18n="nav_curso_desc">Sobre a formação</span>
+          </span>
         </a>
         <a href="#estatisticas" class="menu-item">
-          <i class="fa-solid fa-chart-simple"></i>
-          <span data-i18n="nav_numeros">Números</span>
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-chart-simple"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_numeros">Números</span>
+            <span class="menu-item-desc" data-i18n="nav_numeros_desc">A turma em dados</span>
+          </span>
         </a>
         <a href="#lideres" class="menu-item">
-          <i class="fa-solid fa-crown"></i>
-          <span data-i18n="nav_lideres">Líderes</span>
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-crown"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_lideres">Líderes</span>
+            <span class="menu-item-desc" data-i18n="nav_lideres_desc">Quem representa</span>
+          </span>
         </a>
         <a href="#coordenadores" class="menu-item">
-          <i class="fa-solid fa-user-tie"></i>
-          <span data-i18n="nav_coord">Coord.</span>
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-user-tie"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_coord">Coordenadores</span>
+            <span class="menu-item-desc" data-i18n="nav_coord_desc">Equipes e projetos</span>
+          </span>
         </a>
         <a href="login.html" class="menu-item">
-          <i class="fa-solid fa-calendar-days"></i>
-          <span data-i18n="nav_horarios">Horários</span>
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-calendar-days"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_horarios">Horários</span>
+            <span class="menu-item-desc" data-i18n="nav_horarios_desc">Rotina semanal</span>
+          </span>
         </a>
         <a href="#galeria" class="menu-item">
-          <i class="fa-solid fa-images"></i>
-          <span data-i18n="nav_galeria">Galeria</span>
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-images"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_galeria">Galeria</span>
+            <span class="menu-item-desc" data-i18n="nav_galeria_desc">Nossos momentos</span>
+          </span>
         </a>
         <a href="#projetos" class="menu-item">
-          <i class="fa-solid fa-code"></i>
-          <span data-i18n="nav_projetos">Projetos</span>
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-code"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_projetos">Projetos</span>
+            <span class="menu-item-desc" data-i18n="nav_projetos_desc">O que construímos</span>
+          </span>
         </a>
         <a href="login.html" class="menu-item">
-          <i class="fa-solid fa-id-card"></i>
-          <span>SUAP</span>
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-id-card"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo">SUAP</span>
+            <span class="menu-item-desc" data-i18n="nav_suap_desc">Portal acadêmico</span>
+          </span>
         </a>
         <a href="#contato" class="menu-item">
-          <i class="fa-solid fa-envelope"></i>
-          <span data-i18n="nav_contato">Contato</span>
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-envelope"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_contato">Contato</span>
+            <span class="menu-item-desc" data-i18n="nav_contato_desc">Fale com a turma</span>
+          </span>
         </a>
         <a href="#mascote" class="menu-item">
-          <i class="fa-solid fa-paw"></i>
-          <span data-i18n="nav_mascote">Mascote</span>
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-paw"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_mascote">Mascote</span>
+            <span class="menu-item-desc" data-i18n="nav_mascote_desc">Interaja com ele</span>
+          </span>
         </a>
       </nav>
 
@@ -646,7 +633,6 @@
     </footer>
 
     <a
-      style="-webkit-tap-highlight-color: transparent"
       href="#inicio"
       id="back-to-top"
       class="back-to-top"
