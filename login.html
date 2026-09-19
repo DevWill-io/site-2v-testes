@@ -12,7 +12,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.11/index.global.min.js"></script>
-    <!-- 🆕 Chart.js para o gráfico de evolução -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
     <link
@@ -33,7 +32,6 @@
         <i class="fa-solid fa-code-branch"></i>InfoWeb<span>- 2V</span>
       </a>
       <div class="header-actions">
-        <!-- 🆕 Sino de notificações (aparece só logado) -->
         <button
           id="btn-notificacoes"
           class="btn-theme btn-notificacoes is-hidden"
@@ -109,23 +107,17 @@
       </div>
     </main>
 
-    <!-- ============================================
-         PAINEL DE PRÓXIMOS EVENTOS 🆕
-         ============================================ -->
+    <!-- PRÓXIMOS EVENTOS -->
     <section
       id="proximos-eventos"
       class="proximos-eventos is-authenticated is-hidden"
     >
       <div class="container">
-        <div id="proximos-eventos-lista" class="proximos-eventos-lista">
-          <!-- Preenchido via JS -->
-        </div>
+        <div id="proximos-eventos-lista" class="proximos-eventos-lista"></div>
       </div>
     </section>
 
-    <!-- ============================================
-         CALCULADORA DE NOTAS V3
-         ============================================ -->
+    <!-- CALCULADORA DE NOTAS -->
     <section id="notas" class="notas is-authenticated is-hidden">
       <div class="container">
         <div class="section-title">
@@ -246,7 +238,6 @@
           </div>
         </div>
 
-        <!-- 🆕 GRÁFICO DE EVOLUÇÃO -->
         <div class="evolucao-panel is-hidden" id="evolucao-panel">
           <div class="evolucao-header">
             <h3><i class="fa-solid fa-chart-line"></i> Evolução das Médias</h3>
@@ -723,7 +714,7 @@
       </div>
     </div>
 
-    <!-- 🆕 PAINEL DE NOTIFICAÇÕES (dropdown) -->
+    <!-- PAINEL DE NOTIFICAÇÕES -->
     <div id="painel-notificacoes" class="painel-notificacoes is-hidden">
       <div class="painel-notif-header">
         <strong><i class="fa-regular fa-bell"></i> Notificações</strong>
