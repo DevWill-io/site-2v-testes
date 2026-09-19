@@ -1079,3 +1079,95 @@ body.light-theme .frase-do-dia {
 .btn-like { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; transition: var(--transition); }
 .btn-like:hover { color: var(--danger); transform: scale(1.1); }
 .sem-recados { text-align: center; padding: 40px; color: var(--text-muted); font-style: italic; }
+
+/* ==========================================
+   ⚡ OTIMIZAÇÕES DE PERFORMANCE
+   ========================================== */
+
+/* Reduz blur do navbar (12px → 8px) */
+.navbar {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Overlay do menu lateral SEM blur (era o maior vilão) */
+.menu-lateral-overlay {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* Força aceleração GPU em elementos animados */
+.hero-logo,
+.particle,
+.coracao-animado,
+.confete,
+.spinner {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* Desativa animações pesadas quando não estão visíveis */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Otimiza o menu lateral (evita repaint desnecessário) */
+.menu-lateral {
+    contain: layout style paint;
+}
+
+/* Reduz custo do blur em telas pequenas */
+@media (max-width: 768px) {
+    .navbar {
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+    }
+}
+
+/* Desativa o bg-glow (radial-gradient gigante) em mobile — economiza muito */
+@media (max-width: 600px) {
+    .bg-glow {
+        display: none;
+    }
+}
+
+/* Reduz a quantidade de partículas no hero em telas pequenas */
+@media (max-width: 768px) {
+    #particles-container {
+        display: none;
+    }
+}
+
+/* Scroll progress: usa transform em vez de width (muito mais rápido) */
+#scroll-progress {
+    width: 100%;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.1s linear;
+}
+
+/* Reduz shadow pesada em cards quando em mobile */
+@media (max-width: 600px) {
+    .curso-card,
+    .stat-card,
+    .contato-card,
+    .projeto-card {
+        box-shadow: 0 4px 12px var(--shadow);
+    }
+}
+
+/* Smooth scroll só quando o usuário não tem preferência por redução de movimento */
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
+}

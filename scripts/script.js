@@ -14,6 +14,18 @@ const TRADUCOES = {
     nav_projetos: "Projetos",
     nav_contato: "Contato",
     nav_mascote: "Mascote",
+    nav_inicio_desc: "Voltar ao topo",
+    nav_curso_desc: "Sobre a formação",
+    nav_numeros_desc: "A turma em dados",
+    nav_lideres_desc: "Quem representa",
+    nav_coord_desc: "Equipes e projetos",
+    nav_horarios_desc: "Rotina semanal",
+    nav_galeria_desc: "Nossos momentos",
+    nav_projetos_desc: "O que construímos",
+    nav_suap_desc: "Portal acadêmico",
+    nav_contato_desc: "Fale com a turma",
+    nav_mascote_desc: "Interaja com ele",
+    menu: "Menu",
     idioma: "Idioma",
     tema: "Tema",
     cor_roxo: "Roxo",
@@ -109,6 +121,18 @@ const TRADUCOES = {
     nav_projetos: "Projects",
     nav_contato: "Contact",
     nav_mascote: "Mascot",
+    nav_inicio_desc: "Back to top",
+    nav_curso_desc: "About the course",
+    nav_numeros_desc: "Class in data",
+    nav_lideres_desc: "Who represents",
+    nav_coord_desc: "Teams and projects",
+    nav_horarios_desc: "Weekly routine",
+    nav_galeria_desc: "Our moments",
+    nav_projetos_desc: "What we build",
+    nav_suap_desc: "Academic portal",
+    nav_contato_desc: "Talk to class",
+    nav_mascote_desc: "Interact with it",
+    menu: "Menu",
     idioma: "Language",
     tema: "Theme",
     cor_roxo: "Purple",
@@ -204,6 +228,18 @@ const TRADUCOES = {
     nav_projetos: "Proyectos",
     nav_contato: "Contacto",
     nav_mascote: "Mascota",
+    nav_inicio_desc: "Volver arriba",
+    nav_curso_desc: "Sobre el curso",
+    nav_numeros_desc: "La clase en datos",
+    nav_lideres_desc: "Quién representa",
+    nav_coord_desc: "Equipos y proyectos",
+    nav_horarios_desc: "Rutina semanal",
+    nav_galeria_desc: "Nuestros momentos",
+    nav_projetos_desc: "Lo que construimos",
+    nav_suap_desc: "Portal académico",
+    nav_contato_desc: "Habla con la clase",
+    nav_mascote_desc: "Interactúa con él",
+    menu: "Menú",
     idioma: "Idioma",
     tema: "Tema",
     cor_roxo: "Morado",
@@ -562,17 +598,27 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 10. Barra de Progresso
-  const scrollProgress = document.getElementById("scroll-progress");
-  if (scrollProgress) {
-    window.addEventListener("scroll", () => {
-      const scrollable =
-        document.documentElement.scrollHeight - window.innerHeight;
-      const scrolled = window.scrollY;
-      const progress = (scrolled / scrollable) * 100;
-      scrollProgress.style.width = `${progress}%`;
-    });
-  }
+  // 10. Barra de Progresso (otimizada com transform)
+const scrollProgress = document.getElementById("scroll-progress");
+if (scrollProgress) {
+  let ticking = false;
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const scrollable =
+          document.documentElement.scrollHeight - window.innerHeight;
+        const scrolled = window.scrollY;
+        const progress = scrollable > 0 ? scrolled / scrollable : 0;
+        scrollProgress.style.transform = `scaleX(${progress})`;
+        ticking = false;
+      });
+    },
+    { passive: true }
+  );
+}
 
   // 11. Partículas
   function createParticles() {
@@ -749,19 +795,16 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => btnFecharMenu?.focus(), 100);
 }
   function fecharMenuLateral() {
-    menuLateral?.classList.remove("aberto");
-    menuLateralOverlay?.classList.remove("aberto");
-    menuLateral?.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("menu-aberto");
-    document.getElementById("submenu-idioma")?.classList.remove("aberto");
-    document.getElementById("submenu-tema")?.classList.remove("aberto");
-    document.getElementById("menu-btn-idioma")?.setAttribute("aria-expanded", "false");
-    document.getElementById("menu-btn-tema")?.setAttribute("aria-expanded", "false");
-        // 🆕 blur pra remover foco fantasma
-    const btnMenuEl = document.getElementById("btn-menu");
-    if (btnMenuEl) {
-        btnMenuEl.blur();
-    }
+  menuLateral?.classList.remove("aberto");
+  menuLateralOverlay?.classList.remove("aberto");
+  menuLateral?.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("menu-aberto");
+  document.getElementById("submenu-idioma")?.classList.remove("aberto");
+  document.getElementById("submenu-tema")?.classList.remove("aberto");
+  document.getElementById("menu-btn-idioma")?.setAttribute("aria-expanded", "false");
+  document.getElementById("menu-btn-tema")?.setAttribute("aria-expanded", "false");
+  const btnMenuEl = document.getElementById("btn-menu");
+  if (btnMenuEl) btnMenuEl.blur();
 }
 
   btnMenuLateral?.addEventListener("click", abrirMenuLateral);
@@ -774,11 +817,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  document.querySelectorAll(".menu-lateral-nav .menu-item").forEach((item) => {
+    document.querySelectorAll(".menu-lateral-nav .menu-item").forEach((item) => {
     item.addEventListener("click", () => {
-      setTimeout(fecharMenuLateral, 100);
+        // Fecha imediatamente, sem setTimeout (mais leve)
+        fecharMenuLateral();
     });
-  });
+    });
 
   // Submenus internos
   const btnSubmenuIdioma = document.getElementById("menu-btn-idioma");
