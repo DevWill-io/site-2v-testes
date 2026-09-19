@@ -7,7 +7,7 @@ var SUAP_URL = "https://suap.ifrn.edu.br";
 var SCOPE = "identificacao email documentos_pessoais";
 
 // ==========================================
-// 🎨 HELPERS DE COR (Canvas precisa de hex/rgb clássico)
+// 🎨 HELPERS DE COR
 // ==========================================
 function corParaHex(cor, fallback) {
   fallback = fallback || "#8b5edd";
@@ -25,14 +25,7 @@ function corParaHex(cor, fallback) {
     var r = parseInt(mRgb[1], 10),
       g = parseInt(mRgb[2], 10),
       b = parseInt(mRgb[3], 10);
-    return (
-      "#" +
-      [r, g, b]
-        .map(function (n) {
-          return n.toString(16).padStart(2, "0");
-        })
-        .join("")
-    );
+    return "#" + [r, g, b].map(function (n) { return n.toString(16).padStart(2, "0"); }).join("");
   }
 
   var mHsl = cor.match(/^hsla?\(\s*([\d.]+)[\s,]+([\d.]+)%[\s,]+([\d.]+)%/i);
@@ -53,14 +46,7 @@ function corParaHex(cor, fallback) {
     var rr = Math.round(hue2rgb(p, q, h + 1 / 3) * 255);
     var gg = Math.round(hue2rgb(p, q, h) * 255);
     var bb = Math.round(hue2rgb(p, q, h - 1 / 3) * 255);
-    return (
-      "#" +
-      [rr, gg, bb]
-        .map(function (n) {
-          return n.toString(16).padStart(2, "0");
-        })
-        .join("")
-    );
+    return "#" + [rr, gg, bb].map(function (n) { return n.toString(16).padStart(2, "0"); }).join("");
   }
 
   return fallback;
@@ -131,6 +117,23 @@ const TRADUCOES_LOGIN = {
     notificacoes: "Notificações",
     marcar_todas: "Marcar todas",
     sem_notif: "Sem notificações.",
+
+    /* 🆕 Menu lateral */
+    menu: "Menu",
+    nav_notas: "Notas",
+    nav_notas_desc: "Sua calculadora",
+    nav_horarios: "Horários",
+    nav_horarios_desc: "Rotina semanal",
+    nav_mural: "Mural",
+    nav_mural_desc: "Recados da turma",
+    nav_membros: "Membros",
+    nav_membros_desc: "Colegas do sistema",
+    nav_agenda: "Agenda",
+    nav_agenda_desc: "Eventos do calendário",
+    nav_mascote: "Mascote",
+    nav_mascote_desc: "Interaja com ele",
+    nav_sala: "Sala dos Professores",
+    nav_sala_desc: "Acesso restrito",
 
     calc_titulo_1: "Calculadora de",
     calc_titulo_2: "Notas",
@@ -260,6 +263,7 @@ const TRADUCOES_LOGIN = {
     footer_feito: "- Feito pela turma",
     footer_carinho: "Com Carinho 💜",
   },
+
   en: {
     titulo_pagina_login: "SUAP Login | Class 2V IFRN",
     voltar: "Back",
@@ -288,6 +292,22 @@ const TRADUCOES_LOGIN = {
     notificacoes: "Notifications",
     marcar_todas: "Mark all",
     sem_notif: "No notifications.",
+
+    menu: "Menu",
+    nav_notas: "Grades",
+    nav_notas_desc: "Your calculator",
+    nav_horarios: "Schedule",
+    nav_horarios_desc: "Weekly routine",
+    nav_mural: "Board",
+    nav_mural_desc: "Class messages",
+    nav_membros: "Members",
+    nav_membros_desc: "Classmates",
+    nav_agenda: "Agenda",
+    nav_agenda_desc: "Calendar events",
+    nav_mascote: "Mascot",
+    nav_mascote_desc: "Interact with it",
+    nav_sala: "Teachers' Room",
+    nav_sala_desc: "Restricted access",
 
     calc_titulo_1: "Grade",
     calc_titulo_2: "Calculator",
@@ -417,6 +437,7 @@ const TRADUCOES_LOGIN = {
     footer_feito: "- Made by class",
     footer_carinho: "With love 💜",
   },
+
   es: {
     titulo_pagina_login: "Login SUAP | Clase 2V IFRN",
     voltar: "Volver",
@@ -445,6 +466,22 @@ const TRADUCOES_LOGIN = {
     notificacoes: "Notificaciones",
     marcar_todas: "Marcar todas",
     sem_notif: "Sin notificaciones.",
+
+    menu: "Menú",
+    nav_notas: "Notas",
+    nav_notas_desc: "Tu calculadora",
+    nav_horarios: "Horarios",
+    nav_horarios_desc: "Rutina semanal",
+    nav_mural: "Mural",
+    nav_mural_desc: "Mensajes de la clase",
+    nav_membros: "Miembros",
+    nav_membros_desc: "Compañeros del sistema",
+    nav_agenda: "Agenda",
+    nav_agenda_desc: "Eventos del calendario",
+    nav_mascote: "Mascota",
+    nav_mascote_desc: "Interactúa con ella",
+    nav_sala: "Sala de Profesores",
+    nav_sala_desc: "Acceso restringido",
 
     calc_titulo_1: "Calculadora de",
     calc_titulo_2: "Notas",
@@ -619,11 +656,9 @@ function aplicarTraducoes() {
     if (texto) el.setAttribute("title", texto);
   });
 
-  document
-    .querySelectorAll("#menu-idioma .dropdown-item")
-    .forEach(function (btn) {
-      btn.classList.toggle("ativo", btn.dataset.idioma === lang);
-    });
+  document.querySelectorAll("#menu-idioma .dropdown-item").forEach(function (btn) {
+    btn.classList.toggle("ativo", btn.dataset.idioma === lang);
+  });
 
   document.title = t("titulo_pagina_login");
 }
@@ -667,11 +702,9 @@ function aplicarTema(novoTema) {
     meta.setAttribute("content", cores[novoTema] || "#8b5edd");
   }
 
-  document
-    .querySelectorAll("#menu-tema .dropdown-item")
-    .forEach(function (btn) {
-      btn.classList.toggle("ativo", btn.dataset.tema === novoTema);
-    });
+  document.querySelectorAll("#menu-tema .dropdown-item").forEach(function (btn) {
+    btn.classList.toggle("ativo", btn.dataset.tema === novoTema);
+  });
 
   if (typeof desenharGraficoEvolucao === "function") {
     setTimeout(desenharGraficoEvolucao, 60);
@@ -1290,7 +1323,6 @@ window.forceLogout = function () {
   sessionStorage.clear();
   window.location.replace(window.location.origin + "/login.html");
 };
-
 // ==========================================
 // EDIÇÃO DE PERFIL
 // ==========================================
@@ -1995,7 +2027,6 @@ function desenharGraficoEvolucao() {
   var panel = document.getElementById("evolucao-panel");
 
   if (!canvas || !panel) return;
-
   if (typeof Chart === "undefined") {
     panel.classList.add("is-hidden");
     return;
@@ -2009,23 +2040,16 @@ function desenharGraficoEvolucao() {
     panel.classList.add("is-hidden");
     return;
   }
-
   panel.classList.remove("is-hidden");
 
   var ordenado = __historicoPeriodos.slice().sort(function (a, b) {
     return a.periodo.localeCompare(b.periodo);
   });
-  var labels = ordenado.map(function (h) {
-    return h.periodo;
-  });
-  var dados = ordenado.map(function (h) {
-    return h.media !== null ? h.media : 0;
-  });
+  var labels = ordenado.map(function (h) { return h.periodo; });
+  var dados = ordenado.map(function (h) { return h.media !== null ? h.media : 0; });
 
   if (window.__graficoEvolucao) {
-    try {
-      window.__graficoEvolucao.destroy();
-    } catch (e) {}
+    try { window.__graficoEvolucao.destroy(); } catch (e) {}
     window.__graficoEvolucao = null;
   }
 
@@ -2038,7 +2062,6 @@ function desenharGraficoEvolucao() {
 
   var ctx = canvas.getContext("2d");
   var gradient = ctx.createLinearGradient(0, 0, 0, 260);
-
   addStopSeguro(gradient, 0, corAccent + "cc", "rgba(139,94,221,0.8)");
   addStopSeguro(gradient, 1, corAccent + "08", "rgba(139,94,221,0.03)");
 
@@ -2049,68 +2072,32 @@ function desenharGraficoEvolucao() {
         labels: labels,
         datasets: [
           {
-            label: "Média",
-            data: dados,
-            borderColor: corAccent,
-            backgroundColor: gradient,
-            borderWidth: 3,
-            pointBackgroundColor: corAccent2,
-            pointBorderColor: corAccent,
-            pointBorderWidth: 2,
-            pointRadius: 6,
-            pointHoverRadius: 9,
-            tension: 0.35,
-            fill: true,
+            label: "Média", data: dados,
+            borderColor: corAccent, backgroundColor: gradient, borderWidth: 3,
+            pointBackgroundColor: corAccent2, pointBorderColor: corAccent, pointBorderWidth: 2,
+            pointRadius: 6, pointHoverRadius: 9, tension: 0.35, fill: true,
           },
           {
-            label: "Meta",
-            data: labels.map(function () {
-              return __metaAtual;
-            }),
-            borderColor: corMeta,
-            borderWidth: 2,
-            borderDash: [6, 6],
-            pointRadius: 0,
-            fill: false,
+            label: "Meta", data: labels.map(function () { return __metaAtual; }),
+            borderColor: corMeta, borderWidth: 2, borderDash: [6, 6], pointRadius: 0, fill: false,
           },
         ],
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: false,
         interaction: { mode: "index", intersect: false },
         plugins: {
-          legend: {
-            labels: {
-              color: corTexto,
-              font: { family: "Inter", size: 12, weight: "600" },
-              usePointStyle: true,
-            },
-          },
+          legend: { labels: { color: corTexto, font: { family: "Inter", size: 12, weight: "600" }, usePointStyle: true } },
           tooltip: {
             backgroundColor: "rgba(0,0,0,0.85)",
-            titleFont: { family: "Inter", size: 13 },
-            bodyFont: { family: "Inter", size: 12 },
-            padding: 10,
-            cornerRadius: 8,
-            callbacks: {
-              label: function (context) {
-                return context.dataset.label + ": " + context.parsed.y.toFixed(1);
-              },
-            },
+            titleFont: { family: "Inter", size: 13 }, bodyFont: { family: "Inter", size: 12 },
+            padding: 10, cornerRadius: 8,
+            callbacks: { label: function (context) { return context.dataset.label + ": " + context.parsed.y.toFixed(1); } },
           },
         },
         scales: {
-          y: {
-            beginAtZero: true,
-            max: 100,
-            ticks: { color: corTexto, font: { family: "Inter", size: 11 }, stepSize: 20 },
-            grid: { color: corGrade, drawBorder: false },
-          },
-          x: {
-            ticks: { color: corTexto, font: { family: "Inter", size: 11, weight: "600" } },
-            grid: { display: false },
-          },
+          y: { beginAtZero: true, max: 100, ticks: { color: corTexto, font: { family: "Inter", size: 11 }, stepSize: 20 }, grid: { color: corGrade, drawBorder: false } },
+          x: { ticks: { color: corTexto, font: { family: "Inter", size: 11, weight: "600" } }, grid: { display: false } },
         },
       },
     });
@@ -2133,9 +2120,7 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   if (apenasLinhaCodigo && __notasCache.length) {
     var tr = corpo.querySelector(`tr[data-codigo="${CSS.escape(apenasLinhaCodigo)}"]`);
     if (tr) {
-      var d = __notasCache.find(function (x) {
-        return getCodigoDisc(x) === apenasLinhaCodigo;
-      });
+      var d = __notasCache.find(function (x) { return getCodigoDisc(x) === apenasLinhaCodigo; });
       if (d) {
         atualizarLinhaNota(tr, d, meta);
         atualizarResumoNotas(__notasCache);
@@ -2222,20 +2207,14 @@ function criarLinhaNota(d, etapas, tipo, meta) {
   }[status];
   var linhaRisco = status === "reprovado" || faltasClasse === "critico" ? "linha-risco" : "";
   var linhaSim = calc.simulando ? "simulando" : "";
-  var etapasHTML = notasEtapas
-    .map(function (n) {
-      return '<span class="etapa-pill">' + textoNota(n) + "</span>";
-    })
-    .join("");
+  var etapasHTML = notasEtapas.map(function (n) {
+    return '<span class="etapa-pill">' + textoNota(n) + "</span>";
+  }).join("");
   var percentual = media !== null ? Math.min(media, 100) : 0;
   var mediaHTML =
-    '<div class="media-cell"><span>' +
-    textoNota(media) +
-    '</span><div class="media-bar"><div class="media-bar-fill ' +
-    status +
-    '" style="width:' +
-    percentual +
-    '%"></div></div></div>';
+    '<div class="media-cell"><span>' + textoNota(media) +
+    '</span><div class="media-bar"><div class="media-bar-fill ' + status +
+    '" style="width:' + percentual + '%"></div></div></div>';
   var temEtapaEmAberto = calc.temEtapaAberta;
   var simuladorHTML = temEtapaEmAberto
     ? `<div class="simulador-cell"><input type="number" class="simulador-input" data-codigo="${escaparHTML(codigo)}" min="0" max="100" step="0.1" placeholder="Nota" value="${sim != null ? sim : ""}" />${calc.simulando ? `<span class="simulador-resultado ${status === "aprovado" ? "ok" : status === "recuperacao" ? "mid" : "ruim"}">${textoNota(media)}</span>` : ""}</div>`
@@ -2320,9 +2299,7 @@ function bindSimuladores(corpo) {
         if (Number.isFinite(num)) __simulacoes[cod] = Math.max(0, Math.min(100, num));
       }
       var tr = input.closest("tr");
-      var d = __notasCache.find(function (x) {
-        return getCodigoDisc(x) === cod;
-      });
+      var d = __notasCache.find(function (x) { return getCodigoDisc(x) === cod; });
       if (tr && d) {
         atualizarLinhaNota(tr, d, __metaAtual);
         atualizarResumoNotas(__notasCache);
@@ -2348,9 +2325,7 @@ function abrirModalMetaDisciplina(codigo, nome) {
   nomeEl.textContent = nome;
   rangeInput.value = atual;
   numEl.textContent = atual;
-  rangeInput.oninput = function () {
-    numEl.textContent = rangeInput.value;
-  };
+  rangeInput.oninput = function () { numEl.textContent = rangeInput.value; };
   var btnReset = modal.querySelector("[data-reset]");
   var btnSalvar = modal.querySelector("[data-salvar]");
   var btnFechar = modal.querySelector("[data-fechar]");
@@ -2368,20 +2343,13 @@ function abrirModalMetaDisciplina(codigo, nome) {
     if (__notasCache.length) renderizarNotas(__notasCache);
     exibirToast("Meta salva (" + rangeInput.value + ").", "sucesso");
   };
-  btnFechar.onclick = function () {
-    modal.classList.add("is-hidden");
-  };
-  modal.onclick = function (e) {
-    if (e.target === modal) modal.classList.add("is-hidden");
-  };
+  btnFechar.onclick = function () { modal.classList.add("is-hidden"); };
+  modal.onclick = function (e) { if (e.target === modal) modal.classList.add("is-hidden"); };
   modal.classList.remove("is-hidden");
 }
 
 function exportarCSV() {
-  if (!__notasCache.length) {
-    exibirToast("Nada para exportar.", "erro");
-    return;
-  }
+  if (!__notasCache.length) { exibirToast("Nada para exportar.", "erro"); return; }
   var linhas = [];
   linhas.push(["Disciplina", "Tipo", "Etapas", "Média", "Meta", "Faltas", "Projeção", "Status"].join(";"));
   __notasCache.forEach(function (d) {
@@ -2400,26 +2368,19 @@ function exportarCSV() {
   var periodo = (document.getElementById("periodo-notas")?.value || "boletim").replace("/", ".");
   a.href = url;
   a.download = "boletim_" + periodo + ".csv";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
   exibirToast("CSV exportado!", "sucesso");
 }
 
 function exportarPDF() {
-  if (!__notasCache.length) {
-    exibirToast("Nada para exportar.", "erro");
-    return;
-  }
+  if (!__notasCache.length) { exibirToast("Nada para exportar.", "erro"); return; }
   var periodo = document.getElementById("periodo-notas")?.value || "";
   var nome = window.usuarioLogado.nome || "Aluno";
   var mat = window.usuarioLogado.matricula || "";
   var linhasHTML = "";
   ["Semestral", "Anual"].forEach(function (tipo) {
-    var doTipo = __notasCache.filter(function (d) {
-      return obterEtapasDaDisciplina(d).tipo === tipo;
-    });
+    var doTipo = __notasCache.filter(function (d) { return obterEtapasDaDisciplina(d).tipo === tipo; });
     if (!doTipo.length) return;
     linhasHTML += `<tr class="grupo"><td colspan="6"><strong>${tipo === "Semestral" ? "Matérias Semestrais" : "Matérias Anuais"}</strong></td></tr>`;
     doTipo.forEach(function (d) {
@@ -2438,6 +2399,47 @@ function exportarPDF() {
   w.document.close();
 }
 
+function salvarResumoBoletimFirebase(ano, periodo, disciplinas) {
+  var mat = window.usuarioLogado.matricula;
+  if (!mat || mat === "Matrícula não disponível") return;
+  if (!disciplinas || !disciplinas.length) return;
+
+  try {
+    var somaMedias = 0;
+    var contMedias = 0;
+    var faltasTotais = 0;
+
+    disciplinas.forEach(function (d) {
+      var etapas = obterEtapasDaDisciplina(d).etapas;
+      var notas = etapas.map(function (n) {
+        var e = d["nota_etapa_" + n];
+        return formatarNota(e && typeof e === "object" ? e.nota : e);
+      });
+      var preenchidas = notas.filter(function (v) { return v !== null; });
+      var soma = preenchidas.reduce(function (a, b) { return a + b; }, 0);
+      var mediaApi = formatarNota(d.media_disciplina);
+      var media = preenchidas.length ? soma / preenchidas.length : mediaApi;
+
+      if (media !== null) { somaMedias += media; contMedias++; }
+      faltasTotais += Number(d.numero_faltas) || 0;
+    });
+
+    var mediaGeral = contMedias ? somaMedias / contMedias : null;
+
+    update(ref(db, "resumo_boletim/" + mat), {
+      mediaGeral: mediaGeral,
+      faltasTotais: faltasTotais,
+      disciplinasCount: disciplinas.length,
+      periodo: ano + "." + periodo,
+      atualizadoEm: Date.now(),
+    }).catch(function (err) {
+      console.warn("[resumo boletim] erro:", err);
+    });
+  } catch (e) {
+    console.warn("[resumo boletim] exceção:", e);
+  }
+}
+
 function carregarBoletim(ano, periodo) {
   atualizarStatusNotas("Buscando notas no SUAP...", "loading");
   suap.getAuthenticatedResource(
@@ -2449,8 +2451,6 @@ function carregarBoletim(ano, periodo) {
       atualizarHistoricoComDisciplinas(disciplinas, label, ano);
       var total = resposta.count || disciplinas.length;
       atualizarStatusNotas(total + " disciplina(s) carregada(s).", "sucesso");
-
-      // 🆕 SALVA RESUMO NO FIREBASE (para a Sala dos Professores)
       salvarResumoBoletimFirebase(ano, periodo, disciplinas);
     },
     function (xhr) {
@@ -2516,18 +2516,14 @@ function gerarNotificacoesRecados() {
       lida: !!lidas[r.id],
     });
   });
-  __notificacoes.sort(function (a, b) {
-    return b.data - a.data;
-  });
+  __notificacoes.sort(function (a, b) { return b.data - a.data; });
   atualizarBadgeNotificacoes();
 }
 
 function atualizarBadgeNotificacoes() {
   var btn = document.getElementById("btn-notificacoes");
   var badge = document.getElementById("badge-notificacoes");
-  var naoLidas = __notificacoes.filter(function (n) {
-    return !n.lida;
-  }).length;
+  var naoLidas = __notificacoes.filter(function (n) { return !n.lida; }).length;
   if (btn) btn.classList.remove("is-hidden");
   if (badge) {
     if (naoLidas > 0) {
@@ -2565,31 +2561,24 @@ function marcarNotificacaoLida(id) {
   try {
     var raw = localStorage.getItem(CHAVE_NOTIF_LIDAS());
     lidas = raw ? JSON.parse(raw) : {};
-  } catch (e) {
-    lidas = {};
-  }
+  } catch (e) { lidas = {}; }
   lidas[id] = true;
   localStorage.setItem(CHAVE_NOTIF_LIDAS(), JSON.stringify(lidas));
-  __notificacoes.forEach(function (n) {
-    if (n.id === id) n.lida = true;
-  });
+  __notificacoes.forEach(function (n) { if (n.id === id) n.lida = true; });
   atualizarBadgeNotificacoes();
   renderizarPainelNotificacoes();
 }
 
 function marcarTodasLidas() {
   var lidas = {};
-  __notificacoes.forEach(function (n) {
-    lidas[n.id] = true;
-    n.lida = true;
-  });
+  __notificacoes.forEach(function (n) { lidas[n.id] = true; n.lida = true; });
   localStorage.setItem(CHAVE_NOTIF_LIDAS(), JSON.stringify(lidas));
   atualizarBadgeNotificacoes();
   renderizarPainelNotificacoes();
 }
 
 // ==========================================
-// PRÓXIMOS EVENTOS + CONTAGEM REGRESSIVA
+// PRÓXIMOS EVENTOS + CONTAGEM
 // ==========================================
 let __contagemInterval = null;
 
@@ -2612,6 +2601,7 @@ function renderizarProximosEventos(eventos) {
       return da - db;
     })
     .slice(0, 4);
+
   if (proximos.length === 0) {
     container.innerHTML = "";
     document.getElementById("proximos-eventos")?.classList.add("is-hidden");
@@ -2642,7 +2632,6 @@ function renderizarProximosEventos(eventos) {
       .join("");
   }
 
-  // 🆕 Contagem regressiva com os mesmos eventos
   atualizarContagemRegressiva(eventos);
 }
 
@@ -2747,18 +2736,6 @@ function atualizarTimersContagem() {
 // ==========================================
 // 🆕 SALA DOS PROFESSORES
 // ==========================================
-function revelarSalaProfessores() {
-  if (!window.usuarioLogado.matricula) return;
-  if (!ADMIN_MATRICULAS_SALA.includes(window.usuarioLogado.matricula)) return;
-
-  const secao = document.getElementById("sala-professores");
-  if (secao) {
-    secao.classList.remove("is-admin-hidden");
-    secao.classList.remove("is-hidden");
-  }
-}
-window.revelarSalaProfessores = revelarSalaProfessores;
-
 async function carregarSalaProfessores() {
   if (__salaDadosCarregados) return;
   __salaDadosCarregados = true;
@@ -2767,7 +2744,6 @@ async function carregarSalaProfessores() {
   if (!tbody) return;
 
   try {
-    // Busca perfis, carinhos e resumos em paralelo
     const [perfisSnap, carinhosSnap, resumosSnap, recadosSnap] = await Promise.all([
       get(perfisRef),
       get(ref(db, "mascote/por_aluno")),
@@ -2780,23 +2756,24 @@ async function carregarSalaProfessores() {
     const resumos = resumosSnap.val() || {};
     const totalRecados = recadosSnap.exists() ? Object.keys(recadosSnap.val()).length : 0;
 
-    const alunos = Object.keys(perfis).map((mat) => {
-      const p = perfis[mat] || {};
-      const r = resumos[mat] || {};
-      return {
-        matricula: mat,
-        nome: p.nome || p.nomeCompleto || "Aluno " + mat.slice(-4),
-        nomeCompleto: p.nomeCompleto || p.nome || "",
-        foto: p.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.nome || mat)}&background=random`,
-        carinhos: Number(carinhos[mat]) || 0,
-        ultimoAcesso: p.ultimoAcesso || 0,
-        // 🆕 dados do boletim
-        mediaGeral: typeof r.mediaGeral === "number" ? r.mediaGeral : null,
-        faltasTotais: typeof r.faltasTotais === "number" ? r.faltasTotais : null,
-        periodo: r.periodo || "—",
-        atualizadoEm: r.atualizadoEm || 0,
-      };
-    });
+    const alunos = Object.keys(perfis)
+      .filter((mat) => !String(mat).startsWith("anon_"))
+      .map((mat) => {
+        const p = perfis[mat] || {};
+        const r = resumos[mat] || {};
+        return {
+          matricula: mat,
+          nome: p.nome || p.nomeCompleto || "Aluno " + mat.slice(-4),
+          nomeCompleto: p.nomeCompleto || p.nome || "",
+          foto: p.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.nome || mat)}&background=random`,
+          carinhos: Number(carinhos[mat]) || 0,
+          ultimoAcesso: p.ultimoAcesso || 0,
+          mediaGeral: typeof r.mediaGeral === "number" ? r.mediaGeral : null,
+          faltasTotais: typeof r.faltasTotais === "number" ? r.faltasTotais : null,
+          periodo: r.periodo || "—",
+          atualizadoEm: r.atualizadoEm || 0,
+        };
+      });
 
     alunos.sort((a, b) => a.nome.localeCompare(b.nome));
 
@@ -2818,18 +2795,20 @@ async function carregarSalaProfessores() {
             statusLabel = `${diasSemAcesso}d sem acesso`;
           }
 
-          // Média com cor
-          let mediaHTML = '<span style="color:var(--text-muted)">—</span>';
+          let mediaHTML;
           if (a.mediaGeral !== null) {
             const cor = a.mediaGeral >= 60 ? "var(--success)" : a.mediaGeral >= 40 ? "var(--warning)" : "var(--danger)";
             mediaHTML = `<strong style="color:${cor}">${a.mediaGeral.toFixed(1)}</strong>`;
+          } else {
+            mediaHTML = `<span class="sala-sem-dados" title="Aluno ainda não abriu o site desde que essa funcionalidade foi criada"><i class="fa-solid fa-clock"></i> Pendente</span>`;
           }
 
-          // Faltas com alerta
-          let faltasHTML = '<span style="color:var(--text-muted)">—</span>';
+          let faltasHTML;
           if (a.faltasTotais !== null) {
             const cor = a.faltasTotais > 15 ? "var(--danger)" : a.faltasTotais > 10 ? "var(--warning)" : "var(--text-main)";
             faltasHTML = `<span style="color:${cor};font-weight:600">${a.faltasTotais}</span>`;
+          } else {
+            faltasHTML = `<span class="sala-sem-dados"><i class="fa-solid fa-clock"></i> Pendente</span>`;
           }
 
           return `
@@ -2850,18 +2829,14 @@ async function carregarSalaProfessores() {
         .join("");
     }
 
-    // Stats
     const totalCarinhos = Object.values(carinhos).reduce((a, b) => a + (Number(b) || 0), 0);
     document.getElementById("sala-stat-total-carinhos").textContent = totalCarinhos.toLocaleString("pt-BR");
     document.getElementById("sala-stat-total-recados").textContent = totalRecados;
     document.getElementById("sala-stat-total-alunos").textContent = alunos.length;
 
     const top = alunos.reduce((max, a) => (a.carinhos > (max?.carinhos || 0) ? a : max), null);
-    document.getElementById("sala-stat-top-carinhos").textContent = top
-      ? `${top.nome} (${top.carinhos})`
-      : "—";
+    document.getElementById("sala-stat-top-carinhos").textContent = top ? `${top.nome} (${top.carinhos})` : "—";
 
-    // Lista de engajamento
     const engajamentoLista = document.getElementById("sala-engajamento-lista");
     if (engajamentoLista) {
       const ordenados = [...alunos].sort((a, b) => b.carinhos - a.carinhos).slice(0, 10);
@@ -2881,7 +2856,6 @@ async function carregarSalaProfessores() {
         .join("") || '<p class="sala-vazio-msg">Sem dados de engajamento ainda.</p>';
     }
 
-    // Bind busca
     const buscaInput = document.getElementById("sala-busca-aluno");
     if (buscaInput && !buscaInput.dataset.bound) {
       buscaInput.dataset.bound = "1";
@@ -2895,7 +2869,6 @@ async function carregarSalaProfessores() {
       });
     }
 
-    // Bind tabs
     document.querySelectorAll(".sala-tab").forEach((tab) => {
       if (tab.dataset.bound) return;
       tab.dataset.bound = "1";
@@ -2945,9 +2918,7 @@ function initCalculadoraNotas() {
     if (chip.dataset.bound) return;
     chip.dataset.bound = "1";
     chip.addEventListener("click", function () {
-      document.querySelectorAll(".filtro-chip").forEach(function (c) {
-        c.classList.remove("ativo");
-      });
+      document.querySelectorAll(".filtro-chip").forEach(function (c) { c.classList.remove("ativo"); });
       chip.classList.add("ativo");
       __filtroAtivo = chip.dataset.filtro || "todas";
       if (__notasCache.length) renderizarNotas(__notasCache);
@@ -2966,9 +2937,7 @@ function initCalculadoraNotas() {
   document.querySelectorAll(".tabela-notas thead th.sortable").forEach(function (th) {
     if (th.dataset.bound) return;
     th.dataset.bound = "1";
-    th.addEventListener("click", function () {
-      aplicarSort(th.dataset.sort);
-    });
+    th.addEventListener("click", function () { aplicarSort(th.dataset.sort); });
   });
   document.getElementById("btn-export-csv")?.addEventListener("click", exportarCSV);
   document.getElementById("btn-export-pdf")?.addEventListener("click", exportarPDF);
@@ -3000,6 +2969,159 @@ function initCalculadoraNotas() {
 }
 
 // ==========================================
+// 🆕 MENU LATERAL
+// ==========================================
+function initMenuLateral() {
+  const btnMenuLateral = document.getElementById("btn-menu");
+  const menuLateral = document.getElementById("menu-lateral");
+  const menuLateralOverlay = document.getElementById("menu-lateral-overlay");
+  const btnFecharMenu = document.getElementById("btn-fechar-menu");
+
+  function abrirMenuLateral() {
+    menuLateral?.classList.add("aberto");
+    menuLateralOverlay?.classList.add("aberto");
+    menuLateral?.setAttribute("aria-hidden", "false");
+    document.body.classList.add("menu-aberto");
+    btnMenuLateral?.blur();
+    setTimeout(() => btnFecharMenu?.focus(), 100);
+  }
+
+  function fecharMenuLateral() {
+    menuLateral?.classList.remove("aberto");
+    menuLateralOverlay?.classList.remove("aberto");
+    menuLateral?.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("menu-aberto");
+    document.getElementById("submenu-idioma")?.classList.remove("aberto");
+    document.getElementById("submenu-tema")?.classList.remove("aberto");
+    document.getElementById("menu-btn-idioma")?.setAttribute("aria-expanded", "false");
+    document.getElementById("menu-btn-tema")?.setAttribute("aria-expanded", "false");
+    const btnMenuEl = document.getElementById("btn-menu");
+    if (btnMenuEl) btnMenuEl.blur();
+  }
+
+  btnMenuLateral?.addEventListener("click", abrirMenuLateral);
+  btnFecharMenu?.addEventListener("click", fecharMenuLateral);
+  menuLateralOverlay?.addEventListener("click", fecharMenuLateral);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && menuLateral?.classList.contains("aberto")) {
+      fecharMenuLateral();
+    }
+  });
+
+  document.querySelectorAll(".menu-lateral-nav .menu-item").forEach((item) => {
+    item.addEventListener("click", () => {
+      fecharMenuLateral();
+    });
+  });
+
+  const btnSubmenuIdioma = document.getElementById("menu-btn-idioma");
+  const submenuIdioma = document.getElementById("submenu-idioma");
+  const btnSubmenuTema = document.getElementById("menu-btn-tema");
+  const submenuTema = document.getElementById("submenu-tema");
+
+  btnSubmenuIdioma?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const aberto = submenuIdioma?.classList.toggle("aberto");
+    btnSubmenuIdioma.setAttribute("aria-expanded", aberto ? "true" : "false");
+    submenuTema?.classList.remove("aberto");
+    btnSubmenuTema?.setAttribute("aria-expanded", "false");
+  });
+
+  btnSubmenuTema?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const aberto = submenuTema?.classList.toggle("aberto");
+    btnSubmenuTema.setAttribute("aria-expanded", aberto ? "true" : "false");
+    submenuIdioma?.classList.remove("aberto");
+    btnSubmenuIdioma?.setAttribute("aria-expanded", "false");
+    const modoAtual = document.body.classList.contains("light-theme") ? "claro" : "escuro";
+    document.querySelectorAll(".submenu-modo").forEach((b) => {
+      b.classList.toggle("ativo", b.dataset.tema === modoAtual);
+    });
+  });
+
+  document.querySelectorAll("#submenu-idioma .menu-submenu-item").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      trocarIdioma(btn.dataset.idioma);
+      marcarAtivosMenuLateral();
+    });
+  });
+
+  document.querySelectorAll("#submenu-tema .submenu-cor").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      aplicarTema(btn.dataset.tema);
+      marcarAtivosMenuLateral();
+    });
+  });
+
+  document.querySelectorAll("#submenu-tema .submenu-modo").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const modo = btn.dataset.tema;
+      const themeToggleBtnRef = document.getElementById("theme-toggle");
+      const themeIconRef = themeToggleBtnRef?.querySelector("i");
+      if (modo === "claro") {
+        document.body.classList.add("light-theme");
+        localStorage.setItem("theme", "light");
+        if (themeIconRef) themeIconRef.classList.replace("fa-moon", "fa-sun");
+      } else {
+        document.body.classList.remove("light-theme");
+        localStorage.setItem("theme", "dark");
+        if (themeIconRef) themeIconRef.classList.replace("fa-sun", "fa-moon");
+      }
+      marcarAtivosMenuLateral();
+    });
+  });
+
+  function marcarAtivosMenuLateral() {
+    const idiomaAtual = obterIdiomaAtual();
+    document.querySelectorAll("#submenu-idioma .menu-submenu-item").forEach((b) => {
+      b.classList.toggle("ativo", b.dataset.idioma === idiomaAtual);
+    });
+    const temaAtual = obterTemaAtual();
+    document.querySelectorAll("#submenu-tema .submenu-cor").forEach((b) => {
+      b.classList.toggle("ativo", b.dataset.tema === temaAtual);
+    });
+    const modoAtual = document.body.classList.contains("light-theme") ? "claro" : "escuro";
+    document.querySelectorAll("#submenu-tema .submenu-modo").forEach((b) => {
+      b.classList.toggle("ativo", b.dataset.tema === modoAtual);
+    });
+  }
+  marcarAtivosMenuLateral();
+
+  // Highlight do item ativo ao rolar
+  const sections = document.querySelectorAll("section[id]");
+  const menuItems = document.querySelectorAll(".menu-lateral-nav .menu-item");
+  if (menuItems.length > 0) {
+    let ticking = false;
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          let current = "";
+          sections.forEach((section) => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 250) {
+              current = section.getAttribute("id");
+            }
+          });
+          menuItems.forEach((item) => {
+            item.classList.remove("active");
+            const href = item.getAttribute("href") || "";
+            if (href.startsWith("#") && href.substring(1) === current) {
+              item.classList.add("active");
+            }
+          });
+          ticking = false;
+        });
+      },
+      { passive: true }
+    );
+  }
+}
+
+// ==========================================
 // INICIALIZAÇÃO
 // ==========================================
 document.addEventListener("DOMContentLoaded", function () {
@@ -3012,8 +3134,9 @@ document.addEventListener("DOMContentLoaded", function () {
   inicializarModalEditarPerfil();
   initCalculadoraNotas();
   renderizarLegendaCalendario();
+  initMenuLateral();
 
-  // Dropdown de idioma
+  // Dropdown de idioma (header desktop)
   document
     .querySelectorAll("#menu-idioma .dropdown-item")
     .forEach(function (btn) {
@@ -3022,7 +3145,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
 
-  // Dropdown de tema
+  // Dropdown de tema (header desktop)
   document
     .querySelectorAll("#menu-tema .dropdown-item")
     .forEach(function (btn) {
@@ -3047,9 +3170,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
   // Botão instalar PWA
-  document
-    .getElementById("btn-instalar-app")
-    ?.addEventListener("click", instalarPWA);
+  document.getElementById("btn-instalar-app")?.addEventListener("click", instalarPWA);
 
   // Botão login
   const btnLogin = document.getElementById("suap-login-button");
@@ -3100,8 +3221,7 @@ document.addEventListener("DOMContentLoaded", function () {
         initialDate: "2026-09-01",
         validRange: { start: "2026-09-01", end: "2026-12-31" },
         googleCalendarApiKey: "AIzaSyB9XFKFwtZNQJrN2Kh7UPZxraPXEwqFytw",
-        events:
-          "acb20a08d58749d48304dbda5c87bfb7f0671483ecc4ed942683ad5a1307e78d@group.calendar.google.com",
+        events: "acb20a08d58749d48304dbda5c87bfb7f0671483ecc4ed942683ad5a1307e78d@group.calendar.google.com",
         eventDidMount: function (info) {
           pintarElementoEvento(info.el, info.event.title);
         },
@@ -3141,25 +3261,17 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==========================================
     var scope = suap.getToken().getScope();
     suap.getResource(scope, function (dados_suap) {
-      var fotoPath =
-        dados_suap.url_foto_150x200 ||
-        dados_suap.url_foto_75x100 ||
-        dados_suap.foto ||
-        "";
+      var fotoPath = dados_suap.url_foto_150x200 || dados_suap.url_foto_75x100 || dados_suap.foto || "";
       var fotoUrl = "";
       if (fotoPath) {
         if (fotoPath.startsWith("http://") || fotoPath.startsWith("https://"))
           fotoUrl = fotoPath;
         else {
           var fotoBaseUrl = "https://suap.ifrn.edu.br";
-          fotoUrl =
-            fotoBaseUrl + (fotoPath.startsWith("/") ? "" : "/") + fotoPath;
+          fotoUrl = fotoBaseUrl + (fotoPath.startsWith("/") ? "" : "/") + fotoPath;
         }
       } else {
-        fotoUrl =
-          "https://ui-avatars.com/api/?name=" +
-          encodeURIComponent(dados_suap.nome_usual || dados_suap.nome) +
-          "&background=random";
+        fotoUrl = "https://ui-avatars.com/api/?name=" + encodeURIComponent(dados_suap.nome_usual || dados_suap.nome) + "&background=random";
       }
 
       const userFotoEl = document.getElementById("user-foto");
@@ -3167,8 +3279,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const nomeSuap = dados_suap.nome_usual || dados_suap.nome;
       const nomeCompletoSuap = dados_suap.nome || nomeSuap;
-      const matriculaSuap =
-        dados_suap.matricula || dados_suap.siape || "Matrícula não disponível";
+      const matriculaSuap = dados_suap.matricula || dados_suap.siape || "Matrícula não disponível";
 
       const userNomeEl = document.getElementById("user-nome");
       if (userNomeEl) userNomeEl.textContent = nomeParaExibicao(nomeSuap);
@@ -3213,6 +3324,10 @@ document.addEventListener("DOMContentLoaded", function () {
           setTimeout(() => {
             const secaoSala = document.getElementById("sala-professores");
             if (secaoSala) secaoSala.classList.remove("is-admin-hidden");
+
+            const menuItemSala = document.getElementById("menu-item-sala");
+            if (menuItemSala) menuItemSala.classList.remove("is-hidden");
+
             carregarSalaProfessores();
           }, 1000);
         }
@@ -3235,49 +3350,3 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
-
-// ==========================================
-// 🆕 SALVA RESUMO DO BOLETIM PARA A SALA
-// ==========================================
-function salvarResumoBoletimFirebase(ano, periodo, disciplinas) {
-  var mat = window.usuarioLogado.matricula;
-  if (!mat || mat === "Matrícula não disponível") return;
-  if (!disciplinas || !disciplinas.length) return;
-
-  try {
-    // Calcula média geral + total de faltas
-    var somaMedias = 0;
-    var contMedias = 0;
-    var faltasTotais = 0;
-
-    disciplinas.forEach(function (d) {
-      var etapas = obterEtapasDaDisciplina(d).etapas;
-      var notas = etapas.map(function (n) {
-        var e = d["nota_etapa_" + n];
-        return formatarNota(e && typeof e === "object" ? e.nota : e);
-      });
-      var preenchidas = notas.filter(function (v) { return v !== null; });
-      var soma = preenchidas.reduce(function (a, b) { return a + b; }, 0);
-      var mediaApi = formatarNota(d.media_disciplina);
-      var media = preenchidas.length ? soma / preenchidas.length : mediaApi;
-
-      if (media !== null) { somaMedias += media; contMedias++; }
-      faltasTotais += Number(d.numero_faltas) || 0;
-    });
-
-    var mediaGeral = contMedias ? somaMedias / contMedias : null;
-
-    // Salva no Firebase
-    update(ref(db, "resumo_boletim/" + mat), {
-      mediaGeral: mediaGeral,
-      faltasTotais: faltasTotais,
-      disciplinasCount: disciplinas.length,
-      periodo: ano + "." + periodo,
-      atualizadoEm: Date.now(),
-    }).catch(function (err) {
-      console.warn("[resumo boletim] erro:", err);
-    });
-  } catch (e) {
-    console.warn("[resumo boletim] exceção:", e);
-  }
-}

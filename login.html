@@ -34,10 +34,11 @@
     <link rel="stylesheet" href="styles/login.css" />
   </head>
   <body>
-    <header class="login-header">
+        <header class="login-header">
       <a href="../index.html" class="login-logo">
         <i class="fa-solid fa-code-branch"></i>InfoWeb<span>- 2V</span>
       </a>
+
       <div class="header-actions">
         <button
           id="btn-instalar-app"
@@ -58,64 +59,177 @@
           <span id="badge-notificacoes" class="badge-notif is-hidden">0</span>
         </button>
 
-        <div class="menu-dropdown" id="menu-idioma">
-          <button class="btn-theme btn-idioma" aria-label="Idioma" data-i18n-title="idioma">
+        <button id="btn-menu" class="btn-menu-hamburguer" aria-label="Abrir menu">
+          <i class="fa-solid fa-bars-staggered"></i>
+          <span class="btn-menu-label" data-i18n="menu">Menu</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 🆕 MENU LATERAL -->
+    <div id="menu-lateral-overlay" class="menu-lateral-overlay"></div>
+    <aside id="menu-lateral" class="menu-lateral" aria-hidden="true">
+      <div class="menu-lateral-header">
+        <span class="menu-lateral-titulo">
+          <i class="fa-solid fa-code-branch"></i> InfoWeb 2V
+        </span>
+        <button id="btn-fechar-menu" class="btn-fechar-menu" aria-label="Fechar menu">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <nav class="menu-lateral-nav">
+        <a href="login.html" class="menu-item">
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-chart-line"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_notas">Notas</span>
+            <span class="menu-item-desc" data-i18n="nav_notas_desc">Sua calculadora</span>
+          </span>
+        </a>
+        <a href="#horarios" class="menu-item">
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-calendar-days"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_horarios">Horários</span>
+            <span class="menu-item-desc" data-i18n="nav_horarios_desc">Rotina semanal</span>
+          </span>
+        </a>
+        <a href="#mural" class="menu-item">
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-comments"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_mural">Mural</span>
+            <span class="menu-item-desc" data-i18n="nav_mural_desc">Recados da turma</span>
+          </span>
+        </a>
+        <a href="#perfis" class="menu-item">
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-users"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_membros">Membros</span>
+            <span class="menu-item-desc" data-i18n="nav_membros_desc">Colegas do sistema</span>
+          </span>
+        </a>
+        <a href="#agenda" class="menu-item">
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-calendar-check"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_agenda">Agenda</span>
+            <span class="menu-item-desc" data-i18n="nav_agenda_desc">Eventos do calendário</span>
+          </span>
+        </a>
+        <a href="../index.html#mascote" class="menu-item">
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-paw"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_mascote">Mascote</span>
+            <span class="menu-item-desc" data-i18n="nav_mascote_desc">Interaja com ele</span>
+          </span>
+        </a>
+
+        <!-- 🎭 Sala dos Professores — só admin -->
+        <a href="#sala-professores" class="menu-item is-admin-item is-hidden" id="menu-item-sala">
+          <span class="menu-item-icone">
+            <i class="fa-solid fa-user-tie"></i>
+          </span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_sala">Sala dos Professores</span>
+            <span class="menu-item-desc" data-i18n="nav_sala_desc">Acesso restrito</span>
+          </span>
+        </a>
+      </nav>
+
+      <div class="menu-lateral-footer">
+        <div class="menu-lateral-acoes">
+          <button type="button" class="menu-acao-btn" id="menu-btn-idioma" aria-expanded="false">
             <i class="fa-solid fa-globe"></i>
+            <span data-i18n="idioma">Idioma</span>
           </button>
-          <div class="dropdown-content">
-            <button type="button" class="dropdown-item" data-idioma="pt-BR">🇧🇷 Português</button>
-            <button type="button" class="dropdown-item" data-idioma="en">🇺🇸 English</button>
-            <button type="button" class="dropdown-item" data-idioma="es">🇪🇸 Español</button>
-          </div>
+          <button type="button" class="menu-acao-btn" id="menu-btn-tema" aria-expanded="false">
+            <i class="fa-solid fa-palette"></i>
+            <span data-i18n="tema">Tema</span>
+          </button>
         </div>
 
-        <div class="menu-dropdown" id="menu-tema">
-          <button class="btn-theme btn-paleta" aria-label="Tema" data-i18n-title="tema">
-            <i class="fa-solid fa-palette"></i>
+        <div class="menu-submenu" id="submenu-idioma">
+          <button type="button" class="menu-submenu-item" data-idioma="pt-BR">
+            <span class="submenu-flag">🇧🇷</span>
+            <span>Português</span>
           </button>
-          <div class="dropdown-content dropdown-temas">
-            <button type="button" class="dropdown-item" data-tema="roxo">
+          <button type="button" class="menu-submenu-item" data-idioma="en">
+            <span class="submenu-flag">🇺🇸</span>
+            <span>English</span>
+          </button>
+          <button type="button" class="menu-submenu-item" data-idioma="es">
+            <span class="submenu-flag">🇪🇸</span>
+            <span>Español</span>
+          </button>
+        </div>
+
+        <div class="menu-submenu" id="submenu-tema">
+          <div class="submenu-titulo">
+            <i class="fa-solid fa-swatchbook"></i>
+            <span data-i18n="cor_tema">Cor do tema</span>
+          </div>
+          <div class="submenu-cores">
+            <button type="button" class="submenu-cor" data-tema="roxo" title="Roxo">
               <span class="tema-swatch tema-swatch-roxo"></span>
               <span data-i18n="cor_roxo">Roxo</span>
             </button>
-            <button type="button" class="dropdown-item" data-tema="azul">
+            <button type="button" class="submenu-cor" data-tema="azul" title="Azul">
               <span class="tema-swatch tema-swatch-azul"></span>
               <span data-i18n="cor_azul">Azul</span>
             </button>
-            <button type="button" class="dropdown-item" data-tema="verde">
+            <button type="button" class="submenu-cor" data-tema="verde" title="Verde">
               <span class="tema-swatch tema-swatch-verde"></span>
               <span data-i18n="cor_verde">Verde</span>
             </button>
-            <button type="button" class="dropdown-item" data-tema="rosa">
+            <button type="button" class="submenu-cor" data-tema="rosa" title="Rosa">
               <span class="tema-swatch tema-swatch-rosa"></span>
               <span data-i18n="cor_rosa">Rosa</span>
             </button>
-            <button type="button" class="dropdown-item" data-tema="laranja">
+            <button type="button" class="submenu-cor" data-tema="laranja" title="Laranja">
               <span class="tema-swatch tema-swatch-laranja"></span>
               <span data-i18n="cor_laranja">Laranja</span>
             </button>
-            <div class="dropdown-separator"></div>
-            <button type="button" class="dropdown-item" data-tema="claro">
+          </div>
+
+          <div class="submenu-titulo submenu-titulo-modo">
+            <i class="fa-solid fa-circle-half-stroke"></i>
+            <span data-i18n="modo">Modo</span>
+          </div>
+          <div class="submenu-modos">
+            <button type="button" class="submenu-modo" data-tema="claro">
               <i class="fa-solid fa-sun"></i>
-              <span data-i18n="modo_claro">Modo claro</span>
+              <span data-i18n="modo_claro">Claro</span>
             </button>
-            <button type="button" class="dropdown-item" data-tema="escuro">
+            <button type="button" class="submenu-modo" data-tema="escuro">
               <i class="fa-solid fa-moon"></i>
-              <span data-i18n="modo_escuro">Modo escuro</span>
+              <span data-i18n="modo_escuro">Escuro</span>
             </button>
           </div>
         </div>
 
-        <button id="theme-toggle" class="btn-theme" aria-label="Alternar tema">
-          <i class="fa-solid fa-moon"></i>
-        </button>
-
-        <a href="../index.html" class="btn-voltar">
-          <i class="fa-solid fa-arrow-left"></i>
-          <span data-i18n="voltar">Voltar</span>
-        </a>
+        <div class="menu-lateral-redes">
+          <a href="https://github.com/infoWeb2026-2V" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <i class="fa-brands fa-github"></i>
+          </a>
+          <a href="https://instagram.com/InfoWeb2026.1" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+          <a href="https://www.tiktok.com/@infoweb2026_2v" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+            <i class="fa-brands fa-tiktok"></i>
+          </a>
+        </div>
       </div>
-    </header>
+    </aside>
 
     <main class="login-main">
       <div class="login-container">
