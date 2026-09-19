@@ -1044,3 +1044,70 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
   .btn-voltar span, .btn-voltar { font-size: 0.85rem; }
   .notas-controls { grid-template-columns: 1fr; }
 }
+
+/* ===================================================================
+   LEGENDA DE CORES DO CALENDÁRIO
+   =================================================================== */
+.calendario-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 22px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  padding: 16px 22px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  box-shadow: 0 4px 14px var(--shadow-soft);
+  max-width: 750px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.legenda-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.legenda-item:hover {
+  color: var(--text-main);
+  transform: translateY(-1px);
+}
+
+.legenda-cor {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.legenda-texto {
+  white-space: nowrap;
+}
+
+/* Responsivo: empilha em telas pequenas */
+@media (max-width: 600px) {
+  .calendario-legenda {
+    gap: 10px 16px;
+    padding: 14px 16px;
+    border-radius: 12px;
+  }
+  .legenda-item {
+    font-size: 0.78rem;
+    gap: 6px;
+  }
+  .legenda-cor {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+}
