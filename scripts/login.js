@@ -7,17 +7,11 @@ var SUAP_URL = "https://suap.ifrn.edu.br";
 var SCOPE = "identificacao email documentos_pessoais";
 
 // ==========================================
-// 0. IMPORTAÇÕES DO FIREBASE (Versão 12)
+// 0. FIREBASE
 // ==========================================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import {
-  getDatabase,
-  ref,
-  onValue,
-  push,
-  update,
-  remove,
-  get,
+  getDatabase, ref, onValue, push, update, remove, get,
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
 const firebaseConfig = {
@@ -37,10 +31,7 @@ const perfisRef = ref(db, "perfis_alunos");
 const MATRICULAS_ADMIN = ["20261101110002"];
 
 window.usuarioLogado = {
-  nome: "",
-  matricula: "",
-  foto: "",
-  fotoOriginal: "",
+  nome: "", matricula: "", foto: "", fotoOriginal: "",
 };
 let bancoDeRecados = [];
 let bancoDePerfis = [];
@@ -48,16 +39,13 @@ let filtroRecadoTexto = "";
 let filtroPerfilTexto = "";
 
 // ==========================================
-// AUXILIARES / SEGURANÇA / TOASTS
+// AUXILIARES
 // ==========================================
 function escaparHTML(texto) {
   if (!texto) return "";
   return String(texto)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
 function converterLinks(textoEscapado) {
@@ -143,7 +131,11 @@ function calcularTempoRestante(timestampCriacao, duracaoHoras) {
 const themeToggle = document.getElementById("theme-toggle");
 if (themeToggle) {
   const themeIcon = themeToggle.querySelector("i");
-  const currentTheme = localStorage.getItem("theme") || "dark";
+  // 🆕 Detecta preferência do sistema se nunca escolheu
+  let currentTheme = localStorage.getItem("theme");
+  if (!currentTheme) {
+    currentTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  }
   if (currentTheme === "light") {
     document.body.classList.add("light-theme");
     if (themeIcon) themeIcon.classList.replace("fa-moon", "fa-sun");
@@ -158,6 +150,8 @@ if (themeToggle) {
       if (themeIcon) themeIcon.classList.replace("fa-sun", "fa-moon");
     }
     localStorage.setItem("theme", theme);
+    // 🆕 Redesenha gráfico com cores do tema atual
+    if (window.__graficoEvolucao) desenharGraficoEvolucao();
   });
 }
 
@@ -180,6 +174,8 @@ onValue(recadosRef, (snapshot) => {
     }
   });
   window.renderizarMural();
+  // 🆕 Atualiza notificações
+  if (typeof gerarNotificacoesRecados === "function") gerarNotificacoesRecados();
 });
 
 onValue(perfisRef, (snapshot) => {
@@ -191,9 +187,8 @@ onValue(perfisRef, (snapshot) => {
   window.renderizarPerfis();
   if (window.usuarioLogado.matricula) {
     const meuPerfil = bancoDePerfis.find(
-      (p) =>
-        String(p.matricula) === String(window.usuarioLogado.matricula) ||
-        String(p.id) === String(window.usuarioLogado.matricula)
+      (p) => String(p.matricula) === String(window.usuarioLogado.matricula) ||
+             String(p.id) === String(window.usuarioLogado.matricula)
     );
     if (meuPerfil && typeof window.aplicarPerfilNoCard === "function") {
       window.aplicarPerfilNoCard(meuPerfil);
@@ -219,24 +214,18 @@ if (formRecado) {
     const valorInputDuracao = selectDuracao ? selectDuracao.value : "7d";
     const duracaoTotalHoras = parseDuracaoParaHoras(valorInputDuracao);
     push(recadosRef, {
-      autor_nome: nomeSeguro,
-      autor_matricula: window.usuarioLogado.matricula,
-      mensagem: mensagemSegura,
-      link_anexo: linkAnexo,
+      autor_nome: nomeSeguro, autor_matricula: window.usuarioLogado.matricula,
+      mensagem: mensagemSegura, link_anexo: linkAnexo,
       data: new Date().toLocaleDateString("pt-BR"),
-      timestamp: Date.now(),
-      duracao_horas: duracaoTotalHoras,
-      likes: [],
-      comentarios: {},
-    })
-      .then(() => {
-        exibirToast("Recado publicado com sucesso!", "sucesso");
-        if (msgInput) msgInput.value = "";
-        if (linkInput) linkInput.value = "";
-        const contador = document.getElementById("contador-caracteres");
-        if (contador) contador.textContent = "0";
-      })
-      .catch((err) => exibirToast("Erro ao enviar recado: " + err.message, "erro"));
+      timestamp: Date.now(), duracao_horas: duracaoTotalHoras,
+      likes: [], comentarios: {},
+    }).then(() => {
+      exibirToast("Recado publicado com sucesso!", "sucesso");
+      if (msgInput) msgInput.value = "";
+      if (linkInput) linkInput.value = "";
+      const contador = document.getElementById("contador-caracteres");
+      if (contador) contador.textContent = "0";
+    }).catch((err) => exibirToast("Erro ao enviar recado: " + err.message, "erro"));
   });
 }
 
@@ -249,7 +238,7 @@ if (recadoMensagemInput) {
 }
 
 // ==========================================
-// 4. MURAL — MÉTODOS GLOBAIS
+// 4. MURAL — GLOBAIS
 // ==========================================
 const inputBuscaMural = document.getElementById("busca-recados");
 if (inputBuscaMural) {
@@ -288,31 +277,19 @@ window.abrirModalPerfil = function (identificador) {
   if (imgEl) imgEl.src = fotoExibir;
   if (nomeEl) nomeEl.textContent = nomeExibir;
   if (matEl) matEl.textContent = perfil.matricula || perfil.id || "Não informada";
-  if (acessoEl) {
-    acessoEl.textContent = perfil.ultimoAcesso
-      ? new Date(perfil.ultimoAcesso).toLocaleString("pt-BR")
-      : "Não registrado";
-  }
+  if (acessoEl) acessoEl.textContent = perfil.ultimoAcesso ? new Date(perfil.ultimoAcesso).toLocaleString("pt-BR") : "Não registrado";
   if (bioEl) {
     if (perfil.bio && String(perfil.bio).trim()) {
       bioEl.textContent = perfil.bio;
       bioEl.classList.remove("is-hidden");
-    } else {
-      bioEl.textContent = "";
-      bioEl.classList.add("is-hidden");
-    }
+    } else { bioEl.textContent = ""; bioEl.classList.add("is-hidden"); }
   }
   if (redesEl) {
     const links = montarLinksRedes(perfil.redes);
     if (links.length > 0) {
-      redesEl.innerHTML = links
-        .map((l) => `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}" class="modal-rede-link"><i class="${l.icone}"></i></a>`)
-        .join("");
+      redesEl.innerHTML = links.map((l) => `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}" class="modal-rede-link"><i class="${l.icone}"></i></a>`).join("");
       redesEl.classList.remove("is-hidden");
-    } else {
-      redesEl.innerHTML = "";
-      redesEl.classList.add("is-hidden");
-    }
+    } else { redesEl.innerHTML = ""; redesEl.classList.add("is-hidden"); }
   }
   modal.classList.remove("is-hidden");
 };
@@ -346,19 +323,14 @@ window.renderizarMural = function () {
     const textoExpiracao = calcularTempoRestante(recado.timestampCriacao, recado.duracaoHoras);
     const ehAutor = recado.autor_matricula === window.usuarioLogado.matricula;
     const btnExcluir = ehAutor || ehAdmin
-      ? `<button type="button" class="btn-like" style="color: #ff4757;" onclick="excluirRecado('${recado.id}')" title="${ehAdmin && !ehAutor ? "Excluir como Admin" : "Excluir meu recado"}"><i class="fa-solid fa-trash"></i></button>`
-      : "";
+      ? `<button type="button" class="btn-like" style="color: #ff4757;" onclick="excluirRecado('${recado.id}')"><i class="fa-solid fa-trash"></i></button>` : "";
     const btnEditar = ehAutor || ehAdmin
-      ? `<button type="button" class="btn-like" style="color: #eccc68;" onclick="editarRecado('${recado.id}')" title="${ehAdmin && !ehAutor ? "Editar como Admin" : "Editar meu recado"}"><i class="fa-solid fa-pen"></i></button>`
-      : "";
+      ? `<button type="button" class="btn-like" style="color: #eccc68;" onclick="editarRecado('${recado.id}')"><i class="fa-solid fa-pen"></i></button>` : "";
     const mensagemComLinks = converterLinks(escaparHTML(recado.mensagem));
     const nomeSeguro = escaparHTML(nomeParaExibicao(recado.autor_nome));
-    const tagEditado = recado.editado
-      ? ' <small style="opacity: 0.6; font-style: italic;">(editado)</small>'
-      : "";
+    const tagEditado = recado.editado ? ' <small style="opacity: 0.6; font-style: italic;">(editado)</small>' : "";
     const anexoHTML = recado.link_anexo
-      ? `<div class="recado-anexo" style="margin-top: 8px;"><a href="${recado.link_anexo}" target="_blank" rel="noopener noreferrer" style="font-size: 0.85em; color: #70a1ff; text-decoration: underline;"><i class="fa-solid fa-paperclip"></i> Ver anexo</a></div>`
-      : "";
+      ? `<div class="recado-anexo" style="margin-top: 8px;"><a href="${recado.link_anexo}" target="_blank" rel="noopener noreferrer" style="font-size: 0.85em; color: #70a1ff; text-decoration: underline;"><i class="fa-solid fa-paperclip"></i> Ver anexo</a></div>` : "";
     const comentariosObj = recado.comentarios || {};
     const listaComentarios = Object.keys(comentariosObj).map((cId) => ({ cId, ...comentariosObj[cId] }));
     const totalComentarios = listaComentarios.length;
@@ -366,8 +338,7 @@ window.renderizarMural = function () {
     listaComentarios.forEach((com) => {
       const ehAutorCom = com.autor_matricula === window.usuarioLogado.matricula;
       const btnDelCom = ehAutorCom || ehAdmin
-        ? `<button type="button" style="background:none; border:none; color:#ff4757; cursor:pointer; font-size:0.8em;" onclick="excluirComentario('${recado.id}', '${com.cId}')"><i class="fa-solid fa-xmark"></i></button>`
-        : "";
+        ? `<button type="button" style="background:none; border:none; color:#ff4757; cursor:pointer; font-size:0.8em;" onclick="excluirComentario('${recado.id}', '${com.cId}')"><i class="fa-solid fa-xmark"></i></button>` : "";
       htmlComentarios += `
         <div class="comentario-item" style="display:flex; justify-content:space-between; align-items:center; background: rgba(255,255,255,0.05); padding: 6px 10px; border-radius: 6px; margin-top: 5px; font-size: 0.85em;">
           <div style="flex:1;"><strong>${escaparHTML(com.autor_nome)}:</strong> ${converterLinks(escaparHTML(com.texto))}</div>
@@ -413,14 +384,11 @@ window.adicionarComentario = function (recadoId) {
   if (!inputEl) return;
   const texto = inputEl.value.trim();
   if (!texto) { exibirToast("Escreva um comentário antes de enviar.", "erro"); return; }
-  const comentariosRef = ref(db, `mural_recados/${recadoId}/comentarios`);
-  push(comentariosRef, {
+  push(ref(db, `mural_recados/${recadoId}/comentarios`), {
     autor_nome: escaparHTML(window.usuarioLogado.nome),
     autor_matricula: window.usuarioLogado.matricula,
-    texto: escaparHTML(texto),
-    timestamp: Date.now(),
-  })
-    .then(() => { exibirToast("Comentário adicionado!", "sucesso"); inputEl.value = ""; })
+    texto: escaparHTML(texto), timestamp: Date.now(),
+  }).then(() => { exibirToast("Comentário adicionado!", "sucesso"); inputEl.value = ""; })
     .catch((err) => exibirToast("Erro: " + err.message, "erro"));
 };
 
@@ -431,8 +399,8 @@ window.excluirComentario = function (recadoId, comentarioId) {
     if (com) {
       const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
       const ehAutor = com.autor_matricula === window.usuarioLogado.matricula;
-      if (!ehAutor && !ehAdmin) { exibirToast("Você não tem permissão para excluir este comentário!", "erro"); return; }
-      if (confirm("Deseja excluir este comentário?")) {
+      if (!ehAutor && !ehAdmin) { exibirToast("Sem permissão.", "erro"); return; }
+      if (confirm("Excluir este comentário?")) {
         remove(itemRef).then(() => exibirToast("Comentário removido.", "sucesso"));
       }
     }
@@ -453,10 +421,7 @@ window.renderizarPerfis = function () {
   const contadorEl = document.getElementById("contador-membros");
   if (contadorEl) contadorEl.textContent = `${bancoDePerfis.length} membro(s) cadastrado(s)`;
   if (perfisFiltrados.length === 0) {
-    container.innerHTML = `
-      <p class="sem-perfis" style="text-align:center; opacity:0.7; padding:20px; grid-column: 1 / -1;">
-        ${bancoDePerfis.length === 0 ? "Nenhum membro cadastrado ainda. Os alunos aparecerão aqui após fazerem login." : "Nenhum perfil corresponde ao filtro."}
-      </p>`;
+    container.innerHTML = `<p class="sem-perfis" style="text-align:center; opacity:0.7; padding:20px; grid-column: 1 / -1;">${bancoDePerfis.length === 0 ? "Nenhum membro cadastrado ainda." : "Nenhum perfil corresponde ao filtro."}</p>`;
     return;
   }
   perfisFiltrados.forEach((perfil) => {
@@ -468,13 +433,8 @@ window.renderizarPerfis = function () {
     const nomeExibir = perfil.nomeCompleto || perfil.nome || "Usuário sem nome";
     const fotoFinal = perfil.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random`;
     card.innerHTML = `
-      <div class="perfil-avatar">
-        <img src="${escaparHTML(fotoFinal)}" alt="${escaparHTML(nomeExibir)}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random'" />
-      </div>
-      <div class="perfil-info">
-        <h4 class="perfil-nome">${escaparHTML(nomeExibir)}</h4>
-        <span class="perfil-matricula">${escaparHTML(matriculaParaExibicao(perfil.matricula || perfil.id))}</span>
-      </div>
+      <div class="perfil-avatar"><img src="${escaparHTML(fotoFinal)}" alt="${escaparHTML(nomeExibir)}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random'" /></div>
+      <div class="perfil-info"><h4 class="perfil-nome">${escaparHTML(nomeExibir)}</h4><span class="perfil-matricula">${escaparHTML(matriculaParaExibicao(perfil.matricula || perfil.id))}</span></div>
     `;
     container.appendChild(card);
   });
@@ -487,21 +447,19 @@ window.editarRecado = function (id) {
     if (recado) {
       const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
       const ehAutor = recado.autor_matricula === window.usuarioLogado.matricula;
-      if (!ehAutor && !ehAdmin) { exibirToast("Você não tem permissão para editar este recado!", "erro"); return; }
+      if (!ehAutor && !ehAdmin) { exibirToast("Sem permissão.", "erro"); return; }
       const textoAtual = recado.mensagem.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#039;/g, "'");
       const novaMensagem = prompt("1/2 - Edite a sua mensagem:", textoAtual);
       if (novaMensagem !== null && novaMensagem.trim() !== "") {
         const horasAtuais = recado.duracao_horas || (recado.duracao_dias ? recado.duracao_dias * 24 : 168);
         const tempoAtualStr = horasAtuais % 24 === 0 ? horasAtuais / 24 + "d" : horasAtuais + "h";
-        const promptTempo = '2/2 - Digite o tempo de duração.\nUse "h" para horas ou "d" para dias.\n(Ex: 5h, 12h, 2d, 15d)';
-        const novosDiasInput = prompt(promptTempo, tempoAtualStr);
+        const novosDiasInput = prompt('2/2 - Duração (ex: 5h, 12h, 2d, 15d)', tempoAtualStr);
         let novasHoras = horasAtuais;
         if (novosDiasInput !== null && novosDiasInput.trim() !== "") {
           novasHoras = parseDuracaoParaHoras(novosDiasInput);
         }
-        const mensagemSegura = escaparHTML(novaMensagem.trim());
-        update(itemRef, { mensagem: mensagemSegura, duracao_horas: novasHoras, editado: true })
-          .then(() => exibirToast("Recado atualizado com sucesso!", "sucesso"))
+        update(itemRef, { mensagem: escaparHTML(novaMensagem.trim()), duracao_horas: novasHoras, editado: true })
+          .then(() => exibirToast("Recado atualizado!", "sucesso"))
           .catch((err) => exibirToast("Erro: " + err.message, "erro"));
       }
     }
@@ -514,10 +472,10 @@ window.curtirRecado = function (id) {
     const recado = snapshot.val();
     if (recado) {
       let likes = recado.likes || [];
-      const indexLike = likes.indexOf(window.usuarioLogado.matricula);
-      if (indexLike === -1) likes.push(window.usuarioLogado.matricula);
-      else likes.splice(indexLike, 1);
-      update(itemRef, { likes: likes });
+      const i = likes.indexOf(window.usuarioLogado.matricula);
+      if (i === -1) likes.push(window.usuarioLogado.matricula);
+      else likes.splice(i, 1);
+      update(itemRef, { likes });
     }
   });
 };
@@ -529,9 +487,9 @@ window.excluirRecado = function (id) {
     if (recado) {
       const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
       const ehAutor = recado.autor_matricula === window.usuarioLogado.matricula;
-      if (!ehAutor && !ehAdmin) { exibirToast("Você não tem permissão para excluir este recado!", "erro"); return; }
-      if (confirm("Tem certeza que deseja excluir este recado?")) {
-        remove(itemRef).then(() => exibirToast("Recado excluído com sucesso.", "sucesso")).catch((err) => exibirToast("Erro: " + err.message, "erro"));
+      if (!ehAutor && !ehAdmin) { exibirToast("Sem permissão.", "erro"); return; }
+      if (confirm("Excluir este recado?")) {
+        remove(itemRef).then(() => exibirToast("Recado excluído.", "sucesso")).catch((err) => exibirToast("Erro: " + err.message, "erro"));
       }
     }
   });
@@ -628,19 +586,13 @@ window.aplicarPerfilNoCard = function (perfil) {
   }
   if (redesEl) {
     const links = montarLinksRedes(perfil.redes);
-    redesEl.innerHTML = links
-      .map((l) => `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}"><i class="${l.icone}"></i></a>`)
-      .join("");
+    redesEl.innerHTML = links.map((l) => `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}"><i class="${l.icone}"></i></a>`).join("");
   }
   if (perfil.foto) window.usuarioLogado.foto = perfil.foto;
   if (perfil.nome) window.usuarioLogado.nome = perfil.nome;
   const btn = document.getElementById("btn-editar-perfil");
   const label = document.getElementById("btn-editar-perfil-label");
-  if (btn && label) {
-    btn.disabled = false;
-    label.textContent = "Editar Perfil";
-    btn.title = "Personalize seu perfil";
-  }
+  if (btn && label) { btn.disabled = false; label.textContent = "Editar Perfil"; btn.title = "Personalize seu perfil"; }
 };
 
 window.carregarPerfilUsuario = function (matricula) {
@@ -665,11 +617,11 @@ window.carregarPerfilUsuario = function (matricula) {
       salvarPerfilLocal(matricula, perfilFinal);
       return perfilFinal;
     })
-    .catch((err) => { console.warn("Falha ao consultar Firebase, usando local:", err); return local; });
+    .catch((err) => { console.warn("Firebase off, usando local:", err); return local; });
 };
 
 window.abrirModalEditarPerfil = function () {
-  if (!perfilUsuarioAtual) { exibirToast("Perfil ainda não carregado. Aguarde um instante.", "erro"); return; }
+  if (!perfilUsuarioAtual) { exibirToast("Perfil ainda não carregado.", "erro"); return; }
   const bloqueioEl = document.getElementById("edit-perfil-bloqueio");
   const btnSalvar = document.getElementById("btn-salvar-perfil");
   const inputFoto = document.getElementById("edit-foto-input");
@@ -691,13 +643,11 @@ window.abrirModalEditarPerfil = function () {
   if (btnRestaurar) btnRestaurar.disabled = false;
   const btnUpload = document.querySelector(".btn-upload");
   if (btnUpload) { btnUpload.style.pointerEvents = "auto"; btnUpload.style.opacity = "1"; }
-  const modal = document.getElementById("modal-editar-perfil");
-  if (modal) modal.classList.remove("is-hidden");
+  document.getElementById("modal-editar-perfil")?.classList.remove("is-hidden");
 };
 
 window.fecharModalEditarPerfil = function () {
-  const modal = document.getElementById("modal-editar-perfil");
-  if (modal) modal.classList.add("is-hidden");
+  document.getElementById("modal-editar-perfil")?.classList.add("is-hidden");
 };
 
 function inicializarModalEditarPerfil() {
@@ -714,7 +664,7 @@ function inicializarModalEditarPerfil() {
         document.getElementById("edit-avatar-preview").src = dataUrl;
         inputFoto.dataset.novaFoto = dataUrl;
         delete inputFoto.dataset.restaurar;
-      } catch (err) { exibirToast("Erro ao processar imagem: " + err.message, "erro"); }
+      } catch (err) { exibirToast("Erro: " + err.message, "erro"); }
     });
   }
   const btnRestaurar = document.getElementById("btn-restaurar-foto");
@@ -748,7 +698,7 @@ async function salvarPerfilEditado() {
   else if (inputFoto && inputFoto.dataset.novaFoto) fotoFinal = inputFoto.dataset.novaFoto;
   else fotoFinal = perfilUsuarioAtual.foto || window.usuarioLogado.foto;
   const nome = document.getElementById("edit-nome").value.trim();
-  if (!nome) { exibirToast("Informe um nome de exibição.", "erro"); return; }
+  if (!nome) { exibirToast("Informe um nome.", "erro"); return; }
   const bio = document.getElementById("edit-bio").value.replace(/[\r\n]+/g, " ").trim().slice(0, 160);
   const redes = {
     tiktok: limparArroba(document.getElementById("edit-tiktok").value),
@@ -761,14 +711,9 @@ async function salvarPerfilEditado() {
   if (redes.site && !/^https?:\/\/.+/.test(redes.site)) { exibirToast("Site deve começar com http:// ou https://", "erro"); return; }
   const agora = Date.now();
   const perfilAtualizado = {
-    nome,
-    nomeCompleto: perfilUsuarioAtual.nomeCompleto || window.usuarioLogado.nome,
-    matricula,
-    foto: fotoFinal,
-    bio,
-    redes,
-    perfilEditadoEm: agora,
-    ultimoAcesso: agora,
+    nome, nomeCompleto: perfilUsuarioAtual.nomeCompleto || window.usuarioLogado.nome,
+    matricula, foto: fotoFinal, bio, redes,
+    perfilEditadoEm: agora, ultimoAcesso: agora,
   };
   const btnSalvar = document.getElementById("btn-salvar-perfil");
   const textoOriginal = btnSalvar.innerHTML;
@@ -778,11 +723,10 @@ async function salvarPerfilEditado() {
     await update(ref(db, "perfis_alunos/" + matricula), perfilAtualizado);
     salvarPerfilLocal(matricula, perfilAtualizado);
     window.aplicarPerfilNoCard(perfilAtualizado);
-    exibirToast("Perfil atualizado com sucesso!", "sucesso");
+    exibirToast("Perfil atualizado!", "sucesso");
     window.fecharModalEditarPerfil();
   } catch (err) {
-    console.error(err);
-    exibirToast("Erro ao salvar perfil: " + err.message, "erro");
+    exibirToast("Erro: " + err.message, "erro");
   } finally {
     btnSalvar.disabled = false;
     btnSalvar.innerHTML = textoOriginal;
@@ -790,7 +734,7 @@ async function salvarPerfilEditado() {
 }
 
 // ==========================================
-// 5. INTEGRAÇÃO SUAP E BOLETIM
+// 5. SUAP E BOLETIM
 // ==========================================
 var suap = new SuapClient(SUAP_URL, CLIENT_ID, REDIRECT_URI, SCOPE);
 suap.init();
@@ -801,35 +745,20 @@ function formatarNota(valor) {
   return Number.isFinite(nota) ? nota : null;
 }
 
-function textoNota(valor) {
-  return valor === null ? "-" : valor.toFixed(1);
-}
+function textoNota(valor) { return valor === null ? "-" : valor.toFixed(1); }
 
 function atualizarStatusNotas(mensagem, tipo) {
   var status = document.getElementById("notas-status");
   if (!status) return;
   var variante = tipo === true ? "erro" : (typeof tipo === "string" ? tipo : "info");
-  var icones = {
-    info: "fa-circle-info",
-    loading: "fa-spinner",
-    sucesso: "fa-circle-check",
-    erro: "fa-circle-exclamation",
-  };
+  var icones = { info: "fa-circle-info", loading: "fa-spinner", sucesso: "fa-circle-check", erro: "fa-circle-exclamation" };
   status.className = "notas-status" + (variante === "loading" ? " loading" : (variante === "info" ? "" : " " + variante));
   status.innerHTML = `<i class="fa-solid ${icones[variante] || icones.info}"></i> ${mensagem}`;
 }
 
-/* ---------- Detecção robusta Semestral/Anual ---------- */
 function obterEtapasDaDisciplina(disciplina) {
-  // 1) Se o SUAP manda explicitamente, respeita
-  if (disciplina.segundo_semestre === true) {
-    return { tipo: "Semestral", etapas: [3, 4] };
-  }
-  if (disciplina.segundo_semestre === false) {
-    return { tipo: "Semestral", etapas: [1, 2] };
-  }
-
-  // 2) Fallback: verifica notas lançadas
+  if (disciplina.segundo_semestre === true) return { tipo: "Semestral", etapas: [3, 4] };
+  if (disciplina.segundo_semestre === false) return { tipo: "Semestral", etapas: [1, 2] };
   var tem12 = [1, 2].some(function (n) {
     var e = disciplina["nota_etapa_" + n];
     return formatarNota(e && typeof e === "object" ? e.nota : e) !== null;
@@ -838,21 +767,13 @@ function obterEtapasDaDisciplina(disciplina) {
     var e = disciplina["nota_etapa_" + n];
     return formatarNota(e && typeof e === "object" ? e.nota : e) !== null;
   });
-
-  // 3) Só tem nota em 3/4 → semestral do 2º
   if (tem34 && !tem12) return { tipo: "Semestral", etapas: [3, 4] };
-
-  // 4) Tem nota nos dois blocos → ANUAL
   if (tem12 && tem34) return { tipo: "Anual", etapas: [1, 2, 3, 4] };
-
-  // 5) Só tem em 1/2
   if (tem12) {
     var temCampo34 = ("nota_etapa_3" in disciplina) || ("nota_etapa_4" in disciplina);
     if (temCampo34) return { tipo: "Anual", etapas: [1, 2, 3, 4] };
     return { tipo: "Semestral", etapas: [1, 2] };
   }
-
-  // 6) Nenhuma nota: se tem campos 3/4 declarados → anual
   if (("nota_etapa_3" in disciplina) || ("nota_etapa_4" in disciplina)) {
     return { tipo: "Anual", etapas: [1, 2, 3, 4] };
   }
@@ -860,7 +781,7 @@ function obterEtapasDaDisciplina(disciplina) {
 }
 
 // ==========================================
-// 5.1 ESTADO GLOBAL DA CALCULADORA
+// 5.1 ESTADO
 // ==========================================
 var __notasCache = [];
 var __metaAtual = 60;
@@ -880,10 +801,7 @@ const CARGA_HORARIA_PADRAO = 60;
 // ==========================================
 // 5.2 HELPERS
 // ==========================================
-function getCodigoDisc(d) {
-  return String(d.codigo_diario || d.disciplina || d.id || "disc").trim();
-}
-
+function getCodigoDisc(d) { return String(d.codigo_diario || d.disciplina || d.id || "disc").trim(); }
 function metaEfetiva(d) {
   var cod = getCodigoDisc(d);
   return __metasDisciplinas[cod] != null ? __metasDisciplinas[cod] : __metaAtual;
@@ -903,13 +821,10 @@ function calcularMediaSimples(d, etapas, simulacao) {
     var etapa = d["nota_etapa_" + n];
     return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa);
   });
-
   var preenchidasReais = notas.filter(function (v) { return v !== null; });
   var somaReal = preenchidasReais.reduce(function (a, b) { return a + b; }, 0);
-
   var temEtapaAberta = preenchidasReais.length < etapas.length;
   var usarSimulacao = (simulacao != null) && temEtapaAberta;
-
   if (usarSimulacao) {
     var comSim = preenchidasReais.concat([simulacao]);
     var somaSim = comSim.reduce(function (a, b) { return a + b; }, 0);
@@ -917,22 +832,17 @@ function calcularMediaSimples(d, etapas, simulacao) {
       media: somaSim / comSim.length,
       preenchidasReais: preenchidasReais.length,
       preenchidasComSim: comSim.length,
-      somaReal: somaReal,
-      somaComSim: somaSim,
-      temEtapaAberta: temEtapaAberta,
-      simulando: true,
+      somaReal, somaComSim: somaSim,
+      temEtapaAberta, simulando: true,
     };
   }
-
   var mediaApi = formatarNota(d.media_disciplina);
   return {
     media: preenchidasReais.length ? somaReal / preenchidasReais.length : mediaApi,
     preenchidasReais: preenchidasReais.length,
     preenchidasComSim: preenchidasReais.length,
-    somaReal: somaReal,
-    somaComSim: somaReal,
-    temEtapaAberta: temEtapaAberta,
-    simulando: false,
+    somaReal, somaComSim: somaReal,
+    temEtapaAberta, simulando: false,
   };
 }
 
@@ -941,9 +851,7 @@ function calcularProjecaoDisciplina(notasPreenchidas, totalEtapas, soma, meta) {
   if (faltantes <= 0) {
     var mediaFinal = notasPreenchidas ? soma / notasPreenchidas : null;
     if (mediaFinal === null) return { texto: "Sem notas", classe: "projecao-alerta" };
-    return mediaFinal >= meta
-      ? { texto: "Meta atingida", classe: "projecao-ok" }
-      : { texto: "Abaixo da meta", classe: "projecao-ruim" };
+    return mediaFinal >= meta ? { texto: "Meta atingida", classe: "projecao-ok" } : { texto: "Abaixo da meta", classe: "projecao-ruim" };
   }
   var necessaria = (meta * totalEtapas - soma) / faltantes;
   if (necessaria <= 0) return { texto: "Meta garantida", classe: "projecao-ok" };
@@ -961,25 +869,21 @@ function carregarMetasDisciplinas() {
     var local = localStorage.getItem(MATRICULA_STORAGE_KEY());
     if (local) __metasDisciplinas = JSON.parse(local) || {};
   } catch (e) { __metasDisciplinas = {}; }
-
-  get(ref(db, "metas_disciplinas/" + mat))
-    .then(function (snap) {
-      var dados = snap.val();
-      if (dados && typeof dados === "object") {
-        __metasDisciplinas = dados;
-        try { localStorage.setItem(MATRICULA_STORAGE_KEY(), JSON.stringify(dados)); } catch (e) {}
-        if (__notasCache.length) renderizarNotas(__notasCache);
-      }
-    })
-    .catch(function (err) { console.warn("[metas] firebase erro:", err); });
+  get(ref(db, "metas_disciplinas/" + mat)).then(function (snap) {
+    var dados = snap.val();
+    if (dados && typeof dados === "object") {
+      __metasDisciplinas = dados;
+      try { localStorage.setItem(MATRICULA_STORAGE_KEY(), JSON.stringify(dados)); } catch (e) {}
+      if (__notasCache.length) renderizarNotas(__notasCache);
+    }
+  }).catch(function (err) { console.warn("[metas] firebase:", err); });
 }
 
 function salvarMetasDisciplinas() {
   var mat = window.usuarioLogado.matricula;
   if (!mat) return Promise.resolve();
   try { localStorage.setItem(MATRICULA_STORAGE_KEY(), JSON.stringify(__metasDisciplinas)); } catch (e) {}
-  return update(ref(db, "metas_disciplinas/" + mat), __metasDisciplinas)
-    .catch(function (err) { console.warn("[metas] save erro:", err); });
+  return update(ref(db, "metas_disciplinas/" + mat), __metasDisciplinas).catch(function (err) { console.warn("[metas] save:", err); });
 }
 
 // ==========================================
@@ -1028,7 +932,7 @@ function aplicarSort(key) {
 }
 
 // ==========================================
-// 5.5 RESUMO + ALERTA + HISTÓRICO
+// 5.5 RESUMO / ALERTA / HISTÓRICO
 // ==========================================
 function atualizarResumoNotas(disciplinas) {
   var elMedia = document.getElementById("resumo-media");
@@ -1036,10 +940,8 @@ function atualizarResumoNotas(disciplinas) {
   var elRisco = document.getElementById("resumo-risco");
   var elFaltas = document.getElementById("resumo-faltas");
   if (!elMedia && !elDisc && !elRisco && !elFaltas) return;
-
   var total = disciplinas.length;
   var somaMedias = 0, contMedias = 0, faltasTotais = 0, emRisco = 0;
-
   disciplinas.forEach(function (d) {
     var etapas = obterEtapasDaDisciplina(d).etapas;
     var calc = calcularMediaSimples(d, etapas, __simulacoes[getCodigoDisc(d)]);
@@ -1049,7 +951,6 @@ function atualizarResumoNotas(disciplinas) {
     var st = classificarStatusNota(calc.media, faltas, metaEfetiva(d));
     if (st !== "aprovado") emRisco++;
   });
-
   var mediaGeral = contMedias ? somaMedias / contMedias : null;
   if (elMedia) elMedia.textContent = mediaGeral !== null ? mediaGeral.toFixed(1) : "—";
   if (elDisc) elDisc.textContent = total || "—";
@@ -1060,32 +961,29 @@ function atualizarResumoNotas(disciplinas) {
 function alertaDeFaltas(disciplinas) {
   var antigo = document.querySelector(".alerta-faltas");
   if (antigo) antigo.remove();
-
   var alertaMax = 0, discCritica = null;
   var limiteReprov = CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT;
   var limiteAlerta = CARGA_HORARIA_PADRAO * LIMITE_FALTAS_ALERTA;
-
   disciplinas.forEach(function (d) {
     var faltas = Number(d.numero_faltas) || 0;
     if (faltas >= limiteReprov && faltas > alertaMax) {
       alertaMax = faltas;
-      discCritica = { nome: d.disciplina || d.codigo_diario, faltas: faltas, nivel: "danger" };
+      discCritica = { nome: d.disciplina || d.codigo_diario, faltas, nivel: "danger" };
     } else if (faltas >= limiteAlerta && (!discCritica || discCritica.nivel !== "danger")) {
       if (faltas > alertaMax) {
         alertaMax = faltas;
-        discCritica = { nome: d.disciplina || d.codigo_diario, faltas: faltas, nivel: "warn" };
+        discCritica = { nome: d.disciplina || d.codigo_diario, faltas, nivel: "warn" };
       }
     }
   });
-
   if (!discCritica) return;
   var panel = document.querySelector(".notas-panel");
   if (!panel) return;
   var banner = document.createElement("div");
   banner.className = "alerta-faltas " + discCritica.nivel;
   banner.innerHTML = discCritica.nivel === "danger"
-    ? `<i class="fa-solid fa-triangle-exclamation"></i><span><strong>Atenção!</strong> Você está com <strong>${discCritica.faltas} faltas</strong> em <em>${escaparHTML(discCritica.nome)}</em> — próximo do limite de reprovação por falta (${limiteReprov}).</span>`
-    : `<i class="fa-solid fa-circle-exclamation"></i><span><strong>Cuidado:</strong> ${discCritica.faltas} faltas em <em>${escaparHTML(discCritica.nome)}</em>. Fique atento!</span>`;
+    ? `<i class="fa-solid fa-triangle-exclamation"></i><span><strong>Atenção!</strong> ${discCritica.faltas} faltas em <em>${escaparHTML(discCritica.nome)}</em> — próximo do limite (${limiteReprov}).</span>`
+    : `<i class="fa-solid fa-circle-exclamation"></i><span><strong>Cuidado:</strong> ${discCritica.faltas} faltas em <em>${escaparHTML(discCritica.nome)}</em>.</span>`;
   var refEl = panel.querySelector(".notas-controls");
   if (refEl) panel.insertBefore(banner, refEl);
   else panel.insertBefore(banner, panel.firstChild);
@@ -1101,20 +999,22 @@ function atualizarHistoricoComDisciplinas(disciplinas, periodoLabel, ano) {
   });
   var media = cont ? soma / cont : null;
   var idx = __historicoPeriodos.findIndex(function (h) { return h.periodo === periodoLabel; });
-  var entry = { periodo: periodoLabel, media: media, disciplinas: disciplinas.length, ano: ano };
+  var entry = { periodo: periodoLabel, media, disciplinas: disciplinas.length, ano };
   if (idx >= 0) __historicoPeriodos[idx] = entry;
   else __historicoPeriodos.push(entry);
   __historicoPeriodos.sort(function (a, b) { return b.periodo.localeCompare(a.periodo); });
   renderizarHistorico();
   var panel = document.getElementById("historico-panel");
   if (panel) panel.classList.remove("is-hidden");
+  // 🆕 Atualiza gráfico
+  desenharGraficoEvolucao();
 }
 
 function renderizarHistorico() {
   var container = document.getElementById("historico-content");
   if (!container) return;
   if (__historicoPeriodos.length < 1) {
-    container.innerHTML = '<p class="historico-vazio">Carregue pelo menos 1 período para ver o histórico.</p>';
+    container.innerHTML = '<p class="historico-vazio">Carregue pelo menos 1 período.</p>';
     return;
   }
   var cronologico = __historicoPeriodos.slice().sort(function (a, b) { return a.periodo.localeCompare(b.periodo); });
@@ -1141,12 +1041,139 @@ function renderizarHistorico() {
 }
 
 // ==========================================
+// 🆕 5.5b GRÁFICO DE EVOLUÇÃO
+// ==========================================
+window.__graficoEvolucao = null;
+
+function desenharGraficoEvolucao() {
+  var canvas = document.getElementById("grafico-evolucao");
+  var panel = document.getElementById("evolucao-panel");
+  var vazio = document.getElementById("evolucao-vazio");
+  if (!canvas || !panel) return;
+
+  // Só mostra o painel se tiver pelo menos 1 período com média
+  var comMedia = __historicoPeriodos.filter(function (h) { return h.media !== null; });
+  if (comMedia.length === 0) {
+    panel.classList.add("is-hidden");
+    return;
+  }
+  panel.classList.remove("is-hidden");
+
+  if (comMedia.length === 1) {
+    // Mostra só uma barra solitária
+    if (vazio) vazio.classList.add("is-hidden");
+  } else {
+    if (vazio) vazio.classList.add("is-hidden");
+  }
+
+  // Ordena cronologicamente (mais antigo → mais novo)
+  var ordenado = __historicoPeriodos.slice().sort(function (a, b) { return a.periodo.localeCompare(b.periodo); });
+  var labels = ordenado.map(function (h) { return h.periodo; });
+  var dados = ordenado.map(function (h) { return h.media !== null ? h.media : 0; });
+
+  // Se já existe gráfico, destrói antes de recriar (senão buga)
+  if (window.__graficoEvolucao) {
+    try { window.__graficoEvolucao.destroy(); } catch (e) {}
+    window.__graficoEvolucao = null;
+  }
+
+  // Cores do tema atual
+  var estilo = getComputedStyle(document.documentElement);
+  var corAccent = estilo.getPropertyValue("--accent-strong").trim() || "#8b5edd";
+  var corAccent2 = estilo.getPropertyValue("--accent").trim() || "#cebdec";
+  var corTexto = estilo.getPropertyValue("--text-muted").trim() || "#b8a8d9";
+  var corGrade = estilo.getPropertyValue("--border-color").trim() || "rgba(206,189,236,0.18)";
+  var corMeta = estilo.getPropertyValue("--warning").trim() || "#f59e0b";
+
+  var ctx = canvas.getContext("2d");
+  var gradient = ctx.createLinearGradient(0, 0, 0, 260);
+  gradient.addColorStop(0, corAccent + "cc");
+  gradient.addColorStop(1, corAccent + "08");
+
+  window.__graficoEvolucao = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "Média",
+          data: dados,
+          borderColor: corAccent,
+          backgroundColor: gradient,
+          borderWidth: 3,
+          pointBackgroundColor: corAccent2,
+          pointBorderColor: corAccent,
+          pointBorderWidth: 2,
+          pointRadius: 6,
+          pointHoverRadius: 9,
+          tension: 0.35,
+          fill: true,
+        },
+        {
+          label: "Meta",
+          data: labels.map(function () { return __metaAtual; }),
+          borderColor: corMeta,
+          borderWidth: 2,
+          borderDash: [6, 6],
+          pointRadius: 0,
+          fill: false,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: {
+          labels: {
+            color: corTexto,
+            font: { family: "Inter", size: 12, weight: "600" },
+            usePointStyle: true,
+          },
+        },
+        tooltip: {
+          backgroundColor: "rgba(0,0,0,0.85)",
+          titleFont: { family: "Inter", size: 13 },
+          bodyFont: { family: "Inter", size: 12 },
+          padding: 10,
+          cornerRadius: 8,
+          callbacks: {
+            label: function (context) {
+              return context.dataset.label + ": " + context.parsed.y.toFixed(1);
+            },
+          },
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            color: corTexto,
+            font: { family: "Inter", size: 11 },
+            stepSize: 20,
+          },
+          grid: { color: corGrade, drawBorder: false },
+        },
+        x: {
+          ticks: {
+            color: corTexto,
+            font: { family: "Inter", size: 11, weight: "600" },
+          },
+          grid: { display: false },
+        },
+      },
+    },
+  });
+}
+
+// ==========================================
 // 5.6 RENDERIZAR TABELA
 // ==========================================
 function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   var corpo = document.getElementById("lista-notas");
   if (!corpo) return;
-
   var metaInput = document.getElementById("meta-notas");
   var meta = metaInput ? (formatarNota(metaInput.value) || 60) : 60;
   __metaAtual = meta;
@@ -1167,7 +1194,7 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   corpo.innerHTML = "";
 
   if (!__notasCache.length) {
-    corpo.innerHTML = '<tr><td colspan="8" class="notas-vazia"><i class="fa-solid fa-inbox"></i>Nenhuma disciplina encontrada neste período.</td></tr>';
+    corpo.innerHTML = '<tr><td colspan="8" class="notas-vazia"><i class="fa-solid fa-inbox"></i>Nenhuma disciplina neste período.</td></tr>';
     atualizarResumoNotas([]);
     return;
   }
@@ -1198,7 +1225,6 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
 
   ["Semestral", "Anual"].forEach(function (tipo) {
     if (!grupos[tipo].length) return;
-
     var linhaGrupo = document.createElement("tr");
     linhaGrupo.className = "notas-grupo" + (__gruposColapsados[tipo] ? " colapsado" : "");
     linhaGrupo.dataset.grupo = tipo;
@@ -1211,7 +1237,6 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
       });
     });
     corpo.appendChild(linhaGrupo);
-
     grupos[tipo].forEach(function (item) {
       var tr = criarLinhaNota(item.disciplina, item.etapas, tipo, meta);
       corpo.appendChild(tr);
@@ -1223,47 +1248,37 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   bindSimuladores(corpo);
 }
 
-/* ---------- Criar uma linha ---------- */
 function criarLinhaNota(d, etapas, tipo, meta) {
   var codigo = getCodigoDisc(d);
   var sim = __simulacoes[codigo];
   var faltas = Number(d.numero_faltas) || 0;
   var metaDisc = metaEfetiva(d);
-
   var calc = calcularMediaSimples(d, etapas, sim);
   var media = calc.media;
   var notasEtapas = etapas.map(function (n) {
     var etapa = d["nota_etapa_" + n];
     return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa);
   });
-
   var status = classificarStatusNota(media, faltas, metaDisc);
   var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, etapas.length, calc.somaComSim, metaDisc);
   var faltasClasse = faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT ? "critico"
                     : faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_ALERTA ? "alerta" : "";
-
   var badgeLabel = {
     aprovado: '<i class="fa-solid fa-check"></i> Aprovado',
     recuperacao: '<i class="fa-solid fa-rotate"></i> Recuperação',
     reprovado: '<i class="fa-solid fa-xmark"></i> Reprovado',
   }[status];
-
   var linhaRisco = (status === "reprovado" || faltasClasse === "critico") ? "linha-risco" : "";
   var linhaSim = calc.simulando ? "simulando" : "";
-
   var etapasHTML = notasEtapas.map(function (n) {
     return '<span class="etapa-pill">' + textoNota(n) + '</span>';
   }).join("");
-
   var percentual = media !== null ? Math.min(media, 100) : 0;
   var mediaHTML =
     '<div class="media-cell">' +
       '<span>' + textoNota(media) + '</span>' +
-      '<div class="media-bar">' +
-        '<div class="media-bar-fill ' + status + '" style="width:' + percentual + '%"></div>' +
-      '</div>' +
+      '<div class="media-bar"><div class="media-bar-fill ' + status + '" style="width:' + percentual + '%"></div></div>' +
     '</div>';
-
   var temEtapaEmAberto = calc.temEtapaAberta;
   var simuladorHTML = temEtapaEmAberto
     ? `<div class="simulador-cell">
@@ -1273,20 +1288,17 @@ function criarLinhaNota(d, etapas, tipo, meta) {
          ${calc.simulando ? `<span class="simulador-resultado ${status === 'aprovado' ? 'ok' : status === 'recuperacao' ? 'mid' : 'ruim'}">${textoNota(media)}</span>` : ''}
        </div>`
     : '<span style="color:var(--text-muted);font-size:.8rem;">Fechada</span>';
-
   var metaCustom = __metasDisciplinas[codigo] != null;
   var metaHTML = `<button type="button" class="btn-meta-disciplina ${metaCustom ? 'customizada' : ''}"
                     data-codigo="${escaparHTML(codigo)}"
                     data-nome="${escaparHTML(d.disciplina || codigo)}"
                     title="Meta individual: ${metaDisc}">🎯</button>`;
-
   var tr = document.createElement("tr");
   tr.className = [linhaRisco, linhaSim].filter(Boolean).join(" ");
   tr.dataset.grupoLinha = tipo;
   tr.dataset.codigo = codigo;
-
   tr.innerHTML =
-    '<td class="td-disciplina"><strong>' + escaparHTML(d.disciplina || d.codigo_diario || "Disciplina sem nome") + '</strong></td>' +
+    '<td class="td-disciplina"><strong>' + escaparHTML(d.disciplina || d.codigo_diario || "Disciplina") + '</strong></td>' +
     '<td><div class="etapas-cell">' + (etapasHTML || '<span class="etapa-pill">—</span>') + '</div></td>' +
     '<td class="td-media">' + mediaHTML + '</td>' +
     '<td class="td-faltas"><span class="faltas-cell ' + faltasClasse + '">' + faltas + '</span></td>' +
@@ -1294,18 +1306,15 @@ function criarLinhaNota(d, etapas, tipo, meta) {
     '<td class="td-status"><span class="badge badge-' + status + '">' + badgeLabel + '</span></td>' +
     '<td class="td-simulador">' + simuladorHTML + '</td>' +
     '<td class="td-meta">' + metaHTML + '</td>';
-
   return tr;
 }
 
-/* ---------- Update cirúrgico ---------- */
 function atualizarLinhaNota(tr, d, meta) {
   var codigo = getCodigoDisc(d);
   var sim = __simulacoes[codigo];
   var faltas = Number(d.numero_faltas) || 0;
   var metaDisc = metaEfetiva(d);
   var etapas = obterEtapasDaDisciplina(d).etapas;
-
   var calc = calcularMediaSimples(d, etapas, sim);
   var media = calc.media;
   var status = classificarStatusNota(media, faltas, metaDisc);
@@ -1320,15 +1329,11 @@ function atualizarLinhaNota(tr, d, meta) {
     tdMedia.innerHTML =
       '<div class="media-cell">' +
         '<span>' + textoNota(media) + '</span>' +
-        '<div class="media-bar">' +
-          '<div class="media-bar-fill ' + status + '" style="width:' + percentual + '%"></div>' +
-        '</div>' +
+        '<div class="media-bar"><div class="media-bar-fill ' + status + '" style="width:' + percentual + '%"></div></div>' +
       '</div>';
   }
-
   var tdProj = tr.querySelector(".td-projecao");
   if (tdProj) tdProj.innerHTML = '<span class="projecao-cell ' + proj.classe + '">' + proj.texto + '</span>';
-
   var tdStatus = tr.querySelector(".td-status");
   if (tdStatus) {
     var badgeLabel = {
@@ -1338,7 +1343,6 @@ function atualizarLinhaNota(tr, d, meta) {
     }[status];
     tdStatus.innerHTML = '<span class="badge badge-' + status + '">' + badgeLabel + '</span>';
   }
-
   var tdSim = tr.querySelector(".td-simulador");
   if (tdSim) {
     var resultadoEl = tdSim.querySelector(".simulador-resultado");
@@ -1362,7 +1366,6 @@ function atualizarLinhaNota(tr, d, meta) {
   }
 }
 
-/* ---------- Bind inputs ---------- */
 function bindSimuladores(corpo) {
   corpo.querySelectorAll(".simulador-input").forEach(function (input) {
     if (input.dataset.bound) return;
@@ -1383,7 +1386,6 @@ function bindSimuladores(corpo) {
       }
     });
   });
-
   corpo.querySelectorAll(".btn-meta-disciplina").forEach(function (btn) {
     if (btn.dataset.bound) return;
     btn.dataset.bound = "1";
@@ -1394,7 +1396,7 @@ function bindSimuladores(corpo) {
 }
 
 // ==========================================
-// 5.7 MODAL META POR DISCIPLINA
+// 5.7 MODAL META
 // ==========================================
 function abrirModalMetaDisciplina(codigo, nome) {
   var modal = document.getElementById("modal-meta-disciplina");
@@ -1407,28 +1409,25 @@ function abrirModalMetaDisciplina(codigo, nome) {
   rangeInput.value = atual;
   numEl.textContent = atual;
   rangeInput.oninput = function () { numEl.textContent = rangeInput.value; };
-
   var btnReset = modal.querySelector("[data-reset]");
   var btnSalvar = modal.querySelector("[data-salvar]");
   var btnFechar = modal.querySelector("[data-fechar]");
-
   btnReset.onclick = function () {
     delete __metasDisciplinas[codigo];
     salvarMetasDisciplinas();
     modal.classList.add("is-hidden");
     if (__notasCache.length) renderizarNotas(__notasCache);
-    exibirToast("Meta individual removida — usando meta global.", "sucesso");
+    exibirToast("Meta removida.", "sucesso");
   };
   btnSalvar.onclick = function () {
     __metasDisciplinas[codigo] = Number(rangeInput.value);
     salvarMetasDisciplinas();
     modal.classList.add("is-hidden");
     if (__notasCache.length) renderizarNotas(__notasCache);
-    exibirToast("Meta individual salva (" + rangeInput.value + ").", "sucesso");
+    exibirToast("Meta salva (" + rangeInput.value + ").", "sucesso");
   };
   btnFechar.onclick = function () { modal.classList.add("is-hidden"); };
   modal.onclick = function (e) { if (e.target === modal) modal.classList.add("is-hidden"); };
-
   modal.classList.remove("is-hidden");
 }
 
@@ -1439,7 +1438,6 @@ function exportarCSV() {
   if (!__notasCache.length) { exibirToast("Nada para exportar.", "erro"); return; }
   var linhas = [];
   linhas.push(["Disciplina", "Tipo", "Etapas", "Média", "Meta", "Faltas", "Projeção", "Status"].join(";"));
-
   __notasCache.forEach(function (d) {
     var cfg = obterEtapasDaDisciplina(d);
     var calc = calcularMediaSimples(d, cfg.etapas, __simulacoes[getCodigoDisc(d)]);
@@ -1447,7 +1445,6 @@ function exportarCSV() {
     var meta = metaEfetiva(d);
     var st = classificarStatusNota(calc.media, faltas, meta);
     var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, cfg.etapas.length, calc.somaComSim, meta);
-
     linhas.push([
       (d.disciplina || d.codigo_diario || "").replace(/;/g, ","),
       cfg.tipo,
@@ -1455,14 +1452,9 @@ function exportarCSV() {
         var e = d["nota_etapa_" + n];
         return textoNota(formatarNota(e && typeof e === "object" ? e.nota : e));
       }).join(" | "),
-      textoNota(calc.media),
-      meta,
-      faltas,
-      proj.texto,
-      st
+      textoNota(calc.media), meta, faltas, proj.texto, st
     ].join(";"));
   });
-
   var csv = "\uFEFF" + linhas.join("\n");
   var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   var url = URL.createObjectURL(blob);
@@ -1470,9 +1462,7 @@ function exportarCSV() {
   var periodo = (document.getElementById("periodo-notas")?.value || "boletim").replace("/", ".");
   a.href = url;
   a.download = "boletim_" + periodo + ".csv";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
   exibirToast("CSV exportado!", "sucesso");
 }
@@ -1482,7 +1472,6 @@ function exportarPDF() {
   var periodo = document.getElementById("periodo-notas")?.value || "";
   var nome = window.usuarioLogado.nome || "Aluno";
   var mat = window.usuarioLogado.matricula || "";
-
   var linhasHTML = "";
   ["Semestral", "Anual"].forEach(function (tipo) {
     var doTipo = __notasCache.filter(function (d) { return obterEtapasDaDisciplina(d).tipo === tipo; });
@@ -1510,7 +1499,6 @@ function exportarPDF() {
         </tr>`;
     });
   });
-
   var w = window.open("", "_blank");
   w.document.write(`
     <!doctype html><html><head><meta charset="utf-8">
@@ -1533,7 +1521,7 @@ function exportarPDF() {
       <thead><tr><th>Disciplina</th><th>Etapas</th><th>Média</th><th>Faltas</th><th>Projeção</th><th>Status</th></tr></thead>
       <tbody>${linhasHTML}</tbody>
     </table>
-    <div class="rodape">Gerado automaticamente pelo Portal InfoWeb 2V — IFRN</div>
+    <div class="rodape">Gerado pelo Portal InfoWeb 2V — IFRN</div>
     <script>window.onload = () => setTimeout(() => window.print(), 300);<\/script>
     </body></html>
   `);
@@ -1557,7 +1545,7 @@ function carregarBoletim(ano, periodo) {
     },
     function (xhr) {
       renderizarNotas([]);
-      atualizarStatusNotas("Não foi possível carregar o boletim (HTTP " + xhr.status + ").", "erro");
+      atualizarStatusNotas("Erro ao carregar boletim (HTTP " + xhr.status + ").", "erro");
     }
   );
 }
@@ -1579,12 +1567,191 @@ function carregarPeriodosNotas() {
       });
       seletor.disabled = !periodos.length;
       if (periodos.length) carregarBoletim(periodos[0].ano_letivo, periodos[0].periodo_letivo);
-      else atualizarStatusNotas("Nenhum período letivo disponível no SUAP.", "erro");
+      else atualizarStatusNotas("Nenhum período disponível.", "erro");
     },
-    function (xhr) {
-      atualizarStatusNotas("Não foi possível carregar os períodos (HTTP " + xhr.status + ").", "erro");
-    }
+    function (xhr) { atualizarStatusNotas("Erro nos períodos (HTTP " + xhr.status + ").", "erro"); }
   );
+}
+
+// ==========================================
+// 🆕 5.9b NOTIFICAÇÕES
+// ==========================================
+const CHAVE_NOTIF_LIDAS = () => "notif_lidas_" + (window.usuarioLogado.matricula || "anon");
+let __notificacoes = [];
+
+function gerarNotificacoesRecados() {
+  var mat = window.usuarioLogado.matricula;
+  if (!mat) return;
+  var lidas = {};
+  try {
+    var raw = localStorage.getItem(CHAVE_NOTIF_LIDAS());
+    lidas = raw ? JSON.parse(raw) : {};
+  } catch (e) { lidas = {}; }
+
+  __notificacoes = [];
+  bancoDeRecados.forEach(function (r) {
+    // Só notifica se não for do próprio usuário
+    if (r.autor_matricula === mat) return;
+    // Só notifica recados recentes (últimos 30 dias)
+    var idade = Date.now() - (r.timestampCriacao || 0);
+    if (idade > 30 * 24 * 60 * 60 * 1000) return;
+
+    __notificacoes.push({
+      id: r.id,
+      tipo: "recado",
+      icone: "fa-regular fa-comment-dots",
+      titulo: "Novo recado de " + nomeParaExibicao(r.autor_nome),
+      descricao: (r.mensagem || "").slice(0, 80) + ((r.mensagem || "").length > 80 ? "..." : ""),
+      data: r.timestampCriacao,
+      lida: !!lidas[r.id],
+    });
+  });
+
+  // Ordena mais recentes primeiro
+  __notificacoes.sort(function (a, b) { return b.data - a.data; });
+  atualizarBadgeNotificacoes();
+}
+
+function atualizarBadgeNotificacoes() {
+  var btn = document.getElementById("btn-notificacoes");
+  var badge = document.getElementById("badge-notificacoes");
+  var naoLidas = __notificacoes.filter(function (n) { return !n.lida; }).length;
+  if (btn) btn.classList.remove("is-hidden");
+  if (badge) {
+    if (naoLidas > 0) {
+      badge.textContent = naoLidas > 9 ? "9+" : naoLidas;
+      badge.classList.remove("is-hidden");
+    } else {
+      badge.classList.add("is-hidden");
+    }
+  }
+}
+
+function renderizarPainelNotificacoes() {
+  var lista = document.getElementById("lista-notificacoes");
+  if (!lista) return;
+  if (__notificacoes.length === 0) {
+    lista.innerHTML = '<p class="notif-vazio">Sem notificações.</p>';
+    return;
+  }
+  lista.innerHTML = __notificacoes.map(function (n) {
+    var dataStr = new Date(n.data).toLocaleString("pt-BR", {
+      day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit",
+    });
+    return `
+      <div class="notif-item ${n.lida ? "" : "nao-lida"}" data-id="${n.id}">
+        <div class="notif-icone"><i class="${n.icone}"></i></div>
+        <div class="notif-corpo">
+          <div class="notif-titulo">${escaparHTML(n.titulo)}</div>
+          <div class="notif-descricao">${escaparHTML(n.descricao)}</div>
+          <div class="notif-data">${dataStr}</div>
+        </div>
+      </div>`;
+  }).join("");
+
+  // Clique marca como lida e rola até o recado
+  lista.querySelectorAll(".notif-item").forEach(function (el) {
+    el.addEventListener("click", function () {
+      var id = el.dataset.id;
+      marcarNotificacaoLida(id);
+      document.getElementById("mural")?.scrollIntoView({ behavior: "smooth" });
+      document.getElementById("painel-notificacoes")?.classList.add("is-hidden");
+    });
+  });
+}
+
+function marcarNotificacaoLida(id) {
+  var lidas = {};
+  try {
+    var raw = localStorage.getItem(CHAVE_NOTIF_LIDAS());
+    lidas = raw ? JSON.parse(raw) : {};
+  } catch (e) { lidas = {}; }
+  lidas[id] = true;
+  localStorage.setItem(CHAVE_NOTIF_LIDAS(), JSON.stringify(lidas));
+  __notificacoes.forEach(function (n) { if (n.id === id) n.lida = true; });
+  atualizarBadgeNotificacoes();
+  renderizarPainelNotificacoes();
+}
+
+function marcarTodasLidas() {
+  var lidas = {};
+  __notificacoes.forEach(function (n) { lidas[n.id] = true; n.lida = true; });
+  localStorage.setItem(CHAVE_NOTIF_LIDAS(), JSON.stringify(lidas));
+  atualizarBadgeNotificacoes();
+  renderizarPainelNotificacoes();
+}
+
+// ==========================================
+// 🆕 5.9c PRÓXIMOS EVENTOS (via FullCalendar)
+// ==========================================
+function renderizarProximosEventos(eventos) {
+  var container = document.getElementById("proximos-eventos-lista");
+  if (!container) return;
+
+  var hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  var em7dias = new Date(hoje);
+  em7dias.setDate(em7dias.getDate() + 7);
+
+  // Filtra próximos 7 dias, ordena por data
+  var proximos = eventos
+    .filter(function (ev) {
+      var inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
+      inicio.setHours(0, 0, 0, 0);
+      return inicio >= hoje && inicio <= em7dias;
+    })
+    .sort(function (a, b) {
+      var da = a.start instanceof Date ? a.start : new Date(a.start);
+      var db = b.start instanceof Date ? b.start : new Date(b.start);
+      return da - db;
+    })
+    .slice(0, 4);
+
+  if (proximos.length === 0) {
+    container.innerHTML = "";
+    document.getElementById("proximos-eventos")?.classList.add("is-hidden");
+    return;
+  }
+  document.getElementById("proximos-eventos")?.classList.remove("is-hidden");
+
+  var MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+  container.innerHTML = proximos.map(function (ev) {
+    var inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
+    var dia = inicio.getDate();
+    var mes = MESES[inicio.getMonth()];
+
+    var diffDias = Math.floor((inicio - hoje) / (1000 * 60 * 60 * 24));
+    var classeCard = "evento-card";
+    var badgeHTML = "";
+    if (diffDias === 0) {
+      classeCard += " hoje";
+      badgeHTML = '<span class="evento-badge hoje"><i class="fa-solid fa-fire"></i> HOJE</span>';
+    } else if (diffDias === 1) {
+      classeCard += " destaque";
+      badgeHTML = '<span class="evento-badge amanha">Amanhã</span>';
+    } else if (diffDias <= 3) {
+      classeCard += " destaque";
+      badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`;
+    } else {
+      badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`;
+    }
+
+    // Cor do evento
+    var cor = ev.backgroundColor || ev.borderColor || "#8b5edd";
+
+    return `
+      <div class="${classeCard}" style="border-left-color:${cor}">
+        <div class="evento-data" style="background:${cor}22">
+          <span class="evento-dia" style="color:${cor}">${String(dia).padStart(2, "0")}</span>
+          <span class="evento-mes">${mes}</span>
+        </div>
+        <div class="evento-info">
+          <div class="evento-titulo">${escaparHTML(ev.title || "Sem título")}</div>
+          <div class="evento-descricao">${inicio.toLocaleDateString("pt-BR", { weekday: "long" })}${ev.extendedProps?.location ? " • " + escaparHTML(ev.extendedProps.location) : ""}</div>
+          ${badgeHTML}
+        </div>
+      </div>`;
+  }).join("");
 }
 
 // ==========================================
@@ -1599,7 +1766,6 @@ function initCalculadoraNotas() {
       if (partes.length === 2) carregarBoletim(partes[0], partes[1]);
     });
   }
-
   const elMeta = document.getElementById("meta-notas");
   const elMetaValor = document.getElementById("meta-valor");
   if (elMeta && !elMeta.dataset.bound) {
@@ -1610,9 +1776,9 @@ function initCalculadoraNotas() {
     elMeta.addEventListener("change", function (e) {
       __metaAtual = Number(e.target.value) || 60;
       if (__notasCache.length) renderizarNotas(__notasCache);
+      desenharGraficoEvolucao();
     });
   }
-
   document.querySelectorAll(".filtro-chip").forEach(function (chip) {
     if (chip.dataset.bound) return;
     chip.dataset.bound = "1";
@@ -1623,7 +1789,6 @@ function initCalculadoraNotas() {
       if (__notasCache.length) renderizarNotas(__notasCache);
     });
   });
-
   const elAtualizar = document.getElementById("atualizar-notas");
   if (elAtualizar && !elAtualizar.dataset.bound) {
     elAtualizar.dataset.bound = "1";
@@ -1634,13 +1799,11 @@ function initCalculadoraNotas() {
       if (periodo.length === 2) carregarBoletim(periodo[0], periodo[1]);
     });
   }
-
   document.querySelectorAll(".tabela-notas thead th.sortable").forEach(function (th) {
     if (th.dataset.bound) return;
     th.dataset.bound = "1";
     th.addEventListener("click", function () { aplicarSort(th.dataset.sort); });
   });
-
   document.getElementById("btn-export-csv")?.addEventListener("click", exportarCSV);
   document.getElementById("btn-export-pdf")?.addEventListener("click", exportarPDF);
   document.getElementById("btn-limpar-simulador")?.addEventListener("click", function () {
@@ -1648,35 +1811,48 @@ function initCalculadoraNotas() {
     if (__notasCache.length) renderizarNotas(__notasCache);
     exibirToast("Simulações limpas.", "sucesso");
   });
-
   document.getElementById("btn-toggle-historico")?.addEventListener("click", function () {
     document.getElementById("historico-panel")?.classList.toggle("colapsado");
+  });
+
+  // 🆕 Notificações
+  const btnNotif = document.getElementById("btn-notificacoes");
+  const painelNotif = document.getElementById("painel-notificacoes");
+  if (btnNotif && !btnNotif.dataset.bound) {
+    btnNotif.dataset.bound = "1";
+    btnNotif.addEventListener("click", function (e) {
+      e.stopPropagation();
+      renderizarPainelNotificacoes();
+      painelNotif?.classList.toggle("is-hidden");
+    });
+  }
+  document.getElementById("btn-marcar-lidas")?.addEventListener("click", marcarTodasLidas);
+  // Fecha painel clicando fora
+  document.addEventListener("click", function (e) {
+    if (!painelNotif || painelNotif.classList.contains("is-hidden")) return;
+    if (!e.target.closest("#painel-notificacoes") && !e.target.closest("#btn-notificacoes")) {
+      painelNotif.classList.add("is-hidden");
+    }
   });
 
   carregarMetasDisciplinas();
 }
 
 // ==========================================
-// 6. INICIALIZAÇÃO E AUTENTICAÇÃO
+// 6. INICIALIZAÇÃO
 // ==========================================
 document.addEventListener("DOMContentLoaded", function () {
   filtroRecadoTexto = "";
   filtroPerfilTexto = "";
-
   inicializarModalEditarPerfil();
   initCalculadoraNotas();
 
   const btnLogin = document.getElementById("suap-login-button");
   if (btnLogin) btnLogin.setAttribute("href", suap.getLoginURL());
-
   const btnLogout = document.getElementById("suap-logout-button");
   if (btnLogout) {
-    btnLogout.addEventListener("click", function (e) {
-      e.preventDefault();
-      window.forceLogout();
-    });
+    btnLogout.addEventListener("click", function (e) { e.preventDefault(); window.forceLogout(); });
   }
-
   const anoEl = document.getElementById("ano");
   if (anoEl) anoEl.textContent = new Date().getFullYear();
 
@@ -1684,15 +1860,29 @@ document.addEventListener("DOMContentLoaded", function () {
     if (window.location.hash.includes("access_token")) {
       history.replaceState(null, null, window.location.pathname);
     }
-
-    document.querySelectorAll(".is-authenticated").forEach(function (el) {
-      el.classList.remove("is-hidden");
-    });
-
+    document.querySelectorAll(".is-authenticated").forEach(function (el) { el.classList.remove("is-hidden"); });
     carregarPeriodosNotas();
 
+    // 🆕 CALENDÁRIO COM CORES CUSTOMIZADAS
     var calendarEl = document.getElementById("calendar");
     if (calendarEl && typeof FullCalendar !== "undefined") {
+      // Mapa colorId do Google → paleta do site
+      var MAPA_CORES_GOOGLE = {
+        "1": "#8b5edd",  // Lavanda
+        "2": "#10b981",  // Sálvia
+        "3": "#7c3aed",  // Uva
+        "4": "#ff4757",  // Flamingo
+        "5": "#f59e0b",  // Banana
+        "6": "#f97316",  // Tangerina
+        "7": "#06b6d4",  // Pavão
+        "8": "#64748b",  // Grafite
+        "9": "#3b82f6",  // Mirtilo
+        "10": "#22c55e", // Manjericão
+        "11": "#ef4444", // Tomate
+      };
+
+      var eventosCache = [];
+
       var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: "dayGridMonth",
         locale: "pt-br",
@@ -1700,6 +1890,25 @@ document.addEventListener("DOMContentLoaded", function () {
         validRange: { start: "2026-09-01", end: "2026-12-31" },
         googleCalendarApiKey: "AIzaSyB9XFKFwtZNQJrN2Kh7UPZxraPXEwqFytw",
         events: "acb20a08d58749d48304dbda5c87bfb7f0671483ecc4ed942683ad5a1307e78d@group.calendar.google.com",
+
+        // 🆕 Cores aplicadas por evento
+        eventDidMount: function (info) {
+          var colorId = info.event.extendedProps?.colorId ||
+                        info.event._def?.extendedProps?.colorId;
+          var cor = MAPA_CORES_GOOGLE[colorId];
+          if (cor) {
+            info.el.style.backgroundColor = cor;
+            info.el.style.borderColor = cor;
+            info.el.style.color = "#ffffff";
+          }
+        },
+
+        // 🆕 Captura eventos após renderizar
+        eventsSet: function (eventos) {
+          eventosCache = eventos;
+          renderizarProximosEventos(eventos);
+        },
+
         eventClick: function (arg) {
           window.open(arg.event.url, "_blank");
           arg.jsEvent.preventDefault();
@@ -1708,6 +1917,7 @@ document.addEventListener("DOMContentLoaded", function () {
       calendar.render();
     }
 
+    // SUAP — dados do usuário
     var scope = suap.getToken().getScope();
     suap.getResource(scope, function (dados_suap) {
       var fotoPath = dados_suap.url_foto_150x200 || dados_suap.url_foto_75x100 || dados_suap.foto || "";
@@ -1721,20 +1931,15 @@ document.addEventListener("DOMContentLoaded", function () {
       } else {
         fotoUrl = "https://ui-avatars.com/api/?name=" + encodeURIComponent(dados_suap.nome_usual || dados_suap.nome) + "&background=random";
       }
-
       const userFotoEl = document.getElementById("user-foto");
       if (userFotoEl) userFotoEl.src = fotoUrl;
-
       const nomeSuap = dados_suap.nome_usual || dados_suap.nome;
       const nomeCompletoSuap = dados_suap.nome || nomeSuap;
       const matriculaSuap = dados_suap.matricula || dados_suap.siape || "Matrícula não disponível";
-
       const userNomeEl = document.getElementById("user-nome");
       if (userNomeEl) userNomeEl.textContent = nomeParaExibicao(nomeSuap);
-
       const userMatEl = document.getElementById("user-matricula");
       if (userMatEl) userMatEl.textContent = matriculaSuap;
-
       window.usuarioLogado.nome = nomeParaExibicao(nomeSuap);
       window.usuarioLogado.matricula = matriculaSuap;
       window.usuarioLogado.foto = fotoUrl;
@@ -1745,16 +1950,15 @@ document.addEventListener("DOMContentLoaded", function () {
         get(perfilAlunoRef).then((snap) => {
           const dadosExistentes = snap.val() || {};
           const payload = {
-            nomeCompleto: nomeCompletoSuap,
-            matricula: matriculaSuap,
-            ultimoAcesso: Date.now(),
+            nomeCompleto: nomeCompletoSuap, matricula: matriculaSuap, ultimoAcesso: Date.now(),
           };
           if (!dadosExistentes.nome || !String(dadosExistentes.nome).trim()) payload.nome = nomeParaExibicao(nomeSuap);
           if (!dadosExistentes.foto || !String(dadosExistentes.foto).trim()) payload.foto = fotoUrl;
           update(perfilAlunoRef, payload).then(() => { window.carregarPerfilUsuario(matriculaSuap); });
         });
-
         carregarMetasDisciplinas();
+        // 🆕 Gera notificações iniciais
+        gerarNotificacoesRecados();
       }
 
       const inputRecadoNome = document.getElementById("recado-nome");
@@ -1762,13 +1966,10 @@ document.addEventListener("DOMContentLoaded", function () {
         inputRecadoNome.style.display = "none";
         inputRecadoNome.removeAttribute("required");
       }
-
       window.renderizarMural();
       window.renderizarPerfis();
     });
   } else {
-    document.querySelectorAll(".is-anonymous").forEach(function (el) {
-      el.classList.remove("is-hidden");
-    });
+    document.querySelectorAll(".is-anonymous").forEach(function (el) { el.classList.remove("is-hidden"); });
   }
 });
