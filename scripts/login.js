@@ -513,23 +513,76 @@ function mostrarBotaoNovoEvento() {
   btn.classList.toggle("is-hidden", !ehAdminEventos());
 }
 
-function abrirModalNovoEvento() {
+// Estado dos modais de evento
+let __eventoEditandoId = null;
+let __eventoSelecionadoId = null;
+
+function abrirModalNovoEvento(eventoParaEditar) {
   const modal = document.getElementById("modal-novo-evento");
   if (!modal) return;
 
+  const ehEdicao = !!eventoParaEditar?.id;
+  __eventoEditandoId = ehEdicao ? eventoParaEditar.id : null;
+
+  const tituloSpan = modal.querySelector(".modal-title span");
+  if (tituloSpan) tituloSpan.textContent = ehEdicao ? "Editar Evento" : "Novo Evento";
+  const btnCriar = document.getElementById("btn-criar-evento");
+  if (btnCriar) {
+    btnCriar.innerHTML = ehEdicao
+      ? '<i class="fa-solid fa-floppy-disk"></i> Salvar alterações'
+      : '<i class="fa-solid fa-calendar-plus"></i> Criar evento';
+  }
+
+  const pad = (n) => String(n).padStart(2, "0");
+  const toLocalISO = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const toDateISO = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
   const agora = new Date();
   const daqui1h = new Date(agora.getTime() + 60 * 60 * 1000);
-  const toLocalISO = (d) => {
-    const pad = (n) => String(n).padStart(2, "0");
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  };
+  const checkDiaTodo = document.getElementById("evento-dia-todo");
+  const ehDiaTodo = ehEdicao ? !!eventoParaEditar.diaTodo : false;
 
-  document.getElementById("evento-inicio").value = toLocalISO(agora);
-  document.getElementById("evento-fim").value = toLocalISO(daqui1h);
-  document.getElementById("evento-titulo").value = "";
-  document.getElementById("evento-descricao").value = "";
-  document.getElementById("evento-local").value = "";
-  document.getElementById("evento-cor").value = "roxo";
+  document.getElementById("evento-titulo").value = ehEdicao ? (eventoParaEditar.titulo || "") : "";
+  document.getElementById("evento-descricao").value = ehEdicao ? (eventoParaEditar.descricao || "") : "";
+  document.getElementById("evento-local").value = ehEdicao ? (eventoParaEditar.local || "") : "";
+  if (checkDiaTodo) checkDiaTodo.checked = ehDiaTodo;
+
+  if (ehEdicao && eventoParaEditar.inicio && eventoParaEditar.fim) {
+    const dIni = new Date(eventoParaEditar.inicio);
+    const dFim = new Date(eventoParaEditar.fim);
+    if (ehDiaTodo) {
+      document.getElementById("evento-inicio-data").value = toDateISO(dIni);
+      document.getElementById("evento-fim-data").value = toDateISO(dFim);
+    } else {
+      document.getElementById("evento-inicio").value = toLocalISO(dIni);
+      document.getElementById("evento-fim").value = toLocalISO(dFim);
+    }
+  } else {
+    document.getElementById("evento-inicio").value = toLocalISO(agora);
+    document.getElementById("evento-fim").value = toLocalISO(daqui1h);
+    document.getElementById("evento-inicio-data").value = toDateISO(agora);
+    document.getElementById("evento-fim-data").value = toDateISO(agora);
+  }
+
+  const selectCor = document.getElementById("evento-cor");
+  if (selectCor) {
+    const CORES_HEX_NOMES = {
+      "#8b5edd": "roxo",
+      "#ff4757": "vermelho",
+      "#f59e0b": "laranja",
+      "#10b981": "verde",
+      "#06b6d4": "azul",
+      "#ec4899": "rosa",
+    };
+    if (ehEdicao && eventoParaEditar.cor) {
+      selectCor.value = CORES_HEX_NOMES[eventoParaEditar.cor] || "roxo";
+    } else {
+      selectCor.value = "roxo";
+    }
+  }
+
+  document.getElementById("evento-datas-horario")?.classList.toggle("is-hidden", ehDiaTodo);
+  document.getElementById("evento-datas-todo")?.classList.toggle("is-hidden", !ehDiaTodo);
 
   const status = document.getElementById("evento-status");
   status.className = "evento-status is-hidden";
@@ -540,6 +593,7 @@ function abrirModalNovoEvento() {
 
 function fecharModalNovoEvento() {
   document.getElementById("modal-novo-evento")?.classList.add("is-hidden");
+  __eventoEditandoId = null;
 }
 
 async function enviarNovoEvento(event) {
@@ -551,26 +605,44 @@ async function enviarNovoEvento(event) {
   const titulo = document.getElementById("evento-titulo").value.trim();
   const descricao = document.getElementById("evento-descricao").value.trim();
   const local = document.getElementById("evento-local").value.trim();
-  const inicio = document.getElementById("evento-inicio").value;
-  const fim = document.getElementById("evento-fim").value;
   const cor = document.getElementById("evento-cor").value;
+  const diaTodo = document.getElementById("evento-dia-todo")?.checked || false;
 
-  if (!titulo || !inicio || !fim) {
-    status.className = "evento-status erro";
-    status.textContent = "Preencha título, início e fim.";
-    return;
+  let dataInicio, dataFim;
+
+  if (diaTodo) {
+    const inicioData = document.getElementById("evento-inicio-data").value;
+    const fimData = document.getElementById("evento-fim-data").value;
+    if (!titulo || !inicioData || !fimData) {
+      status.className = "evento-status erro";
+      status.textContent = "Preencha título, data de início e data de término.";
+      return;
+    }
+    dataInicio = new Date(inicioData + "T00:00:00");
+    dataFim = new Date(fimData + "T23:59:59");
+  } else {
+    const inicio = document.getElementById("evento-inicio").value;
+    const fim = document.getElementById("evento-fim").value;
+    if (!titulo || !inicio || !fim) {
+      status.className = "evento-status erro";
+      status.textContent = "Preencha título, início e fim.";
+      return;
+    }
+    dataInicio = new Date(inicio);
+    dataFim = new Date(fim);
   }
 
-  const dataInicio = new Date(inicio);
-  const dataFim = new Date(fim);
   if (dataFim <= dataInicio) {
     status.className = "evento-status erro";
     status.textContent = "A data final precisa ser depois da inicial.";
     return;
   }
 
+  const ehEdicao = !!__eventoEditandoId;
   btn.disabled = true;
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Criando...';
+  btn.innerHTML = ehEdicao
+    ? '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...'
+    : '<i class="fa-solid fa-spinner fa-spin"></i> Criando...';
   status.className = "evento-status is-hidden";
   status.textContent = "";
 
@@ -584,58 +656,169 @@ async function enviarNovoEvento(event) {
       rosa: "#ec4899",
     };
 
-    await push(ref(db, "agenda_manual"), {
+    const payload = {
       titulo,
       descricao,
       local,
       inicio: dataInicio.getTime(),
       fim: dataFim.getTime(),
+      diaTodo,
       cor: CORES_HEX[cor] || "#8b5edd",
       autor: window.usuarioLogado.matricula,
       autorNome: window.usuarioLogado.nome,
-      criadoEm: Date.now(),
-    });
+    };
 
-    status.className = "evento-status sucesso";
-    status.textContent = "✅ Evento criado! Já apareceu no calendário.";
+    if (ehEdicao) {
+      payload.editadoEm = Date.now();
+      await update(ref(db, "agenda_manual/" + __eventoEditandoId), payload);
+      status.className = "evento-status sucesso";
+      status.textContent = "✅ Evento atualizado!";
+    } else {
+      payload.criadoEm = Date.now();
+      await push(ref(db, "agenda_manual"), payload);
+      status.className = "evento-status sucesso";
+      status.textContent = "✅ Evento criado! Já apareceu no calendário.";
+    }
 
     setTimeout(() => {
       fecharModalNovoEvento();
+      __eventoEditandoId = null;
       if (typeof exibirToast === "function") {
-        exibirToast("Evento criado no calendário!", "sucesso");
+        exibirToast(ehEdicao ? "Evento atualizado!" : "Evento criado no calendário!", "sucesso");
       }
     }, 1500);
   } catch (err) {
     status.className = "evento-status erro";
-    status.textContent = "❌ Erro ao criar evento: " + err.message;
+    status.textContent = "❌ Erro ao salvar evento: " + err.message;
   } finally {
     btn.disabled = false;
     btn.innerHTML = textoOriginal;
   }
 }
 
-window.apagarEventoManual = function (firebaseId, titulo) {
-  if (!ehAdminEventos()) return;
-  if (!firebaseId) return;
-  if (!confirm(`Apagar o evento "${titulo}"?`)) return;
-  remove(ref(db, "agenda_manual/" + firebaseId))
+function abrirModalOpcoesEvento(firebaseId, eventArg) {
+  const modal = document.getElementById("modal-opcoes-evento");
+  if (!modal) return;
+
+  __eventoSelecionadoId = firebaseId;
+
+  const titulo = document.getElementById("opcoes-evento-titulo");
+  const dataInfo = document.getElementById("opcoes-evento-data");
+  const ev = eventArg.extendedProps || {};
+
+  if (titulo) titulo.textContent = eventArg.title || "Evento";
+
+  if (dataInfo) {
+    const inicio = eventArg.start;
+    const fim = eventArg.end;
+    const diaTodo = eventArg.allDay;
+
+    const fmt = (d) => {
+      if (!d) return "";
+      const data = new Date(d);
+      const dia = data.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+      if (diaTodo) return dia;
+      const hora = data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+      return `${dia} às ${hora}`;
+    };
+
+    let texto = fmt(inicio);
+    if (fim && !diaTodo) {
+      const fimAjustado = new Date(fim.getTime() - 60000);
+      texto += " — " + fimAjustado.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    }
+    if (diaTodo) texto = "📅 Dia todo · " + texto;
+
+    if (ev.local) texto += " · 📍 " + ev.local;
+    dataInfo.textContent = texto;
+  }
+
+  modal.classList.remove("is-hidden");
+}
+
+function fecharModalOpcoesEvento() {
+  document.getElementById("modal-opcoes-evento")?.classList.add("is-hidden");
+  __eventoSelecionadoId = null;
+}
+
+function editarEventoSelecionado() {
+  const id = __eventoSelecionadoId;
+  if (!id) return;
+
+  get(ref(db, "agenda_manual/" + id)).then((snap) => {
+    if (!snap.exists()) {
+      fecharModalOpcoesEvento();
+      if (typeof exibirToast === "function") exibirToast("Evento não existe mais.", "erro");
+      return;
+    }
+    const ev = snap.val();
+    ev.id = id;
+    fecharModalOpcoesEvento();
+    abrirModalNovoEvento(ev);
+  });
+}
+
+function excluirEventoSelecionado() {
+  const id = __eventoSelecionadoId;
+  if (!id) return;
+
+  if (!confirm("Tem certeza que quer excluir este evento?")) return;
+
+  remove(ref(db, "agenda_manual/" + id))
     .then(() => {
-      if (typeof exibirToast === "function") exibirToast("Evento removido.", "sucesso");
+      fecharModalOpcoesEvento();
+      if (typeof exibirToast === "function") exibirToast("Evento excluído.", "sucesso");
     })
     .catch((e) => {
       if (typeof exibirToast === "function") exibirToast("Erro: " + e.message, "erro");
     });
-};
+}
 
 function inicializarNovoEvento() {
-  document.getElementById("btn-novo-evento")?.addEventListener("click", abrirModalNovoEvento);
+  document.getElementById("btn-novo-evento")?.addEventListener("click", () => abrirModalNovoEvento(null));
   document.getElementById("btn-fechar-evento")?.addEventListener("click", fecharModalNovoEvento);
   document.getElementById("btn-cancelar-evento")?.addEventListener("click", fecharModalNovoEvento);
   document.getElementById("form-novo-evento")?.addEventListener("submit", enviarNovoEvento);
-  const modal = document.getElementById("modal-novo-evento");
-  modal?.addEventListener("click", (e) => {
-    if (e.target === modal) fecharModalNovoEvento();
+
+  const checkDiaTodo = document.getElementById("evento-dia-todo");
+  checkDiaTodo?.addEventListener("change", () => {
+    const ehDiaTodo = checkDiaTodo.checked;
+    document.getElementById("evento-datas-horario")?.classList.toggle("is-hidden", ehDiaTodo);
+    document.getElementById("evento-datas-todo")?.classList.toggle("is-hidden", !ehDiaTodo);
+
+    if (ehDiaTodo) {
+      const hoje = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      const hojeISO = `${hoje.getFullYear()}-${pad(hoje.getMonth() + 1)}-${pad(hoje.getDate())}`;
+      const campoInicio = document.getElementById("evento-inicio-data");
+      const campoFim = document.getElementById("evento-fim-data");
+      if (campoInicio && !campoInicio.value) campoInicio.value = hojeISO;
+      if (campoFim && !campoFim.value) campoFim.value = hojeISO;
+    }
   });
+
+  const modalNovo = document.getElementById("modal-novo-evento");
+  modalNovo?.addEventListener("click", (e) => {
+    if (e.target === modalNovo) fecharModalNovoEvento();
+  });
+
+  document.getElementById("btn-fechar-opcoes")?.addEventListener("click", fecharModalOpcoesEvento);
+  document.getElementById("btn-editar-evento")?.addEventListener("click", editarEventoSelecionado);
+  document.getElementById("btn-excluir-evento")?.addEventListener("click", excluirEventoSelecionado);
+  const modalOpcoes = document.getElementById("modal-opcoes-evento");
+  modalOpcoes?.addEventListener("click", (e) => {
+    if (e.target === modalOpcoes) fecharModalOpcoesEvento();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (modalNovo && !modalNovo.classList.contains("is-hidden")) {
+      fecharModalNovoEvento();
+    } else if (modalOpcoes && !modalOpcoes.classList.contains("is-hidden")) {
+      fecharModalOpcoesEvento();
+    }
+  });
+
   mostrarBotaoNovoEvento();
 }
 
@@ -3475,7 +3658,7 @@ document.addEventListener("DOMContentLoaded", function () {
           const origem = arg.event.extendedProps?.origem;
           if (origem === "manual" && ehAdminEventos()) {
             const id = arg.event.extendedProps.firebaseId;
-            window.apagarEventoManual(id, arg.event.title);
+            abrirModalOpcoesEvento(id, arg.event);
             arg.jsEvent.preventDefault();
             return;
           }
@@ -3510,11 +3693,27 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
           }
 
+          const ehDiaTodo = !!ev.diaTodo;
+          let startEvento, endEvento;
+
+          if (ehDiaTodo) {
+            const dIni = new Date(ev.inicio);
+            const dFim = new Date(ev.fim);
+            const pad = (n) => String(n).padStart(2, "0");
+            startEvento = `${dIni.getFullYear()}-${pad(dIni.getMonth() + 1)}-${pad(dIni.getDate())}`;
+            const diaSeguinte = new Date(dFim.getFullYear(), dFim.getMonth(), dFim.getDate() + 1);
+            endEvento = `${diaSeguinte.getFullYear()}-${pad(diaSeguinte.getMonth() + 1)}-${pad(diaSeguinte.getDate())}`;
+          } else {
+            startEvento = new Date(ev.inicio).toISOString();
+            endEvento = new Date(ev.fim).toISOString();
+          }
+
           calendar.addEvent({
             id: `manual_${id}`,
             title: ev.titulo || "Evento",
-            start: new Date(ev.inicio).toISOString(),
-            end: new Date(ev.fim).toISOString(),
+            start: startEvento,
+            end: endEvento,
+            allDay: ehDiaTodo,
             backgroundColor: ev.cor || "#8b5edd",
             borderColor: ev.cor || "#8b5edd",
             textColor: "#ffffff",
