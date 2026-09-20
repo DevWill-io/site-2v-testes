@@ -7,6 +7,31 @@ var SUAP_URL = "https://suap.ifrn.edu.br";
 var SCOPE = "identificacao email documentos_pessoais";
 
 // ==========================================
+// 🌐 CHAMADAS À API (helper)
+// ==========================================
+function obterTokenSuap() {
+  const m = document.cookie.match(/(?:^|;\s*)suapToken=([^;]+)/);
+  if (m) return decodeURIComponent(m[1]);
+  return localStorage.getItem("suapToken") || null;
+}
+
+async function chamarAPI(endpoint, corpo) {
+  const token = obterTokenSuap();
+  if (!token) throw new Error("Sem token SUAP");
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+    body: JSON.stringify(corpo || {}),
+  });
+  const dados = await res.json();
+  if (!res.ok) throw new Error(dados.erro || "Erro na API");
+  return dados;
+}
+
+// ==========================================
 // 🎨 HELPERS DE COR
 // ==========================================
 function corParaHex(cor, fallback) {
@@ -500,10 +525,10 @@ function celebrarConquista(conquista) {
 }
 
 // ==========================================
-// FIREBASE
+// FIREBASE (só leitura — escritas via API)
 // ==========================================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import { getDatabase, ref, onValue, push, update, remove, get } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA_wDDRCRJL_WviT6FBorz8dhnHe0-pI8s",
@@ -514,7 +539,8 @@ const firebaseConfig = {
   appId: "1:993749229757:web:ec87d8ca3b8950d70d57d4",
 };
 
-const app = initializeApp(firebaseConfig, "loginApp");
+const app = getApps().find((a) => a.name === "loginApp")
+  || initializeApp(firebaseConfig, "loginApp");
 const db = getDatabase(app);
 const recadosRef = ref(db, "mural_recados");
 const perfisRef = ref(db, "perfis_alunos");
@@ -528,6 +554,7 @@ let bancoDeRecados = [];
 let bancoDePerfis = [];
 let filtroRecadoTexto = "";
 let filtroPerfilTexto = "";
+
 function escaparHTML(texto) {
   if (!texto) return "";
   return String(texto).replace(/&/g, "&amp;").replace(/</g, "&lt;")
@@ -632,99 +659,30 @@ async function adicionarXP(quantidade, motivo) {
       if (nivelDepois.nivel >= 5) desbloquearConquista("nivel_5");
       if (nivelDepois.nivel >= 10) desbloquearConquista("nivel_10");
     }
-    return;
-  }
-  try {
-    const refXP = ref(db, "usuarios_xp/" + mat);
-    const snap = await get(refXP);
-    const dados = snap.val() || {};
-    const xpAntes = Number(dados.xp) || 0;
-    const xpDepois = xpAntes + quantidade;
-    const nivelAntes = calcularNivel(xpAntes);
-    const nivelDepois = calcularNivel(xpDepois);
-    await update(refXP, { xp: xpDepois });
-    if (nivelDepois.nivel > nivelAntes.nivel) {
-      if (typeof exibirToast === "function") {
-        exibirToast(`🎉 SUBIU DE NÍVEL! ${nivelDepois.nome} (Nv ${nivelDepois.nivel})`, "sucesso");
-      }
-      if (nivelDepois.nivel >= 5) desbloquearConquista("nivel_5");
-      if (nivelDepois.nivel >= 10) desbloquearConquista("nivel_10");
-    }
-    meuXP = xpDepois;
-    renderizarPainelXP();
-  } catch (e) {
-    console.warn("[XP] Erro:", e);
   }
 }
 
 async function desbloquearConquista(idConquista) {
   const mat = window.usuarioLogado.matricula;
   if (!mat || mat === "Matrícula não disponível") return;
-  if (window.xpCore?.estaPronto?.()) {
-    if (minhasConquistas[idConquista]) return;
-    const sucesso = await window.xpCore.desbloquearConquista(idConquista);
-    if (!sucesso) return;
-    const c = CONQUISTAS.find(x => x.id === idConquista);
-    if (c) celebrarConquista(c);
-    await adicionarXP(XP_RECOMPENSAS.conquista, "conquista");
-    minhasConquistas[idConquista] = { desbloqueadaEm: Date.now() };
-    renderizarConquistas();
-    return;
-  }
-  try {
-    const refConquista = ref(db, `usuarios_xp/${mat}/conquistas/${idConquista}`);
-    const snap = await get(refConquista);
-    if (snap.exists()) return;
-    await update(refConquista, { desbloqueadaEm: Date.now() });
-    const c = CONQUISTAS.find(x => x.id === idConquista);
-    if (c) celebrarConquista(c);
-    try {
-      const refXP = ref(db, "usuarios_xp/" + mat);
-      const snapXP = await get(refXP);
-      const dadosXP = snapXP.val() || {};
-      const xpAntes = Number(dadosXP.xp) || 0;
-      const xpDepois = xpAntes + XP_RECOMPENSAS.conquista;
-      await update(refXP, { xp: xpDepois });
-      const nivelAntes = calcularNivel(xpAntes);
-      const nivelDepois = calcularNivel(xpDepois);
-      if (nivelDepois.nivel > nivelAntes.nivel) {
-        if (typeof exibirToast === "function") {
-          exibirToast(`🎉 SUBIU DE NÍVEL! ${nivelDepois.nome} (Nv ${nivelDepois.nivel})`, "sucesso");
-        }
-      }
-      meuXP = xpDepois;
-      renderizarPainelXP();
-    } catch (e) {
-      console.warn("[conquista XP] erro:", e);
-    }
-    minhasConquistas[idConquista] = { desbloqueadaEm: Date.now() };
-    renderizarConquistas();
-  } catch (e) {
-    console.warn("[conquista] Erro:", e);
-  }
+  if (!window.xpCore?.estaPronto?.()) return;
+  if (minhasConquistas[idConquista]) return;
+  const sucesso = await window.xpCore.desbloquearConquista(idConquista);
+  if (!sucesso) return;
+  const c = CONQUISTAS.find(x => x.id === idConquista);
+  if (c) celebrarConquista(c);
+  await adicionarXP(XP_RECOMPENSAS.conquista, "conquista");
+  minhasConquistas[idConquista] = { desbloqueadaEm: Date.now() };
+  renderizarConquistas();
 }
-
 async function atualizarStreakLogin() {
   const mat = window.usuarioLogado.matricula;
   if (!mat || mat === "Matrícula não disponível") return;
   try {
-    const refXP = ref(db, "usuarios_xp/" + mat);
-    const snap = await get(refXP);
-    const dados = snap.val() || {};
-    const hoje = new Date().toISOString().slice(0, 10);
-    const ultimaVisita = dados.ultimaVisita || "";
-    let streak = Number(dados.streak) || 0;
-    if (ultimaVisita === hoje) return;
-    const ontem = new Date();
-    ontem.setDate(ontem.getDate() - 1);
-    const ontemStr = ontem.toISOString().slice(0, 10);
-    if (ultimaVisita === ontemStr) streak += 1;
-    else streak = 1;
-    await update(refXP, { streak, ultimaVisita: hoje });
-    await adicionarXP(XP_RECOMPENSAS.login_diario, "login_diario");
-    if (streak >= 7) desbloquearConquista("streak_7");
-    if (streak >= 30) desbloquearConquista("streak_30");
-    setTimeout(() => checarConquistasAutomaticas(), 500);
+    if (window.xpCore?.estaPronto?.()) {
+      await window.xpCore.registrarAcessoDiario();
+      setTimeout(() => checarConquistasAutomaticas(), 500);
+    }
   } catch (e) {
     console.warn("[streak] Erro:", e);
   }
@@ -813,42 +771,31 @@ function montarConquistasVisiveisPayload(selecionadas) {
   return { mostraTodas: false, ativos };
 }
 
-async function migrarXPLocalParaFirebase(_mat) {
-  if (window.xpCore?.estaPronto?.()) return;
-  console.warn("[XP] migração local chamada, mas xpCore não está pronto.");
-}
-
 // ==========================================
 // 🎖️ CHECAGEM AUTOMÁTICA DE CONQUISTAS
 // ==========================================
 async function checarConquistasAutomaticas() {
   const mat = window.usuarioLogado.matricula;
   if (!mat || mat === "Matrícula não disponível") return;
+  if (!window.xpCore?.estaPronto?.()) return;
 
-  const usarCore = window.xpCore?.estaPronto?.();
-
-  meusCliquesMascote = usarCore
-    ? window.xpCore.obterCliquesMascote()
-    : parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
-
+  meusCliquesMascote = window.xpCore.obterCliquesMascote();
   for (const c of CONQUISTAS) {
     if (c.tipo === "cliques" && meusCliquesMascote >= c.meta) await desbloquearConquista(c.id);
   }
 
-  if (usarCore) meuXP = window.xpCore.obterXP();
+  meuXP = window.xpCore.obterXP();
   const nivelInfo = calcularNivel(meuXP);
   for (const c of CONQUISTAS) {
     if (c.tipo === "nivel" && nivelInfo.nivel >= c.meta) await desbloquearConquista(c.id);
   }
 
-  if (usarCore) minhaStreak = window.xpCore.obterStreak();
+  minhaStreak = window.xpCore.obterStreak();
   for (const c of CONQUISTAS) {
     if (c.tipo === "streak" && minhaStreak >= c.meta) await desbloquearConquista(c.id);
   }
 
-  const usosSim = usarCore
-    ? window.xpCore.obterContador("simulador")
-    : parseInt(localStorage.getItem("xp_simulador_total") || "0", 10);
+  const usosSim = window.xpCore.obterContador("simulador");
   for (const c of CONQUISTAS) {
     if (c.tipo === "simulador" && usosSim >= c.meta) await desbloquearConquista(c.id);
   }
@@ -858,30 +805,24 @@ async function checarConquistasAutomaticas() {
     if (c.tipo === "metas" && metasCount >= c.meta) await desbloquearConquista(c.id);
   }
 
-  const periodosCount = usarCore
-    ? window.xpCore.obterContador("periodos")
-    : parseInt(localStorage.getItem("xp_periodos_total") || "0", 10);
+  const periodosCount = window.xpCore.obterContador("periodos");
   for (const c of CONQUISTAS) {
     if (c.tipo === "periodos" && periodosCount >= c.meta) await desbloquearConquista(c.id);
   }
 
-  const recadosCount = usarCore
-    ? window.xpCore.obterContador("recados")
-    : parseInt(localStorage.getItem("xp_recados_total") || "0", 10);
+  const recadosCount = window.xpCore.obterContador("recados");
   for (const c of CONQUISTAS) {
     if (c.tipo === "recados" && recadosCount >= c.meta) await desbloquearConquista(c.id);
   }
 
-  const curtidasCount = usarCore
-    ? window.xpCore.obterContador("curtidas")
-    : parseInt(localStorage.getItem("xp_curtidas_total") || "0", 10);
+  const curtidasCount = window.xpCore.obterContador("curtidas");
   for (const c of CONQUISTAS) {
     if (c.tipo === "curtidas" && curtidasCount >= c.meta) await desbloquearConquista(c.id);
   }
 }
 
 // ==========================================
-// PAINEL DE XP E CONQUISTAS
+// PAINEL DE XP
 // ==========================================
 async function carregarPainelXP() {
   const mat = window.usuarioLogado.matricula;
@@ -897,27 +838,9 @@ async function carregarPainelXP() {
       const skin = window.xpCore.obterSkinAtiva();
       avatarSelecionado = skin || "padrao";
       await checarConquistasAutomaticas();
-      return;
     }
-    const refXP = ref(db, "usuarios_xp/" + mat);
-    const snap = await get(refXP);
-    const dados = snap.val() || {};
-    meuXP = Number(dados.xp) || 0;
-    minhaStreak = Number(dados.streak) || 0;
-    minhasConquistas = dados.conquistas || {};
-    meusCliquesMascote = parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
-    renderizarPainelXP();
-    renderizarConquistas();
-    const avatarSalvo = dados.mascoteAvatar || localStorage.getItem("skin_ativa") || "padrao";
-    avatarSelecionado = avatarSalvo;
-    await checarConquistasAutomaticas();
   } catch (e) {
     console.warn("[painelXP] Erro:", e);
-    meuXP = parseInt(localStorage.getItem("xp_total") || "0", 10);
-    minhaStreak = parseInt(localStorage.getItem("xp_streak") || "0", 10);
-    meusCliquesMascote = parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
-    renderizarPainelXP();
-    renderizarConquistas();
   }
 }
 
@@ -1212,8 +1135,12 @@ onValue(recadosRef, (snapshot) => {
     const timestampCriacao = recado.timestamp || agora;
     const duracaoHoras = recado.duracao_horas || (recado.duracao_dias ? recado.duracao_dias * 24 : 7 * 24);
     const tempoDeVidaMs = duracaoHoras * 60 * 60 * 1000;
-    if (agora - timestampCriacao > tempoDeVidaMs) remove(ref(db, "mural_recados/" + id));
-    else bancoDeRecados.push({ id, ...recado, timestampCriacao, duracaoHoras });
+    if (agora - timestampCriacao > tempoDeVidaMs) {
+      // Expira via API
+      chamarAPI("/api/mural?tipo=recado", { id, acao: "delete" }).catch(() => {});
+    } else {
+      bancoDeRecados.push({ id, ...recado, timestampCriacao, duracaoHoras });
+    }
   });
   window.renderizarMural();
   if (typeof gerarNotificacoesRecados === "function") gerarNotificacoesRecados();
@@ -1235,7 +1162,7 @@ onValue(perfisRef, (snapshot) => {
 });
 
 // ==========================================
-// ENVIO DE RECADOS
+// ENVIO DE RECADOS (via API)
 // ==========================================
 const formRecado = document.getElementById("form-recado");
 if (formRecado) {
@@ -1246,21 +1173,14 @@ if (formRecado) {
     const selectDuracao = document.getElementById("recado-duracao");
     const mensagemBruta = msgInput ? msgInput.value.trim() : "";
     if (!mensagemBruta) { exibirToast("Escreva uma mensagem antes de enviar!", "erro"); return; }
-    const mensagemSegura = escaparHTML(mensagemBruta);
-    const linkAnexo = linkInput ? escaparHTML(linkInput.value.trim()) : "";
-    const nomeSeguro = escaparHTML(window.usuarioLogado.nome);
+    const linkAnexo = linkInput ? linkInput.value.trim() : "";
     const valorInputDuracao = selectDuracao ? selectDuracao.value : "7d";
     const duracaoTotalHoras = parseDuracaoParaHoras(valorInputDuracao);
-    push(recadosRef, {
-      autor_nome: nomeSeguro,
-      autor_matricula: window.usuarioLogado.matricula,
-      mensagem: mensagemSegura,
-      link_anexo: linkAnexo,
-      data: new Date().toLocaleDateString("pt-BR"),
-      timestamp: Date.now(),
-      duracao_horas: duracaoTotalHoras,
-      likes: [],
-      comentarios: {},
+
+    chamarAPI("/api/mural?tipo=recado", {
+      mensagem: mensagemBruta,
+      link: linkAnexo,
+      duracaoHoras: duracaoTotalHoras,
     })
       .then(async () => {
         exibirToast("Recado publicado! +10 XP", "sucesso");
@@ -1268,10 +1188,6 @@ if (formRecado) {
         if (window.xpCore?.estaPronto?.()) {
           const total = await window.xpCore.incrementarContador("recados", 1);
           if (total >= 10) desbloquearConquista("comunicador");
-        } else {
-          const totalRecadosUser = parseInt(localStorage.getItem("xp_recados_total") || "0", 10) + 1;
-          localStorage.setItem("xp_recados_total", String(totalRecadosUser));
-          if (totalRecadosUser >= 10) desbloquearConquista("comunicador");
         }
         if (msgInput) msgInput.value = "";
         if (linkInput) linkInput.value = "";
@@ -1520,12 +1436,7 @@ window.adicionarComentario = function (recadoId) {
   if (!inputEl) return;
   const texto = inputEl.value.trim();
   if (!texto) { exibirToast("Escreva um comentário antes de enviar.", "erro"); return; }
-  push(ref(db, `mural_recados/${recadoId}/comentarios`), {
-    autor_nome: escaparHTML(window.usuarioLogado.nome),
-    autor_matricula: window.usuarioLogado.matricula,
-    texto: escaparHTML(texto),
-    timestamp: Date.now(),
-  })
+  chamarAPI("/api/mural?tipo=comentar", { recadoId, texto })
     .then(() => {
       exibirToast("Comentário adicionado! +3 XP", "sucesso");
       adicionarXP(XP_RECOMPENSAS.comentario, "comentario");
@@ -1535,17 +1446,10 @@ window.adicionarComentario = function (recadoId) {
 };
 
 window.excluirComentario = function (recadoId, comentarioId) {
-  const itemRef = ref(db, `mural_recados/${recadoId}/comentarios/${comentarioId}`);
-  get(itemRef).then((snapshot) => {
-    const com = snapshot.val();
-    if (com) {
-      const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
-      const ehAutor = com.autor_matricula === window.usuarioLogado.matricula;
-      if (!ehAutor && !ehAdmin) { exibirToast("Sem permissão.", "erro"); return; }
-      if (confirm("Excluir este comentário?"))
-        remove(itemRef).then(() => exibirToast("Comentário removido.", "sucesso"));
-    }
-  });
+  if (!confirm("Excluir este comentário?")) return;
+  chamarAPI("/api/mural?tipo=excluir-comentario", { recadoId, comentarioId })
+    .then(() => exibirToast("Comentário removido.", "sucesso"))
+    .catch((err) => exibirToast("Erro: " + err.message, "erro"));
 };
 
 // ==========================================
@@ -1596,76 +1500,53 @@ window.renderizarPerfis = function () {
 };
 
 // ==========================================
-// RECADOS — EDIÇÃO
+// RECADOS — EDIÇÃO (via API)
 // ==========================================
 window.editarRecado = function (id) {
-  const itemRef = ref(db, "mural_recados/" + id);
-  get(itemRef).then((snapshot) => {
+  get(ref(db, "mural_recados/" + id)).then((snapshot) => {
     const recado = snapshot.val();
-    if (recado) {
-      const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
-      const ehAutor = recado.autor_matricula === window.usuarioLogado.matricula;
-      if (!ehAutor && !ehAdmin) { exibirToast("Sem permissão.", "erro"); return; }
-      const textoAtual = recado.mensagem.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#039;/g, "'");
-      const novaMensagem = prompt("1/2 - Edite a sua mensagem:", textoAtual);
-      if (novaMensagem !== null && novaMensagem.trim() !== "") {
-        const horasAtuais = recado.duracao_horas || (recado.duracao_dias ? recado.duracao_dias * 24 : 168);
-        const tempoAtualStr = horasAtuais % 24 === 0 ? horasAtuais / 24 + "d" : horasAtuais + "h";
-        const novosDiasInput = prompt("2/2 - Duração (ex: 5h, 12h, 2d, 15d)", tempoAtualStr);
-        let novasHoras = horasAtuais;
-        if (novosDiasInput !== null && novosDiasInput.trim() !== "") novasHoras = parseDuracaoParaHoras(novosDiasInput);
-        update(itemRef, { mensagem: escaparHTML(novaMensagem.trim()), duracao_horas: novasHoras, editado: true })
-          .then(() => exibirToast("Recado atualizado!", "sucesso"))
-          .catch((err) => exibirToast("Erro: " + err.message, "erro"));
-      }
+    if (!recado) return;
+    const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
+    const ehAutor = recado.autor_matricula === window.usuarioLogado.matricula;
+    if (!ehAutor && !ehAdmin) { exibirToast("Sem permissão.", "erro"); return; }
+    const textoAtual = recado.mensagem.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#039;/g, "'");
+    const novaMensagem = prompt("1/2 - Edite a sua mensagem:", textoAtual);
+    if (novaMensagem !== null && novaMensagem.trim() !== "") {
+      const horasAtuais = recado.duracao_horas || (recado.duracao_dias ? recado.duracao_dias * 24 : 168);
+      const tempoAtualStr = horasAtuais % 24 === 0 ? horasAtuais / 24 + "d" : horasAtuais + "h";
+      const novosDiasInput = prompt("2/2 - Duração (ex: 5h, 12h, 2d, 15d)", tempoAtualStr);
+      let novasHoras = horasAtuais;
+      if (novosDiasInput !== null && novosDiasInput.trim() !== "") novasHoras = parseDuracaoParaHoras(novosDiasInput);
+      chamarAPI("/api/mural?tipo=editar", { id, mensagem: novaMensagem.trim(), duracaoHoras: novasHoras })
+        .then(() => exibirToast("Recado atualizado!", "sucesso"))
+        .catch((err) => exibirToast("Erro: " + err.message, "erro"));
     }
   });
 };
 
 // ==========================================
-// CURTIR RECADO
+// CURTIR RECADO (via API)
 // ==========================================
 window.curtirRecado = function (id) {
-  const itemRef = ref(db, "mural_recados/" + id);
-  get(itemRef).then((snapshot) => {
-    const recado = snapshot.val();
-    if (recado) {
-      let likes = recado.likes || [];
-      const i = likes.indexOf(window.usuarioLogado.matricula);
-      if (i === -1) {
-        likes.push(window.usuarioLogado.matricula);
+  chamarAPI("/api/mural?tipo=curtir", { id })
+    .then((r) => {
+      if (r.curtiu) {
         adicionarXP(XP_RECOMPENSAS.curtida, "curtida");
         if (window.xpCore?.estaPronto?.()) {
           window.xpCore.incrementarContador("curtidas", 1).then((total) => {
             if (total >= 20) desbloquearConquista("social");
           });
-        } else {
-          const totalCurtidas = parseInt(localStorage.getItem("xp_curtidas_total") || "0", 10) + 1;
-          localStorage.setItem("xp_curtidas_total", String(totalCurtidas));
-          if (totalCurtidas >= 20) desbloquearConquista("social");
         }
-      } else {
-        likes.splice(i, 1);
       }
-      update(itemRef, { likes });
-    }
-  });
+    })
+    .catch((err) => exibirToast("Erro: " + err.message, "erro"));
 };
 
 window.excluirRecado = function (id) {
-  const itemRef = ref(db, "mural_recados/" + id);
-  get(itemRef).then((snapshot) => {
-    const recado = snapshot.val();
-    if (recado) {
-      const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
-      const ehAutor = recado.autor_matricula === window.usuarioLogado.matricula;
-      if (!ehAutor && !ehAdmin) { exibirToast("Sem permissão.", "erro"); return; }
-      if (confirm("Excluir este recado?")) {
-        remove(itemRef).then(() => exibirToast("Recado excluído.", "sucesso"))
-          .catch((err) => exibirToast("Erro: " + err.message, "erro"));
-      }
-    }
-  });
+  if (!confirm("Excluir este recado?")) return;
+  chamarAPI("/api/mural?tipo=recado", { id, acao: "delete" })
+    .then(() => exibirToast("Recado excluído.", "sucesso"))
+    .catch((err) => exibirToast("Erro: " + err.message, "erro"));
 };
 
 window.forceLogout = function () {
@@ -1946,32 +1827,22 @@ async function salvarPerfilEditado() {
   };
   if (redes.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(redes.email)) { exibirToast("Email inválido.", "erro"); return; }
   if (redes.site && !/^https?:\/\/.+/.test(redes.site)) { exibirToast("Site deve começar com http:// ou https://", "erro"); return; }
-  const agora = Date.now();
-  const perfilAtualizado = {
-    nome,
-    nomeCompleto: perfilUsuarioAtual.nomeCompleto || window.usuarioLogado.nome,
-    matricula, foto: fotoFinal, bio, redes,
-    perfilEditadoEm: agora, ultimoAcesso: agora,
-    mascoteAvatar: avatarSelecionado,
-    conquistasVisiveis: montarConquistasVisiveisPayload(conquistasVisiveisSelecionadas),
-  };
   const btnSalvar = document.getElementById("btn-salvar-perfil");
   const textoOriginal = btnSalvar.innerHTML;
   btnSalvar.disabled = true;
   btnSalvar.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
   try {
-    await update(ref(db, "perfis_alunos/" + matricula), perfilAtualizado);
+    const perfilAtualizado = {
+      nome, foto: fotoFinal, bio, redes,
+      mascoteAvatar: avatarSelecionado,
+      conquistasVisiveis: montarConquistasVisiveisPayload(conquistasVisiveisSelecionadas),
+    };
+    await chamarAPI("/api/perfil?tipo=update", perfilAtualizado);
+    if (window.xpCore?.estaPronto?.()) {
+      await window.xpCore.definirSkinAtiva(avatarSelecionado);
+    }
     salvarPerfilLocal(matricula, perfilAtualizado);
     window.aplicarPerfilNoCard(perfilAtualizado);
-    if (window.xpCore?.estaPronto?.()) {
-      window.xpCore.definirSkinAtiva(avatarSelecionado);
-    } else {
-      try {
-        await update(ref(db, "mascote/avatares/" + matricula), { avatar: avatarSelecionado });
-        localStorage.setItem("mascote_avatar", avatarSelecionado);
-        localStorage.setItem("skin_ativa", avatarSelecionado);
-      } catch (e) { console.warn("[mascote avatar] Erro:", e); }
-    }
     exibirToast("Perfil atualizado!", "sucesso");
     window.fecharModalEditarPerfil();
   } catch (err) { exibirToast("Erro: " + err.message, "erro"); }
@@ -2108,7 +1979,7 @@ function salvarMetasDisciplinas() {
   var mat = window.usuarioLogado.matricula;
   if (!mat) return Promise.resolve();
   try { localStorage.setItem(MATRICULA_STORAGE_KEY(), JSON.stringify(__metasDisciplinas)); } catch (e) {}
-  return update(ref(db, "metas_disciplinas/" + mat), __metasDisciplinas).catch(function (err) { console.warn("[metas] save:", err); });
+  return chamarAPI("/api/meta", { metas: __metasDisciplinas }).catch(function (err) { console.warn("[metas] api:", err); });
 }
 
 function ordenarDisciplinas(lista) {
@@ -2303,6 +2174,9 @@ function desenharGraficoEvolucao() {
   } catch (err) { console.error("[evolução] Erro ao criar gráfico:", err); panel.classList.add("is-hidden"); }
 }
 
+// ==========================================
+// RENDERIZAR NOTAS (mantém igual)
+// ==========================================
 function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   var corpo = document.getElementById("lista-notas");
   if (!corpo) return;
@@ -2475,10 +2349,6 @@ function bindSimuladores(corpo) {
           window.xpCore.incrementarContador("simulador", 1).then((total) => {
             if (total >= 10) desbloquearConquista("cientista");
           });
-        } else {
-          const totalSim = parseInt(localStorage.getItem("xp_simulador_total") || "0", 10) + 1;
-          localStorage.setItem("xp_simulador_total", String(totalSim));
-          if (totalSim >= 10) desbloquearConquista("cientista");
         }
       }
     });
@@ -2605,12 +2475,11 @@ function salvarResumoBoletimFirebase(ano, periodo, disciplinas) {
     });
     var mediaGeral = contMedias ? somaMedias / contMedias : null;
     if (mediaGeral !== null && mediaGeral >= 90) desbloquearConquista("nota_maxima");
-    update(ref(db, "resumo_boletim/" + mat), {
-      mediaGeral: mediaGeral,
-      faltasTotais: faltasTotais,
+    chamarAPI("/api/boletim", {
+      mediaGeral,
+      faltasTotais,
       disciplinasCount: disciplinas.length,
       periodo: ano + "." + periodo,
-      atualizadoEm: Date.now(),
     }).catch(function (err) { console.warn("[resumo boletim] erro:", err); });
   } catch (e) { console.warn("[resumo boletim] exceção:", e); }
 }
@@ -2637,17 +2506,6 @@ function carregarBoletim(ano, periodo) {
               if (total >= 3) desbloquearConquista("explorador");
             }
           });
-        } else {
-          let periodosVistos = [];
-          try {
-            periodosVistos = JSON.parse(localStorage.getItem("xp_periodos_vistos") || "[]");
-          } catch (e) { periodosVistos = []; }
-          if (!periodosVistos.includes(label)) {
-            periodosVistos.push(label);
-            localStorage.setItem("xp_periodos_vistos", JSON.stringify(periodosVistos));
-            localStorage.setItem("xp_periodos_total", String(periodosVistos.length));
-            if (periodosVistos.length >= 3) desbloquearConquista("explorador");
-          }
         }
       }
     },
@@ -2874,7 +2732,7 @@ async function carregarSalaProfessores() {
   if (__salaDadosCarregados) return;
   __salaDadosCarregados = true;
   const tbody = document.getElementById("sala-lista-alunos");
-  if (!tbody) { console.warn("[sala] tbody não encontrado"); return; }
+  if (!tbody) return;
   console.log("[sala] Iniciando carregamento...");
   const resultados = await Promise.allSettled([
     get(perfisRef),
@@ -2884,11 +2742,6 @@ async function carregarSalaProfessores() {
     get(ref(db, "usuarios_xp")),
   ]);
   const [perfisRes, carinhosRes, resumosRes, recadosRes, xpRes] = resultados;
-  if (perfisRes.status === "rejected") console.warn("[sala] perfis falhou:", perfisRes.reason);
-  if (carinhosRes.status === "rejected") console.warn("[sala] carinhos falhou:", carinhosRes.reason);
-  if (resumosRes.status === "rejected") console.warn("[sala] resumos falhou:", resumosRes.reason);
-  if (recadosRes.status === "rejected") console.warn("[sala] recados falhou:", recadosRes.reason);
-  if (xpRes.status === "rejected") console.warn("[sala] usuarios_xp falhou:", xpRes.reason);
   const perfisSnap = perfisRes.status === "fulfilled" ? perfisRes.value : { val: () => ({}) };
   const carinhosSnap = carinhosRes.status === "fulfilled" ? carinhosRes.value : { val: () => ({}) };
   const resumosSnap = resumosRes.status === "fulfilled" ? resumosRes.value : { val: () => ({}) };
@@ -2918,7 +2771,6 @@ async function carregarSalaProfessores() {
         mediaGeral: typeof r.mediaGeral === "number" ? r.mediaGeral : null,
         faltasTotais: typeof r.faltasTotais === "number" ? r.faltasTotais : null,
         periodo: r.periodo || "—",
-        atualizadoEm: r.atualizadoEm || 0,
         numConquistas,
         xpTotal,
       };
@@ -3378,6 +3230,7 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem("matricula_suap", matriculaSuap);
         document.cookie = `matricula=${matriculaSuap}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`;
       } catch (e) {}
+
       if (matriculaSuap && matriculaSuap !== "Matrícula não disponível") {
         const perfilAlunoRef = ref(db, "perfis_alunos/" + matriculaSuap);
         get(perfilAlunoRef).then((snap) => {
@@ -3385,7 +3238,14 @@ document.addEventListener("DOMContentLoaded", function () {
           const payload = { nomeCompleto: nomeCompletoSuap, matricula: matriculaSuap, ultimoAcesso: Date.now() };
           if (!dadosExistentes.nome || !String(dadosExistentes.nome).trim()) payload.nome = nomeParaExibicao(nomeSuap);
           if (!dadosExistentes.foto || !String(dadosExistentes.foto).trim()) payload.foto = fotoUrl;
-          update(perfilAlunoRef, payload).then(() => { window.carregarPerfilUsuario(matriculaSuap); });
+          chamarAPI("/api/perfil?tipo=update", {
+            nome: payload.nome,
+            nomeCompleto: payload.nomeCompleto,
+            foto: payload.foto,
+          }).then(() => { window.carregarPerfilUsuario(matriculaSuap); }).catch((e) => {
+            console.warn("[perfil] erro na API, aplicando local:", e);
+            window.carregarPerfilUsuario(matriculaSuap);
+          });
         });
         carregarMetasDisciplinas();
         gerarNotificacoesRecados();
