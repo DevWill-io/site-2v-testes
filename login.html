@@ -302,10 +302,26 @@
         </div>
 
         <div class="conquistas-box">
-          <h3>
-            <i class="fa-solid fa-medal"></i>
-            <span data-i18n="conquistas_titulo">Conquistas</span>
-          </h3>
+          <div class="conquistas-header">
+            <h3>
+              <i class="fa-solid fa-medal"></i>
+              <span data-i18n="conquistas_titulo">Conquistas</span>
+            </h3>
+            <span class="conquistas-contador" id="conquistas-contador">0/0</span>
+          </div>
+          <div class="conquistas-filtros">
+            <button type="button" class="conquista-filtro ativo" data-filtro="todas">
+              <span data-i18n="todas">Todas</span>
+            </button>
+            <button type="button" class="conquista-filtro" data-filtro="desbloqueadas">
+              <i class="fa-solid fa-check"></i>
+              <span data-i18n="desbloqueadas">Desbloqueadas</span>
+            </button>
+            <button type="button" class="conquista-filtro" data-filtro="bloqueadas">
+              <i class="fa-solid fa-lock"></i>
+              <span data-i18n="bloqueadas">Bloqueadas</span>
+            </button>
+          </div>
           <div class="conquistas-grid" id="conquistas-grid"></div>
         </div>
       </div>
