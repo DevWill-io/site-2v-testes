@@ -88,14 +88,35 @@ function addStopSeguro(gradient, posicao, cor, fallback) {
 // ==========================================
 const MATRICULA_ADMIN = "20261101110002";
 
+// ==========================================
+// 🎭 SKINS DO MASCOTE
+// tipo: "cliques" → desbloqueia por cliques acumulados
+// tipo: "conquista" → desbloqueia ao ganhar uma conquista específica
+// ==========================================
 const AVATARES_MASCOTE = [
+  // Gratuitas
   { id: "padrao",  nome: "Padrão",  arquivo: "img/MascotePadrao.png",  gratis: true, admin: false },
   { id: "alien",   nome: "Alien",   arquivo: "img/MascoteAlien.png",   gratis: true, admin: false },
   { id: "pirata",  nome: "Pirata",  arquivo: "img/MascotePirata.png",  gratis: true, admin: false },
   { id: "genio",   nome: "Gênio",   arquivo: "img/MascoteGenio.png",   gratis: true, admin: false },
-  { id: "simpson", nome: "Simpson", arquivo: "img/MascoteSimpson.png", gratis: false, cliquesNecessarios: 1500, admin: false },
-  { id: "mafioso", nome: "Mafioso", arquivo: "img/MascoteMafioso.png", gratis: false, cliquesNecessarios: 3000, admin: false },
-  { id: "admin",   nome: "Admin",   arquivo: "img/MascoteAdmin.png",   gratis: false, apenasAdmin: true, admin: true },
+
+  // Desbloqueio por cliques
+  { id: "if",       nome: "IF",       arquivo: "img/MascoteIf.png",       gratis: false, tipo: "cliques", cliquesNecessarios: 500,   admin: false },
+  { id: "jojo",     nome: "Jojo",     arquivo: "img/MascoteJojo.png",     gratis: false, tipo: "cliques", cliquesNecessarios: 1000,  admin: false },
+  { id: "simpson",  nome: "Simpson",  arquivo: "img/MascoteSimpson.png",  gratis: false, tipo: "cliques", cliquesNecessarios: 1500,  admin: false },
+  { id: "antigo",   nome: "Antigo",   arquivo: "img/MascoteAntigo.png",   gratis: false, tipo: "cliques", cliquesNecessarios: 2000,  admin: false },
+  { id: "mafioso",  nome: "Mafioso",  arquivo: "img/MascoteMafioso.png",  gratis: false, tipo: "cliques", cliquesNecessarios: 2500,  admin: false },
+  { id: "retro",    nome: "Retro",    arquivo: "img/MascoteRetro.png",    gratis: false, tipo: "cliques", cliquesNecessarios: 3000,  admin: false },
+  { id: "turma1",   nome: "Turma 1",  arquivo: "img/MascoteTurma1.png",   gratis: false, tipo: "cliques", cliquesNecessarios: 4000,  admin: false },
+  { id: "turma2",   nome: "Turma 2",  arquivo: "img/MascoteTurma2.png",   gratis: false, tipo: "cliques", cliquesNecessarios: 5000,  admin: false },
+  { id: "turma3",   nome: "Turma 3",  arquivo: "img/MascoteTurma3.png",   gratis: false, tipo: "cliques", cliquesNecessarios: 10000, admin: false },
+
+  // Desbloqueio por conquista
+  { id: "100",       nome: "100",         arquivo: "img/Mascote100.png",       gratis: false, tipo: "conquista", conquistaNecessaria: "nerd",     admin: false },
+  { id: "vestuario", nome: "Vestuário?",  arquivo: "img/MascoteVestuario.png", gratis: false, tipo: "conquista", conquistaNecessaria: "vestuario", admin: false },
+
+  // Exclusiva admin
+  { id: "admin",    nome: "Admin",    arquivo: "img/MascoteAdmin.png",    gratis: false, apenasAdmin: true, admin: true },
 ];
 
 function obterSkinsDisponiveis() {
@@ -149,7 +170,11 @@ const CONQUISTAS = [
   { id: "social",          icone: "fa-solid fa-share-nodes",   emoji: "🔗", nome: "Sociável",         desc: "Curtiu 20 recados", raridade: "comum", tipo: "curtidas", meta: 20 },
   { id: "cientista",       icone: "fa-solid fa-flask",         emoji: "🧪", nome: "Cientista",        desc: "Usou o simulador 10 vezes", raridade: "comum", tipo: "simulador", meta: 10 },
   { id: "metódico",        icone: "fa-solid fa-bullseye",      emoji: "🎯", nome: "Metódico",         desc: "Definiu 5 metas individuais", raridade: "raro", tipo: "metas", meta: 5 },
-  { id: "explorador",      icone: "fa-solid fa-compass",       emoji: "🧭", nome: "Explorador",       desc: "Consultou 3 períodos diferentes", raridade: "raro", tipo: "periodos", meta: 3 },
+    { id: "explorador",      icone: "fa-solid fa-compass",       emoji: "🧭", nome: "Explorador",       desc: "Consultou 3 períodos diferentes", raridade: "raro", tipo: "periodos", meta: 3 },
+
+  // ===== Novas conquistas =====
+  { id: "nerd",     icone: "fa-solid fa-graduation-cap", emoji: "🎓", nome: "Nerd",        desc: "Tirou nota 100 em alguma matéria",                                       raridade: "epico",    tipo: "manual", meta: 1 },
+  { id: "vestuario", icone: "fa-solid fa-shirt",         emoji: "👕", nome: "Vestuário?",  desc: "Desbloqueou as skins IF, Turma 1, Turma 2 e Turma 3 (10.000 cliques)", raridade: "lendario", tipo: "cliques", meta: 10000 },
 ];
 
 const XP_RECOMPENSAS = {
@@ -1690,33 +1715,77 @@ window.carregarPerfilUsuario = function (matricula) {
 };
 
 // ==========================================
-// SELETOR DE AVATAR DO MASCOTE
+// 🎭 SELETOR DE AVATAR DO MASCOTE
+// Bloqueia skins por cliques OU por conquista não desbloqueada.
 // ==========================================
 function renderizarSeletorAvatar() {
   const grid = document.getElementById("avatar-mascote-grid");
   if (!grid) return;
+
   const cliques = meusCliquesMascote;
   const skins = obterSkinsDisponiveis();
+
   grid.innerHTML = skins.map((av) => {
     const ativo = av.id === avatarSelecionado;
-    const bloqueada = !av.gratis && !av.apenasAdmin && cliques < (av.cliquesNecessarios || 0);
-    const faltam = bloqueada ? (av.cliquesNecessarios || 0) - cliques : 0;
     const ehAdminSkin = av.id === "admin";
+
+    // ---- Calcula bloqueio e motivo ----
+    let bloqueada = false;
+    let motivoBloqueio = "";
+
+    if (!av.gratis && !av.apenasAdmin) {
+      if (av.tipo === "conquista") {
+        // Skin liberada só se a conquista já foi desbloqueada
+        const temConquista = !!minhasConquistas[av.conquistaNecessaria];
+        if (!temConquista) {
+          bloqueada = true;
+          const nomeConquista = av.conquistaNecessaria === "nerd" ? "Nerd" : "Vestuário?";
+          motivoBloqueio = `Conquista "${nomeConquista}" não desbloqueada`;
+        }
+      } else {
+        // tipo "cliques" (padrão) — comportamento original
+        const necessarios = av.cliquesNecessarios || 0;
+        if (cliques < necessarios) {
+          bloqueada = true;
+          const faltam = necessarios - cliques;
+          motivoBloqueio = `Faltam ${faltam.toLocaleString("pt-BR")} cliques`;
+        }
+      }
+    }
+
+    // ---- Monta o HTML do lock ----
     let lockHTML = "";
     if (bloqueada) {
-      lockHTML = `
-        <span class="avatar-lock"><i class="fa-solid fa-lock"></i></span>
-        <span class="avatar-faltam">Faltam ${faltam.toLocaleString("pt-BR")}</span>
-      `;
+      if (av.tipo === "conquista") {
+        // Mostra um cadeado + ícone de conquista (não tem "faltam X")
+        lockHTML = `
+          <span class="avatar-lock"><i class="fa-solid fa-lock"></i></span>
+          <span class="avatar-faltam">Conquista</span>
+        `;
+      } else {
+        // Cliques: mostra o número que falta
+        const faltam = (av.cliquesNecessarios || 0) - cliques;
+        lockHTML = `
+          <span class="avatar-lock"><i class="fa-solid fa-lock"></i></span>
+          <span class="avatar-faltam">Faltam ${faltam.toLocaleString("pt-BR")}</span>
+        `;
+      }
     }
+
+    // ---- Título (tooltip) ----
+    let titulo = av.nome;
+    if (bloqueada) titulo += " — " + motivoBloqueio;
+    if (ehAdminSkin) titulo += " (exclusiva admin)";
+
     return `
       <button type="button" class="avatar-mascote-opcao ${ativo ? "ativo" : ""} ${bloqueada ? "bloqueado" : ""} ${ehAdminSkin ? "admin" : ""}"
               data-avatar="${av.id}" ${bloqueada ? 'disabled aria-disabled="true"' : ""}
-              title="${av.nome}${bloqueada ? " — Bloqueada (" + faltam.toLocaleString("pt-BR") + " cliques faltando)" : ""}${ehAdminSkin ? " (exclusiva admin)" : ""}">
+              title="${escaparHTML(titulo)}">
         <img src="${av.arquivo}" alt="${escaparHTML(av.nome)}" onerror="this.style.display='none';this.parentNode.textContent='🐾'">
         ${lockHTML}
       </button>`;
   }).join("");
+
   grid.querySelectorAll(".avatar-mascote-opcao:not(.bloqueado)").forEach((btn) => {
     btn.addEventListener("click", () => {
       const anterior = avatarSelecionado;
@@ -2462,6 +2531,7 @@ function salvarResumoBoletimFirebase(ano, periodo, disciplinas) {
   if (!disciplinas || !disciplinas.length) return;
   try {
     var somaMedias = 0, contMedias = 0, faltasTotais = 0;
+    var temNota100 = false; // 🆕 flag: detecta nota 100 em qualquer matéria/etapa
     disciplinas.forEach(function (d) {
       var etapas = obterEtapasDaDisciplina(d).etapas;
       var notas = etapas.map(function (n) {
@@ -2474,10 +2544,22 @@ function salvarResumoBoletimFirebase(ano, periodo, disciplinas) {
       var media = preenchidas.length ? soma / preenchidas.length : mediaApi;
       if (media !== null) { somaMedias += media; contMedias++; }
       faltasTotais += Number(d.numero_faltas) || 0;
+
+      // 🆕 Conquista antiga: média da disciplina = 100
       if (media !== null && media >= 100) desbloquearConquista("nota_100");
+
+      // 🆕 Conquista nova: QUALQUER etapa com nota 100 (não só a média)
+      if (preenchidas.some(function (v) { return v >= 100; })) {
+        temNota100 = true;
+      }
     });
+
     var mediaGeral = contMedias ? somaMedias / contMedias : null;
     if (mediaGeral !== null && mediaGeral >= 90) desbloquearConquista("nota_maxima");
+
+    // 🆕 Desbloqueia "nerd" se tirou 100 em QUALQUER etapa de QUALQUER disciplina
+    if (temNota100) desbloquearConquista("nerd");
+
     chamarAPI("/api/boletim", {
       mediaGeral,
       faltasTotais,
