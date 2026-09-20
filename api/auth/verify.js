@@ -1,5 +1,5 @@
-import { autenticar } from "../auth.js";
-import { metodoObrigatorio, ok, erro, cors } from "../helpers.js";
+import { autenticar } from "../_lib/auth.js";
+import { metodoObrigatorio, ok, erro, cors } from "../_lib/helpers.js";
 
 export default async function handler(req, res) {
   cors(res);
