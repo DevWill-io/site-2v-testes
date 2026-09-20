@@ -3,13 +3,29 @@ import { autenticar, ehAdmin } from "../auth.js";
 import { ok, erro, metodoObrigatorio, cors, sanitizar } from "../helpers.js";
 
 const SKINS = {
-  padrao:  { gratis: true },
-  alien:   { gratis: true },
-  pirata:  { gratis: true },
-  genio:   { gratis: true },
-  simpson: { gratis: false, cliques: 1500 },
-  mafioso: { gratis: false, cliques: 3000 },
-  admin:   { gratis: false, apenasAdmin: true },
+  // Gratuitas
+  padrao:   { gratis: true },
+  alien:    { gratis: true },
+  pirata:   { gratis: true },
+  genio:    { gratis: true },
+
+  // Desbloqueio por cliques
+  if:       { gratis: false, tipo: "cliques", cliques: 500 },
+  jojo:     { gratis: false, tipo: "cliques", cliques: 1000 },
+  simpson:  { gratis: false, tipo: "cliques", cliques: 1500 },
+  antigo:   { gratis: false, tipo: "cliques", cliques: 2000 },
+  mafioso:  { gratis: false, tipo: "cliques", cliques: 2500 },  // ← ajustado
+  retro:    { gratis: false, tipo: "cliques", cliques: 3000 },
+  turma1:   { gratis: false, tipo: "cliques", cliques: 4000 },
+  turma2:   { gratis: false, tipo: "cliques", cliques: 5000 },
+  turma3:   { gratis: false, tipo: "cliques", cliques: 10000 },
+
+  // Desbloqueio por conquista
+  "100":       { gratis: false, tipo: "conquista", conquista: "nerd" },
+  vestuario:   { gratis: false, tipo: "conquista", conquista: "vestuario" },
+
+  // Exclusiva admin
+  admin:    { gratis: false, apenasAdmin: true },
 };
 
 export default async function handler(req, res) {
@@ -24,17 +40,26 @@ export default async function handler(req, res) {
   const skin = SKINS[skinId];
   if (!skin) return erro(res, 400, "Skin inválida");
 
-  // Skin admin
+    // Skin admin
   if (skin.apenasAdmin && !ehAdmin(matricula)) {
     return erro(res, 403, "Skin exclusiva do admin");
   }
 
-  // Skin bloqueada por cliques
+  // Skin bloqueada: cliques OU conquista
   if (!skin.gratis && !skin.apenasAdmin) {
-    const snap = await db.ref(`usuarios_xp/${matricula}/cliquesMascote`).get();
-    const cliques = Number(snap.val()) || 0;
-    if (cliques < skin.cliques) {
-      return erro(res, 403, `Precisa de ${skin.cliques} cliques (tem ${cliques})`);
+    if (skin.tipo === "conquista") {
+      // Precisa da conquista desbloqueada
+      const snapC = await db.ref(`usuarios_xp/${matricula}/conquistas/${skin.conquista}`).get();
+      if (!snapC.exists()) {
+        return erro(res, 403, `Precisa da conquista "${skin.conquista}"`);
+      }
+    } else {
+      // tipo "cliques" (padrão)
+      const snap = await db.ref(`usuarios_xp/${matricula}/cliquesMascote`).get();
+      const cliques = Number(snap.val()) || 0;
+      if (cliques < skin.cliques) {
+        return erro(res, 403, `Precisa de ${skin.cliques} cliques (tem ${cliques})`);
+      }
     }
   }
 

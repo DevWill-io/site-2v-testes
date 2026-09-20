@@ -304,18 +304,35 @@ window.addEventListener("storage", (e) => {
   }
 });
 
-onValue(ref(db, "mascote/avatares/" + MINHA_MATRICULA), (snap) => {
-  const av = snap.val()?.avatar;
-  if (av && AVATARES[av]) {
-    if (av === "admin" && !SOU_ADMIN) return;
-    const skinAtualLocal = localStorage.getItem("skin_ativa");
-    const isSkinNova = skinAtualLocal === "simpson" || skinAtualLocal === "mafioso" || skinAtualLocal === "admin";
-    if (!isSkinNova) {
-      avatarAtual = av;
-      try { localStorage.setItem("mascote_avatar", av); } catch (e) {}
-      mostrarAvatarFlutuante();
-    }
-  }
+// ==========================================
+// 🔄 SINCRONIZAÇÃO DE SKIN — Fonte da verdade: Firebase
+// Escuta DUAS fontes:
+//   1. mascote/avatares/{mat}/avatar       ← gravada pela API /api/mascote?tipo=skin
+//   2. perfis_alunos/{mat}/mascoteAvatar   ← gravada pela API /api/perfil?tipo=update
+// Quando o login.js troca a skin, uma dessas fontes dispara e atualiza aqui.
+// ==========================================
+
+function aplicarSkinRemota(av, origem) {
+  if (!av || !IMAGENS_MASCOTE[av]) return;
+  if (av === "admin" && !SOU_ADMIN) return;
+  if (av === avatarAtual) return; // evita loop
+  avatarAtual = av;
+  try {
+    localStorage.setItem("mascote_avatar", av);
+    localStorage.setItem("skin_ativa", av);
+  } catch (e) {}
+  mostrarAvatarFlutuante();
+  console.log(`[mascote] skin atualizada via ${origem}:`, av);
+}
+
+// Fonte 1: mascote/avatares/{mat}/avatar
+onValue(ref(db, "mascote/avatares/" + MINHA_MATRICULA + "/avatar"), (snap) => {
+  aplicarSkinRemota(snap.val(), "mascote/avatares");
+});
+
+// Fonte 2: perfis_alunos/{mat}/mascoteAvatar
+onValue(ref(db, "perfis_alunos/" + MINHA_MATRICULA + "/mascoteAvatar"), (snap) => {
+  aplicarSkinRemota(snap.val(), "perfis_alunos");
 });
 
 function criarCoracao(x, y) {
