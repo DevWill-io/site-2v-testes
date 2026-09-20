@@ -1,7 +1,7 @@
 // ==========================================
 // SERVICE WORKER — Portal InfoWeb 2V
 // ==========================================
-const CACHE_NAME = "infoweb-2v-v10";  // ← bump da versão (invalida cache antigo)
+const CACHE_NAME = "infoweb-2v-v14";  // ← bump da versão (invalida cache antigo)
 const ASSETS_CACHE = [
   "/",
   "/login.html",
