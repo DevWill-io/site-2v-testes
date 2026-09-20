@@ -656,6 +656,108 @@ const TRADUCOES_LOGIN = {
 const IDIOMAS_SUPORTADOS = ["pt-BR", "en", "es"];
 const IDIOMA_PADRAO = "pt-BR";
 
+// ==========================================
+// ⭐ SISTEMA DE XP
+// ==========================================
+function calcularNivel(xp) {
+  let nivelAtual = NIVEIS[0];
+  for (let i = 0; i < NIVEIS.length; i++) {
+    if (xp >= NIVEIS[i].xp) nivelAtual = NIVEIS[i];
+    else break;
+  }
+  const proximo = NIVEIS.find(n => n.nivel === nivelAtual.nivel + 1) || null;
+  const xpProximo = proximo ? proximo.xp : nivelAtual.xp;
+  const xpAtual = nivelAtual.xp;
+  const progresso = proximo
+    ? Math.round(((xp - xpAtual) / (xpProximo - xpAtual)) * 100)
+    : 100;
+
+  return {
+    nivel: nivelAtual.nivel,
+    nome: nivelAtual.nome,
+    xpAtual,
+    xpProximo,
+    progresso,
+    proximoNome: proximo ? proximo.nome : null,
+  };
+}
+
+async function adicionarXP(quantidade, motivo) {
+  const mat = window.usuarioLogado.matricula;
+  if (!mat || mat === "Matrícula não disponível") return;
+
+  try {
+    const refXP = ref(db, "usuarios_xp/" + mat);
+    const snap = await get(refXP);
+    const dados = snap.val() || {};
+    const xpAntes = Number(dados.xp) || 0;
+    const xpDepois = xpAntes + quantidade;
+
+    const nivelAntes = calcularNivel(xpAntes);
+    const nivelDepois = calcularNivel(xpDepois);
+
+    await update(refXP, { xp: xpDepois });
+
+    if (nivelDepois.nivel > nivelAntes.nivel) {
+      if (typeof exibirToast === "function") {
+        exibirToast(`🎉 SUBIU DE NÍVEL! ${nivelDepois.nome} (Nv ${nivelDepois.nivel})`, "sucesso");
+      }
+    }
+  } catch (e) {
+    console.warn("[XP] Erro:", e);
+  }
+}
+
+async function desbloquearConquista(idConquista) {
+  const mat = window.usuarioLogado.matricula;
+  if (!mat || mat === "Matrícula não disponível") return;
+
+  try {
+    const refConquista = ref(db, `usuarios_xp/${mat}/conquistas/${idConquista}`);
+    const snap = await get(refConquista);
+    if (snap.exists()) return;
+
+    await update(refConquista, { desbloqueadaEm: Date.now() });
+    const c = CONQUISTAS.find(x => x.id === idConquista);
+    if (c && typeof exibirToast === "function") {
+      exibirToast(`${c.icone} CONQUISTA: ${c.nome}!`, "sucesso");
+    }
+  } catch (e) {
+    console.warn("[conquista] Erro:", e);
+  }
+}
+
+async function atualizarStreakLogin() {
+  const mat = window.usuarioLogado.matricula;
+  if (!mat || mat === "Matrícula não disponível") return;
+
+  try {
+    const refXP = ref(db, "usuarios_xp/" + mat);
+    const snap = await get(refXP);
+    const dados = snap.val() || {};
+    const hoje = new Date().toISOString().slice(0, 10);
+    const ultimaVisita = dados.ultimaVisita || "";
+    let streak = Number(dados.streak) || 0;
+
+    if (ultimaVisita === hoje) return;
+
+    const ontem = new Date();
+    ontem.setDate(ontem.getDate() - 1);
+    const ontemStr = ontem.toISOString().slice(0, 10);
+
+    if (ultimaVisita === ontemStr) streak += 1;
+    else streak = 1;
+
+    await update(refXP, { streak, ultimaVisita: hoje });
+    await adicionarXP(5, "login diário");
+
+    if (streak >= 7) desbloquearConquista("streak_7");
+    if (streak >= 30) desbloquearConquista("streak_30");
+  } catch (e) {
+    console.warn("[streak] Erro:", e);
+  }
+}
+
 function obterIdiomaAtual() {
   var lang = localStorage.getItem("idioma");
   if (lang && IDIOMAS_SUPORTADOS.includes(lang)) return lang;
