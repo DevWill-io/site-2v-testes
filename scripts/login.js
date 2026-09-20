@@ -55,17 +55,28 @@ function addStopSeguro(gradient, posicao, cor, fallback) {
 }
 
 // ==========================================
-// 🎭 SKINS DO MASCOTE
+// 🎭 SKINS DO MASCOTE (com suporte a admin)
 // ==========================================
+const MATRICULA_ADMIN = "20261101110002";
+
 const AVATARES_MASCOTE = [
-  { id: "padrao", emoji: "🐾", nome: "Padrão", gratis: true },
-  { id: "alien", emoji: "👽", nome: "Alien", gratis: true },
-  { id: "pirata", emoji: "🏴‍☠️", nome: "Pirata", gratis: true },
-  { id: "genio", emoji: "🧠", nome: "Gênio", gratis: true },
-  { id: "simpson", emoji: "🍩", nome: "Simpson", gratis: false, cliquesNecessarios: 1500 },
-  { id: "mafioso", emoji: "🕴️", nome: "Mafioso", gratis: false, cliquesNecessarios: 3000 },
+  { id: "padrao",  nome: "Padrão",  arquivo: "img/MascotePadrao.png",  gratis: true, admin: false },
+  { id: "alien",   nome: "Alien",   arquivo: "img/MascoteAlien.png",   gratis: true, admin: false },
+  { id: "pirata",  nome: "Pirata",  arquivo: "img/MascotePirata.png",  gratis: true, admin: false },
+  { id: "genio",   nome: "Gênio",   arquivo: "img/MascoteGenio.png",   gratis: true, admin: false },
+  { id: "simpson", nome: "Simpson", arquivo: "img/MascoteSimpson.png", gratis: false, cliquesNecessarios: 1500, admin: false },
+  { id: "mafioso", nome: "Mafioso", arquivo: "img/MascoteMafioso.png", gratis: false, cliquesNecessarios: 3000, admin: false },
+  { id: "admin",   nome: "Admin",   arquivo: "img/MascoteAdmin.png",   gratis: false, apenasAdmin: true, admin: true },
 ];
 
+// Retorna a lista de skins visíveis para a matrícula atual
+function obterSkinsDisponiveis() {
+  const mat = window.usuarioLogado?.matricula;
+  const ehAdmin = mat === MATRICULA_ADMIN;
+  return AVATARES_MASCOTE.filter((s) => (s.apenasAdmin ? ehAdmin : true));
+}
+
+// Busca skin pelo id (sempre inclui admin, pra exibir no perfil público)
 function obterMascotePorId(id) {
   return AVATARES_MASCOTE.find((m) => m.id === id) || AVATARES_MASCOTE[0];
 }
@@ -1163,6 +1174,9 @@ async function carregarConquistasNoModalPerfil(matricula) {
   }
 }
 
+// ==========================================
+// MODAL DE PERFIL PÚBLICO
+// ==========================================
 window.abrirModalPerfil = function (identificador) {
   const modal = document.getElementById("modal-perfil");
   if (!modal) return;
@@ -1185,20 +1199,21 @@ window.abrirModalPerfil = function (identificador) {
   if (imgEl) imgEl.src = fotoExibir;
   if (nomeEl) nomeEl.textContent = nomeExibir;
   if (matEl) matEl.textContent = perfil.matricula || perfil.id || "Não informada";
-  
-    // 🐾 Mascote ativo
+
+  // 🐾 Mascote ativo (nome + imagem)
   const mascoteBox = document.getElementById("modal-perfil-mascote");
   const mascoteEmoji = document.getElementById("modal-perfil-mascote-emoji");
   const mascoteNome = document.getElementById("modal-perfil-mascote-nome");
   if (mascoteBox && mascoteEmoji && mascoteNome) {
     const mascoteId = perfil.mascoteAvatar || "padrao";
     const mascote = obterMascotePorId(mascoteId);
-    mascoteEmoji.textContent = mascote.emoji;
+    mascoteEmoji.innerHTML = `<img src="${mascote.arquivo}" alt="${escaparHTML(mascote.nome)}" onerror="this.style.display='none';this.parentNode.textContent='🐾'">`;
     mascoteNome.textContent = mascote.nome;
     mascoteBox.classList.remove("is-hidden");
+    mascoteBox.classList.toggle("admin", mascoteId === "admin");
   }
 
-  // Nível + XP
+  // ⭐ Nível + XP
   (async function carregarNivelDoPerfil() {
     const nivelBox = document.getElementById("modal-perfil-nivel");
     const badgeEl = document.getElementById("modal-perfil-nivel-badge");
@@ -1243,6 +1258,9 @@ window.fecharModalPerfil = function () {
   if (modal) modal.classList.add("is-hidden");
 };
 
+// ==========================================
+// MURAL — RENDER
+// ==========================================
 window.renderizarMural = function () {
   const lista = document.getElementById("lista-recados");
   if (!lista) return;
@@ -1345,6 +1363,9 @@ window.excluirComentario = function (recadoId, comentarioId) {
   });
 };
 
+// ==========================================
+// PERFIS — RENDER (com badge do mascote)
+// ==========================================
 window.renderizarPerfis = function () {
   const container = document.getElementById("lista-perfis");
   if (!container) return;
@@ -1370,16 +1391,30 @@ window.renderizarPerfis = function () {
     card.style.cursor = "pointer";
     const nomeExibir = perfil.nomeCompleto || perfil.nome || "Usuário sem nome";
     const fotoFinal = perfil.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random`;
+
     const mascoteId = perfil.mascoteAvatar || "padrao";
     const mascote = obterMascotePorId(mascoteId);
+    const ehAdminSkin = mascoteId === "admin";
+
     card.innerHTML = `
-      <div class="perfil-card-mascote" title="Mascote: ${escaparHTML(mascote.nome)}">${mascote.emoji}</div>
-      <div class="perfil-avatar"><img src="${escaparHTML(fotoFinal)}" alt="${escaparHTML(nomeExibir)}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random'" /></div>
-      <div class="perfil-info"><h4 class="perfil-nome">${escaparHTML(nomeExibir)}</h4><span class="perfil-matricula">${escaparHTML(matriculaParaExibicao(perfil.matricula || perfil.id))}</span></div>
+      <div class="perfil-card-mascote ${ehAdminSkin ? "admin" : ""}" title="Mascote: ${escaparHTML(mascote.nome)}">
+        <img src="${mascote.arquivo}" alt="${escaparHTML(mascote.nome)}" onerror="this.style.display='none'">
+      </div>
+      <div class="perfil-avatar">
+        <img src="${escaparHTML(fotoFinal)}" alt="${escaparHTML(nomeExibir)}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random'">
+      </div>
+      <div class="perfil-info">
+        <h4 class="perfil-nome">${escaparHTML(nomeExibir)}</h4>
+        <span class="perfil-matricula">${escaparHTML(matriculaParaExibicao(perfil.matricula || perfil.id))}</span>
+      </div>
     `;
+    container.appendChild(card);
   });
 };
 
+// ==========================================
+// RECADOS — EDIÇÃO
+// ==========================================
 window.editarRecado = function (id) {
   const itemRef = ref(db, "mural_recados/" + id);
   get(itemRef).then((snapshot) => {
@@ -1576,17 +1611,21 @@ window.carregarPerfilUsuario = function (matricula) {
 };
 
 // ==========================================
-// SELETOR DE AVATAR DO MASCOTE
+// SELETOR DE AVATAR DO MASCOTE (imagens + admin)
 // ==========================================
 function renderizarSeletorAvatar() {
   const grid = document.getElementById("avatar-mascote-grid");
   if (!grid) return;
 
   const cliques = meusCliquesMascote;
-  grid.innerHTML = AVATARES_MASCOTE.map((av) => {
+  const skins = obterSkinsDisponiveis();
+  const ehAdmin = window.usuarioLogado.matricula === MATRICULA_ADMIN;
+
+  grid.innerHTML = skins.map((av) => {
     const ativo = av.id === avatarSelecionado;
-    const bloqueada = !av.gratis && cliques < av.cliquesNecessarios;
-    const faltam = bloqueada ? av.cliquesNecessarios - cliques : 0;
+    const bloqueada = !av.gratis && !av.apenasAdmin && cliques < (av.cliquesNecessarios || 0);
+    const faltam = bloqueada ? (av.cliquesNecessarios || 0) - cliques : 0;
+    const ehAdminSkin = av.id === "admin";
     let lockHTML = "";
     if (bloqueada) {
       lockHTML = `
@@ -1595,10 +1634,11 @@ function renderizarSeletorAvatar() {
       `;
     }
     return `
-      <button type="button" class="avatar-mascote-opcao ${ativo ? "ativo" : ""} ${bloqueada ? "bloqueado" : ""}"
+      <button type="button" class="avatar-mascote-opcao ${ativo ? "ativo" : ""} ${bloqueada ? "bloqueado" : ""} ${ehAdminSkin ? "admin" : ""}"
               data-avatar="${av.id}" ${bloqueada ? 'disabled aria-disabled="true"' : ""}
-              title="${av.nome}${bloqueada ? " — Bloqueada (" + faltam.toLocaleString("pt-BR") + " cliques faltando)" : ""}">
-        ${av.emoji}${lockHTML}
+              title="${av.nome}${bloqueada ? " — Bloqueada (" + faltam.toLocaleString("pt-BR") + " cliques faltando)" : ""}${ehAdminSkin ? " (exclusiva admin)" : ""}">
+        <img src="${av.arquivo}" alt="${escaparHTML(av.nome)}" onerror="this.style.display='none';this.parentNode.textContent='🐾'">
+        ${lockHTML}
       </button>`;
   }).join("");
 
@@ -1617,6 +1657,9 @@ function renderizarSeletorAvatar() {
   });
 }
 
+// ==========================================
+// ABRIR / FECHAR MODAL EDITAR PERFIL
+// ==========================================
 window.abrirModalEditarPerfil = function () {
   if (!perfilUsuarioAtual) { exibirToast("Perfil ainda não carregado.", "erro"); return; }
   const bloqueioEl = document.getElementById("edit-perfil-bloqueio");
@@ -2072,7 +2115,7 @@ function desenharGraficoEvolucao() {
 }
 
 // ==========================================
-// RENDERIZAR TABELA
+// RENDERIZAR TABELA DE NOTAS
 // ==========================================
 function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   var corpo = document.getElementById("lista-notas");
@@ -2621,7 +2664,7 @@ function atualizarTimersContagem() {
 }
 
 // ==========================================
-// SALA DOS PROFESSORES (com bugs corrigidos)
+// SALA DOS PROFESSORES (bugs corrigidos)
 // ==========================================
 async function carregarSalaProfessores() {
   if (__salaDadosCarregados) return;

@@ -2190,6 +2190,7 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
     border: 1px solid var(--border-color);
     cursor: pointer;
     transition: var(--transition);
+    position: relative;
 }
 .perfil-card:hover {
     transform: translateY(-3px);
@@ -2214,6 +2215,117 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
     text-overflow: ellipsis;
 }
 .perfil-matricula { font-size: 0.78rem; color: var(--text-muted); }
+
+/* ===================================================================
+   🐾 MASCOTE ATIVO NOS PERFIS
+   =================================================================== */
+.perfil-card-mascote {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-surface);
+    border: 2px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease;
+    z-index: 2;
+}
+
+.perfil-card-mascote img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
+
+.perfil-card:hover .perfil-card-mascote {
+    transform: scale(1.15) rotate(-8deg);
+}
+
+/* Badge admin — destaque dourado */
+.perfil-card-mascote.admin {
+    border-color: #ffd700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+}
+
+/* Modal de perfil: pílula com a skin */
+.modal-perfil-mascote {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px auto 4px;
+    padding: 6px 14px 6px 6px;
+    background: linear-gradient(135deg,
+        hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.18),
+        hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.06));
+    border: 1px solid hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.35);
+    border-radius: 999px;
+    box-shadow: 0 2px 10px hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.15);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.modal-perfil-mascote:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.25);
+}
+
+.modal-perfil-mascote.admin {
+    border-color: #ffd700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+}
+
+.modal-perfil-mascote-emoji {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 2px 6px hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.45);
+    flex-shrink: 0;
+}
+
+.modal-perfil-mascote-emoji img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
+
+.modal-perfil-mascote-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    text-align: left;
+    min-width: 0;
+}
+
+.modal-perfil-mascote-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+}
+
+.modal-perfil-mascote-nome {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    line-height: 1.1;
+}
 
 /* ===================================================================
    AGENDA
@@ -2299,7 +2411,7 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
 .legenda-texto { white-space: nowrap; }
 
 /* ===================================================================
-   🆕 SALA DOS PROFESSORES
+   SALA DOS PROFESSORES
    =================================================================== */
 .sala-professores {
     background-color: var(--bg-base);
@@ -2613,7 +2725,6 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
     background: var(--bg-card);
 }
 
-/* ⭐ NÍVEL NO PERFIL PÚBLICO (compacto e elegante) */
 .modal-perfil-nivel {
     display: inline-flex;
     align-items: center;
@@ -2712,7 +2823,6 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
     transform: translateY(-2px);
 }
 
-/* 🎖️ CONQUISTAS NO MODAL DE PERFIL (público) */
 .modal-perfil-conquistas {
     margin-top: 18px;
     padding-top: 18px;
@@ -2956,12 +3066,21 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
     transition: all 0.22s ease;
-    padding: 0;
+    padding: 4px;
     line-height: 1;
     position: relative;
+    overflow: hidden;
 }
+
+.avatar-mascote-opcao img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 10px;
+    display: block;
+}
+
 .avatar-mascote-opcao:hover {
     transform: translateY(-3px) scale(1.05);
     border-color: var(--accent);
@@ -2988,6 +3107,13 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
     align-items: center;
     justify-content: center;
     border: 2px solid var(--bg-surface);
+    z-index: 2;
+}
+
+/* Admin skin destaque */
+.avatar-mascote-opcao.admin {
+    border-color: #ffd700;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.45);
 }
 
 .avatar-mascote-opcao.bloqueado {
@@ -3016,6 +3142,7 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
     justify-content: center;
     border: 1px solid var(--border-color);
     z-index: 2;
+    color: var(--text-main);
 }
 
 .avatar-mascote-opcao .avatar-faltam {
@@ -3035,7 +3162,7 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
 }
 
 /* ===================================================================
-   🎖️ SELETOR DE CONQUISTAS VISÍVEIS (editar perfil)
+   🎖️ SELETOR DE CONQUISTAS VISÍVEIS
    =================================================================== */
 .conquistas-visiveis-area {
     margin-top: 18px;
@@ -3255,6 +3382,8 @@ body.light-theme .conquistas-visiveis-grid {
     .modal-perfil-nivel-xp { font-size: 0.62rem; }
     .modal-perfil-conquistas-grid { grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 8px; }
     .modal-conquista-badge { font-size: 1.1rem; border-radius: 12px; }
+    .perfil-card-mascote { width: 28px; height: 28px; }
+    .modal-perfil-mascote-emoji { width: 34px; height: 34px; }
 }
 
 @media (max-width: 560px) {
@@ -3273,96 +3402,4 @@ body.light-theme .conquistas-visiveis-grid {
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
-}
-
-/* ===================================================================
-   🐾 MASCOTE ATIVO NOS PERFIS
-   =================================================================== */
-
-/* Badge pequeno no card de membro */
-.perfil-card {
-    position: relative;
-}
-
-.perfil-card-mascote {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: var(--bg-surface);
-    border: 2px solid var(--accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    line-height: 1;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-    transition: transform 0.2s ease;
-    z-index: 2;
-}
-
-.perfil-card:hover .perfil-card-mascote {
-    transform: scale(1.15) rotate(-8deg);
-}
-
-/* Seção do mascote no modal de perfil */
-.modal-perfil-mascote {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin: 10px auto 4px;
-    padding: 8px 16px 8px 10px;
-    background: linear-gradient(135deg,
-        hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.18),
-        hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.06));
-    border: 1px solid hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.35);
-    border-radius: 999px;
-    box-shadow: 0 2px 10px hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.15);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.modal-perfil-mascote:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 14px hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.25);
-}
-
-.modal-perfil-mascote-emoji {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-strong), var(--accent));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.05rem;
-    line-height: 1;
-    box-shadow: 0 2px 6px hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.45);
-    flex-shrink: 0;
-}
-
-.modal-perfil-mascote-info {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    text-align: left;
-    min-width: 0;
-}
-
-.modal-perfil-mascote-label {
-    font-size: 0.68rem;
-    font-weight: 600;
-    color: var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    line-height: 1.1;
-}
-
-.modal-perfil-mascote-nome {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    font-size: 0.82rem;
-    color: var(--text-main);
-    line-height: 1.1;
 }
