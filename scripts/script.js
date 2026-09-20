@@ -1010,14 +1010,15 @@ function aplicarTema(novoTema) {
 }
 
 // ==========================================
-// 🎮 SISTEMA GLOBAL DE XP (localStorage)
+// 🎮 SISTEMA GLOBAL DE XP (delega pro xpCore)
 // ==========================================
-// Chaves usadas:
-//   xp_total          → XP acumulado total
-//   xp_cliques_mascote → total de cliques no mascote (p/ desbloquear skins)
-//   xp_streak          → dias consecutivos de acesso
-//   xp_ultimo_acesso   → data (YYYY-MM-DD) do último acesso
-//   skin_ativa         → id da skin atualmente equipada
+// Fonte de verdade: Firebase (via window.xpCore)
+// Fallback: localStorage (se xpCore ainda não carregou ou é anônimo)
+//
+// O xpCore roda como módulo ES (assíncrono), então os primeiros
+// milissegundos podem ter chamadas antes dele estar pronto.
+// Nesse caso, as funções abaixo caem no fallback local.
+// Quando xpCore termina de carregar, ele sobrescreve essas funções.
 
 const XP_STORAGE = {
   TOTAL: "xp_total",
@@ -1027,14 +1028,35 @@ const XP_STORAGE = {
   SKIN_ATIVA: "skin_ativa",
 };
 
-window.obterXPTotal = function () {
+// ------ Fallback: leituras do localStorage ------
+function _lsObterXP() {
   return parseInt(localStorage.getItem(XP_STORAGE.TOTAL) || "0", 10);
+}
+function _lsObterCliques() {
+  return parseInt(localStorage.getItem(XP_STORAGE.CLIQUES) || "0", 10);
+}
+function _lsObterStreak() {
+  return parseInt(localStorage.getItem(XP_STORAGE.STREAK) || "0", 10);
+}
+
+// ------ API pública: prioriza xpCore, cai no local se não tiver ------
+window.obterXPTotal = function () {
+  if (window.xpCore?.estaPronto?.()) return window.xpCore.obterXP();
+  return _lsObterXP();
 };
 
 window.adicionarXP = function (quantidade, motivo) {
   quantidade = Number(quantidade) || 0;
   if (quantidade <= 0) return window.obterXPTotal();
-  const novo = window.obterXPTotal() + quantidade;
+
+  if (window.xpCore?.estaPronto?.()) {
+    // Delega (assíncrono, mas não bloqueia)
+    window.xpCore.incrementarXP(quantidade, motivo || "geral");
+    return window.xpCore.obterXP();
+  }
+
+  // Fallback local
+  const novo = _lsObterXP() + quantidade;
   localStorage.setItem(XP_STORAGE.TOTAL, String(novo));
   window.dispatchEvent(new CustomEvent("xp:update", {
     detail: { total: novo, quantidade, motivo: motivo || "geral" }
@@ -1043,12 +1065,20 @@ window.adicionarXP = function (quantidade, motivo) {
 };
 
 window.obterCliquesMascote = function () {
-  return parseInt(localStorage.getItem(XP_STORAGE.CLIQUES) || "0", 10);
+  if (window.xpCore?.estaPronto?.()) return window.xpCore.obterCliquesMascote();
+  return _lsObterCliques();
 };
 
 window.adicionarCliqueMascote = function (qtd) {
   qtd = Number(qtd) || 1;
-  const novo = window.obterCliquesMascote() + qtd;
+
+  if (window.xpCore?.estaPronto?.()) {
+    window.xpCore.incrementarCliquesMascote(qtd);
+    return window.xpCore.obterCliquesMascote();
+  }
+
+  // Fallback local
+  const novo = _lsObterCliques() + qtd;
   localStorage.setItem(XP_STORAGE.CLIQUES, String(novo));
   window.dispatchEvent(new CustomEvent("mascote:cliques", {
     detail: { total: novo, adicionado: qtd }
@@ -1057,13 +1087,19 @@ window.adicionarCliqueMascote = function (qtd) {
 };
 
 window.obterStreak = function () {
-  return parseInt(localStorage.getItem(XP_STORAGE.STREAK) || "0", 10);
+  if (window.xpCore?.estaPronto?.()) return window.xpCore.obterStreak();
+  return _lsObterStreak();
 };
 
 window.registrarAcessoDiario = function () {
+  if (window.xpCore?.estaPronto?.()) {
+    return window.xpCore.registrarAcessoDiario();
+  }
+
+  // Fallback local (mesma lógica de antes)
   const hoje = new Date().toISOString().slice(0, 10);
   const ultimo = localStorage.getItem(XP_STORAGE.ULTIMO);
-  let streak = window.obterStreak();
+  let streak = _lsObterStreak();
 
   if (ultimo === hoje) return { streak, novo: false, bonusXP: 0 };
 
@@ -1078,13 +1114,31 @@ window.registrarAcessoDiario = function () {
   localStorage.setItem(XP_STORAGE.ULTIMO, hoje);
 
   const bonusXP = streak >= 30 ? 100 : streak >= 7 ? 50 : streak >= 3 ? 20 : 10;
-  window.adicionarXP(bonusXP, "login_diario");
+  const novo = _lsObterXP() + bonusXP;
+  localStorage.setItem(XP_STORAGE.TOTAL, String(novo));
 
   window.dispatchEvent(new CustomEvent("xp:streak", {
     detail: { streak, bonusXP, novo: true }
   }));
 
   return { streak, novo: true, bonusXP };
+};
+
+// ------ Funções de skin também delegam ------
+window.obterSkinAtiva = function () {
+  if (window.xpCore?.estaPronto?.()) return window.xpCore.obterSkinAtiva();
+  return localStorage.getItem(XP_STORAGE.SKIN_ATIVA) || "padrao";
+};
+
+window.definirSkinAtiva = function (skinId) {
+  // Não valida aqui — quem valida é o xpCore (checa desbloqueio)
+  if (window.xpCore?.estaPronto?.()) {
+    window.xpCore.definirSkinAtiva(skinId);
+    return true;
+  }
+  localStorage.setItem(XP_STORAGE.SKIN_ATIVA, skinId);
+  window.dispatchEvent(new CustomEvent("skin:mudou", { detail: { skinId } }));
+  return true;
 };
 
 // Sistema de níveis (XP → nível)
@@ -1171,7 +1225,18 @@ document.addEventListener("DOMContentLoaded", () => {
   aplicarTraducoes();
 
   // Registra acesso diário (streak)
-  window.registrarAcessoDiario();
+  // Se xpCore já estiver pronto, delega. Senão, roda local e depois
+  // roda de novo quando o xpCore terminar de sincronizar.
+  if (window.xpCore?.estaPronto?.()) {
+    window.registrarAcessoDiario();
+  } else {
+    // Espera o xpCore sinalizar que está pronto
+    window.addEventListener("xpCore:pronto", () => {
+      window.registrarAcessoDiario();
+    }, { once: true });
+    // Fallback: roda local imediatamente (não quebra nada)
+    // Se xpCore terminar, o de cima roda de novo e sobrescreve
+  }
 
   // 1. Efeito de Digitação
   const textElement = document.getElementById("typing-text");

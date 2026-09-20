@@ -98,22 +98,50 @@ console.log("[mascote] Matrícula usada:", MINHA_MATRICULA, "| É admin?", SOU_A
 
 // ==========================================
 // Inicializa avatarAtual com prioridade correta
+// Fonte de verdade: xpCore (que puxa do Firebase) > localStorage
 // ==========================================
-let avatarAtual = (function () {
-  // Se for admin, força admin se não tiver uma skin customizada
+function _resolverAvatarInicial() {
+  // 1) Se xpCore está pronto, ele é a fonte de verdade (Firebase)
+  if (window.xpCore?.estaPronto?.()) {
+    const skin = window.xpCore.obterSkinAtiva();
+    if (skin && IMAGENS_MASCOTE[skin]) {
+      if (skin === "admin" && !SOU_ADMIN) return "padrao";
+      return skin;
+    }
+  }
+
+  // 2) Fallback: localStorage (comportamento antigo)
   if (SOU_ADMIN) {
     const skinSalva = localStorage.getItem("skin_ativa");
     if (!skinSalva || !IMAGENS_MASCOTE[skinSalva]) return "admin";
     return skinSalva;
   }
-  // Não-admin: pega skin salva ou padrão
   const skinAtiva = localStorage.getItem("skin_ativa");
   const avatarLegado = localStorage.getItem("mascote_avatar");
   const escolhido = skinAtiva || avatarLegado || "padrao";
-  // Bloqueia admin pra não-admin
   if (escolhido === "admin") return "padrao";
   return IMAGENS_MASCOTE[escolhido] ? escolhido : "padrao";
-})();
+}
+
+let avatarAtual = _resolverAvatarInicial();
+
+// Se xpCore ainda não estava pronto, escuta o evento pra atualizar
+if (!window.xpCore?.estaPronto?.()) {
+  window.addEventListener("xpCore:pronto", () => {
+    const skin = window.xpCore?.obterSkinAtiva?.();
+    if (skin && IMAGENS_MASCOTE[skin]) {
+      if (skin === "admin" && !SOU_ADMIN) return;
+      if (skin !== avatarAtual) {
+        avatarAtual = skin;
+        try {
+          localStorage.setItem("skin_ativa", skin);
+          localStorage.setItem("mascote_avatar", skin);
+        } catch (e) {}
+        mostrarAvatarFlutuante();
+      }
+    }
+  }, { once: true });
+}
 
 // Se for admin e a skin salva não for admin, força admin
 if (SOU_ADMIN) {
@@ -276,10 +304,15 @@ mostrarAvatarFlutuante();
 function atualizarProgressoSkin() {
   if (!skinProgressoBox || !skinProgressoFill) return;
 
-  // Pega cliques totais do localStorage (sistema global do script.js)
-  const cliques = window.obterCliquesMascote
-    ? window.obterCliquesMascote()
-    : parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
+  // Fonte de verdade: xpCore (Firebase) > script.js > localStorage
+  let cliques;
+  if (window.xpCore?.estaPronto?.()) {
+    cliques = window.xpCore.obterCliquesMascote();
+  } else if (window.obterCliquesMascote) {
+    cliques = window.obterCliquesMascote();
+  } else {
+    cliques = parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
+  }
 
   // Função auxiliar pra traduzir
   const traduzir = window.t ? window.t : (k) => k;
@@ -677,21 +710,25 @@ async function darCarinho(event) {
   tocarSom("carinho");
 
   // ==========================================
-  // 🆕 REGISTRA CLIQUE + XP (sistema global)
+  // 🆕 REGISTRA CLIQUE + XP (via xpCore)
   // ==========================================
-  const cliquesAntes = window.obterCliquesMascote
-    ? window.obterCliquesMascote()
-    : parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
+  const cliquesAntes = window.xpCore?.estaPronto?.()
+    ? window.xpCore.obterCliquesMascote()
+    : (window.obterCliquesMascote
+        ? window.obterCliquesMascote()
+        : parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10));
 
-  if (window.adicionarCliqueMascote) {
+  // Delega pro xpCore (Firebase quando logado, localStorage quando anônimo)
+  if (window.xpCore?.estaPronto?.()) {
+    window.xpCore.incrementarCliquesMascote(1);
+    window.xpCore.incrementarXP(1, "clique_mascote");
+  } else if (window.adicionarCliqueMascote) {
+    // Fallback: script.js delegação (Patch #4)
     window.adicionarCliqueMascote(1);
+    if (window.adicionarXP) window.adicionarXP(1, "clique_mascote");
   } else {
+    // Último fallback: localStorage puro
     localStorage.setItem("xp_cliques_mascote", String(cliquesAntes + 1));
-  }
-
-  if (window.adicionarXP) {
-    window.adicionarXP(1, "clique_mascote");
-  } else {
     const xpAtual = parseInt(localStorage.getItem("xp_total") || "0", 10);
     localStorage.setItem("xp_total", String(xpAtual + 1));
   }

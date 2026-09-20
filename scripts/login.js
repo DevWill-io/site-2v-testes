@@ -425,6 +425,30 @@ function calcularNivel(xp) {
 async function adicionarXP(quantidade, motivo) {
   const mat = window.usuarioLogado.matricula;
   if (!mat || mat === "Matrícula não disponível") return;
+
+  // Se xpCore está pronto, delega (usa runTransaction + cache)
+  if (window.xpCore?.estaPronto?.()) {
+    // Detecta subida de nível ANTES de incrementar
+    const nivelAntes = calcularNivel(window.xpCore.obterXP());
+    await window.xpCore.incrementarXP(quantidade, motivo);
+
+    // Atualiza variável local (usada por renderizarPainelXP)
+    meuXP = window.xpCore.obterXP();
+    renderizarPainelXP();
+
+    // Checa subida de nível DEPOIS
+    const nivelDepois = calcularNivel(meuXP);
+    if (nivelDepois.nivel > nivelAntes.nivel) {
+      if (typeof exibirToast === "function") {
+        exibirToast(`🎉 SUBIU DE NÍVEL! ${nivelDepois.nome} (Nv ${nivelDepois.nivel})`, "sucesso");
+      }
+      if (nivelDepois.nivel >= 5) desbloquearConquista("nivel_5");
+      if (nivelDepois.nivel >= 10) desbloquearConquista("nivel_10");
+    }
+    return;
+  }
+
+  // Fallback: comportamento antigo (Firebase direct)
   try {
     const refXP = ref(db, "usuarios_xp/" + mat);
     const snap = await get(refXP);
@@ -452,6 +476,28 @@ async function adicionarXP(quantidade, motivo) {
 async function desbloquearConquista(idConquista) {
   const mat = window.usuarioLogado.matricula;
   if (!mat || mat === "Matrícula não disponível") return;
+
+  // Se xpCore está pronto, delega
+  if (window.xpCore?.estaPronto?.()) {
+    if (minhasConquistas[idConquista]) return; // já desbloqueada
+    const sucesso = await window.xpCore.desbloquearConquista(idConquista);
+    if (!sucesso) return;
+
+    const c = CONQUISTAS.find(x => x.id === idConquista);
+    if (c && typeof exibirToast === "function") {
+      exibirToast(`${c.emoji} CONQUISTA: ${c.nome}!`, "sucesso");
+    }
+
+    // Bônus de XP pela conquista
+    await adicionarXP(XP_RECOMPENSAS.conquista, "conquista");
+
+    // Atualiza estado local
+    minhasConquistas[idConquista] = { desbloqueadaEm: Date.now() };
+    renderizarConquistas();
+    return;
+  }
+
+  // Fallback: comportamento antigo
   try {
     const refConquista = ref(db, `usuarios_xp/${mat}/conquistas/${idConquista}`);
     const snap = await get(refConquista);
@@ -600,19 +646,14 @@ function montarConquistasVisiveisPayload(selecionadas) {
 // ==========================================
 // MIGRAÇÃO DE XP LOCAL → FIREBASE
 // ==========================================
-async function migrarXPLocalParaFirebase(mat) {
-  try {
-    const xpLocal = parseInt(localStorage.getItem("xp_total") || "0", 10);
-    if (xpLocal <= 0) return;
-    const refXP = ref(db, "usuarios_xp/" + mat);
-    const snap = await get(refXP);
-    const dados = snap.val() || {};
-    const xpAtual = Number(dados.xp) || 0;
-    await update(refXP, { xp: xpAtual + xpLocal });
-    localStorage.setItem("xp_total", "0");
-  } catch (e) {
-    console.warn("[XP migração] erro:", e);
-  }
+// (removida — a migração agora é feita pelo xpCore de forma completa:
+// XP, cliquesMascote, contadores de recados/curtidas/simulador/períodos,
+// com flag de controle pra rodar só 1x por matrícula)
+async function migrarXPLocalParaFirebase(_mat) {
+  // No-op: mantida só pra compatibilidade com chamadas antigas.
+  // Se xpCore estiver disponível, ele já migrou tudo na inicialização.
+  if (window.xpCore?.estaPronto?.()) return;
+  console.warn("[XP] migração local chamada, mas xpCore não está pronto.");
 }
 
 // ==========================================
@@ -622,15 +663,22 @@ async function checarConquistasAutomaticas() {
   const mat = window.usuarioLogado.matricula;
   if (!mat || mat === "Matrícula não disponível") return;
 
-  // ===== Por CLiques no mascote =====
-  meusCliquesMascote = parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
+  // Se xpCore está pronto, usa os valores dele (fonte de verdade: Firebase)
+  const usarCore = window.xpCore?.estaPronto?.();
+
+  // ===== Cliques no mascote =====
+  meusCliquesMascote = usarCore
+    ? window.xpCore.obterCliquesMascote()
+    : parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
+
   for (const c of CONQUISTAS) {
     if (c.tipo === "cliques" && meusCliquesMascote >= c.meta) {
       await desbloquearConquista(c.id);
     }
   }
 
-  // ===== Por NÍVEL/XP =====
+  // ===== Nível / XP =====
+  if (usarCore) meuXP = window.xpCore.obterXP();
   const nivelInfo = calcularNivel(meuXP);
   for (const c of CONQUISTAS) {
     if (c.tipo === "nivel" && nivelInfo.nivel >= c.meta) {
@@ -638,22 +686,25 @@ async function checarConquistasAutomaticas() {
     }
   }
 
-  // ===== Por STREAK =====
+  // ===== Streak =====
+  if (usarCore) minhaStreak = window.xpCore.obterStreak();
   for (const c of CONQUISTAS) {
     if (c.tipo === "streak" && minhaStreak >= c.meta) {
       await desbloquearConquista(c.id);
     }
   }
 
-  // ===== Por SIMULADOR =====
-  const usosSim = parseInt(localStorage.getItem("xp_simulador_total") || "0", 10);
+  // ===== Simulador =====
+  const usosSim = usarCore
+    ? window.xpCore.obterContador("simulador")
+    : parseInt(localStorage.getItem("xp_simulador_total") || "0", 10);
   for (const c of CONQUISTAS) {
     if (c.tipo === "simulador" && usosSim >= c.meta) {
       await desbloquearConquista(c.id);
     }
   }
 
-  // ===== Por METAS definidas =====
+  // ===== Metas definidas (vem de __metasDisciplinas, que já é do Firebase) =====
   const metasCount = Object.keys(__metasDisciplinas || {}).length;
   for (const c of CONQUISTAS) {
     if (c.tipo === "metas" && metasCount >= c.meta) {
@@ -661,24 +712,30 @@ async function checarConquistasAutomaticas() {
     }
   }
 
-  // ===== Por PERÍODOS consultados =====
-  const periodosCount = parseInt(localStorage.getItem("xp_periodos_total") || "0", 10);
+  // ===== Períodos consultados =====
+  const periodosCount = usarCore
+    ? window.xpCore.obterContador("periodos")
+    : parseInt(localStorage.getItem("xp_periodos_total") || "0", 10);
   for (const c of CONQUISTAS) {
     if (c.tipo === "periodos" && periodosCount >= c.meta) {
       await desbloquearConquista(c.id);
     }
   }
 
-  // ===== Por RECADOS postados =====
-  const recadosCount = parseInt(localStorage.getItem("xp_recados_total") || "0", 10);
+  // ===== Recados postados =====
+  const recadosCount = usarCore
+    ? window.xpCore.obterContador("recados")
+    : parseInt(localStorage.getItem("xp_recados_total") || "0", 10);
   for (const c of CONQUISTAS) {
     if (c.tipo === "recados" && recadosCount >= c.meta) {
       await desbloquearConquista(c.id);
     }
   }
 
-  // ===== Por CURTIDAS dadas =====
-  const curtidasCount = parseInt(localStorage.getItem("xp_curtidas_total") || "0", 10);
+  // ===== Curtidas dadas =====
+  const curtidasCount = usarCore
+    ? window.xpCore.obterContador("curtidas")
+    : parseInt(localStorage.getItem("xp_curtidas_total") || "0", 10);
   for (const c of CONQUISTAS) {
     if (c.tipo === "curtidas" && curtidasCount >= c.meta) {
       await desbloquearConquista(c.id);
@@ -692,8 +749,28 @@ async function checarConquistasAutomaticas() {
 async function carregarPainelXP() {
   const mat = window.usuarioLogado.matricula;
   if (!mat || mat === "Matrícula não disponível") return;
-  try {
-    await migrarXPLocalParaFirebase(mat);
+    try {
+    // Migração agora é feita pelo xpCore na inicialização
+    // (não precisa chamar aqui)
+
+    // Se xpCore está pronto, usa os valores dele
+    if (window.xpCore?.estaPronto?.()) {
+      meuXP = window.xpCore.obterXP();
+      minhaStreak = window.xpCore.obterStreak();
+      minhasConquistas = window.xpCore.obterConquistas();
+      meusCliquesMascote = window.xpCore.obterCliquesMascote();
+
+      renderizarPainelXP();
+      renderizarConquistas();
+
+      const skin = window.xpCore.obterSkinAtiva();
+      avatarSelecionado = skin || "padrao";
+
+      await checarConquistasAutomaticas();
+      return;
+    }
+
+    // Fallback: comportamento antigo
     const refXP = ref(db, "usuarios_xp/" + mat);
     const snap = await get(refXP);
     const dados = snap.val() || {};
@@ -1172,13 +1249,20 @@ if (formRecado) {
       likes: [],
       comentarios: {},
     })
-      .then(() => {
+      .then(async () => {
         exibirToast("Recado publicado! +10 XP", "sucesso");
         adicionarXP(XP_RECOMPENSAS.recado_postado, "recado_postado");
-        // 🆕 Conta recados totais
-        const totalRecadosUser = parseInt(localStorage.getItem("xp_recados_total") || "0", 10) + 1;
-        localStorage.setItem("xp_recados_total", String(totalRecadosUser));
-        if (totalRecadosUser >= 10) desbloquearConquista("comunicador");
+
+        // Conta recados totais
+        if (window.xpCore?.estaPronto?.()) {
+          const total = await window.xpCore.incrementarContador("recados", 1);
+          if (total >= 10) desbloquearConquista("comunicador");
+        } else {
+          // Fallback: localStorage
+          const totalRecadosUser = parseInt(localStorage.getItem("xp_recados_total") || "0", 10) + 1;
+          localStorage.setItem("xp_recados_total", String(totalRecadosUser));
+          if (totalRecadosUser >= 10) desbloquearConquista("comunicador");
+        }
         if (msgInput) msgInput.value = "";
         if (linkInput) linkInput.value = "";
         const contador = document.getElementById("contador-caracteres");
@@ -1552,10 +1636,17 @@ window.curtirRecado = function (id) {
       if (i === -1) {
         likes.push(window.usuarioLogado.matricula);
         adicionarXP(XP_RECOMPENSAS.curtida, "curtida");
-        // 🆕 Conta curtidas dadas
-        const totalCurtidas = parseInt(localStorage.getItem("xp_curtidas_total") || "0", 10) + 1;
-        localStorage.setItem("xp_curtidas_total", String(totalCurtidas));
-        if (totalCurtidas >= 20) desbloquearConquista("social");
+
+        // Conta curtidas dadas
+        if (window.xpCore?.estaPronto?.()) {
+          window.xpCore.incrementarContador("curtidas", 1).then((total) => {
+            if (total >= 20) desbloquearConquista("social");
+          });
+        } else {
+          const totalCurtidas = parseInt(localStorage.getItem("xp_curtidas_total") || "0", 10) + 1;
+          localStorage.setItem("xp_curtidas_total", String(totalCurtidas));
+          if (totalCurtidas >= 20) desbloquearConquista("social");
+        }
       } else {
         likes.splice(i, 1);
       }
@@ -2402,10 +2493,17 @@ function bindSimuladores(corpo) {
       if (val !== "" && podeGanharXPSimulador()) {
         registrarXPSimulador();
         adicionarXP(XP_RECOMPENSAS.simulador, "simulador");
-        // 🆕 Conta total de usos do simulador
-        const totalSim = parseInt(localStorage.getItem("xp_simulador_total") || "0", 10) + 1;
-        localStorage.setItem("xp_simulador_total", String(totalSim));
-        if (totalSim >= 10) desbloquearConquista("cientista");
+
+        // Conta total de usos do simulador
+        if (window.xpCore?.estaPronto?.()) {
+          window.xpCore.incrementarContador("simulador", 1).then((total) => {
+            if (total >= 10) desbloquearConquista("cientista");
+          });
+        } else {
+          const totalSim = parseInt(localStorage.getItem("xp_simulador_total") || "0", 10) + 1;
+          localStorage.setItem("xp_simulador_total", String(totalSim));
+          if (totalSim >= 10) desbloquearConquista("cientista");
+        }
       }
     });
   });
@@ -2563,16 +2661,26 @@ function carregarBoletim(ano, periodo) {
       if (!jaGanhouXPBoletim(label)) {
         marcarXPBoletim(label);
         adicionarXP(XP_RECOMPENSAS.ver_boletim, "ver_boletim");
-        // 🆕 Conta períodos únicos consultados
-        let periodosVistos = [];
-        try {
-          periodosVistos = JSON.parse(localStorage.getItem("xp_periodos_vistos") || "[]");
-        } catch (e) { periodosVistos = []; }
-        if (!periodosVistos.includes(label)) {
-          periodosVistos.push(label);
-          localStorage.setItem("xp_periodos_vistos", JSON.stringify(periodosVistos));
-          localStorage.setItem("xp_periodos_total", String(periodosVistos.length));
-          if (periodosVistos.length >= 3) desbloquearConquista("explorador");
+
+        // Conta períodos únicos consultados
+        if (window.xpCore?.estaPronto?.()) {
+          window.xpCore.registrarPeriodoVisto(label).then((novo) => {
+            if (novo) {
+              const total = window.xpCore.obterContador("periodos");
+              if (total >= 3) desbloquearConquista("explorador");
+            }
+          });
+        } else {
+          let periodosVistos = [];
+          try {
+            periodosVistos = JSON.parse(localStorage.getItem("xp_periodos_vistos") || "[]");
+          } catch (e) { periodosVistos = []; }
+          if (!periodosVistos.includes(label)) {
+            periodosVistos.push(label);
+            localStorage.setItem("xp_periodos_vistos", JSON.stringify(periodosVistos));
+            localStorage.setItem("xp_periodos_total", String(periodosVistos.length));
+            if (periodosVistos.length >= 3) desbloquearConquista("explorador");
+          }
         }
       }
     },
@@ -3358,4 +3466,20 @@ document.addEventListener("DOMContentLoaded", function () {
   } else {
     document.querySelectorAll(".is-anonymous").forEach(function (el) { el.classList.remove("is-hidden"); });
   }
+  // 🆕 Quando o xpCore terminar de sincronizar, atualiza a UI
+  window.addEventListener("xpCore:pronto", (e) => {
+    if (!e.detail || e.detail.anonimo) return;
+    console.log("[login] xpCore pronto, sincronizando UI...");
+    if (window.usuarioLogado?.matricula) {
+      // Atualiza painel com dados do Firebase
+      meuXP = window.xpCore.obterXP();
+      minhaStreak = window.xpCore.obterStreak();
+      meusCliquesMascote = window.xpCore.obterCliquesMascote();
+      minhasConquistas = window.xpCore.obterConquistas();
+
+      if (typeof renderizarPainelXP === "function") renderizarPainelXP();
+      if (typeof renderizarConquistas === "function") renderizarConquistas();
+      if (typeof checarConquistasAutomaticas === "function") checarConquistasAutomaticas();
+    }
+  }, { once: true });
 });
