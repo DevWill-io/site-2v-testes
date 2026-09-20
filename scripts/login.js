@@ -69,10 +69,12 @@ function addStopSeguro(gradient, posicao, cor, fallback) {
 // 🎭 AVATARES DO MASCOTE
 // ==========================================
 const AVATARES_MASCOTE = [
-  { id: "padrao", emoji: "🐾", nome: "Padrão" },
-  { id: "genio", emoji: "🧠", nome: "Gênio" },
-  { id: "pirata", emoji: "🏴‍☠️", nome: "Pirata" },
-  { id: "alien", emoji: "👽", nome: "Alien" },
+  { id: "padrao", emoji: "🐾", nome: "Padrão", gratis: true },
+  { id: "alien", emoji: "👽", nome: "Alien", gratis: true },
+  { id: "pirata", emoji: "🏴‍☠️", nome: "Pirata", gratis: true },
+  { id: "genio", emoji: "🧠", nome: "Gênio", gratis: true },
+  { id: "simpson", emoji: "🍩", nome: "Simpson", gratis: false, cliquesNecessarios: 1500 },
+  { id: "mafioso", emoji: "🕴️", nome: "Mafioso", gratis: false, cliquesNecessarios: 3000 },
 ];
 
 let avatarSelecionado = "padrao";
