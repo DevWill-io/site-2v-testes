@@ -128,6 +128,17 @@ const TRADUCOES = {
     mascote_progresso: "Progresso para 1 MILHÃO",
     mascote_btn: "Dar carinho",
 
+    /* ===== SKINS DO MASCOTE ===== */
+    proxima_skin: "Próxima skin:",
+    skin_padrao: "Padrão",
+    skin_alien: "Alien",
+    skin_pirata: "Pirata",
+    skin_genio: "Gênio",
+    skin_simpson: "Mascote Simpson",
+    skin_mafioso: "Mascote Mafioso",
+    skin_bloqueada: "Bloqueada",
+    skin_todas_desbloqueadas: "🎉 Todas as skins desbloqueadas!",
+
     /* ===== RANKING ===== */
     ranking_titulo: "Top Carinhos",
     ranking_carregando: "Carregando ranking...",
@@ -151,6 +162,24 @@ const TRADUCOES = {
     editar_perfil: "Editar Perfil",
     editar_perfil_sub: "Personalize como você aparece para a turma.",
     encerrar_sessao: "Encerrar Sessão",
+
+    /* ===== XP ===== */
+    dias: "dias",
+    xp_nivel_nome_1: "Novato",
+    xp_nivel_nome_2: "Curioso",
+    xp_nivel_nome_3: "Explorador",
+    xp_nivel_nome_4: "Aprendiz",
+    xp_nivel_nome_5: "Dedicado",
+    xp_nivel_nome_6: "Veterano",
+    xp_nivel_nome_7: "Mestre",
+    xp_nivel_nome_8: "Lenda",
+    xp_proximo_nivel: "Próximo nível",
+
+    /* ===== CONQUISTAS ===== */
+    conquistas_titulo: "Conquistas",
+    todas: "Todas",
+    desbloqueadas: "Desbloqueadas",
+    bloqueadas: "Bloqueadas",
 
     /* ===== CALCULADORA ===== */
     calc_titulo_1: "Calculadora de",
@@ -406,6 +435,16 @@ const TRADUCOES = {
     mascote_progresso: "Progress to 1 MILLION",
     mascote_btn: "Give a hug",
 
+    proxima_skin: "Next skin:",
+    skin_padrao: "Default",
+    skin_alien: "Alien",
+    skin_pirata: "Pirate",
+    skin_genio: "Genie",
+    skin_simpson: "Simpson Mascot",
+    skin_mafioso: "Mafioso Mascot",
+    skin_bloqueada: "Locked",
+    skin_todas_desbloqueadas: "🎉 All skins unlocked!",
+
     ranking_titulo: "Top Hugs",
     ranking_carregando: "Loading ranking...",
     ranking_vazio: "No hugs yet. Be the first!",
@@ -426,6 +465,22 @@ const TRADUCOES = {
     editar_perfil: "Edit Profile",
     editar_perfil_sub: "Customize how you appear to the class.",
     encerrar_sessao: "Log Out",
+
+    dias: "days",
+    xp_nivel_nome_1: "Novice",
+    xp_nivel_nome_2: "Curious",
+    xp_nivel_nome_3: "Explorer",
+    xp_nivel_nome_4: "Apprentice",
+    xp_nivel_nome_5: "Dedicated",
+    xp_nivel_nome_6: "Veteran",
+    xp_nivel_nome_7: "Master",
+    xp_nivel_nome_8: "Legend",
+    xp_proximo_nivel: "Next level",
+
+    conquistas_titulo: "Achievements",
+    todas: "All",
+    desbloqueadas: "Unlocked",
+    bloqueadas: "Locked",
 
     calc_titulo_1: "Grade",
     calc_titulo_2: "Calculator",
@@ -672,6 +727,16 @@ const TRADUCOES = {
     mascote_progresso: "Progreso hacia 1 MILLÓN",
     mascote_btn: "Dar cariño",
 
+    proxima_skin: "Próxima skin:",
+    skin_padrao: "Predeterminada",
+    skin_alien: "Alien",
+    skin_pirata: "Pirata",
+    skin_genio: "Genio",
+    skin_simpson: "Mascota Simpson",
+    skin_mafioso: "Mascota Mafioso",
+    skin_bloqueada: "Bloqueada",
+    skin_todas_desbloqueadas: "🎉 ¡Todas las skins desbloqueadas!",
+
     ranking_titulo: "Top Cariños",
     ranking_carregando: "Cargando ranking...",
     ranking_vazio: "Nadie dio cariño aún. ¡Sé el primero!",
@@ -692,6 +757,22 @@ const TRADUCOES = {
     editar_perfil: "Editar Perfil",
     editar_perfil_sub: "Personaliza cómo apareces ante la clase.",
     encerrar_sessao: "Cerrar Sesión",
+
+    dias: "días",
+    xp_nivel_nome_1: "Novato",
+    xp_nivel_nome_2: "Curioso",
+    xp_nivel_nome_3: "Explorador",
+    xp_nivel_nome_4: "Aprendiz",
+    xp_nivel_nome_5: "Dedicado",
+    xp_nivel_nome_6: "Veterano",
+    xp_nivel_nome_7: "Maestro",
+    xp_nivel_nome_8: "Leyenda",
+    xp_proximo_nivel: "Próximo nivel",
+
+    conquistas_titulo: "Logros",
+    todas: "Todos",
+    desbloqueadas: "Desbloqueados",
+    bloqueadas: "Bloqueados",
 
     calc_titulo_1: "Calculadora de",
     calc_titulo_2: "Notas",
@@ -887,6 +968,7 @@ function trocarIdioma(novoIdioma) {
   aplicarTraducoes();
   if (typeof exibirFraseAleatoria === "function") exibirFraseAleatoria();
   if (typeof carregarProjetosGitHub === "function") carregarProjetosGitHub();
+  window.dispatchEvent(new CustomEvent("idioma:mudou", { detail: { idioma: novoIdioma } }));
 }
 
 // ==========================================
@@ -928,12 +1010,168 @@ function aplicarTema(novoTema) {
 }
 
 // ==========================================
+// 🎮 SISTEMA GLOBAL DE XP (localStorage)
+// ==========================================
+// Chaves usadas:
+//   xp_total          → XP acumulado total
+//   xp_cliques_mascote → total de cliques no mascote (p/ desbloquear skins)
+//   xp_streak          → dias consecutivos de acesso
+//   xp_ultimo_acesso   → data (YYYY-MM-DD) do último acesso
+//   skin_ativa         → id da skin atualmente equipada
+
+const XP_STORAGE = {
+  TOTAL: "xp_total",
+  CLIQUES: "xp_cliques_mascote",
+  STREAK: "xp_streak",
+  ULTIMO: "xp_ultimo_acesso",
+  SKIN_ATIVA: "skin_ativa",
+};
+
+window.obterXPTotal = function () {
+  return parseInt(localStorage.getItem(XP_STORAGE.TOTAL) || "0", 10);
+};
+
+window.adicionarXP = function (quantidade, motivo) {
+  quantidade = Number(quantidade) || 0;
+  if (quantidade <= 0) return window.obterXPTotal();
+  const novo = window.obterXPTotal() + quantidade;
+  localStorage.setItem(XP_STORAGE.TOTAL, String(novo));
+  window.dispatchEvent(new CustomEvent("xp:update", {
+    detail: { total: novo, quantidade, motivo: motivo || "geral" }
+  }));
+  return novo;
+};
+
+window.obterCliquesMascote = function () {
+  return parseInt(localStorage.getItem(XP_STORAGE.CLIQUES) || "0", 10);
+};
+
+window.adicionarCliqueMascote = function (qtd) {
+  qtd = Number(qtd) || 1;
+  const novo = window.obterCliquesMascote() + qtd;
+  localStorage.setItem(XP_STORAGE.CLIQUES, String(novo));
+  window.dispatchEvent(new CustomEvent("mascote:cliques", {
+    detail: { total: novo, adicionado: qtd }
+  }));
+  return novo;
+};
+
+window.obterStreak = function () {
+  return parseInt(localStorage.getItem(XP_STORAGE.STREAK) || "0", 10);
+};
+
+window.registrarAcessoDiario = function () {
+  const hoje = new Date().toISOString().slice(0, 10);
+  const ultimo = localStorage.getItem(XP_STORAGE.ULTIMO);
+  let streak = window.obterStreak();
+
+  if (ultimo === hoje) return { streak, novo: false, bonusXP: 0 };
+
+  if (ultimo) {
+    const ontem = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    streak = (ultimo === ontem) ? streak + 1 : 1;
+  } else {
+    streak = 1;
+  }
+
+  localStorage.setItem(XP_STORAGE.STREAK, String(streak));
+  localStorage.setItem(XP_STORAGE.ULTIMO, hoje);
+
+  const bonusXP = streak >= 30 ? 100 : streak >= 7 ? 50 : streak >= 3 ? 20 : 10;
+  window.adicionarXP(bonusXP, "login_diario");
+
+  window.dispatchEvent(new CustomEvent("xp:streak", {
+    detail: { streak, bonusXP, novo: true }
+  }));
+
+  return { streak, novo: true, bonusXP };
+};
+
+// Sistema de níveis (XP → nível)
+window.NIVEIS_XP = [
+  { nivel: 1, nome: "Novato",     xpNecessario: 0 },
+  { nivel: 2, nome: "Curioso",    xpNecessario: 100 },
+  { nivel: 3, nome: "Explorador", xpNecessario: 300 },
+  { nivel: 4, nome: "Aprendiz",   xpNecessario: 700 },
+  { nivel: 5, nome: "Dedicado",   xpNecessario: 1500 },
+  { nivel: 6, nome: "Veterano",   xpNecessario: 3000 },
+  { nivel: 7, nome: "Mestre",     xpNecessario: 6000 },
+  { nivel: 8, nome: "Lenda",      xpNecessario: 12000 },
+];
+
+window.calcularNivel = function (xpTotal) {
+  xpTotal = Number(xpTotal) || 0;
+  const niveis = window.NIVEIS_XP;
+  let atual = niveis[0];
+  let proximo = null;
+  for (let i = 0; i < niveis.length; i++) {
+    if (xpTotal >= niveis[i].xpNecessario) {
+      atual = niveis[i];
+      proximo = niveis[i + 1] || null;
+    } else {
+      break;
+    }
+  }
+  const xpNoNivel = xpTotal - atual.xpNecessario;
+  const xpParaProximo = proximo ? (proximo.xpNecessario - atual.xpNecessario) : 0;
+  const progresso = proximo ? Math.min(100, (xpNoNivel / xpParaProximo) * 100) : 100;
+  return { atual, proximo, xpNoNivel, xpParaProximo, progresso };
+};
+
+// ==========================================
+// 🎭 SKINS DO MASCOTE
+// ==========================================
+window.SKINS = [
+  { id: "padrao",  nome: "skin_padrao",  arquivo: "img/MascotePadrao.png",  cliquesNecessarios: 0,     emoji: "🐾", gratis: true },
+  { id: "alien",   nome: "skin_alien",   arquivo: "img/MascoteAlien.png",   cliquesNecessarios: 0,     emoji: "👽", gratis: true },
+  { id: "pirata",  nome: "skin_pirata",  arquivo: "img/MascotePirata.png",  cliquesNecessarios: 0,     emoji: "🏴‍☠️", gratis: true },
+  { id: "genio",   nome: "skin_genio",   arquivo: "img/MascoteGenio.png",   cliquesNecessarios: 0,     emoji: "🧞", gratis: true },
+  { id: "simpson", nome: "skin_simpson", arquivo: "img/MascoteSimpson.png", cliquesNecessarios: 1500,  emoji: "🍩", gratis: false },
+  { id: "mafioso", nome: "skin_mafioso", arquivo: "img/MascoteMafioso.png", cliquesNecessarios: 3000,  emoji: "🕴️", gratis: false },
+];
+
+window.obterSkinAtiva = function () {
+  return localStorage.getItem(XP_STORAGE.SKIN_ATIVA) || "padrao";
+};
+
+window.definirSkinAtiva = function (skinId) {
+  const skin = window.SKINS.find(s => s.id === skinId);
+  if (!skin) return false;
+  // Verifica se está desbloqueada
+  if (!skin.gratis) {
+    const cliques = window.obterCliquesMascote();
+    if (cliques < skin.cliquesNecessarios) return false;
+  }
+  localStorage.setItem(XP_STORAGE.SKIN_ATIVA, skinId);
+  window.dispatchEvent(new CustomEvent("skin:mudou", { detail: { skinId } }));
+  return true;
+};
+
+window.skinEstaDesbloqueada = function (skinId) {
+  const skin = window.SKINS.find(s => s.id === skinId);
+  if (!skin) return false;
+  if (skin.gratis) return true;
+  return window.obterCliquesMascote() >= skin.cliquesNecessarios;
+};
+
+window.obterProximaSkin = function () {
+  const cliques = window.obterCliquesMascote();
+  const bloqueadas = window.SKINS
+    .filter(s => !s.gratis && cliques < s.cliquesNecessarios)
+    .sort((a, b) => a.cliquesNecessarios - b.cliquesNecessarios);
+  return bloqueadas[0] || null;
+};
+
+// ==========================================
 // INICIALIZAÇÃO
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
   // Aplica tema e idioma salvos
   aplicarTema(obterTemaAtual());
   aplicarTraducoes();
+
+  // Registra acesso diário (streak)
+  window.registrarAcessoDiario();
 
   // 1. Efeito de Digitação
   const textElement = document.getElementById("typing-text");
@@ -1296,35 +1534,34 @@ document.addEventListener("DOMContentLoaded", () => {
   carregarProjetosGitHub();
   window.carregarProjetosGitHub = carregarProjetosGitHub;
 
-
   // 14.5 📱 INSTALAR APP (PWA)
-    let __deferredPrompt = null;
+  let __deferredPrompt = null;
 
-    window.addEventListener("beforeinstallprompt", function (e) {
+  window.addEventListener("beforeinstallprompt", function (e) {
     e.preventDefault();
     __deferredPrompt = e;
     const btn = document.getElementById("btn-instalar-app");
     if (btn) btn.classList.remove("is-hidden");
-    });
+  });
 
-    window.addEventListener("appinstalled", function () {
+  window.addEventListener("appinstalled", function () {
     __deferredPrompt = null;
     const btn = document.getElementById("btn-instalar-app");
     if (btn) btn.classList.add("is-hidden");
-    });
+  });
 
-    function instalarPWA() {
+  function instalarPWA() {
     if (!__deferredPrompt) {
-        alert("Para instalar, use o menu do navegador > 'Adicionar à tela inicial'.");
-        return;
+      alert("Para instalar, use o menu do navegador > 'Adicionar à tela inicial'.");
+      return;
     }
     __deferredPrompt.prompt();
     __deferredPrompt.userChoice.then(function (choice) {
-        __deferredPrompt = null;
+      __deferredPrompt = null;
     });
-    }
+  }
 
-    document
+  document
     .getElementById("btn-instalar-app")
     ?.addEventListener("click", instalarPWA);
 
