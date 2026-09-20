@@ -48,7 +48,7 @@
     height: auto;
     border-radius: 30px;
     filter: drop-shadow(0 20px 30px rgba(0,0,0,0.3));
-    transition: all 0.3s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
     cursor: pointer;
     animation: flutuarMascote 3s ease-in-out infinite;
 }
@@ -385,7 +385,9 @@
     }
 }
 
-/* 🆕 RANKING DO MASCOTE */
+/* ==========================================
+   🆕 RANKING DO MASCOTE
+   ========================================== */
 .mascote-ranking {
     margin-top: 40px;
     background: hsl(var(--tema-h, 265), var(--tema-s, 60%), var(--tema-l, 62%) / 0.08);
@@ -602,6 +604,57 @@ body.light-theme .marco {
     background: rgba(0, 0, 0, 0.06);
 }
 
+/* ==========================================
+   🎭 SKIN BLOQUEADA (seletor no login)
+   ========================================== */
+.avatar-mascote-opcao.bloqueado {
+    opacity: 0.4;
+    cursor: not-allowed;
+    position: relative;
+    filter: grayscale(0.8);
+}
+
+.avatar-mascote-opcao.bloqueado:hover {
+    transform: none;
+    border-color: transparent;
+    box-shadow: none;
+}
+
+.avatar-mascote-opcao .avatar-lock {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 0.9rem;
+    background: var(--bg-base);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    z-index: 2;
+}
+
+.avatar-mascote-opcao .avatar-faltam {
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.62rem;
+    background: var(--danger);
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    white-space: nowrap;
+    z-index: 2;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* ==========================================
+   RESPONSIVO
+   ========================================== */
 @media (max-width: 768px) {
     .mascote-wrapper {
         flex-direction: column;
