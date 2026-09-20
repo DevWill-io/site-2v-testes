@@ -66,6 +66,10 @@ const AVATARES_MASCOTE = [
   { id: "mafioso", emoji: "🕴️", nome: "Mafioso", gratis: false, cliquesNecessarios: 3000 },
 ];
 
+function obterMascotePorId(id) {
+  return AVATARES_MASCOTE.find((m) => m.id === id) || AVATARES_MASCOTE[0];
+}
+
 // ==========================================
 // 🏆 NÍVEIS
 // ==========================================
@@ -1181,6 +1185,18 @@ window.abrirModalPerfil = function (identificador) {
   if (imgEl) imgEl.src = fotoExibir;
   if (nomeEl) nomeEl.textContent = nomeExibir;
   if (matEl) matEl.textContent = perfil.matricula || perfil.id || "Não informada";
+  
+    // 🐾 Mascote ativo
+  const mascoteBox = document.getElementById("modal-perfil-mascote");
+  const mascoteEmoji = document.getElementById("modal-perfil-mascote-emoji");
+  const mascoteNome = document.getElementById("modal-perfil-mascote-nome");
+  if (mascoteBox && mascoteEmoji && mascoteNome) {
+    const mascoteId = perfil.mascoteAvatar || "padrao";
+    const mascote = obterMascotePorId(mascoteId);
+    mascoteEmoji.textContent = mascote.emoji;
+    mascoteNome.textContent = mascote.nome;
+    mascoteBox.classList.remove("is-hidden");
+  }
 
   // Nível + XP
   (async function carregarNivelDoPerfil() {
@@ -1354,8 +1370,13 @@ window.renderizarPerfis = function () {
     card.style.cursor = "pointer";
     const nomeExibir = perfil.nomeCompleto || perfil.nome || "Usuário sem nome";
     const fotoFinal = perfil.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random`;
-    card.innerHTML = `<div class="perfil-avatar"><img src="${escaparHTML(fotoFinal)}" alt="${escaparHTML(nomeExibir)}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random'" /></div><div class="perfil-info"><h4 class="perfil-nome">${escaparHTML(nomeExibir)}</h4><span class="perfil-matricula">${escaparHTML(matriculaParaExibicao(perfil.matricula || perfil.id))}</span></div>`;
-    container.appendChild(card);
+    const mascoteId = perfil.mascoteAvatar || "padrao";
+    const mascote = obterMascotePorId(mascoteId);
+    card.innerHTML = `
+      <div class="perfil-card-mascote" title="Mascote: ${escaparHTML(mascote.nome)}">${mascote.emoji}</div>
+      <div class="perfil-avatar"><img src="${escaparHTML(fotoFinal)}" alt="${escaparHTML(nomeExibir)}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random'" /></div>
+      <div class="perfil-info"><h4 class="perfil-nome">${escaparHTML(nomeExibir)}</h4><span class="perfil-matricula">${escaparHTML(matriculaParaExibicao(perfil.matricula || perfil.id))}</span></div>
+    `;
   });
 };
 

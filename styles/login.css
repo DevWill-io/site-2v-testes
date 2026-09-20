@@ -3274,3 +3274,95 @@ body.light-theme .conquistas-visiveis-grid {
         scroll-behavior: auto !important;
     }
 }
+
+/* ===================================================================
+   🐾 MASCOTE ATIVO NOS PERFIS
+   =================================================================== */
+
+/* Badge pequeno no card de membro */
+.perfil-card {
+    position: relative;
+}
+
+.perfil-card-mascote {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--bg-surface);
+    border: 2px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    line-height: 1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease;
+    z-index: 2;
+}
+
+.perfil-card:hover .perfil-card-mascote {
+    transform: scale(1.15) rotate(-8deg);
+}
+
+/* Seção do mascote no modal de perfil */
+.modal-perfil-mascote {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px auto 4px;
+    padding: 8px 16px 8px 10px;
+    background: linear-gradient(135deg,
+        hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.18),
+        hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.06));
+    border: 1px solid hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.35);
+    border-radius: 999px;
+    box-shadow: 0 2px 10px hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.15);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.modal-perfil-mascote:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.25);
+}
+
+.modal-perfil-mascote-emoji {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    line-height: 1;
+    box-shadow: 0 2px 6px hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.45);
+    flex-shrink: 0;
+}
+
+.modal-perfil-mascote-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    text-align: left;
+    min-width: 0;
+}
+
+.modal-perfil-mascote-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+}
+
+.modal-perfil-mascote-nome {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--text-main);
+    line-height: 1.1;
+}
