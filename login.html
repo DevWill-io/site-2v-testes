@@ -34,7 +34,7 @@
     <link rel="stylesheet" href="styles/login.css" />
   </head>
   <body>
-        <header class="login-header">
+    <header class="login-header">
       <a href="../index.html" class="login-logo">
         <i class="fa-solid fa-code-branch"></i>InfoWeb<span>- 2V</span>
       </a>
@@ -66,7 +66,6 @@
       </div>
     </header>
 
-    <!-- 🆕 MENU LATERAL -->
     <div id="menu-lateral-overlay" class="menu-lateral-overlay"></div>
     <aside id="menu-lateral" class="menu-lateral" aria-hidden="true">
       <div class="menu-lateral-header">
@@ -79,73 +78,58 @@
       </div>
 
       <nav class="menu-lateral-nav">
-        <a href="index.html#inicio" class="menu-item">
+        <a href="../index.html" class="menu-item">
           <span class="menu-item-icone"><i class="fa-solid fa-house"></i></span>
           <span class="menu-item-texto">
             <span class="menu-item-titulo" data-i18n="nav_inicio">Início</span>
-            <span class="menu-item-desc" data-i18n="nav_inicio_desc">Voltar ao topo</span>
+            <span class="menu-item-desc" data-i18n="nav_inicio_desc_login">Página inicial</span>
           </span>
         </a>
-        <a href="#notas" class="menu-item">
-          <span class="menu-item-icone">
-            <i class="fa-solid fa-chart-line"></i>
-          </span>
+        <a href="login.html" class="menu-item">
+          <span class="menu-item-icone"><i class="fa-solid fa-chart-line"></i></span>
           <span class="menu-item-texto">
             <span class="menu-item-titulo" data-i18n="nav_notas">Notas</span>
             <span class="menu-item-desc" data-i18n="nav_notas_desc">Sua calculadora</span>
           </span>
         </a>
         <a href="#horarios" class="menu-item">
-          <span class="menu-item-icone">
-            <i class="fa-solid fa-calendar-days"></i>
-          </span>
+          <span class="menu-item-icone"><i class="fa-solid fa-calendar-days"></i></span>
           <span class="menu-item-texto">
             <span class="menu-item-titulo" data-i18n="nav_horarios">Horários</span>
             <span class="menu-item-desc" data-i18n="nav_horarios_desc">Rotina semanal</span>
           </span>
         </a>
         <a href="#mural" class="menu-item">
-          <span class="menu-item-icone">
-            <i class="fa-solid fa-comments"></i>
-          </span>
+          <span class="menu-item-icone"><i class="fa-solid fa-comments"></i></span>
           <span class="menu-item-texto">
             <span class="menu-item-titulo" data-i18n="nav_mural">Mural</span>
             <span class="menu-item-desc" data-i18n="nav_mural_desc">Recados da turma</span>
           </span>
         </a>
         <a href="#perfis" class="menu-item">
-          <span class="menu-item-icone">
-            <i class="fa-solid fa-users"></i>
-          </span>
+          <span class="menu-item-icone"><i class="fa-solid fa-users"></i></span>
           <span class="menu-item-texto">
             <span class="menu-item-titulo" data-i18n="nav_membros">Membros</span>
             <span class="menu-item-desc" data-i18n="nav_membros_desc">Colegas do sistema</span>
           </span>
         </a>
         <a href="#agenda" class="menu-item">
-          <span class="menu-item-icone">
-            <i class="fa-solid fa-calendar-check"></i>
-          </span>
+          <span class="menu-item-icone"><i class="fa-solid fa-calendar-check"></i></span>
           <span class="menu-item-texto">
             <span class="menu-item-titulo" data-i18n="nav_agenda">Agenda</span>
             <span class="menu-item-desc" data-i18n="nav_agenda_desc">Eventos do calendário</span>
           </span>
         </a>
         <a href="../index.html#mascote" class="menu-item">
-          <span class="menu-item-icone">
-            <i class="fa-solid fa-paw"></i>
-          </span>
+          <span class="menu-item-icone"><i class="fa-solid fa-paw"></i></span>
           <span class="menu-item-texto">
             <span class="menu-item-titulo" data-i18n="nav_mascote">Mascote</span>
             <span class="menu-item-desc" data-i18n="nav_mascote_desc">Interaja com ele</span>
           </span>
         </a>
 
-        <!-- 🎭 Sala dos Professores — só admin -->
         <a href="#sala-professores" class="menu-item is-admin-item is-hidden" id="menu-item-sala">
-          <span class="menu-item-icone">
-            <i class="fa-solid fa-user-tie"></i>
-          </span>
+          <span class="menu-item-icone"><i class="fa-solid fa-user-tie"></i></span>
           <span class="menu-item-texto">
             <span class="menu-item-titulo" data-i18n="nav_sala">Sala dos Professores</span>
             <span class="menu-item-desc" data-i18n="nav_sala_desc">Acesso restrito</span>
@@ -167,16 +151,13 @@
 
         <div class="menu-submenu" id="submenu-idioma">
           <button type="button" class="menu-submenu-item" data-idioma="pt-BR">
-            <span class="submenu-flag">🇧🇷</span>
-            <span>Português</span>
+            <span class="submenu-flag">🇧🇷</span><span>Português</span>
           </button>
           <button type="button" class="menu-submenu-item" data-idioma="en">
-            <span class="submenu-flag">🇺🇸</span>
-            <span>English</span>
+            <span class="submenu-flag">🇺🇸</span><span>English</span>
           </button>
           <button type="button" class="menu-submenu-item" data-idioma="es">
-            <span class="submenu-flag">🇪🇸</span>
-            <span>Español</span>
+            <span class="submenu-flag">🇪🇸</span><span>Español</span>
           </button>
         </div>
 
@@ -296,13 +277,46 @@
       </div>
     </main>
 
+    <!-- 🆕 PAINEL DE XP E CONQUISTAS -->
+    <section id="xp-painel" class="xp-painel is-authenticated is-hidden">
+      <div class="container">
+        <div class="xp-card">
+          <div class="xp-header">
+            <div class="xp-nivel-badge" id="xp-nivel-badge">
+              <span class="xp-nivel-num" id="xp-nivel-num">1</span>
+            </div>
+            <div class="xp-info">
+              <span class="xp-nome-nivel" id="xp-nome-nivel">Novato</span>
+              <span class="xp-total" id="xp-total">0 XP</span>
+            </div>
+            <div class="xp-streak" id="xp-streak-box">
+              <i class="fa-solid fa-fire"></i>
+              <span id="xp-streak">0</span>
+              <small data-i18n="dias">dias</small>
+            </div>
+          </div>
+          <div class="xp-barra">
+            <div class="xp-barra-fill" id="xp-barra-fill"></div>
+          </div>
+          <span class="xp-proximo" id="xp-proximo">Próximo nível: Curioso (100 XP)</span>
+        </div>
+
+        <div class="conquistas-box">
+          <h3>
+            <i class="fa-solid fa-medal"></i>
+            <span data-i18n="conquistas_titulo">Conquistas</span>
+          </h3>
+          <div class="conquistas-grid" id="conquistas-grid"></div>
+        </div>
+      </div>
+    </section>
+
     <section id="proximos-eventos" class="proximos-eventos is-authenticated is-hidden">
       <div class="container">
         <div id="proximos-eventos-lista" class="proximos-eventos-lista"></div>
       </div>
     </section>
 
-    <!-- 🆕 CONTAGEM REGRESSIVA -->
     <section id="contagem-regressiva" class="contagem-regressiva is-authenticated is-hidden">
       <div class="container">
         <div class="section-title">
@@ -326,7 +340,7 @@
       <div class="container">
         <div class="section-title">
           <h2>
-            <span data-i18n="calc_titulo_1" id="notas">Calculadora de</span>
+            <span data-i18n="calc_titulo_1">Calculadora de</span>
             <span class="highlight" data-i18n="calc_titulo_2">Notas</span>
           </h2>
           <p data-i18n="calc_sub">Boletim atualizado diretamente pelo SUAP</p>
@@ -694,7 +708,6 @@
       </div>
     </section>
 
-    <!-- 🆕 SALA DOS PROFESSORES (só admin) -->
     <section id="sala-professores" class="sala-professores is-authenticated is-hidden is-admin-hidden">
       <div class="container">
         <div class="section-title">
@@ -887,7 +900,6 @@
             </div>
           </div>
 
-          <!-- 🆕 AVATAR DO MASCOTE -->
           <div class="avatar-mascote-area">
             <p class="field-section-title">
               <i class="fa-solid fa-paw"></i>
