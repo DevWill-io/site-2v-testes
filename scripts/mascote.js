@@ -35,14 +35,13 @@ const MATRICULA_STORAGE_KEY = "mascote_matricula_temp";
 // ==========================================
 // 🎭 AVATARES DO MASCOTE
 // ==========================================
-// ==========================================
-// 🎭 AVATARES DO MASCOTE
-// ==========================================
 const AVATARES = {
   padrao: "🐾",
   genio: "🧠",
   pirata: "🏴‍☠️",
   alien: "👽",
+  simpson: "🍩",
+  mafioso: "🕴️",
 };
 
 // 🖼️ Imagens reais de cada avatar
@@ -51,9 +50,12 @@ const IMAGENS_MASCOTE = {
   genio: "img/MascoteGenio.png",
   pirata: "img/MascotePirata.png",
   alien: "img/MascoteAlien.png",
+  simpson: "img/MascoteSimpson.png",
+  mafioso: "img/MascoteMafioso.png",
 };
 
 const IMAGEM_MASCOTE_PADRAO = "img/MascotePadrao.png";
+
 // ==========================================
 // ESTADO
 // ==========================================
@@ -62,9 +64,13 @@ let meusCarinhos = 0;
 let podeClicar = true;
 let somLigado = localStorage.getItem("mascote_som") !== "off";
 let marcosAnteriores = new Set();
-let avatarAtual = localStorage.getItem("mascote_avatar") || "padrao";
-// Aplica a imagem correta assim que a página abre
-setTimeout(mostrarAvatarFlutuante, 100);
+let avatarAtual = (function () {
+  // 🆕 Prioridade: skin_ativa (novo sistema) → mascote_avatar (legado) → padrao
+  const skinAtiva = localStorage.getItem("skin_ativa");
+  const avatarLegado = localStorage.getItem("mascote_avatar");
+  const escolhido = skinAtiva || avatarLegado || "padrao";
+  return IMAGENS_MASCOTE[escolhido] ? escolhido : "padrao";
+})();
 let perfisCache = {};
 let rankingDataCache = {};
 
@@ -110,6 +116,12 @@ const rankingMinhaPosicao = document.getElementById("ranking-minha-posicao");
 const rankingMeusCarinhos = document.getElementById("ranking-meus-carinhos");
 const btnToggleRanking = document.getElementById("btn-toggle-ranking");
 const mascoteRankingEl = document.getElementById("mascote-ranking");
+
+// 🆕 Elementos da barra de progresso da SKIN
+const skinProgressoBox = document.getElementById("mascote-skin-progresso");
+const proximaSkinNome = document.getElementById("proxima-skin-nome");
+const proximaSkinContagem = document.getElementById("proxima-skin-contagem");
+const skinProgressoFill = document.getElementById("skin-progresso-fill");
 
 // ==========================================
 // 🔊 ÁUDIO (Web Audio API — sem arquivos externos)
@@ -157,6 +169,20 @@ function tocarSom(tipo = "carinho") {
         g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.12 + 0.35);
         o.start(audioCtx.currentTime + i * 0.12);
         o.stop(audioCtx.currentTime + i * 0.12 + 0.35);
+      });
+    } else if (tipo === "desbloqueio") {
+      // 🆕 Som especial pra desbloquear skin
+      [659.25, 880, 1046.5, 1318.5, 1567.98].forEach((freq, i) => {
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = "triangle";
+        o.connect(g);
+        g.connect(audioCtx.destination);
+        o.frequency.value = freq;
+        g.gain.setValueAtTime(0.18, audioCtx.currentTime + i * 0.1);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.1 + 0.4);
+        o.start(audioCtx.currentTime + i * 0.1);
+        o.stop(audioCtx.currentTime + i * 0.1 + 0.4);
       });
     }
   } catch (e) {
@@ -214,18 +240,92 @@ function mostrarAvatarFlutuante() {
       }, 250);
     }
   }
+  // Atualiza data-skin pra CSS/JS saberem qual tá ativa
+  if (mascoteImg) {
+    mascoteImg.setAttribute("data-skin", avatarAtual);
+  }
 }
 mostrarAvatarFlutuante();
 
-// Escuta mudanças no avatar em tempo real
+// ==========================================
+// 🎁 SISTEMA DE SKINS — Barra de progresso
+// ==========================================
+function atualizarProgressoSkin() {
+  if (!skinProgressoBox || !skinProgressoFill) return;
+
+  // Pega cliques totais do localStorage (sistema global do script.js)
+  const cliques = window.obterCliquesMascote
+    ? window.obterCliquesMascote()
+    : parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
+
+  // Lista de skins bloqueadas (com cliquesNecessarios > 0)
+  const SKINS_BLOQUEAVEIS = [
+    { id: "simpson", nomeKey: "skin_simpson", meta: 1500 },
+    { id: "mafioso", nomeKey: "skin_mafioso", meta: 3000 },
+  ];
+
+  // Encontra a próxima skin a desbloquear
+  const proxima = SKINS_BLOQUEAVEIS.find((s) => cliques < s.meta);
+
+  // Função auxiliar pra traduzir
+  const traduzir = window.t
+    ? window.t
+    : (k) => k;
+
+  if (!proxima) {
+    // Todas desbloqueadas 🎉
+    skinProgressoBox.classList.add("completo");
+    if (proximaSkinNome) proximaSkinNome.textContent = traduzir("skin_todas_desbloqueadas") || "🎉 Todas desbloqueadas!";
+    if (proximaSkinContagem) proximaSkinContagem.textContent = "✓";
+    skinProgressoFill.style.width = "100%";
+    return;
+  }
+
+  skinProgressoBox.classList.remove("completo");
+
+  const nome = traduzir(proxima.nomeKey) || proxima.id;
+  if (proximaSkinNome) proximaSkinNome.textContent = nome;
+  if (proximaSkinContagem) {
+    proximaSkinContagem.textContent = `${cliques.toLocaleString("pt-BR")} / ${proxima.meta.toLocaleString("pt-BR")}`;
+  }
+  const percentual = Math.min(100, (cliques / proxima.meta) * 100);
+  skinProgressoFill.style.width = `${percentual}%`;
+}
+
+// Chama na inicialização
+atualizarProgressoSkin();
+
+// 🆕 Escuta mudanças de cliques (evento do script.js)
+window.addEventListener("mascote:cliques", () => {
+  atualizarProgressoSkin();
+});
+
+// 🆕 Escuta mudanças de skin
+window.addEventListener("skin:mudou", (e) => {
+  const skinId = e.detail?.skinId;
+  if (skinId && IMAGENS_MASCOTE[skinId]) {
+    avatarAtual = skinId;
+    try {
+      localStorage.setItem("mascote_avatar", skinId);
+    } catch (err) {}
+    mostrarAvatarFlutuante();
+  }
+});
+
+// Escuta mudanças no avatar em tempo real (Firebase legado)
 onValue(ref(db, "mascote/avatares/" + MINHA_MATRICULA), (snap) => {
   const av = snap.val()?.avatar;
   if (av && AVATARES[av]) {
-    avatarAtual = av;
-    try {
-      localStorage.setItem("mascote_avatar", av);
-    } catch (e) {}
-    mostrarAvatarFlutuante();
+    // Só sobrescreve se NÃO for uma skin nova (pra preservar escolha do novo sistema)
+    const skinAtualLocal = localStorage.getItem("skin_ativa");
+    const isSkinNova = skinAtualLocal === "simpson" || skinAtualLocal === "mafioso";
+    if (!isSkinNova) {
+      avatarAtual = av;
+      try {
+        localStorage.setItem("mascote_avatar", av);
+      } catch (e) {}
+      mostrarAvatarFlutuante();
+    }
   }
 });
 
@@ -531,6 +631,52 @@ async function darCarinho(event) {
   }
   tocarSom("carinho");
 
+  // ==========================================
+  // 🆕 REGISTRA CLIQUE + XP (sistema global)
+  // ==========================================
+  const cliquesAntes = window.obterCliquesMascote
+    ? window.obterCliquesMascote()
+    : parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
+
+  if (window.adicionarCliqueMascote) {
+    window.adicionarCliqueMascote(1);
+  } else {
+    localStorage.setItem("xp_cliques_mascote", String(cliquesAntes + 1));
+  }
+
+  if (window.adicionarXP) {
+    window.adicionarXP(1, "clique_mascote");
+  } else {
+    const xpAtual = parseInt(localStorage.getItem("xp_total") || "0", 10);
+    localStorage.setItem("xp_total", String(xpAtual + 1));
+  }
+
+  // Recalcula a barra da próxima skin
+  atualizarProgressoSkin();
+
+  // 🆕 Detecta desbloqueio de skin nova
+  const cliquesDepois = cliquesAntes + 1;
+  const SKINS_BLOQUEAVEIS = [
+    { id: "simpson", meta: 1500, nomeKey: "skin_simpson" },
+    { id: "mafioso", meta: 3000, nomeKey: "skin_mafioso" },
+  ];
+  const traduzir = window.t ? window.t : (k) => k;
+
+  SKINS_BLOQUEAVEIS.forEach((s) => {
+    if (cliquesAntes < s.meta && cliquesDepois >= s.meta) {
+      // 🎉 Acabou de desbloquear!
+      soltarConfete(80);
+      tocarSom("desbloqueio");
+      const nome = traduzir(s.nomeKey) || s.id;
+      setTimeout(() => {
+        mostrarNotificacao(`🎉 NOVA SKIN DESBLOQUEADA: ${nome}!`, "sucesso");
+      }, 400);
+    }
+  });
+
+  // ==========================================
+  // Corações voando
+  // ==========================================
   let x, y;
   if (event && event.clientX && event.clientY) {
     x = event.clientX;
