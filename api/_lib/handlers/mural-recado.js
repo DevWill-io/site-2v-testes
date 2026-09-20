@@ -1,7 +1,8 @@
+// api/_lib/handlers/mural-recado.js
 import { db } from "../../_lib/firebase.js";
-import { autenticar, ehAdmin } from "../auth.js";
-import { verificarRateLimit } from "../rateLimit.js";
-import { ok, erro, metodoObrigatorio, cors, sanitizar } from "../helpers.js";
+import { autenticar, ehAdmin } from "../../_lib/auth.js";
+import { verificarRateLimit } from "../../_lib/rateLimit.js";
+import { ok, erro, cors, sanitizar } from "../../_lib/helpers.js";
 
 const RATE_MAX = 10;
 const RATE_JANELA = 60_000;
@@ -15,8 +16,12 @@ export default async function handler(req, res) {
   const matricula = await autenticar(req);
   if (!matricula) return erro(res, 401, "Não autenticado");
 
-  if (req.method === "POST") {
-    // --- CRIAR ---
+  const acao = req.body?.acao || (req.method === "POST" ? "criar" : "delete");
+
+  // ============================
+  // CRIAR
+  // ============================
+  if (acao === "criar") {
     const rl = await verificarRateLimit(matricula, "mural", RATE_MAX, RATE_JANELA);
     if (!rl.ok) return erro(res, 429, "Rate limit excedido");
 
@@ -25,13 +30,10 @@ export default async function handler(req, res) {
     const duracaoHoras = Math.max(1, Math.min(360, Number(req.body?.duracaoHoras) || 168));
 
     if (!mensagem) return erro(res, 400, "Mensagem obrigatória");
-
-    // Valida link (se houver)
     if (link && !/^https?:\/\//i.test(link)) {
       return erro(res, 400, "Link deve começar com http:// ou https://");
     }
 
-    // Pega dados do perfil pra denormalizar
     const snapPerfil = await db.ref(`perfis_alunos/${matricula}`).get();
     const perfil = snapPerfil.val() || {};
     const autorNome = perfil.nome || "Aluno";
@@ -53,8 +55,10 @@ export default async function handler(req, res) {
     return ok(res, { id: ref.key });
   }
 
-  if (req.method === "DELETE") {
-    // --- EXCLUIR ---
+  // ============================
+  // EXCLUIR
+  // ============================
+  if (acao === "delete") {
     const id = sanitizar(req.body?.id, 40);
     if (!id) return erro(res, 400, "ID obrigatório");
 
@@ -72,5 +76,5 @@ export default async function handler(req, res) {
     return ok(res, { id });
   }
 
-  return erro(res, 405, "Método não permitido");
+  return erro(res, 400, "Ação inválida");
 }
