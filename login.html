@@ -1050,14 +1050,34 @@
           <label class="field-label" for="evento-local">Local</label>
           <input type="text" id="evento-local" maxlength="200" placeholder="Ex: Sala 12 (opcional)" />
 
-          <div class="evento-datas-grid">
+          <label class="field-checkbox" for="evento-dia-todo">
+            <input type="checkbox" id="evento-dia-todo" />
+            <span class="field-checkbox-marca"></span>
+            <span class="field-checkbox-texto">
+              <i class="fa-solid fa-sun"></i>
+              Evento de dia todo (sem horário)
+            </span>
+          </label>
+
+          <div id="evento-datas-horario" class="evento-datas-grid">
             <div>
               <label class="field-label" for="evento-inicio">Início *</label>
-              <input type="datetime-local" id="evento-inicio" required />
+              <input type="datetime-local" id="evento-inicio" />
             </div>
             <div>
               <label class="field-label" for="evento-fim">Fim *</label>
-              <input type="datetime-local" id="evento-fim" required />
+              <input type="datetime-local" id="evento-fim" />
+            </div>
+          </div>
+
+          <div id="evento-datas-todo" class="evento-datas-grid is-hidden">
+            <div>
+              <label class="field-label" for="evento-inicio-data">Data de início *</label>
+              <input type="date" id="evento-inicio-data" />
+            </div>
+            <div>
+              <label class="field-label" for="evento-fim-data">Data de término *</label>
+              <input type="date" id="evento-fim-data" />
             </div>
           </div>
 
@@ -1080,6 +1100,32 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- MODAL OPÇÕES DO EVENTO -->
+    <div id="modal-opcoes-evento" class="modal-overlay is-hidden">
+      <div class="modal-content modal-opcoes-evento" onclick="event.stopPropagation()">
+        <button type="button" class="modal-close" id="btn-fechar-opcoes" aria-label="Fechar">
+          &times;
+        </button>
+
+        <h2 class="modal-title">
+          <i class="fa-solid fa-calendar-day"></i>
+          <span id="opcoes-evento-titulo">Evento</span>
+        </h2>
+        <p class="modal-subtitle" id="opcoes-evento-data"></p>
+
+        <div class="opcoes-evento-acoes">
+          <button type="button" id="btn-editar-evento" class="btn-opcao-evento editar">
+            <i class="fa-solid fa-pen"></i>
+            <span>Editar</span>
+          </button>
+          <button type="button" id="btn-excluir-evento" class="btn-opcao-evento excluir">
+            <i class="fa-solid fa-trash"></i>
+            <span>Excluir</span>
+          </button>
+        </div>
       </div>
     </div>
 
