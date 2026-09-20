@@ -731,7 +731,7 @@
       </div>
     </section>
 
-    <section id="sala-professores" class="sala-professores is-authenticated is-hidden is-admin-hidden">
+        <section id="sala-professores" class="sala-professores is-authenticated is-hidden is-admin-hidden">
       <div class="container">
         <div class="section-title">
           <h2>
@@ -754,13 +754,10 @@
             <i class="fa-solid fa-heart"></i>
             <span data-i18n="sala_tab_engajamento">Engajamento</span>
           </button>
-          <button type="button" class="sala-tab" data-tab="admins">
-            <i class="fa-solid fa-shield-halved"></i>
-            <span>Admins</span>
-          </button>
         </div>
 
         <div class="sala-painel">
+          <!-- ABA 1: Alunos -->
           <div class="sala-tab-content ativo" id="sala-tab-alunos">
             <input
               type="text"
@@ -793,42 +790,9 @@
                 </tbody>
               </table>
             </div>
-            <div class="sala-tab-content" id="sala-tab-admins">
-              <div class="adm-container">
-                <h3 class="adm-titulo">
-                  <i class="fa-solid fa-shield-halved"></i>
-                  Administradores ativos
-                </h3>
-
-                <div class="adm-adicionar">
-                  <input
-                    type="text"
-                    id="adm-input-matricula"
-                    placeholder="Matrícula do aluno (ex: 20261101110002)"
-                    maxlength="20"
-                    autocomplete="off"
-                  />
-                  <button type="button" id="adm-btn-adicionar" class="btn-adm-add">
-                    <i class="fa-solid fa-plus"></i>
-                    Adicionar
-                  </button>
-                </div>
-
-                <div id="adm-lista" class="adm-lista">
-                  <p class="adm-vazio">Carregando...</p>
-                </div>
-
-                <h3 class="adm-titulo" style="margin-top:30px;">
-                  <i class="fa-solid fa-clipboard-list"></i>
-                  Últimas ações
-                </h3>
-                <div id="adm-logs" class="adm-logs">
-                  <p class="adm-vazio">Carregando...</p>
-                </div>
-              </div>
-            </div>
           </div>
 
+          <!-- ABA 2: Em Risco -->
           <div class="sala-tab-content" id="sala-tab-risco">
             <div id="sala-lista-risco" class="sala-cards">
               <p class="sala-vazio-msg" data-i18n="sala_risco_carregando">
@@ -837,6 +801,7 @@
             </div>
           </div>
 
+          <!-- ABA 3: Engajamento -->
           <div class="sala-tab-content" id="sala-tab-engajamento">
             <div class="sala-stats-grid">
               <div class="sala-stat-card">
