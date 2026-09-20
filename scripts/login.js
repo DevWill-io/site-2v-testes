@@ -176,6 +176,7 @@ const TRADUCOES_LOGIN = {
     nav_mascote: "Mascote", nav_mascote_desc: "Interaja com ele",
     nav_sala: "Sala dos Professores", nav_sala_desc: "Acesso restrito",
     nav_inicio: "Início", nav_inicio_desc: "Página inicial",
+    nav_inicio_desc_login: "Página inicial",
     calc_titulo_1: "Calculadora de", calc_titulo_2: "Notas",
     calc_sub: "Boletim atualizado diretamente pelo SUAP",
     media_geral: "Média Geral", disciplinas: "Disciplinas", em_risco: "Em Risco",
@@ -247,7 +248,7 @@ const TRADUCOES_LOGIN = {
     proxima_skin: "Next skin:", skin_bloqueada: "Locked", skin_admin: "Admin",
     conquistas_visiveis_titulo: "Achievements on profile",
     conquistas_visiveis_desc: "Choose which achievements others will see on your profile. No selection = shows all.",
-    nav_inicio: "Home", nav_inicio_desc: "Homepage", menu: "Menu",
+    nav_inicio: "Home", nav_inicio_desc: "Homepage", nav_inicio_desc_login: "Homepage", menu: "Menu",
     nav_notas: "Grades", nav_notas_desc: "Your calculator",
     nav_horarios: "Schedule", nav_horarios_desc: "Weekly routine",
     nav_mural: "Board", nav_mural_desc: "Class messages",
@@ -326,7 +327,7 @@ const TRADUCOES_LOGIN = {
     proxima_skin: "Próxima skin:", skin_bloqueada: "Bloqueada", skin_admin: "Admin",
     conquistas_visiveis_titulo: "Logros en el perfil",
     conquistas_visiveis_desc: "Elige qué logros verán los demás en tu perfil. Sin selección = muestra todos.",
-    nav_inicio: "Inicio", nav_inicio_desc: "Página de inicio", menu: "Menú",
+    nav_inicio: "Inicio", nav_inicio_desc: "Página de inicio", nav_inicio_desc_login: "Página de inicio", menu: "Menú",
     nav_notas: "Notas", nav_notas_desc: "Tu calculadora",
     nav_horarios: "Horarios", nav_horarios_desc: "Rutina semanal",
     nav_mural: "Mural", nav_mural_desc: "Mensajes de la clase",
@@ -496,6 +497,247 @@ function celebrarConquista(conquista) {
   setTimeout(() => {
     if (document.body.contains(overlay)) fechar();
   }, 6000);
+}
+
+// ==========================================
+// 🎓 NOVO EVENTO (só admin)
+// ==========================================
+function ehAdminEventos() {
+  const mat = window.usuarioLogado?.matricula;
+  return mat === MATRICULA_ADMIN;
+}
+
+function mostrarBotaoNovoEvento() {
+  const btn = document.getElementById("btn-novo-evento");
+  if (!btn) return;
+  btn.classList.toggle("is-hidden", !ehAdminEventos());
+}
+
+function abrirModalNovoEvento() {
+  const modal = document.getElementById("modal-novo-evento");
+  if (!modal) return;
+
+  const agora = new Date();
+  const daqui1h = new Date(agora.getTime() + 60 * 60 * 1000);
+  const toLocalISO = (d) => {
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
+  document.getElementById("evento-inicio").value = toLocalISO(agora);
+  document.getElementById("evento-fim").value = toLocalISO(daqui1h);
+  document.getElementById("evento-titulo").value = "";
+  document.getElementById("evento-descricao").value = "";
+  document.getElementById("evento-local").value = "";
+  document.getElementById("evento-cor").value = "roxo";
+
+  const status = document.getElementById("evento-status");
+  status.className = "evento-status is-hidden";
+  status.textContent = "";
+
+  modal.classList.remove("is-hidden");
+}
+
+function fecharModalNovoEvento() {
+  document.getElementById("modal-novo-evento")?.classList.add("is-hidden");
+}
+
+async function enviarNovoEvento(event) {
+  event.preventDefault();
+  const btn = document.getElementById("btn-criar-evento");
+  const status = document.getElementById("evento-status");
+  const textoOriginal = btn.innerHTML;
+
+  const titulo = document.getElementById("evento-titulo").value.trim();
+  const descricao = document.getElementById("evento-descricao").value.trim();
+  const local = document.getElementById("evento-local").value.trim();
+  const inicio = document.getElementById("evento-inicio").value;
+  const fim = document.getElementById("evento-fim").value;
+  const cor = document.getElementById("evento-cor").value;
+
+  if (!titulo || !inicio || !fim) {
+    status.className = "evento-status erro";
+    status.textContent = "Preencha título, início e fim.";
+    return;
+  }
+
+  const dataInicio = new Date(inicio);
+  const dataFim = new Date(fim);
+  if (dataFim <= dataInicio) {
+    status.className = "evento-status erro";
+    status.textContent = "A data final precisa ser depois da inicial.";
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Criando...';
+  status.className = "evento-status is-hidden";
+  status.textContent = "";
+
+  try {
+    const CORES_HEX = {
+      roxo: "#8b5edd",
+      vermelho: "#ff4757",
+      laranja: "#f59e0b",
+      verde: "#10b981",
+      azul: "#06b6d4",
+      rosa: "#ec4899",
+    };
+
+    await push(ref(db, "agenda_manual"), {
+      titulo,
+      descricao,
+      local,
+      inicio: dataInicio.getTime(),
+      fim: dataFim.getTime(),
+      cor: CORES_HEX[cor] || "#8b5edd",
+      autor: window.usuarioLogado.matricula,
+      autorNome: window.usuarioLogado.nome,
+      criadoEm: Date.now(),
+    });
+
+    status.className = "evento-status sucesso";
+    status.textContent = "✅ Evento criado! Já apareceu no calendário.";
+
+    setTimeout(() => {
+      fecharModalNovoEvento();
+      if (typeof exibirToast === "function") {
+        exibirToast("Evento criado no calendário!", "sucesso");
+      }
+    }, 1500);
+  } catch (err) {
+    status.className = "evento-status erro";
+    status.textContent = "❌ Erro ao criar evento: " + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = textoOriginal;
+  }
+}
+
+window.apagarEventoManual = function (firebaseId, titulo) {
+  if (!ehAdminEventos()) return;
+  if (!firebaseId) return;
+  if (!confirm(`Apagar o evento "${titulo}"?`)) return;
+  remove(ref(db, "agenda_manual/" + firebaseId))
+    .then(() => {
+      if (typeof exibirToast === "function") exibirToast("Evento removido.", "sucesso");
+    })
+    .catch((e) => {
+      if (typeof exibirToast === "function") exibirToast("Erro: " + e.message, "erro");
+    });
+};
+
+function inicializarNovoEvento() {
+  document.getElementById("btn-novo-evento")?.addEventListener("click", abrirModalNovoEvento);
+  document.getElementById("btn-fechar-evento")?.addEventListener("click", fecharModalNovoEvento);
+  document.getElementById("btn-cancelar-evento")?.addEventListener("click", fecharModalNovoEvento);
+  document.getElementById("form-novo-evento")?.addEventListener("submit", enviarNovoEvento);
+  const modal = document.getElementById("modal-novo-evento");
+  modal?.addEventListener("click", (e) => {
+    if (e.target === modal) fecharModalNovoEvento();
+  });
+  mostrarBotaoNovoEvento();
+}
+
+// ==========================================
+// FIREBASE
+// ==========================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { getDatabase, ref, onValue, push, update, remove, get } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA_wDDRCRJL_WviT6FBorz8dhnHe0-pI8s",
+  authDomain: "muralturmanormal.firebaseapp.com",
+  projectId: "muralturmanormal",
+  storageBucket: "muralturmanormal.firebasestorage.app",
+  messagingSenderId: "993749229757",
+  appId: "1:993749229757:web:ec87d8ca3b8950d70d57d4",
+};
+
+const app = initializeApp(firebaseConfig, "loginApp");
+const db = getDatabase(app);
+const recadosRef = ref(db, "mural_recados");
+const perfisRef = ref(db, "perfis_alunos");
+
+const MATRICULAS_ADMIN = ["20261101110002"];
+const ADMIN_MATRICULAS_SALA = MATRICULAS_ADMIN;
+let __salaDadosCarregados = false;
+
+window.usuarioLogado = { nome: "", matricula: "", foto: "", fotoOriginal: "" };
+let bancoDeRecados = [];
+let bancoDePerfis = [];
+let filtroRecadoTexto = "";
+let filtroPerfilTexto = "";
+function escaparHTML(texto) {
+  if (!texto) return "";
+  return String(texto).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function converterLinks(textoEscapado) {
+  if (!textoEscapado) return "";
+  const urlRegex = /(https?:\/\/[^\s<]+)/g;
+  return textoEscapado.replace(urlRegex, function (url) {
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="link-destaque" style="color: #4cd137; text-decoration: underline;">${url}</a>`;
+  });
+}
+
+function exibirToast(mensagem, tipo = "info") {
+  let toastContainer = document.getElementById("toast-container");
+  if (!toastContainer) {
+    toastContainer = document.createElement("div");
+    toastContainer.id = "toast-container";
+    toastContainer.style.cssText = `position:fixed;bottom:20px;right:20px;z-index:10000;display:flex;flex-direction:column;gap:10px;pointer-events:none;`;
+    document.body.appendChild(toastContainer);
+  }
+  const toast = document.createElement("div");
+  const corBg = tipo === "erro" ? "#ff4757" : tipo === "sucesso" ? "#2ed573" : "#2f3542";
+  toast.style.cssText = `background:${corBg};color:#fff;padding:12px 20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-size:0.9em;pointer-events:auto;opacity:0;transform:translateY(20px);transition:all 0.3s ease;font-family:sans-serif;`;
+  toast.textContent = mensagem;
+  toastContainer.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = "1"; toast.style.transform = "translateY(0)"; }, 10);
+  setTimeout(() => {
+    toast.style.opacity = "0"; toast.style.transform = "translateY(20px)";
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
+function nomeParaExibicao(nome) {
+  var partes = String(nome || "Usuário").trim().split(/\s+/);
+  if (partes.length < 2) return partes[0] || "Usuário";
+  return partes[0] + " " + partes[partes.length - 1].charAt(0) + ".";
+}
+
+function matriculaParaExibicao(matricula) {
+  var valor = String(matricula || "");
+  if (valor.length <= 4) return "Matrícula protegida";
+  return "******" + valor.slice(-4);
+}
+
+function parseDuracaoParaHoras(valor) {
+  if (!valor) return 24 * 7;
+  let str = String(valor).trim().toLowerCase();
+  let horas = 0;
+  if (str.endsWith("h")) horas = parseFloat(str.replace("h", ""));
+  else if (str.endsWith("d")) horas = parseFloat(str.replace("d", "")) * 24;
+  else horas = parseFloat(str) * 24;
+  if (isNaN(horas) || horas <= 0) horas = 24 * 7;
+  if (horas < 1) horas = 1;
+  if (horas > 360) horas = 360;
+  return Math.round(horas);
+}
+
+function calcularTempoRestante(timestampCriacao, duracaoHoras) {
+  const agora = Date.now();
+  const tempoLimite = timestampCriacao + duracaoHoras * 60 * 60 * 1000;
+  const msRestantes = tempoLimite - agora;
+  if (msRestantes <= 0) return `Expirado`;
+  const horasRestantes = Math.floor(msRestantes / (1000 * 60 * 60));
+  const diasRestantes = Math.floor(horasRestantes / 24);
+  if (diasRestantes > 1) return `Expira em ${diasRestantes} dias`;
+  else if (diasRestantes === 1) return `Expira amanhã`;
+  else if (horasRestantes > 0) return `Expira em ${horasRestantes}h`;
+  else return `Expira em ${Math.floor(msRestantes / (1000 * 60))} min`;
 }
 
 // ==========================================
@@ -711,9 +953,6 @@ function montarConquistasVisiveisPayload(selecionadas) {
   return { mostraTodas: false, ativos };
 }
 
-// ==========================================
-// MIGRAÇÃO (no-op, xpCore cuida)
-// ==========================================
 async function migrarXPLocalParaFirebase(_mat) {
   if (window.xpCore?.estaPronto?.()) return;
   console.warn("[XP] migração local chamada, mas xpCore não está pronto.");
@@ -1078,108 +1317,6 @@ function renderizarLegendaCalendario() {
 }
 
 // ==========================================
-// FIREBASE
-// ==========================================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import { getDatabase, ref, onValue, push, update, remove, get } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyA_wDDRCRJL_WviT6FBorz8dhnHe0-pI8s",
-  authDomain: "muralturmanormal.firebaseapp.com",
-  projectId: "muralturmanormal",
-  storageBucket: "muralturmanormal.firebasestorage.app",
-  messagingSenderId: "993749229757",
-  appId: "1:993749229757:web:ec87d8ca3b8950d70d57d4",
-};
-
-const app = initializeApp(firebaseConfig, "loginApp");
-const db = getDatabase(app);
-const recadosRef = ref(db, "mural_recados");
-const perfisRef = ref(db, "perfis_alunos");
-
-const MATRICULAS_ADMIN = ["20261101110002"];
-const ADMIN_MATRICULAS_SALA = MATRICULAS_ADMIN;
-let __salaDadosCarregados = false;
-
-window.usuarioLogado = { nome: "", matricula: "", foto: "", fotoOriginal: "" };
-let bancoDeRecados = [];
-let bancoDePerfis = [];
-let filtroRecadoTexto = "";
-let filtroPerfilTexto = "";
-
-function escaparHTML(texto) {
-  if (!texto) return "";
-  return String(texto).replace(/&/g, "&amp;").replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
-
-function converterLinks(textoEscapado) {
-  if (!textoEscapado) return "";
-  const urlRegex = /(https?:\/\/[^\s<]+)/g;
-  return textoEscapado.replace(urlRegex, function (url) {
-    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="link-destaque" style="color: #4cd137; text-decoration: underline;">${url}</a>`;
-  });
-}
-
-function exibirToast(mensagem, tipo = "info") {
-  let toastContainer = document.getElementById("toast-container");
-  if (!toastContainer) {
-    toastContainer = document.createElement("div");
-    toastContainer.id = "toast-container";
-    toastContainer.style.cssText = `position:fixed;bottom:20px;right:20px;z-index:10000;display:flex;flex-direction:column;gap:10px;pointer-events:none;`;
-    document.body.appendChild(toastContainer);
-  }
-  const toast = document.createElement("div");
-  const corBg = tipo === "erro" ? "#ff4757" : tipo === "sucesso" ? "#2ed573" : "#2f3542";
-  toast.style.cssText = `background:${corBg};color:#fff;padding:12px 20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-size:0.9em;pointer-events:auto;opacity:0;transform:translateY(20px);transition:all 0.3s ease;font-family:sans-serif;`;
-  toast.textContent = mensagem;
-  toastContainer.appendChild(toast);
-  setTimeout(() => { toast.style.opacity = "1"; toast.style.transform = "translateY(0)"; }, 10);
-  setTimeout(() => {
-    toast.style.opacity = "0"; toast.style.transform = "translateY(20px)";
-    setTimeout(() => toast.remove(), 300);
-  }, 3500);
-}
-
-function nomeParaExibicao(nome) {
-  var partes = String(nome || "Usuário").trim().split(/\s+/);
-  if (partes.length < 2) return partes[0] || "Usuário";
-  return partes[0] + " " + partes[partes.length - 1].charAt(0) + ".";
-}
-
-function matriculaParaExibicao(matricula) {
-  var valor = String(matricula || "");
-  if (valor.length <= 4) return "Matrícula protegida";
-  return "******" + valor.slice(-4);
-}
-
-function parseDuracaoParaHoras(valor) {
-  if (!valor) return 24 * 7;
-  let str = String(valor).trim().toLowerCase();
-  let horas = 0;
-  if (str.endsWith("h")) horas = parseFloat(str.replace("h", ""));
-  else if (str.endsWith("d")) horas = parseFloat(str.replace("d", "")) * 24;
-  else horas = parseFloat(str) * 24;
-  if (isNaN(horas) || horas <= 0) horas = 24 * 7;
-  if (horas < 1) horas = 1;
-  if (horas > 360) horas = 360;
-  return Math.round(horas);
-}
-
-function calcularTempoRestante(timestampCriacao, duracaoHoras) {
-  const agora = Date.now();
-  const tempoLimite = timestampCriacao + duracaoHoras * 60 * 60 * 1000;
-  const msRestantes = tempoLimite - agora;
-  if (msRestantes <= 0) return `Expirado`;
-  const horasRestantes = Math.floor(msRestantes / (1000 * 60 * 60));
-  const diasRestantes = Math.floor(horasRestantes / 24);
-  if (diasRestantes > 1) return `Expira em ${diasRestantes} dias`;
-  else if (diasRestantes === 1) return `Expira amanhã`;
-  else if (horasRestantes > 0) return `Expira em ${horasRestantes}h`;
-  else return `Expira em ${Math.floor(msRestantes / (1000 * 60))} min`;
-}
-
-// ==========================================
 // TEMA CLARO/ESCURO
 // ==========================================
 const themeToggle = document.getElementById("theme-toggle");
@@ -1340,7 +1477,6 @@ async function carregarConquistasNoModalPerfil(matricula) {
       conquistasParaMostrar = CONQUISTAS.filter(
         (c) => conquistasVisiveis.includes(c.id) && !!conquistas[c.id]
       );
-      if (conquistarParaMostrar === undefined) {} // nunca cai
       if (conquistasParaMostrar.length === 0) {
         if (contador) contador.textContent = `0/${CONQUISTAS.length}`;
         grid.innerHTML = '<p class="modal-perfil-conquistas-vazio">Este aluno não exibe conquistas publicamente.</p>';
@@ -3248,6 +3384,7 @@ document.addEventListener("DOMContentLoaded", function () {
   initMenuLateral();
   inicializarFiltrosConquistas();
   inicializarBotoesConquistasVisiveis();
+  inicializarNovoEvento();
 
   window.addEventListener("mascote:cliques", () => {
     meusCliquesMascote = window.xpCore?.estaPronto?.()
@@ -3256,7 +3393,6 @@ document.addEventListener("DOMContentLoaded", function () {
     checarConquistasAutomaticas();
   });
 
-  // 🆕 Quando o xpCore terminar de sincronizar, atualiza a UI
   window.addEventListener("xpCore:pronto", (e) => {
     if (!e.detail || e.detail.anonimo) return;
     console.log("[login] xpCore pronto, sincronizando UI...");
@@ -3335,9 +3471,68 @@ document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll(".fc-event").forEach(function (el) { pintarElementoEvento(el, el.innerText || ""); });
           }, 50);
         },
-        eventClick: function (arg) { window.open(arg.event.url, "_blank"); arg.jsEvent.preventDefault(); },
+        eventClick: function (arg) {
+          const origem = arg.event.extendedProps?.origem;
+          if (origem === "manual" && ehAdminEventos()) {
+            const id = arg.event.extendedProps.firebaseId;
+            window.apagarEventoManual(id, arg.event.title);
+            arg.jsEvent.preventDefault();
+            return;
+          }
+          if (arg.event.url) {
+            window.open(arg.event.url, "_blank");
+            arg.jsEvent.preventDefault();
+          }
+        },
       });
       calendar.render();
+
+      // ==========================================
+      // 🎓 Carrega eventos manuais do Firebase
+      // ==========================================
+      onValue(ref(db, "agenda_manual"), (snap) => {
+        const eventos = snap.val() || {};
+        const agora = Date.now();
+        const idsParaRemover = [];
+
+        calendar.getEvents().forEach((ev) => {
+          if (ev.extendedProps?.origem === "manual") {
+            ev.remove();
+          }
+        });
+
+        Object.keys(eventos).forEach((id) => {
+          const ev = eventos[id];
+          if (!ev || !ev.inicio || !ev.fim) return;
+
+          if (ev.fim && ev.fim < agora - 86400000) {
+            idsParaRemover.push(id);
+            return;
+          }
+
+          calendar.addEvent({
+            id: `manual_${id}`,
+            title: ev.titulo || "Evento",
+            start: new Date(ev.inicio).toISOString(),
+            end: new Date(ev.fim).toISOString(),
+            backgroundColor: ev.cor || "#8b5edd",
+            borderColor: ev.cor || "#8b5edd",
+            textColor: "#ffffff",
+            extendedProps: {
+              origem: "manual",
+              firebaseId: id,
+              descricao: ev.descricao || "",
+              local: ev.local || "",
+              autorNome: ev.autorNome || "",
+            },
+          });
+        });
+
+        idsParaRemover.forEach((id) => {
+          remove(ref(db, "agenda_manual/" + id)).catch(() => {});
+        });
+      });
+
       var observer = new MutationObserver(function () {
         document.querySelectorAll(".fc-event").forEach(function (el) {
           var texto = el.innerText || "";
@@ -3390,6 +3585,7 @@ document.addEventListener("DOMContentLoaded", function () {
         gerarNotificacoesRecados();
         carregarPainelXP();
         atualizarStreakLogin();
+        mostrarBotaoNovoEvento();
         if (ADMIN_MATRICULAS_SALA.includes(matriculaSuap)) {
           setTimeout(() => {
             const secaoSala = document.getElementById("sala-professores");
