@@ -3726,3 +3726,73 @@ body.light-theme .conquistas-visiveis-grid {
     font-size: 0.85rem;
   }
 }
+
+/* ==========================================
+   BOTÃO NOVO EVENTO
+   ========================================== */
+.btn-novo-evento {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px auto 20px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #8b5edd, #6b46c1);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(139, 94, 221, 0.35);
+}
+.btn-novo-evento:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(139, 94, 221, 0.55);
+}
+.modal-evento { max-width: 540px; }
+.evento-datas-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 6px;
+}
+@media (max-width: 500px) { .evento-datas-grid { grid-template-columns: 1fr; } }
+.modal-evento input[type="text"],
+.modal-evento input[type="datetime-local"],
+.modal-evento textarea,
+.modal-evento select {
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(139, 94, 221, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main, #fff);
+  font-family: inherit;
+  font-size: 0.92rem;
+}
+.modal-evento input:focus,
+.modal-evento textarea:focus,
+.modal-evento select:focus {
+  outline: none;
+  border-color: var(--accent-strong, #8b5edd);
+  background: rgba(139, 94, 221, 0.08);
+}
+.evento-status {
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  margin: 10px 0;
+  text-align: center;
+  font-weight: 600;
+}
+.evento-status.sucesso { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.4); }
+.evento-status.erro { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.4); }
+body.light-theme .modal-evento input[type="text"],
+body.light-theme .modal-evento input[type="datetime-local"],
+body.light-theme .modal-evento textarea,
+body.light-theme .modal-evento select {
+  background: rgba(0, 0, 0, 0.03);
+}
