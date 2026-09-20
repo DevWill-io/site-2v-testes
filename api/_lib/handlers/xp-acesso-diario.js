@@ -1,6 +1,6 @@
-import { db } from "../_lib/firebase.js";
-import { autenticar } from "../_lib/auth.js";
-import { ok, erro, metodoObrigatorio, cors } from "../_lib/helpers.js";
+import { db } from "../../_lib/firebase.js";
+import { autenticar } from "../auth.js";
+import { ok, erro, metodoObrigatorio, cors } from "../helpers.js";
 
 export default async function handler(req, res) {
   cors(res);
