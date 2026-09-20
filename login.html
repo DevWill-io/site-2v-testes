@@ -834,6 +834,15 @@
             <strong data-i18n="matricula">Matrícula:</strong>
             <span id="modal-perfil-matricula"></span>
           </p>
+
+          <div id="modal-perfil-nivel" class="modal-perfil-nivel is-hidden">
+            <div class="modal-perfil-nivel-badge" id="modal-perfil-nivel-badge">1</div>
+            <div class="modal-perfil-nivel-info">
+              <span class="modal-perfil-nivel-nome" id="modal-perfil-nivel-nome">Novato</span>
+              <span class="modal-perfil-nivel-xp" id="modal-perfil-nivel-xp">0 XP</span>
+            </div>
+          </div>
+
           <p id="modal-perfil-bio" class="modal-perfil-bio is-hidden"></p>
           <div id="modal-perfil-redes" class="modal-perfil-redes is-hidden"></div>
 
@@ -936,6 +945,25 @@
               Personalize o mascote que aparece quando você dá carinho.
             </p>
             <div class="avatar-mascote-grid" id="avatar-mascote-grid"></div>
+          </div>
+
+          <div class="conquistas-visiveis-area">
+            <p class="field-section-title">
+              <i class="fa-solid fa-eye"></i>
+              <span data-i18n="conquistas_visiveis_titulo">Conquistas no perfil</span>
+            </p>
+            <p class="conquistas-visiveis-desc" data-i18n="conquistas_visiveis_desc">
+              Escolha quais conquistas os outros verão no seu perfil. Sem seleção = mostra todas.
+            </p>
+            <div class="conquistas-visiveis-acoes">
+              <button type="button" class="btn-mini" id="btn-conquistas-todas">
+                <i class="fa-solid fa-check-double"></i> <span data-i18n="todas">Todas</span>
+              </button>
+              <button type="button" class="btn-mini" id="btn-conquistas-nenhuma">
+                <i class="fa-solid fa-eraser"></i> <span data-i18n="bloqueadas">Nenhuma</span>
+              </button>
+            </div>
+            <div class="conquistas-visiveis-grid" id="conquistas-visiveis-grid"></div>
           </div>
 
           <div id="edit-perfil-bloqueio" class="edit-bloqueio is-hidden">
