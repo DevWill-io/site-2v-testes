@@ -66,7 +66,7 @@ function addStopSeguro(gradient, posicao, cor, fallback) {
 }
 
 // ==========================================
-// 🎭 AVATARES DO MASCOTE
+// 🎭 SKINS DO MASCOTE (com bloqueio)
 // ==========================================
 const AVATARES_MASCOTE = [
   { id: "padrao", emoji: "🐾", nome: "Padrão", gratis: true },
@@ -76,6 +76,45 @@ const AVATARES_MASCOTE = [
   { id: "simpson", emoji: "🍩", nome: "Simpson", gratis: false, cliquesNecessarios: 1500 },
   { id: "mafioso", emoji: "🕴️", nome: "Mafioso", gratis: false, cliquesNecessarios: 3000 },
 ];
+
+// ==========================================
+// 🏆 NÍVEIS DO USUÁRIO
+// ==========================================
+const NIVEIS = [
+  { nivel: 1, xp: 0, nome: "Novato" },
+  { nivel: 2, xp: 100, nome: "Curioso" },
+  { nivel: 3, xp: 300, nome: "Aprendiz" },
+  { nivel: 4, xp: 600, nome: "Dev Júnior" },
+  { nivel: 5, xp: 1000, nome: "Dev Pleno" },
+  { nivel: 6, xp: 1500, nome: "Dev Sênior" },
+  { nivel: 7, xp: 2200, nome: "Tech Lead" },
+  { nivel: 8, xp: 3000, nome: "Arquiteto" },
+  { nivel: 9, xp: 4000, nome: "CTO" },
+  { nivel: 10, xp: 5000, nome: "Lenda" },
+];
+
+// ==========================================
+// 🎖️ CONQUISTAS
+// ==========================================
+const CONQUISTAS = [
+  { id: "primeiro_carinho", icone: "🎯", nome: "Primeiro Carinho", desc: "Deu seu primeiro carinho no mascote" },
+  { id: "carinhoso", icone: "❤️", nome: "Carinhoso", desc: "Deu 100 carinhos no mascote" },
+  { id: "apaixonado", icone: "💖", nome: "Apaixonado", desc: "Deu 500 carinhos no mascote" },
+  { id: "nota_100", icone: "🎓", nome: "Nota 100", desc: "Tirou 100 em alguma matéria" },
+  { id: "nota_maxima", icone: "🏆", nome: "Nota Máxima", desc: "Média geral ≥ 90" },
+  { id: "streak_7", icone: "🔥", nome: "Streak 7", desc: "Logou 7 dias seguidos" },
+  { id: "streak_30", icone: "⭐", nome: "Streak 30", desc: "Logou 30 dias seguidos" },
+  { id: "comunicador", icone: "💬", nome: "Comunicador", desc: "Postou 10 recados" },
+  { id: "estiloso", icone: "🎨", nome: "Estiloso", desc: "Mudou o avatar do mascote" },
+  { id: "cientista", icone: "🧪", nome: "Cientista", desc: "Usou o simulador 10 vezes" },
+];
+
+// Estado local do XP
+let meuXP = 0;
+let minhaStreak = 0;
+let meusCliquesMascote = 0;
+let minhasConquistas = {};
+let contadorSimulador = 0;
 
 let avatarSelecionado = "padrao";
 
