@@ -4105,3 +4105,22 @@ body.light-theme .field-checkbox-marca {
   min-height: auto;
   height: auto;
 }
+
+/* ==========================================
+   FIX: ABA ADMINS DA SALA DOS PROFESSORES
+   ========================================== */
+#sala-tab-admins.sala-tab-content.ativo,
+.sala-tab-content#sala-tab-admins.ativo,
+#sala-tab-admins.ativo {
+  display: block !important;
+}
+
+#sala-tab-admins {
+  padding: 20px 0 !important;
+}
+
+#sala-tab-admins .adm-container {
+  display: block;
+  min-height: auto;
+  padding: 20px 0;
+}
