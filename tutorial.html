@@ -1,0 +1,892 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#8b5edd" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'self' https://*.firebaseio.com; form-action 'self' https://suap.ifrn.edu.br; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; connect-src 'self' https://suap.ifrn.edu.br https://*.firebaseio.com wss://*.firebaseio.com https://*.googleapis.com;"
+    />
+    <title>Tutorial | Turma 2V IFRN</title>
+
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600&family=Poppins:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="styles/login.css" />
+
+    <style>
+      /* ==========================================
+         ESTILOS ESPECÍFICOS DO TUTORIAL
+         ========================================== */
+      .tutorial-main {
+        padding: 100px 16px 60px;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .tutorial-hero {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .tutorial-hero h1 {
+        font-family: "Poppins", sans-serif;
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--text-main, #fff);
+        margin-bottom: 8px;
+      }
+
+      .tutorial-hero p {
+        color: var(--text-muted, #b8a8d9);
+        font-size: 1.05rem;
+      }
+
+      .tutorial-indice {
+        background: var(--bg-card, rgba(255,255,255,0.05));
+        border: 1px solid var(--border-color, rgba(206,189,236,0.18));
+        border-radius: 14px;
+        padding: 20px 24px;
+        margin-bottom: 40px;
+      }
+
+      .tutorial-indice h3 {
+        font-family: "Poppins", sans-serif;
+        font-size: 1rem;
+        margin-bottom: 12px;
+        color: var(--accent, #cebdec);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+      }
+
+      .tutorial-indice ol {
+        margin: 0;
+        padding-left: 22px;
+        columns: 2;
+        column-gap: 30px;
+        list-style: decimal;
+      }
+
+      .tutorial-indice li {
+        margin-bottom: 6px;
+        color: var(--text-main, #fff);
+      }
+
+      .tutorial-indice a {
+        color: var(--text-main, #fff);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .tutorial-indice a:hover {
+        color: var(--accent-strong, #8b5edd);
+      }
+
+      @media (max-width: 600px) {
+        .tutorial-indice ol { columns: 1; }
+        .tutorial-hero h1 { font-size: 1.6rem; }
+      }
+
+      .tutorial-secao {
+        background: var(--bg-card, rgba(255,255,255,0.04));
+        border: 1px solid var(--border-color, rgba(206,189,236,0.18));
+        border-radius: 16px;
+        padding: 28px 26px;
+        margin-bottom: 24px;
+        scroll-margin-top: 90px;
+      }
+
+      .tutorial-secao-cabecalho {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 18px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--border-color, rgba(206,189,236,0.18));
+      }
+
+      .tutorial-secao-icone {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #8b5edd, #6b46c1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: #fff;
+        flex-shrink: 0;
+        box-shadow: 0 4px 14px rgba(139, 94, 221, 0.4);
+      }
+
+      .tutorial-secao h2 {
+        font-family: "Poppins", sans-serif;
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text-main, #fff);
+      }
+
+      .tutorial-secao p {
+        color: var(--text-main, #fff);
+        line-height: 1.7;
+        margin-bottom: 14px;
+        font-size: 0.95rem;
+      }
+
+      .tutorial-secao strong {
+        color: var(--accent-strong, #8b5edd);
+        font-weight: 600;
+      }
+
+      .tutorial-passo {
+        display: flex;
+        gap: 14px;
+        margin-bottom: 14px;
+        padding: 12px 16px;
+        background: rgba(139, 94, 221, 0.08);
+        border-left: 3px solid var(--accent-strong, #8b5edd);
+        border-radius: 8px;
+      }
+
+      .tutorial-passo-num {
+        flex-shrink: 0;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--accent-strong, #8b5edd);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.85rem;
+      }
+
+      .tutorial-passo-texto {
+        flex: 1;
+        color: var(--text-main, #fff);
+        font-size: 0.92rem;
+        line-height: 1.6;
+      }
+
+      .tutorial-dica {
+        background: rgba(245, 158, 11, 0.12);
+        border-left: 3px solid #f59e0b;
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin: 14px 0;
+        font-size: 0.88rem;
+        color: var(--text-main, #fff);
+      }
+
+      .tutorial-dica strong {
+        color: #f59e0b;
+      }
+
+      .tutorial-aviso {
+        background: rgba(59, 130, 246, 0.12);
+        border-left: 3px solid #3b82f6;
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin: 14px 0;
+        font-size: 0.88rem;
+        color: var(--text-main, #fff);
+      }
+
+      .tutorial-aviso strong {
+        color: #3b82f6;
+      }
+
+      .tutorial-lista {
+        margin: 12px 0;
+        padding-left: 22px;
+      }
+
+      .tutorial-lista li {
+        color: var(--text-main, #fff);
+        margin-bottom: 6px;
+        line-height: 1.6;
+        font-size: 0.92rem;
+      }
+
+      .tutorial-tabela {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0;
+        font-size: 0.88rem;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .tutorial-tabela th,
+      .tutorial-tabela td {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color, rgba(206,189,236,0.18));
+        color: var(--text-main, #fff);
+      }
+
+      .tutorial-tabela th {
+        background: rgba(139, 94, 221, 0.2);
+        font-weight: 700;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .tutorial-tabela tr:hover td {
+        background: rgba(139, 94, 221, 0.06);
+      }
+
+      .tutorial-raridade {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+      }
+
+      .tutorial-raridade.comum { background: #6b7280; color: #fff; }
+      .tutorial-raridade.raro { background: #3b82f6; color: #fff; }
+      .tutorial-raridade.epico { background: #a855f7; color: #fff; }
+      .tutorial-raridade.lendario { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
+
+      .tutorial-voltar {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 30px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #8b5edd, #6b46c1);
+        color: #fff;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        font-family: "Poppins", sans-serif;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .tutorial-voltar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(139, 94, 221, 0.5);
+      }
+
+      .tutorial-bloqueado {
+        text-align: center;
+        padding: 80px 20px;
+      }
+
+      .tutorial-bloqueado i {
+        font-size: 4rem;
+        color: var(--accent-strong, #8b5edd);
+        margin-bottom: 20px;
+        display: block;
+      }
+
+      .tutorial-bloqueado h2 {
+        font-family: "Poppins", sans-serif;
+        font-size: 1.6rem;
+        margin-bottom: 12px;
+        color: var(--text-main, #fff);
+      }
+
+      .tutorial-bloqueado p {
+        color: var(--text-muted, #b8a8d9);
+        margin-bottom: 24px;
+      }
+
+      .tutorial-bloqueado a {
+        display: inline-block;
+        padding: 12px 28px;
+        background: linear-gradient(135deg, #8b5edd, #6b46c1);
+        color: #fff;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body.light-theme .tutorial-secao,
+      body.light-theme .tutorial-indice {
+        background: rgba(0, 0, 0, 0.03);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="login-header">
+      <a href="login.html" class="login-logo">
+        <i class="fa-solid fa-code-branch"></i>InfoWeb<span>- 2V</span>
+      </a>
+      <div class="header-actions">
+        <a href="login.html" class="button is-link" style="text-decoration:none;">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Voltar</span>
+        </a>
+      </div>
+    </header>
+
+    <main class="tutorial-main">
+      <!-- CONTEÚDO BLOQUEADO -->
+      <div id="tutorial-bloqueado" class="tutorial-bloqueado" style="display:none;">
+        <i class="fa-solid fa-lock"></i>
+        <h2>Acesso Restrito</h2>
+        <p>Você precisa fazer login com SUAP para acessar o tutorial.</p>
+        <a href="login.html">
+          <i class="fa-solid fa-right-to-bracket"></i> Fazer login
+        </a>
+      </div>
+
+      <!-- CONTEÚDO DO TUTORIAL -->
+      <div id="tutorial-conteudo" style="display:none;">
+        <div class="tutorial-hero">
+          <h1>📚 Tutorial Completo</h1>
+          <p>Tudo que você precisa saber sobre o site da turma 2V</p>
+        </div>
+
+        <!-- ÍNDICE -->
+        <div class="tutorial-indice">
+          <h3><i class="fa-solid fa-list"></i> Índice</h3>
+          <ol>
+            <li><a href="#login">Como fazer login</a></li>
+            <li><a href="#navegacao">Navegação do site</a></li>
+            <li><a href="#perfil">Seu perfil</a></li>
+            <li><a href="#mascote">Mascote e carinhos</a></li>
+            <li><a href="#xp">XP e níveis</a></li>
+            <li><a href="#conquistas">Conquistas</a></li>
+            <li><a href="#mural">Mural de recados</a></li>
+            <li><a href="#notas">Calculadora de notas</a></li>
+            <li><a href="#horarios">Horários</a></li>
+            <li><a href="#agenda">Agenda da turma</a></li>
+            <li><a href="#notificacoes">Notificações</a></li>
+            <li><a href="#temas">Temas e idiomas</a></li>
+            <li><a href="#pwa">Instalar como app</a></li>
+            <li><a href="#sala">Sala dos Professores</a></li>
+          </ol>
+        </div>
+
+        <!-- 1. LOGIN -->
+        <section id="login" class="tutorial-secao">
+          <div class="tutorial-secao-cabecalho">
+            <div class="tutorial-secao-icone"><i class="fa-solid fa-right-to-bracket"></i></div>
+            <h2>1. Como fazer login</h2>
+          </div>
+          <p>O site tem duas áreas: uma <strong>pública</strong> (<code>index.html</code>) e uma <strong>privada</strong> (<code>login.html</code>). Pra acessar as funcionalidades completas, você precisa fazer login com sua conta SUAP do IFRN.</p>
+
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">1</div>
+            <div class="tutorial-passo-texto">Acesse a página inicial e clique em <strong>"Acessar SUAP"</strong> no topo, ou vá direto em <code>/login.html</code>.</div>
+          </div>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">2</div>
+            <div class="tutorial-passo-texto">Clique no botão <strong>"Login com SUAP"</strong>. Você será redirecionado para o site oficial do IFRN.</div>
+          </div>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">3</div>
+            <div class="tutorial-passo-texto">Informe sua <strong>matrícula</strong> e <strong>senha do SUAP</strong>. Esses dados <u>não passam pelo nosso site</u> — vão direto pro servidor do IFRN.</div>
+          </div>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">4</div>
+            <div class="tutorial-passo-texto">Após autorizar, você volta automaticamente pro nosso site, já logado.</div>
+          </div>
+
+          <div class="tutorial-dica">
+            <strong>💡 Dica:</strong> se sua sessão expirar, basta fazer login de novo. Os dados ficam salvos por até 30 dias.
+          </div>
+        </section>
+
+        <!-- 2. NAVEGAÇÃO -->
+        <section id="navegacao" class="tutorial-secao">
+          <div class="tutorial-secao-cabecalho">
+            <div class="tutorial-secao-icone"><i class="fa-solid fa-compass"></i></div>
+            <h2>2. Navegação do site</h2>
+          </div>
+          <p>Use o <strong>menu lateral</strong> (ícone ☰ no topo) pra navegar entre as seções:</p>
+          <ul class="tutorial-lista">
+            <li><strong>Início</strong> — volta pro topo da página</li>
+            <li><strong>Notas</strong> — sua calculadora de notas</li>
+            <li><strong>Horários</strong> — quadro de aulas semanal</li>
+            <li><strong>Mural</strong> — recados da turma</li>
+            <li><strong>Membros</strong> — colegas do sistema</li>
+            <li><strong>Agenda</strong> — calendário de eventos</li>
+            <li><strong>Mascote</strong> — interagir com o mascote</li>
+            <li><strong>Tutorial</strong> — esta página</li>
+            <li><strong>Sala dos Professores</strong> — só admin</li>
+          </ul>
+        </section>
+
+        <!-- 3. PERFIL -->
+        <section id="perfil" class="tutorial-secao">
+          <div class="tutorial-secao-cabecalho">
+            <div class="tutorial-secao-icone"><i class="fa-solid fa-user-pen"></i></div>
+            <h2>3. Seu perfil</h2>
+          </div>
+          <p>No topo da página de login você vê seu nome e foto. Clique em <strong>"Editar Perfil"</strong> pra personalizar:</p>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">📸 Foto</h3>
+          <ul class="tutorial-lista">
+            <li><strong>Trocar foto</strong> — JPG/PNG até 5MB (o site comprime automaticamente)</li>
+            <li><strong>Restaurar SUAP</strong> — volta pra sua foto oficial do SUAP</li>
+          </ul>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">✏️ Informações</h3>
+          <ul class="tutorial-lista">
+            <li><strong>Nome de exibição</strong> — como você quer aparecer (máx 30 caracteres)</li>
+            <li><strong>Bio</strong> — fale um pouco sobre você (máx 160 caracteres)</li>
+            <li><strong>Redes sociais</strong> — TikTok, Instagram, GitHub, email e site</li>
+          </ul>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🎭 Mascote equipado</h3>
+          <p>Escolha qual mascote aparece no seu perfil. As skins <strong>Simpson</strong> e <strong>Mafioso</strong> precisam ser desbloqueadas primeiro (veja a seção do mascote).</p>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🎖️ Conquistas visíveis</h3>
+          <p>Escolha quais conquistas os outros verão quando abrirem seu perfil. Se você não escolher nada, todas as conquistas desbloqueadas aparecem.</p>
+
+          <div class="tutorial-aviso">
+            <strong>ℹ️ Importante:</strong> as alterações são salvas na nuvem e aparecem em todos os dispositivos onde você fizer login.
+          </div>
+        </section>
+
+        <!-- 4. MASCOTE -->
+        <section id="mascote" class="tutorial-secao">
+          <div class="tutorial-secao-cabecalho">
+            <div class="tutorial-secao-icone"><i class="fa-solid fa-paw"></i></div>
+            <h2>4. Mascote e carinhos</h2>
+          </div>
+          <p>O mascote da turma está lá pra interagir. Cada clique que você dá conta como <strong>"carinho"</strong> e ajuda a turma a chegar em 1 MILHÃO!</p>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🐾 Como dar carinho</h3>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">1</div>
+            <div class="tutorial-passo-texto">Vá até a seção <strong>Mascote</strong> no site principal.</div>
+          </div>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">2</div>
+            <div class="tutorial-passo-texto">Clique na imagem do mascote (ou no botão <strong>"Dar carinho"</strong>).</div>
+          </div>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">3</div>
+            <div class="tutorial-passo-texto">Cada clique vale <strong>+1 XP</strong> e conta pro seu total de carinhos.</div>
+          </div>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🎁 Skins do mascote</h3>
+          <table class="tutorial-tabela">
+            <thead>
+              <tr><th>Skin</th><th>Como desbloquear</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>🐾 Padrão</td><td>Já vem desbloqueada</td></tr>
+              <tr><td>👽 Alien</td><td>Já vem desbloqueada</td></tr>
+              <tr><td>🏴‍☠️ Pirata</td><td>Já vem desbloqueada</td></tr>
+              <tr><td>🧞 Gênio</td><td>Já vem desbloqueada</td></tr>
+              <tr><td>🍩 Simpson</td><td><strong>1.500 cliques</strong> no mascote</td></tr>
+              <tr><td>🕴️ Mafioso</td><td><strong>3.000 cliques</strong> no mascote</td></tr>
+              <tr><td>👑 Admin</td><td>Exclusivo do admin</td></tr>
+            </tbody>
+          </table>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🏆 Ranking de carinhos</h3>
+          <p>Na seção do mascote você vê o <strong>Top 10</strong> alunos que mais deram carinho. Sua posição aparece embaixo.</p>
+
+          <div class="tutorial-dica">
+            <strong>💡 Dica:</strong> seu progresso de cliques fica salvo na nuvem! Se você clicar 500x no PC da escola, seus 500 cliques contam também quando você abrir no celular.
+          </div>
+        </section>
+
+        <!-- 5. XP -->
+        <section id="xp" class="tutorial-secao">
+          <div class="tutorial-secao-cabecalho">
+            <div class="tutorial-secao-icone"><i class="fa-solid fa-star"></i></div>
+            <h2>5. XP e níveis</h2>
+          </div>
+          <p>Você ganha <strong>XP (pontos de experiência)</strong> por interagir com o site. Conforme acumula XP, sobe de nível!</p>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">⭐ Como ganhar XP</h3>
+          <table class="tutorial-tabela">
+            <thead>
+              <tr><th>Ação</th><th>XP</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Dar carinho no mascote</td><td>+1 XP</td></tr>
+              <tr><td>Postar recado no mural</td><td>+10 XP</td></tr>
+              <tr><td>Comentar em recado</td><td>+3 XP</td></tr>
+              <tr><td>Curtir recado</td><td>+1 XP</td></tr>
+              <tr><td>Usar o simulador de notas</td><td>+2 XP (máx 10/dia)</td></tr>
+              <tr><td>Consultar boletim</td><td>+5 XP</td></tr>
+              <tr><td>Definir meta individual</td><td>+5 XP</td></tr>
+              <tr><td>Trocar avatar do mascote</td><td>+5 XP</td></tr>
+              <tr><td>Login diário</td><td>+5 a +100 XP (bonus por streak)</td></tr>
+              <tr><td>Desbloquear conquista</td><td>+10 XP</td></tr>
+            </tbody>
+          </table>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🏆 Níveis</h3>
+          <table class="tutorial-tabela">
+            <thead>
+              <tr><th>Nível</th><th>Nome</th><th>XP necessário</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>Novato</td><td>0</td></tr>
+              <tr><td>2</td><td>Curioso</td><td>100</td></tr>
+              <tr><td>3</td><td>Aprendiz</td><td>300</td></tr>
+              <tr><td>4</td><td>Dev Júnior</td><td>600</td></tr>
+              <tr><td>5</td><td>Dev Pleno</td><td>1.000</td></tr>
+              <tr><td>6</td><td>Dev Sênior</td><td>1.500</td></tr>
+              <tr><td>7</td><td>Tech Lead</td><td>2.200</td></tr>
+              <tr><td>8</td><td>Arquiteto</td><td>3.000</td></tr>
+              <tr><td>9</td><td>CTO</td><td>4.000</td></tr>
+              <tr><td>10</td><td>Lenda</td><td>5.000</td></tr>
+            </tbody>
+          </table>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🔥 Streak (dias seguidos)</h3>
+          <p>Se você acessar o site <strong>dias seguidos</strong>, ganha XP extra:</p>
+          <ul class="tutorial-lista">
+            <li>3 dias seguidos → <strong>+20 XP</strong></li>
+            <li>7 dias seguidos → <strong>+50 XP</strong></li>
+            <li>30 dias seguidos → <strong>+100 XP</strong></li>
+          </ul>
+
+          <div class="tutorial-dica">
+            <strong>💡 Dica:</strong> entre todos os dias pra não perder a sequência!
+          </div>
+        </section>
+
+        <!-- 6. CONQUISTAS -->
+        <section id="conquistas" class="tutorial-secao">
+          <div class="tutorial-secao-cabecalho">
+            <div class="tutorial-secao-icone"><i class="fa-solid fa-medal"></i></div>
+            <h2>6. Conquistas</h2>
+          </div>
+          <p>As conquistas são medalhas que você desbloqueia ao completar desafios. Cada conquista vale <strong>+10 XP</strong> e aparece no seu perfil!</p>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🎯 Tipos de conquista</h3>
+          <ul class="tutorial-lista">
+            <li><strong>Cliques</strong> — dar X carinhos no mascote</li>
+            <li><strong>Nível</strong> — alcançar nível X</li>
+            <li><strong>Streak</strong> — logar X dias seguidos</li>
+            <li><strong>Recados</strong> — postar X recados no mural</li>
+            <li><strong>Curtidas</strong> — curtir X recados</li>
+            <li><strong>Simulador</strong> — usar o simulador X vezes</li>
+            <li><strong>Metas</strong> — definir X metas individuais</li>
+            <li><strong>Períodos</strong> — consultar X períodos diferentes</li>
+          </ul>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">💎 Raridades</h3>
+          <p>Cada conquista tem uma raridade:</p>
+          <p>
+            <span class="tutorial-raridade comum">COMUM</span> &nbsp;
+            <span class="tutorial-raridade raro">RARO</span> &nbsp;
+            <span class="tutorial-raridade epico">ÉPICO</span> &nbsp;
+            <span class="tutorial-raridade lendario">LENDÁRIO</span>
+          </p>
+          <p>Quando você desbloqueia uma conquista, aparece uma <strong>celebração especial</strong> com confete, som e uma animação!</p>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">👁️ Onde ver suas conquistas</h3>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">1</div>
+            <div class="tutorial-passo-texto">Na página de login, logo abaixo do seu perfil, está o painel <strong>"Conquistas"</strong>.</div>
+          </div>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">2</div>
+            <div class="tutorial-passo-texto">Use os filtros: <strong>Todas</strong>, <strong>Desbloqueadas</strong>, ou <strong>Bloqueadas</strong>.</div>
+          </div>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">3</div>
+            <div class="tutorial-passo-texto">No perfil de outro aluno, você vê as conquistas que ele escolheu mostrar.</div>
+          </div>
+
+          <div class="tutorial-aviso">
+            <strong>ℹ️ Importante:</strong> as conquistas ficam salvas na nuvem! Se você desbloqueou "100 carinhos" no PC, ela também aparece no celular.
+          </div>
+        </section>
+
+        <!-- 7. MURAL -->
+        <section id="mural" class="tutorial-secao">
+          <div class="tutorial-secao-cabecalho">
+            <div class="tutorial-secao-icone"><i class="fa-solid fa-comments"></i></div>
+            <h2>7. Mural de recados</h2>
+          </div>
+          <p>O mural é onde a turma troca mensagens. Você pode postar textos, links e interagir com os recados dos colegas.</p>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">📝 Como postar um recado</h3>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">1</div>
+            <div class="tutorial-passo-texto">Vá até a seção <strong>Mural</strong>.</div>
+          </div>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">2</div>
+            <div class="tutorial-passo-texto">Escreva sua mensagem (máx 200 caracteres).</div>
+          </div>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">3</div>
+            <div class="tutorial-passo-texto">Opcionalmente, cole um link/anexo (começando com https://).</div>
+          </div>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">4</div>
+            <div class="tutorial-passo-texto">Escolha por quanto tempo o recado dura: <strong>1 dia</strong>, <strong>7 dias</strong> ou <strong>15 dias</strong>.</div>
+          </div>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">5</div>
+            <div class="tutorial-passo-texto">Clique em <strong>Publicar</strong>. Você ganha <strong>+10 XP</strong>!</div>
+          </div>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">💬 Interagindo com recados</h3>
+          <ul class="tutorial-lista">
+            <li><strong>Curtir</strong> — clique no coração (❤️). Você só pode curtir uma vez por recado.</li>
+            <li><strong>Comentar</strong> — clique no ícone de comentário e escreva sua resposta. Ganha +3 XP por comentário.</li>
+            <li><strong>Editar</strong> — só o autor (ou admin) pode editar o próprio recado.</li>
+            <li><strong>Excluir</strong> — só o autor (ou admin) pode apagar.</li>
+          </ul>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🔍 Buscar recados</h3>
+          <p>Use a barra de busca no topo do mural pra filtrar por texto ou autor.</p>
+
+          <div class="tutorial-dica">
+            <strong>💡 Dica:</strong> os recados expiram automaticamente após o tempo escolhido. Depois disso, são removidos do banco de dados.
+          </div>
+        </section>
+
+        <!-- 8. NOTAS -->
+        <section id="notas" class="tutorial-secao">
+          <div class="tutorial-secao-cabecalho">
+            <div class="tutorial-secao-icone"><i class="fa-solid fa-chart-line"></i></div>
+            <h2>8. Calculadora de notas</h2>
+          </div>
+          <p>A calculadora busca automaticamente suas notas do SUAP e mostra tudo numa tabela organizada.</p>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">📊 O que ela mostra</h3>
+          <ul class="tutorial-lista">
+            <li><strong>Média Geral</strong> — sua média atual entre todas as matérias</li>
+            <li><strong>Disciplinas</strong> — quantas matérias você tem no período</li>
+            <li><strong>Em Risco</strong> — matérias onde você está perto de reprovar</li>
+            <li><strong>Faltas Totais</strong> — soma de todas as faltas</li>
+          </ul>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🎯 Metas</h3>
+          <p>Você pode definir uma <strong>meta individual</strong> pra cada matéria. A calculadora avisa se você está perto ou longe da meta.</p>
+          <ul class="tutorial-lista">
+            <li><strong>Meta global</strong> — vale pra todas as matérias (padrão: 60)</li>
+            <li><strong>Meta individual</strong> — clique no 🎯 ao lado da matéria pra definir uma meta só pra ela</li>
+          </ul>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🧪 Simulador "E se...?"</h3>
+          <p>Nas matérias com etapas em aberto, você pode digitar uma <strong>nota hipotética</strong> e ver como sua média ficaria.</p>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">📈 Histórico e evolução</h3>
+          <p>Se você consultar mais de um período letivo, o site monta um <strong>gráfico de evolução</strong> das suas médias.</p>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">📤 Exportar</h3>
+          <ul class="tutorial-lista">
+            <li><strong>CSV</strong> — abre no Excel/Google Sheets</li>
+            <li><strong>PDF</strong> — gera um boletim bonito pra imprimir/salvar</li>
+          </ul>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🔍 Filtros</h3>
+          <p>Filtre por: <strong>Todas</strong>, <strong>Aprovadas</strong>, <strong>Recuperação</strong>, <strong>Reprovadas</strong> ou <strong>Em Risco</strong>.</p>
+        </section>
+
+        <!-- 9. HORÁRIOS -->
+        <section id="horarios" class="tutorial-secao">
+          <div class="tutorial-secao-cabecalho">
+            <div class="tutorial-secao-icone"><i class="fa-solid fa-calendar-days"></i></div>
+            <h2>9. Horários</h2>
+          </div>
+          <p>Quadro completo das aulas da semana: horário, matéria e dia.</p>
+          <p>O quadro mostra:</p>
+          <ul class="tutorial-lista">
+            <li>Horário de cada aula</li>
+            <li>Matéria de cada dia (Segunda a Sexta)</li>
+            <li>Intervalos (I e II)</li>
+          </ul>
+          <div class="tutorial-aviso">
+            <strong>ℹ️ Importante:</strong> em caso de dúvida, sempre confira o horário oficial no SUAP.
+          </div>
+        </section>
+
+        <!-- 10. AGENDA -->
+        <section id="agenda" class="tutorial-secao">
+          <div class="tutorial-secao-cabecalho">
+            <div class="tutorial-secao-icone"><i class="fa-solid fa-calendar-check"></i></div>
+            <h2>10. Agenda da turma</h2>
+          </div>
+          <p>Um calendário com todos os eventos importantes: provas, trabalhos, feriados, reuniões, festas e mais.</p>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🎨 Legenda de cores</h3>
+          <ul class="tutorial-lista">
+            <li><span style="color:#ff4757">●</span> Vermelho — Provas e avaliações</li>
+            <li><span style="color:#f59e0b">●</span> Laranja — Trabalhos e listas</li>
+            <li><span style="color:#10b981">●</span> Verde — Feriados e recessos</li>
+            <li><span style="color:#7c3aed">●</span> Roxo — Reuniões e aulas</li>
+            <li><span style="color:#06b6d4">●</span> Azul — Esportes e jogos</li>
+            <li><span style="color:#ec4899">●</span> Rosa — Festas e eventos</li>
+          </ul>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">⏰ Contagem regressiva</h3>
+          <p>Acima do calendário aparece uma contagem regressiva pros eventos dos próximos 30 dias.</p>
+
+          <div class="tutorial-dica">
+            <strong>💡 Dica:</strong> clique em qualquer evento pra ver mais detalhes ou abrir no Google Calendar.
+          </div>
+        </section>
+
+        <!-- 11. NOTIFICAÇÕES -->
+        <section id="notificacoes" class="tutorial-secao">
+          <div class="tutorial-secao-cabecalho">
+            <div class="tutorial-secao-icone"><i class="fa-solid fa-bell"></i></div>
+            <h2>11. Notificações</h2>
+          </div>
+          <p>No topo da página, ao lado do menu, tem um <strong>sino 🔔</strong>. Ele mostra quantos recados novos você ainda não viu.</p>
+          <ul class="tutorial-lista">
+            <li><strong>Badge vermelho</strong> — número de notificações não lidas</li>
+            <li><strong>Clique no sino</strong> — abre a lista de notificações</li>
+            <li><strong>Clique numa notificação</strong> — vai direto pro recado</li>
+            <li><strong>Marcar todas</strong> — marca todas como lidas de uma vez</li>
+          </ul>
+        </section>
+
+        <!-- 12. TEMAS -->
+        <section id="temas" class="tutorial-secao">
+          <div class="tutorial-secao-cabecalho">
+            <div class="tutorial-secao-icone"><i class="fa-solid fa-palette"></i></div>
+            <h2>12. Temas e idiomas</h2>
+          </div>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🎨 Cor do tema</h3>
+          <p>Escolha a cor principal do site:</p>
+          <ul class="tutorial-lista">
+            <li><span style="color:#8b5edd">●</span> Roxo (padrão)</li>
+            <li><span style="color:#3b82f6">●</span> Azul</li>
+            <li><span style="color:#10b981">●</span> Verde</li>
+            <li><span style="color:#ec4899">●</span> Rosa</li>
+            <li><span style="color:#f97316">●</span> Laranja</li>
+          </ul>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🌙 Modo claro/escuro</h3>
+          <p>Alterne entre modo claro e escuro pelo botão sol/lua ou pelo menu lateral.</p>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🌐 Idioma</h3>
+          <p>O site tem suporte a 3 idiomas:</p>
+          <ul class="tutorial-lista">
+            <li>🇧🇷 Português (padrão)</li>
+            <li>🇺🇸 English</li>
+            <li>🇪🇸 Español</li>
+          </ul>
+
+          <p>Pra trocar: clique no ícone de <strong>globo 🌐</strong> no menu lateral.</p>
+        </section>
+
+        <!-- 13. PWA -->
+        <section id="pwa" class="tutorial-secao">
+          <div class="tutorial-secao-cabecalho">
+            <div class="tutorial-secao-icone"><i class="fa-solid fa-download"></i></div>
+            <h2>13. Instalar como app</h2>
+          </div>
+          <p>Você pode instalar o site no seu celular ou PC como se fosse um <strong>app nativo</strong>!</p>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">📱 No celular</h3>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">1</div>
+            <div class="tutorial-passo-texto">Abra o site no navegador (Chrome, Edge, Safari).</div>
+          </div>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">2</div>
+            <div class="tutorial-passo-texto">Toque no menu do navegador (três pontinhos ou botão de compartilhar).</div>
+          </div>
+          <div class="tutorial-passo">
+            <div class="tutorial-passo-num">3</div>
+            <div class="tutorial-passo-texto">Selecione <strong>"Adicionar à tela inicial"</strong> ou <strong>"Instalar app"</strong>.</div>
+          </div>
+
+          <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">💻 No computador</h3>
+          <p>No Chrome/Edge, aparece um <strong>ícone de instalação</strong> na barra de endereços. Ou clique no botão <strong>"📥 Instalar"</strong> no topo do site.</p>
+
+          <div class="tutorial-dica">
+            <strong>💡 Dica:</strong> o app instalado abre mais rápido e tem ícone próprio na tela inicial!
+          </div>
+        </section>
+
+        <!-- 14. SALA -->
+        <section id="sala" class="tutorial-secao">
+          <div class="tutorial-secao-cabecalho">
+            <div class="tutorial-secao-icone"><i class="fa-solid fa-user-tie"></i></div>
+            <h2>14. Sala dos Professores</h2>
+          </div>
+          <p>Seção <strong>exclusiva do admin</strong> com visão geral da turma:</p>
+          <ul class="tutorial-lista">
+            <li><strong>Alunos</strong> — tabela com média, faltas, carinhos e conquistas de cada um</li>
+            <li><strong>Em Risco</strong> — alunos com média baixa ou muitas faltas</li>
+            <li><strong>Engajamento</strong> — Top 10 alunos que mais interagem com o site</li>
+            <li><strong>Estatísticas</strong> — totais de carinhos, recados e alunos ativos</li>
+          </ul>
+          <div class="tutorial-aviso">
+            <strong>ℹ️ Importante:</strong> esta seção só aparece se você for admin.
+          </div>
+        </section>
+
+        <a href="login.html" class="tutorial-voltar">
+          <i class="fa-solid fa-arrow-left"></i>
+          Voltar para o site
+        </a>
+      </div>
+    </main>
+
+    <footer class="login-footer" style="margin-top: 40px;">
+      <p>
+        © <span id="ano">2026</span> - Feito pela turma
+        <a href="https://github.com/infoWeb2026-2V" target="_blank" rel="noopener noreferrer">InfoWeb2026.2V</a>
+        Com Carinho 💜
+      </p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="suapi/js.cookie.js"></script>
+    <script src="suapi/settings.sample.js"></script>
+    <script src="suapi/client.js"></script>
+    <script>
+      // ==========================================
+      // VERIFICAÇÃO DE AUTENTICAÇÃO
+      // ==========================================
+      (function () {
+        var suap = new SuapClient(SUAP_URL, CLIENT_ID, REDIRECT_URI, SCOPE);
+        suap.init();
+
+        var conteudo = document.getElementById("tutorial-conteudo");
+        var bloqueado = document.getElementById("tutorial-bloqueado");
+        var anoEl = document.getElementById("ano");
+        if (anoEl) anoEl.textContent = new Date().getFullYear();
+
+        if (suap.isAuthenticated()) {
+          // Mostra o conteúdo
+          conteudo.style.display = "block";
+          bloqueado.style.display = "none";
+
+          // Aplica tema salvo
+          var tema = localStorage.getItem("tema-cor") || "roxo";
+          var temas = ["roxo", "azul", "verde", "rosa", "laranja"];
+          if (temas.indexOf(tema) === -1) tema = "roxo";
+          document.body.classList.add("tema-" + tema);
+
+          // Aplica modo claro/escuro
+          if (localStorage.getItem("theme") === "light") {
+            document.body.classList.add("light-theme");
+          }
+        } else {
+          // Bloqueia
+          conteudo.style.display = "none";
+          bloqueado.style.display = "block";
+        }
+      })();
+    </script>
+  </body>
+</html>
