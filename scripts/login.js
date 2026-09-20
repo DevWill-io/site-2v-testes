@@ -13,21 +13,16 @@ function corParaHex(cor, fallback) {
   fallback = fallback || "#8b5edd";
   if (!cor) return fallback;
   cor = String(cor).trim();
-
   if (/^#[0-9a-f]{6}$/i.test(cor)) return cor;
   if (/^#[0-9a-f]{3}$/i.test(cor)) {
     return "#" + cor[1] + cor[1] + cor[2] + cor[2] + cor[3] + cor[3];
   }
   if (/^#[0-9a-f]{8}$/i.test(cor)) return cor.slice(0, 7);
-
   var mRgb = cor.match(/^rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)/i);
   if (mRgb) {
-    var r = parseInt(mRgb[1], 10),
-      g = parseInt(mRgb[2], 10),
-      b = parseInt(mRgb[3], 10);
+    var r = parseInt(mRgb[1], 10), g = parseInt(mRgb[2], 10), b = parseInt(mRgb[3], 10);
     return "#" + [r, g, b].map(function (n) { return n.toString(16).padStart(2, "0"); }).join("");
   }
-
   var mHsl = cor.match(/^hsla?\(\s*([\d.]+)[\s,]+([\d.]+)%[\s,]+([\d.]+)%/i);
   if (mHsl) {
     var h = parseFloat(mHsl[1]) / 360;
@@ -48,25 +43,19 @@ function corParaHex(cor, fallback) {
     var bb = Math.round(hue2rgb(p, q, h - 1 / 3) * 255);
     return "#" + [rr, gg, bb].map(function (n) { return n.toString(16).padStart(2, "0"); }).join("");
   }
-
   return fallback;
 }
-
-function corParaCanvas(cor, fallback) {
-  return corParaHex(cor, fallback);
-}
-
+function corParaCanvas(cor, fallback) { return corParaHex(cor, fallback); }
 function addStopSeguro(gradient, posicao, cor, fallback) {
-  try {
-    gradient.addColorStop(posicao, corParaCanvas(cor, fallback));
-  } catch (err) {
+  try { gradient.addColorStop(posicao, corParaCanvas(cor, fallback)); }
+  catch (err) {
     console.warn("[gradient] cor inválida:", cor, "→ usando fallback");
     gradient.addColorStop(posicao, fallback || "#8b5edd");
   }
 }
 
 // ==========================================
-// 🎭 SKINS DO MASCOTE (com bloqueio)
+// 🎭 SKINS DO MASCOTE
 // ==========================================
 const AVATARES_MASCOTE = [
   { id: "padrao", emoji: "🐾", nome: "Padrão", gratis: true },
@@ -78,7 +67,7 @@ const AVATARES_MASCOTE = [
 ];
 
 // ==========================================
-// 🏆 NÍVEIS DO USUÁRIO
+// 🏆 NÍVEIS
 // ==========================================
 const NIVEIS = [
   { nivel: 1, xp: 0, nome: "Novato" },
@@ -94,7 +83,7 @@ const NIVEIS = [
 ];
 
 // ==========================================
-// 🎖️ CONQUISTAS (com raridade)
+// 🎖️ CONQUISTAS
 // ==========================================
 const CONQUISTAS = [
   { id: "primeiro_carinho", icone: "🎯", nome: "Primeiro Carinho", desc: "Deu seu primeiro carinho no mascote", raridade: "comum" },
@@ -110,6 +99,20 @@ const CONQUISTAS = [
   { id: "streak_30", icone: "⭐", nome: "Streak 30", desc: "Logou 30 dias seguidos", raridade: "lendario" },
   { id: "mafioso_unlocked", icone: "🕴️", nome: "Mafioso no Pedaço", desc: "Desbloqueou a skin Mafioso (3.000 cliques)", raridade: "lendario" },
 ];
+
+// Recompensas de XP por ação
+const XP_RECOMPENSAS = {
+  recado_postado: 10,
+  comentario: 3,
+  curtida: 1,
+  trocar_avatar: 5,
+  simulador: 2,
+  ver_boletim: 5,
+  definir_meta: 5,
+  conquista: 10,
+  login_diario: 5,
+  clique_mascote: 1,
+};
 
 let meuXP = 0;
 let minhaStreak = 0;
@@ -152,7 +155,6 @@ const TRADUCOES_LOGIN = {
     notificacoes: "Notificações",
     marcar_todas: "Marcar todas",
     sem_notif: "Sem notificações.",
-
     dias: "dias",
     conquistas_titulo: "Conquistas",
     todas: "Todas",
@@ -160,7 +162,6 @@ const TRADUCOES_LOGIN = {
     bloqueadas: "Bloqueadas",
     proxima_skin: "Próxima skin:",
     skin_bloqueada: "Bloqueada",
-
     menu: "Menu",
     nav_notas: "Notas",
     nav_notas_desc: "Sua calculadora",
@@ -178,7 +179,6 @@ const TRADUCOES_LOGIN = {
     nav_sala_desc: "Acesso restrito",
     nav_inicio: "Início",
     nav_inicio_desc: "Página inicial",
-
     calc_titulo_1: "Calculadora de",
     calc_titulo_2: "Notas",
     calc_sub: "Boletim atualizado diretamente pelo SUAP",
@@ -215,7 +215,6 @@ const TRADUCOES_LOGIN = {
     evolucao_sub: "Sua média por período letivo",
     historico_titulo: "Histórico de Períodos",
     historico_vazio: "Carregue pelo menos 2 períodos para comparar.",
-
     contagem_titulo_1: "Faltam",
     contagem_titulo_2: "pouco!",
     contagem_sub: "Próximos eventos importantes",
@@ -224,7 +223,6 @@ const TRADUCOES_LOGIN = {
     contagem_horas: "horas",
     contagem_min: "min",
     contagem_seg: "seg",
-
     horarios_titulo_1: "Quadro de",
     horarios_titulo_2: "Horários",
     horarios_sub: "Nossa rotina semanal",
@@ -238,7 +236,6 @@ const TRADUCOES_LOGIN = {
     intervalo_2: "II Intervalo",
     horario_sujeito: "Horário sujeito a alterações. Consulte o",
     horario_versao: "para a versão oficial.",
-
     mural_titulo_1: "Mural de",
     mural_titulo_2: "Recados",
     mural_sub: "Deixe um recado para a turma",
@@ -250,12 +247,10 @@ const TRADUCOES_LOGIN = {
     dias_7: "7 Dias",
     dias_15: "15 Dias",
     publicar: "Publicar",
-
     membros_titulo_1: "Membros do",
     membros_titulo_2: "Sistema",
     membros_sub: "Membros integrados ao sistema",
     busca_perfis: "🔍 Filtrar por nome ou matrícula...",
-
     agenda_titulo_1: "Agenda da",
     agenda_titulo_2: "Turma",
     agenda_sub: "Eventos de Setembro a Dezembro de 2026",
@@ -276,7 +271,6 @@ const TRADUCOES_LOGIN = {
     usar_meta_global: "Usar meta global",
     mascote_avatar_titulo: "Seu mascote",
     mascote_avatar_desc: "Personalize o mascote que aparece quando você dá carinho.",
-
     sala_titulo: "Sala dos Professores",
     sala_sub: "Visão geral da turma (acesso restrito)",
     sala_tab_alunos: "Alunos",
@@ -296,7 +290,6 @@ const TRADUCOES_LOGIN = {
     sala_stat_recados: "Recados publicados",
     sala_stat_alunos: "Alunos ativos",
     sala_stat_top: "Top contribuinte",
-
     cal_provas: "Provas e avaliações",
     cal_trabalhos: "Trabalhos e listas",
     cal_feriados: "Feriados e recessos",
@@ -304,379 +297,167 @@ const TRADUCOES_LOGIN = {
     cal_esportes: "Esportes e jogos",
     cal_festas: "Festas e eventos",
     cal_outros: "Outros eventos",
-
     footer_feito: "- Feito pela turma",
     footer_carinho: "Com Carinho 💜",
   },
-
   en: {
     titulo_pagina_login: "SUAP Login | Class 2V IFRN",
-    voltar: "Back",
-    portal_suap: "SUAP Portal",
+    voltar: "Back", portal_suap: "SUAP Portal",
     area_auth: "Academic authentication area",
     acesse_credenciais: "Log in with your IFRN institutional credentials to integrate and view your academic data.",
-    login_suap: "Login with SUAP",
-    login_ok: "You logged in successfully!",
-    sessao_ativa: "Active session connected to SUAP.",
-    bem_vindo: "Welcome,",
-    editar_perfil: "Edit Profile",
-    editar_perfil_sub: "Customize how you appear to the class.",
-    encerrar_sessao: "Log Out",
-    idioma: "Language",
-    tema: "Theme",
-    cor_tema: "Theme color",
-    modo: "Mode",
-    cor_roxo: "Purple",
-    cor_azul: "Blue",
-    cor_verde: "Green",
-    cor_rosa: "Pink",
-    cor_laranja: "Orange",
-    modo_claro: "Light",
-    modo_escuro: "Dark",
-    instalar_app: "Install app",
-    notificacoes: "Notifications",
-    marcar_todas: "Mark all",
-    sem_notif: "No notifications.",
-
-    dias: "days",
-    conquistas_titulo: "Achievements",
-    todas: "All",
-    desbloqueadas: "Unlocked",
-    bloqueadas: "Locked",
-    proxima_skin: "Next skin:",
-    skin_bloqueada: "Locked",
-
-    nav_inicio: "Home",
-    nav_inicio_desc: "Homepage",
-    menu: "Menu",
-    nav_notas: "Grades",
-    nav_notas_desc: "Your calculator",
-    nav_horarios: "Schedule",
-    nav_horarios_desc: "Weekly routine",
-    nav_mural: "Board",
-    nav_mural_desc: "Class messages",
-    nav_membros: "Members",
-    nav_membros_desc: "Classmates",
-    nav_agenda: "Agenda",
-    nav_agenda_desc: "Calendar events",
-    nav_mascote: "Mascot",
-    nav_mascote_desc: "Interact with it",
-    nav_sala: "Teachers' Room",
-    nav_sala_desc: "Restricted access",
-
-    calc_titulo_1: "Grade",
-    calc_titulo_2: "Calculator",
+    login_suap: "Login with SUAP", login_ok: "You logged in successfully!",
+    sessao_ativa: "Active session connected to SUAP.", bem_vindo: "Welcome,",
+    editar_perfil: "Edit Profile", editar_perfil_sub: "Customize how you appear to the class.",
+    encerrar_sessao: "Log Out", idioma: "Language", tema: "Theme",
+    cor_tema: "Theme color", modo: "Mode", cor_roxo: "Purple", cor_azul: "Blue",
+    cor_verde: "Green", cor_rosa: "Pink", cor_laranja: "Orange",
+    modo_claro: "Light", modo_escuro: "Dark", instalar_app: "Install app",
+    notificacoes: "Notifications", marcar_todas: "Mark all", sem_notif: "No notifications.",
+    dias: "days", conquistas_titulo: "Achievements", todas: "All",
+    desbloqueadas: "Unlocked", bloqueadas: "Locked",
+    proxima_skin: "Next skin:", skin_bloqueada: "Locked",
+    nav_inicio: "Home", nav_inicio_desc: "Homepage", menu: "Menu",
+    nav_notas: "Grades", nav_notas_desc: "Your calculator",
+    nav_horarios: "Schedule", nav_horarios_desc: "Weekly routine",
+    nav_mural: "Board", nav_mural_desc: "Class messages",
+    nav_membros: "Members", nav_membros_desc: "Classmates",
+    nav_agenda: "Agenda", nav_agenda_desc: "Calendar events",
+    nav_mascote: "Mascot", nav_mascote_desc: "Interact with it",
+    nav_sala: "Teachers' Room", nav_sala_desc: "Restricted access",
+    calc_titulo_1: "Grade", calc_titulo_2: "Calculator",
     calc_sub: "Report card updated directly from SUAP",
-    media_geral: "Overall Average",
-    disciplinas: "Subjects",
-    em_risco: "At Risk",
-    faltas_totais: "Total Absences",
-    periodo: "Term",
-    meta: "Target",
-    atualizar: "Refresh",
-    export_csv: "Export CSV",
-    export_pdf: "Export PDF",
-    limpar_simulador: "Clear simulator",
-    filtro_todas: "All",
-    filtro_aprovadas: "Passed",
-    filtro_recuperacao: "Recovery",
-    filtro_reprovadas: "Failed",
-    filtro_risco: "At risk",
-    aguardando_suap: "Waiting for SUAP data...",
-    th_disciplina: "Subject",
-    th_etapas: "Grades",
-    th_media: "Average",
-    th_faltas: "Absences",
-    th_projecao: "Projection",
-    th_status: "Status",
+    media_geral: "Overall Average", disciplinas: "Subjects", em_risco: "At Risk",
+    faltas_totais: "Total Absences", periodo: "Term", meta: "Target", atualizar: "Refresh",
+    export_csv: "Export CSV", export_pdf: "Export PDF", limpar_simulador: "Clear simulator",
+    filtro_todas: "All", filtro_aprovadas: "Passed", filtro_recuperacao: "Recovery",
+    filtro_reprovadas: "Failed", filtro_risco: "At risk", aguardando_suap: "Waiting for SUAP data...",
+    th_disciplina: "Subject", th_etapas: "Grades", th_media: "Average", th_faltas: "Absences",
+    th_projecao: "Projection", th_status: "Status",
     th_simulador: "Simulator: enter a hypothetical grade for the next term",
-    th_meta_ind: "Individual target",
-    notas_vazio: "Log in to load your grades.",
-    leg_aprovado: "Passed",
-    leg_recuperacao: "Recovery",
-    leg_reprovado: "Failed",
+    th_meta_ind: "Individual target", notas_vazio: "Log in to load your grades.",
+    leg_aprovado: "Passed", leg_recuperacao: "Recovery", leg_reprovado: "Failed",
     leg_extra: "🧪 Simulator • 🎯 Individual target",
-    evolucao_titulo: "Average Evolution",
-    evolucao_sub: "Your average per academic term",
-    historico_titulo: "Term History",
-    historico_vazio: "Load at least 2 terms to compare.",
-
-    contagem_titulo_1: "Almost",
-    contagem_titulo_2: "there!",
+    evolucao_titulo: "Average Evolution", evolucao_sub: "Your average per academic term",
+    historico_titulo: "Term History", historico_vazio: "Load at least 2 terms to compare.",
+    contagem_titulo_1: "Almost", contagem_titulo_2: "there!",
     contagem_sub: "Upcoming important events",
     contagem_vazio: "No upcoming events in the next 30 days.",
-    contagem_dias: "days",
-    contagem_horas: "hours",
-    contagem_min: "min",
-    contagem_seg: "sec",
-
-    horarios_titulo_1: "Weekly",
-    horarios_titulo_2: "Schedule",
-    horarios_sub: "Our weekly routine",
-    th_horario: "Time",
-    dia_seg: "Monday",
-    dia_ter: "Tuesday",
-    dia_qua: "Wednesday",
-    dia_qui: "Thursday",
-    dia_sex: "Friday",
-    intervalo_1: "Break I",
-    intervalo_2: "Break II",
-    horario_sujeito: "Schedule subject to change. Check",
-    horario_versao: "for the official version.",
-
-    mural_titulo_1: "Message",
-    mural_titulo_2: "Board",
-    mural_sub: "Leave a message for the class",
-    busca_recados: "🔍 Search messages...",
-    recado_msg: "Your message...",
-    recado_link: "Optional link/attachment (https://...)",
-    expirar_em: "Expires in:",
-    dia_1: "1 Day",
-    dias_7: "7 Days",
-    dias_15: "15 Days",
-    publicar: "Post",
-
-    membros_titulo_1: "System",
-    membros_titulo_2: "Members",
+    contagem_dias: "days", contagem_horas: "hours", contagem_min: "min", contagem_seg: "sec",
+    horarios_titulo_1: "Weekly", horarios_titulo_2: "Schedule", horarios_sub: "Our weekly routine",
+    th_horario: "Time", dia_seg: "Monday", dia_ter: "Tuesday", dia_qua: "Wednesday",
+    dia_qui: "Thursday", dia_sex: "Friday", intervalo_1: "Break I", intervalo_2: "Break II",
+    horario_sujeito: "Schedule subject to change. Check", horario_versao: "for the official version.",
+    mural_titulo_1: "Message", mural_titulo_2: "Board", mural_sub: "Leave a message for the class",
+    busca_recados: "🔍 Search messages...", recado_msg: "Your message...",
+    recado_link: "Optional link/attachment (https://...)", expirar_em: "Expires in:",
+    dia_1: "1 Day", dias_7: "7 Days", dias_15: "15 Days", publicar: "Post",
+    membros_titulo_1: "System", membros_titulo_2: "Members",
     membros_sub: "Members integrated into the system",
     busca_perfis: "🔍 Filter by name or ID...",
-
-    agenda_titulo_1: "Class",
-    agenda_titulo_2: "Agenda",
+    agenda_titulo_1: "Class", agenda_titulo_2: "Agenda",
     agenda_sub: "Events from September to December 2026",
-    matricula: "ID:",
-    ultimo_acesso: "Last Access:",
-    nao_registrado: "Not registered",
-    trocar_foto: "Change photo",
-    restaurar_suap: "Restore SUAP photo",
+    matricula: "ID:", ultimo_acesso: "Last Access:", nao_registrado: "Not registered",
+    trocar_foto: "Change photo", restaurar_suap: "Restore SUAP photo",
     foto_hint: "JPG/PNG up to 5MB — will be optimized.",
-    nome_exibicao: "Display name",
-    nome_placeholder: "How you want to be called",
-    bio: "Bio",
-    bio_placeholder: "Tell a bit about yourself...",
-    redes_sociais: "Social media",
-    cancelar: "Cancel",
-    salvar: "Save",
-    meta_individual: "Individual target",
-    usar_meta_global: "Use global target",
+    nome_exibicao: "Display name", nome_placeholder: "How you want to be called",
+    bio: "Bio", bio_placeholder: "Tell a bit about yourself...",
+    redes_sociais: "Social media", cancelar: "Cancel", salvar: "Save",
+    meta_individual: "Individual target", usar_meta_global: "Use global target",
     mascote_avatar_titulo: "Your mascot",
     mascote_avatar_desc: "Customize the mascot that appears when you send a hug.",
-
-    sala_titulo: "Teachers' Room",
-    sala_sub: "Class overview (restricted access)",
-    sala_tab_alunos: "Students",
-    sala_tab_risco: "At Risk",
-    sala_tab_engajamento: "Engagement",
+    sala_titulo: "Teachers' Room", sala_sub: "Class overview (restricted access)",
+    sala_tab_alunos: "Students", sala_tab_risco: "At Risk", sala_tab_engajamento: "Engagement",
     sala_busca: "🔍 Search student by name or ID...",
-    sala_th_aluno: "Student",
-    sala_th_matricula: "ID",
-    sala_th_media: "Average",
-    sala_th_faltas: "Absences",
-    sala_th_carinhos: "Hugs",
-    sala_th_conquistas: "Achievements",
-    sala_th_status: "Status",
-    sala_carregando: "Loading data...",
-    sala_risco_carregando: "Loading...",
-    sala_stat_carinhos: "Total hugs",
-    sala_stat_recados: "Posts published",
-    sala_stat_alunos: "Active students",
+    sala_th_aluno: "Student", sala_th_matricula: "ID", sala_th_media: "Average",
+    sala_th_faltas: "Absences", sala_th_carinhos: "Hugs", sala_th_conquistas: "Achievements",
+    sala_th_status: "Status", sala_carregando: "Loading data...",
+    sala_risco_carregando: "Loading...", sala_stat_carinhos: "Total hugs",
+    sala_stat_recados: "Posts published", sala_stat_alunos: "Active students",
     sala_stat_top: "Top contributor",
-
-    cal_provas: "Exams and quizzes",
-    cal_trabalhos: "Assignments and lists",
-    cal_feriados: "Holidays and breaks",
-    cal_reunioes: "Meetings and classes",
-    cal_esportes: "Sports and games",
-    cal_festas: "Parties and events",
-    cal_outros: "Other events",
-
-    footer_feito: "- Made by class",
-    footer_carinho: "With love 💜",
+    cal_provas: "Exams and quizzes", cal_trabalhos: "Assignments and lists",
+    cal_feriados: "Holidays and breaks", cal_reunioes: "Meetings and classes",
+    cal_esportes: "Sports and games", cal_festas: "Parties and events",
+    cal_outros: "Other events", footer_feito: "- Made by class", footer_carinho: "With love 💜",
   },
-
   es: {
     titulo_pagina_login: "Login SUAP | Clase 2V IFRN",
-    voltar: "Volver",
-    portal_suap: "Portal SUAP",
+    voltar: "Volver", portal_suap: "Portal SUAP",
     area_auth: "Área de autenticación académica",
     acesse_credenciais: "Inicia sesión con tus credenciales institucionales del IFRN para integrar y ver tus datos académicos.",
-    login_suap: "Entrar con SUAP",
-    login_ok: "¡Iniciaste sesión correctamente!",
-    sessao_ativa: "Sesión activa y conectada al SUAP.",
-    bem_vindo: "Bienvenido,",
-    editar_perfil: "Editar Perfil",
-    editar_perfil_sub: "Personaliza cómo apareces ante la clase.",
-    encerrar_sessao: "Cerrar Sesión",
-    idioma: "Idioma",
-    tema: "Tema",
-    cor_tema: "Color del tema",
-    modo: "Modo",
-    cor_roxo: "Morado",
-    cor_azul: "Azul",
-    cor_verde: "Verde",
-    cor_rosa: "Rosa",
-    cor_laranja: "Naranja",
-    modo_claro: "Claro",
-    modo_escuro: "Oscuro",
-    instalar_app: "Instalar app",
-    notificacoes: "Notificaciones",
-    marcar_todas: "Marcar todas",
-    sem_notif: "Sin notificaciones.",
-
-    dias: "días",
-    conquistas_titulo: "Logros",
-    todas: "Todos",
-    desbloqueadas: "Desbloqueados",
-    bloqueadas: "Bloqueados",
-    proxima_skin: "Próxima skin:",
-    skin_bloqueada: "Bloqueada",
-
-    nav_inicio: "Inicio",
-    nav_inicio_desc: "Página de inicio",
-    menu: "Menú",
-    nav_notas: "Notas",
-    nav_notas_desc: "Tu calculadora",
-    nav_horarios: "Horarios",
-    nav_horarios_desc: "Rutina semanal",
-    nav_mural: "Mural",
-    nav_mural_desc: "Mensajes de la clase",
-    nav_membros: "Miembros",
-    nav_membros_desc: "Compañeros del sistema",
-    nav_agenda: "Agenda",
-    nav_agenda_desc: "Eventos del calendario",
-    nav_mascote: "Mascota",
-    nav_mascote_desc: "Interactúa con ella",
-    nav_sala: "Sala de Profesores",
-    nav_sala_desc: "Acceso restringido",
-
-    calc_titulo_1: "Calculadora de",
-    calc_titulo_2: "Notas",
+    login_suap: "Entrar con SUAP", login_ok: "¡Iniciaste sesión correctamente!",
+    sessao_ativa: "Sesión activa y conectada al SUAP.", bem_vindo: "Bienvenido,",
+    editar_perfil: "Editar Perfil", editar_perfil_sub: "Personaliza cómo apareces ante la clase.",
+    encerrar_sessao: "Cerrar Sesión", idioma: "Idioma", tema: "Tema",
+    cor_tema: "Color del tema", modo: "Modo", cor_roxo: "Morado", cor_azul: "Azul",
+    cor_verde: "Verde", cor_rosa: "Rosa", cor_laranja: "Naranja",
+    modo_claro: "Claro", modo_escuro: "Oscuro", instalar_app: "Instalar app",
+    notificacoes: "Notificaciones", marcar_todas: "Marcar todas", sem_notif: "Sin notificaciones.",
+    dias: "días", conquistas_titulo: "Logros", todas: "Todos",
+    desbloqueadas: "Desbloqueados", bloqueadas: "Bloqueados",
+    proxima_skin: "Próxima skin:", skin_bloqueada: "Bloqueada",
+    nav_inicio: "Inicio", nav_inicio_desc: "Página de inicio", menu: "Menú",
+    nav_notas: "Notas", nav_notas_desc: "Tu calculadora",
+    nav_horarios: "Horarios", nav_horarios_desc: "Rutina semanal",
+    nav_mural: "Mural", nav_mural_desc: "Mensajes de la clase",
+    nav_membros: "Miembros", nav_membros_desc: "Compañeros del sistema",
+    nav_agenda: "Agenda", nav_agenda_desc: "Eventos del calendario",
+    nav_mascote: "Mascota", nav_mascote_desc: "Interactúa con ella",
+    nav_sala: "Sala de Profesores", nav_sala_desc: "Acceso restringido",
+    calc_titulo_1: "Calculadora de", calc_titulo_2: "Notas",
     calc_sub: "Boletín actualizado directamente desde SUAP",
-    media_geral: "Promedio General",
-    disciplinas: "Asignaturas",
-    em_risco: "En Riesgo",
-    faltas_totais: "Faltas Totales",
-    periodo: "Período",
-    meta: "Meta",
-    atualizar: "Actualizar",
-    export_csv: "Exportar CSV",
-    export_pdf: "Exportar PDF",
-    limpar_simulador: "Limpiar simulador",
-    filtro_todas: "Todas",
-    filtro_aprovadas: "Aprobadas",
-    filtro_recuperacao: "Recuperación",
-    filtro_reprovadas: "Reprobadas",
-    filtro_risco: "En riesgo",
-    aguardando_suap: "Esperando datos del SUAP...",
-    th_disciplina: "Asignatura",
-    th_etapas: "Notas",
-    th_media: "Promedio",
-    th_faltas: "Faltas",
-    th_projecao: "Proyección",
-    th_status: "Estado",
+    media_geral: "Promedio General", disciplinas: "Asignaturas", em_risco: "En Riesgo",
+    faltas_totais: "Faltas Totales", periodo: "Período", meta: "Meta", atualizar: "Actualizar",
+    export_csv: "Exportar CSV", export_pdf: "Exportar PDF", limpar_simulador: "Limpiar simulador",
+    filtro_todas: "Todas", filtro_aprovadas: "Aprobadas", filtro_recuperacao: "Recuperación",
+    filtro_reprovadas: "Reprobadas", filtro_risco: "En riesgo", aguardando_suap: "Esperando datos del SUAP...",
+    th_disciplina: "Asignatura", th_etapas: "Notas", th_media: "Promedio", th_faltas: "Faltas",
+    th_projecao: "Proyección", th_status: "Estado",
     th_simulador: "Simulador: ingresa una nota hipotética para la próxima etapa",
-    th_meta_ind: "Meta individual",
-    notas_vazio: "Inicia sesión para cargar tus notas.",
-    leg_aprovado: "Aprobado",
-    leg_recuperacao: "Recuperación",
-    leg_reprovado: "Reprobado",
+    th_meta_ind: "Meta individual", notas_vazio: "Inicia sesión para cargar tus notas.",
+    leg_aprovado: "Aprobado", leg_recuperacao: "Recuperación", leg_reprovado: "Reprobado",
     leg_extra: "🧪 Simulador • 🎯 Meta individual",
-    evolucao_titulo: "Evolución de Promedios",
-    evolucao_sub: "Tu promedio por período lectivo",
+    evolucao_titulo: "Evolución de Promedios", evolucao_sub: "Tu promedio por período lectivo",
     historico_titulo: "Historial de Períodos",
     historico_vazio: "Carga al menos 2 períodos para comparar.",
-
-    contagem_titulo_1: "Falta",
-    contagem_titulo_2: "poco!",
+    contagem_titulo_1: "Falta", contagem_titulo_2: "poco!",
     contagem_sub: "Próximos eventos importantes",
     contagem_vazio: "Ningún evento próximo en los próximos 30 días.",
-    contagem_dias: "días",
-    contagem_horas: "horas",
-    contagem_min: "min",
-    contagem_seg: "seg",
-
-    horarios_titulo_1: "Horario",
-    horarios_titulo_2: "Semanal",
-    horarios_sub: "Nuestra rutina semanal",
-    th_horario: "Hora",
-    dia_seg: "Lunes",
-    dia_ter: "Martes",
-    dia_qua: "Miércoles",
-    dia_qui: "Jueves",
-    dia_sex: "Viernes",
-    intervalo_1: "Recreo I",
-    intervalo_2: "Recreo II",
-    horario_sujeito: "Horario sujeto a cambios. Consulta el",
-    horario_versao: "para la versión oficial.",
-
-    mural_titulo_1: "Mural de",
-    mural_titulo_2: "Mensajes",
-    mural_sub: "Deja un mensaje para la clase",
-    busca_recados: "🔍 Buscar mensajes...",
-    recado_msg: "Tu mensaje...",
-    recado_link: "Enlace/adjunto opcional (https://...)",
-    expirar_em: "Expira en:",
-    dia_1: "1 Día",
-    dias_7: "7 Días",
-    dias_15: "15 Días",
-    publicar: "Publicar",
-
-    membros_titulo_1: "Miembros del",
-    membros_titulo_2: "Sistema",
+    contagem_dias: "días", contagem_horas: "horas", contagem_min: "min", contagem_seg: "seg",
+    horarios_titulo_1: "Horario", horarios_titulo_2: "Semanal", horarios_sub: "Nuestra rutina semanal",
+    th_horario: "Hora", dia_seg: "Lunes", dia_ter: "Martes", dia_qua: "Miércoles",
+    dia_qui: "Jueves", dia_sex: "Viernes", intervalo_1: "Recreo I", intervalo_2: "Recreo II",
+    horario_sujeito: "Horario sujeto a cambios. Consulta el", horario_versao: "para la versión oficial.",
+    mural_titulo_1: "Mural de", mural_titulo_2: "Mensajes", mural_sub: "Deja un mensaje para la clase",
+    busca_recados: "🔍 Buscar mensajes...", recado_msg: "Tu mensaje...",
+    recado_link: "Enlace/adjunto opcional (https://...)", expirar_em: "Expira en:",
+    dia_1: "1 Día", dias_7: "7 Días", dias_15: "15 Días", publicar: "Publicar",
+    membros_titulo_1: "Miembros del", membros_titulo_2: "Sistema",
     membros_sub: "Miembros integrados al sistema",
     busca_perfis: "🔍 Filtrar por nombre o matrícula...",
-
-    agenda_titulo_1: "Agenda de la",
-    agenda_titulo_2: "Clase",
+    agenda_titulo_1: "Agenda de la", agenda_titulo_2: "Clase",
     agenda_sub: "Eventos de Septiembre a Diciembre de 2026",
-    matricula: "Matrícula:",
-    ultimo_acesso: "Último Acceso:",
-    nao_registrado: "No registrado",
-    trocar_foto: "Cambiar foto",
-    restaurar_suap: "Restaurar foto SUAP",
+    matricula: "Matrícula:", ultimo_acesso: "Último Acceso:", nao_registrado: "No registrado",
+    trocar_foto: "Cambiar foto", restaurar_suap: "Restaurar foto SUAP",
     foto_hint: "JPG/PNG hasta 5MB — será optimizada.",
-    nome_exibicao: "Nombre para mostrar",
-    nome_placeholder: "Cómo quieres ser llamado",
-    bio: "Biografía",
-    bio_placeholder: "Cuenta un poco sobre ti...",
-    redes_sociais: "Redes sociales",
-    cancelar: "Cancelar",
-    salvar: "Guardar",
-    meta_individual: "Meta individual",
-    usar_meta_global: "Usar meta global",
+    nome_exibicao: "Nombre para mostrar", nome_placeholder: "Cómo quieres ser llamado",
+    bio: "Biografía", bio_placeholder: "Cuenta un poco sobre ti...",
+    redes_sociais: "Redes sociales", cancelar: "Cancelar", salvar: "Guardar",
+    meta_individual: "Meta individual", usar_meta_global: "Usar meta global",
     mascote_avatar_titulo: "Tu mascota",
     mascote_avatar_desc: "Personaliza la mascota que aparece cuando das cariño.",
-
-    sala_titulo: "Sala de Profesores",
-    sala_sub: "Vista general de la clase (acceso restringido)",
-    sala_tab_alunos: "Alumnos",
-    sala_tab_risco: "En Riesgo",
-    sala_tab_engajamento: "Compromiso",
+    sala_titulo: "Sala de Profesores", sala_sub: "Vista general de la clase (acceso restringido)",
+    sala_tab_alunos: "Alumnos", sala_tab_risco: "En Riesgo", sala_tab_engajamento: "Compromiso",
     sala_busca: "🔍 Buscar alumno por nombre o matrícula...",
-    sala_th_aluno: "Alumno",
-    sala_th_matricula: "Matrícula",
-    sala_th_media: "Promedio",
-    sala_th_faltas: "Faltas",
-    sala_th_carinhos: "Cariños",
-    sala_th_conquistas: "Logros",
-    sala_th_status: "Estado",
-    sala_carregando: "Cargando datos...",
-    sala_risco_carregando: "Cargando...",
-    sala_stat_carinhos: "Cariños totales",
-    sala_stat_recados: "Mensajes publicados",
-    sala_stat_alumnos: "Alumnos activos",
+    sala_th_aluno: "Alumno", sala_th_matricula: "Matrícula", sala_th_media: "Promedio",
+    sala_th_faltas: "Faltas", sala_th_carinhos: "Cariños", sala_th_conquistas: "Logros",
+    sala_th_status: "Estado", sala_carregando: "Cargando datos...",
+    sala_risco_carregando: "Cargando...", sala_stat_carinhos: "Cariños totales",
+    sala_stat_recados: "Mensajes publicados", sala_stat_alumnos: "Alumnos activos",
     sala_stat_top: "Top contribuyente",
-
-    cal_provas: "Exámenes y evaluaciones",
-    cal_trabalhos: "Trabajos y listas",
-    cal_feriados: "Feriados y recesos",
-    cal_reunioes: "Reuniones y clases",
-    cal_esportes: "Deportes y juegos",
-    cal_festas: "Fiestas y eventos",
-    cal_outros: "Otros eventos",
-
-    footer_feito: "- Hecho por la clase",
-    footer_carinho: "Con cariño 💜",
+    cal_provas: "Exámenes y evaluaciones", cal_trabalhos: "Trabajos y listas",
+    cal_feriados: "Feriados y recesos", cal_reunioes: "Reuniones y clases",
+    cal_esportes: "Deportes y juegos", cal_festas: "Fiestas y eventos",
+    cal_outros: "Otros eventos", footer_feito: "- Hecho por la clase", footer_carinho: "Con cariño 💜",
   },
 };
 
@@ -695,18 +476,8 @@ function calcularNivel(xp) {
   const proximo = NIVEIS.find(n => n.nivel === nivelAtual.nivel + 1) || null;
   const xpProximo = proximo ? proximo.xp : nivelAtual.xp;
   const xpAtual = nivelAtual.xp;
-  const progresso = proximo
-    ? Math.round(((xp - xpAtual) / (xpProximo - xpAtual)) * 100)
-    : 100;
-
-  return {
-    nivel: nivelAtual.nivel,
-    nome: nivelAtual.nome,
-    xpAtual,
-    xpProximo,
-    progresso,
-    proximoNome: proximo ? proximo.nome : null,
-  };
+  const progresso = proximo ? Math.round(((xp - xpAtual) / (xpProximo - xpAtual)) * 100) : 100;
+  return { nivel: nivelAtual.nivel, nome: nivelAtual.nome, xpAtual, xpProximo, progresso, proximoNome: proximo ? proximo.nome : null };
 }
 
 async function adicionarXP(quantidade, motivo) {
@@ -731,7 +502,9 @@ async function adicionarXP(quantidade, motivo) {
       }
     }
 
-    await carregarPainelXP();
+    // Atualiza painel (sem chamar carregarPainelXP pra evitar loop)
+    meuXP = xpDepois;
+    renderizarPainelXP();
   } catch (e) {
     console.warn("[XP] Erro:", e);
   }
@@ -752,7 +525,31 @@ async function desbloquearConquista(idConquista) {
       exibirToast(`${c.icone} CONQUISTA: ${c.nome}!`, "sucesso");
     }
 
-    await carregarPainelXP();
+    // +10 XP por desbloquear (direto no Firebase pra evitar recursão)
+    try {
+      const refXP = ref(db, "usuarios_xp/" + mat);
+      const snapXP = await get(refXP);
+      const dadosXP = snapXP.val() || {};
+      const xpAntes = Number(dadosXP.xp) || 0;
+      const xpDepois = xpAntes + XP_RECOMPENSAS.conquista;
+      await update(refXP, { xp: xpDepois });
+
+      const nivelAntes = calcularNivel(xpAntes);
+      const nivelDepois = calcularNivel(xpDepois);
+      if (nivelDepois.nivel > nivelAntes.nivel) {
+        if (typeof exibirToast === "function") {
+          exibirToast(`🎉 SUBIU DE NÍVEL! ${nivelDepois.nome} (Nv ${nivelDepois.nivel})`, "sucesso");
+        }
+      }
+      meuXP = xpDepois;
+      renderizarPainelXP();
+    } catch (e) {
+      console.warn("[conquista XP] erro:", e);
+    }
+
+    // Atualiza estado local e re-renderiza conquistas
+    minhasConquistas[idConquista] = { desbloqueadaEm: Date.now() };
+    renderizarConquistas();
   } catch (e) {
     console.warn("[conquista] Erro:", e);
   }
@@ -780,12 +577,75 @@ async function atualizarStreakLogin() {
     else streak = 1;
 
     await update(refXP, { streak, ultimaVisita: hoje });
-    await adicionarXP(5, "login diário");
+    await adicionarXP(XP_RECOMPENSAS.login_diario, "login_diario");
 
     if (streak >= 7) desbloquearConquista("streak_7");
     if (streak >= 30) desbloquearConquista("streak_30");
   } catch (e) {
     console.warn("[streak] Erro:", e);
+  }
+}
+
+// ==========================================
+// 🆕 HELPERS: LIMITE DIÁRIO / POR PERÍODO
+// ==========================================
+function obterDataHoje() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function podeGanharXPSimulador() {
+  try {
+    const raw = localStorage.getItem("xp_simulador_hoje");
+    const dados = raw ? JSON.parse(raw) : {};
+    if (dados.data !== obterDataHoje()) return true;
+    return (dados.count || 0) < 10; // limite diário: 10 usos × 2 XP = 20 XP/dia
+  } catch { return true; }
+}
+function registrarXPSimulador() {
+  const hoje = obterDataHoje();
+  let dados = {};
+  try {
+    const raw = localStorage.getItem("xp_simulador_hoje");
+    dados = raw ? JSON.parse(raw) : {};
+  } catch {}
+  if (dados.data !== hoje) dados = { data: hoje, count: 0 };
+  dados.count = (dados.count || 0) + 1;
+  localStorage.setItem("xp_simulador_hoje", JSON.stringify(dados));
+}
+
+function jaGanhouXPBoletim(periodo) {
+  try {
+    const raw = localStorage.getItem("xp_boletim_periodos");
+    const dados = raw ? JSON.parse(raw) : {};
+    return !!dados[periodo];
+  } catch { return false; }
+}
+function marcarXPBoletim(periodo) {
+  let dados = {};
+  try {
+    const raw = localStorage.getItem("xp_boletim_periodos");
+    dados = raw ? JSON.parse(raw) : {};
+  } catch {}
+  dados[periodo] = Date.now();
+  localStorage.setItem("xp_boletim_periodos", JSON.stringify(dados));
+}
+
+// ==========================================
+// 🆕 MIGRAÇÃO DE XP LOCAL → FIREBASE
+// ==========================================
+async function migrarXPLocalParaFirebase(mat) {
+  try {
+    const xpLocal = parseInt(localStorage.getItem("xp_total") || "0", 10);
+    if (xpLocal <= 0) return;
+    const refXP = ref(db, "usuarios_xp/" + mat);
+    const snap = await get(refXP);
+    const dados = snap.val() || {};
+    const xpAtual = Number(dados.xp) || 0;
+    await update(refXP, { xp: xpAtual + xpLocal });
+    localStorage.setItem("xp_total", "0");
+    console.log(`[XP] Migrados ${xpLocal} XP local → Firebase`);
+  } catch (e) {
+    console.warn("[XP migração] erro:", e);
   }
 }
 
@@ -797,6 +657,9 @@ async function carregarPainelXP() {
   if (!mat || mat === "Matrícula não disponível") return;
 
   try {
+    // Migra XP local (dos cliques no mascote) antes de ler Firebase
+    await migrarXPLocalParaFirebase(mat);
+
     const refXP = ref(db, "usuarios_xp/" + mat);
     const snap = await get(refXP);
     const dados = snap.val() || {};
@@ -813,23 +676,12 @@ async function carregarPainelXP() {
     const avatarSalvo = dados.mascoteAvatar || localStorage.getItem("skin_ativa") || "padrao";
     avatarSelecionado = avatarSalvo;
 
-    // 🆕 Desbloqueia conquistas de skins automaticamente
-    if (meusCliquesMascote >= 1500 && !minhasConquistas["simpson_unlocked"]) {
-      await desbloquearConquista("simpson_unlocked");
-    }
-    if (meusCliquesMascote >= 3000 && !minhasConquistas["mafioso_unlocked"]) {
-      await desbloquearConquista("mafioso_unlocked");
-    }
-    // 🆕 Conquistas de carinho
-    if (meusCliquesMascote >= 100 && !minhasConquistas["carinhoso"]) {
-      await desbloquearConquista("carinhoso");
-    }
-    if (meusCliquesMascote >= 500 && !minhasConquistas["apaixonado"]) {
-      await desbloquearConquista("apaixonado");
-    }
-    if (meusCliquesMascote >= 1 && !minhasConquistas["primeiro_carinho"]) {
-      await desbloquearConquista("primeiro_carinho");
-    }
+    // Desbloqueia conquistas automáticas
+    if (meusCliquesMascote >= 1500) await desbloquearConquista("simpson_unlocked");
+    if (meusCliquesMascote >= 3000) await desbloquearConquista("mafioso_unlocked");
+    if (meusCliquesMascote >= 100) await desbloquearConquista("carinhoso");
+    if (meusCliquesMascote >= 500) await desbloquearConquista("apaixonado");
+    if (meusCliquesMascote >= 1) await desbloquearConquista("primeiro_carinho");
   } catch (e) {
     console.warn("[painelXP] Erro:", e);
     meuXP = parseInt(localStorage.getItem("xp_total") || "0", 10);
@@ -889,25 +741,18 @@ function renderizarConquistas() {
     return;
   }
 
-  grid.innerHTML = conquistasFiltradas
-    .map((c) => {
-      const desbloqueada = !!minhasConquistas[c.id];
-      const raridade = c.raridade || "comum";
-      return `
-        <div
-          class="conquista-card ${desbloqueada ? "desbloqueada" : "bloqueada"} ${raridade}"
-          title="${escaparHTML(c.desc)}"
-        >
-          <div class="conquista-icone">
-            ${c.icone}
-          </div>
-          <div class="conquista-info">
-            <span class="conquista-titulo">${escaparHTML(c.nome)}</span>
-            <span class="conquista-desc">${escaparHTML(c.desc)}</span>
-          </div>
-        </div>`;
-    })
-    .join("");
+  grid.innerHTML = conquistasFiltradas.map((c) => {
+    const desbloqueada = !!minhasConquistas[c.id];
+    const raridade = c.raridade || "comum";
+    return `
+      <div class="conquista-card ${desbloqueada ? "desbloqueada" : "bloqueada"} ${raridade}" title="${escaparHTML(c.desc)}">
+        <div class="conquista-icone">${c.icone}</div>
+        <div class="conquista-info">
+          <span class="conquista-titulo">${escaparHTML(c.nome)}</span>
+          <span class="conquista-desc">${escaparHTML(c.desc)}</span>
+        </div>
+      </div>`;
+  }).join("");
 }
 
 function inicializarFiltrosConquistas() {
@@ -932,11 +777,8 @@ function obterIdiomaAtual() {
 
 function t(chave) {
   var lang = obterIdiomaAtual();
-  return (
-    (TRADUCOES_LOGIN[lang] && TRADUCOES_LOGIN[lang][chave]) ||
-    TRADUCOES_LOGIN[IDIOMA_PADRAO][chave] ||
-    chave
-  );
+  return (TRADUCOES_LOGIN[lang] && TRADUCOES_LOGIN[lang][chave]) ||
+    TRADUCOES_LOGIN[IDIOMA_PADRAO][chave] || chave;
 }
 
 function aplicarTraducoes() {
@@ -948,23 +790,19 @@ function aplicarTraducoes() {
     var texto = t(chave);
     if (texto) el.textContent = texto;
   });
-
   document.querySelectorAll("[data-i18n-placeholder]").forEach(function (el) {
     var chave = el.getAttribute("data-i18n-placeholder");
     var texto = t(chave);
     if (texto) el.setAttribute("placeholder", texto);
   });
-
   document.querySelectorAll("[data-i18n-title]").forEach(function (el) {
     var chave = el.getAttribute("data-i18n-title");
     var texto = t(chave);
     if (texto) el.setAttribute("title", texto);
   });
-
   document.querySelectorAll("#menu-idioma .dropdown-item").forEach(function (btn) {
     btn.classList.toggle("ativo", btn.dataset.idioma === lang);
   });
-
   document.title = t("titulo_pagina_login");
 }
 
@@ -990,78 +828,53 @@ function obterTemaAtual() {
 
 function aplicarTema(novoTema) {
   if (!TEMAS_DISPONIVEIS.includes(novoTema)) novoTema = TEMA_PADRAO;
-  TEMAS_DISPONIVEIS.forEach(function (t) {
-    document.body.classList.remove("tema-" + t);
-  });
+  TEMAS_DISPONIVEIS.forEach(function (t) { document.body.classList.remove("tema-" + t); });
   document.body.classList.add("tema-" + novoTema);
   localStorage.setItem("tema-cor", novoTema);
 
   var meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
-    var cores = {
-      roxo: "#8b5edd",
-      azul: "#3b82f6",
-      verde: "#10b981",
-      rosa: "#ec4899",
-      laranja: "#f97316",
-    };
+    var cores = { roxo: "#8b5edd", azul: "#3b82f6", verde: "#10b981", rosa: "#ec4899", laranja: "#f97316" };
     meta.setAttribute("content", cores[novoTema] || "#8b5edd");
   }
-
   document.querySelectorAll("#menu-tema .dropdown-item").forEach(function (btn) {
     btn.classList.toggle("ativo", btn.dataset.tema === novoTema);
   });
-
-  if (typeof desenharGraficoEvolucao === "function") {
-    setTimeout(desenharGraficoEvolucao, 60);
-  }
+  if (typeof desenharGraficoEvolucao === "function") setTimeout(desenharGraficoEvolucao, 60);
 }
 
 // ==========================================
 // 📱 PWA
 // ==========================================
 var __deferredPrompt = null;
-
 window.addEventListener("beforeinstallprompt", function (e) {
   e.preventDefault();
   __deferredPrompt = e;
   var btn = document.getElementById("btn-instalar-app");
   if (btn) btn.classList.remove("is-hidden");
 });
-
 window.addEventListener("appinstalled", function () {
   __deferredPrompt = null;
   var btn = document.getElementById("btn-instalar-app");
   if (btn) btn.classList.add("is-hidden");
   if (typeof exibirToast === "function") exibirToast("App instalado! 🎉", "sucesso");
 });
-
 function instalarPWA() {
   if (!__deferredPrompt) {
-    if (typeof exibirToast === "function") {
-      exibirToast("Para instalar, use o menu do navegador > 'Adicionar à tela inicial'.", "info");
-    }
+    if (typeof exibirToast === "function") exibirToast("Para instalar, use o menu do navegador > 'Adicionar à tela inicial'.", "info");
     return;
   }
   __deferredPrompt.prompt();
   __deferredPrompt.userChoice.then(function (choice) {
-    if (choice.outcome === "accepted" && typeof exibirToast === "function") {
-      exibirToast("Instalando app...", "sucesso");
-    }
+    if (choice.outcome === "accepted" && typeof exibirToast === "function") exibirToast("Instalando app...", "sucesso");
     __deferredPrompt = null;
   });
 }
-
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
-    navigator.serviceWorker
-      .register("/sw.js")
-      .then(function (reg) {
-        console.log("[PWA] SW registrado:", reg.scope);
-      })
-      .catch(function (err) {
-        console.warn("[PWA] Falha ao registrar SW:", err);
-      });
+    navigator.serviceWorker.register("/sw.js")
+      .then(function (reg) { console.log("[PWA] SW registrado:", reg.scope); })
+      .catch(function (err) { console.warn("[PWA] Falha ao registrar SW:", err); });
   });
 }
 
@@ -1090,26 +903,16 @@ function renderizarLegendaCalendario() {
   var container = document.getElementById("calendario-legenda");
   if (!container) return;
   var todas = REGRAS_CORES_CALENDARIO.concat([COR_PADRAO_CALENDARIO]);
-  container.innerHTML = todas
-    .map(function (item) {
-      return `<div class="legenda-item"><span class="legenda-cor" style="background:${item.cor}"></span><span class="legenda-texto">${escaparHTML(t(item.textoKey))}</span></div>`;
-    })
-    .join("");
+  container.innerHTML = todas.map(function (item) {
+    return `<div class="legenda-item"><span class="legenda-cor" style="background:${item.cor}"></span><span class="legenda-texto">${escaparHTML(t(item.textoKey))}</span></div>`;
+  }).join("");
 }
 
 // ==========================================
 // 0. FIREBASE
 // ==========================================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import {
-  getDatabase,
-  ref,
-  onValue,
-  push,
-  update,
-  remove,
-  get,
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+import { getDatabase, ref, onValue, push, update, remove, get } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA_wDDRCRJL_WviT6FBorz8dhnHe0-pI8s",
@@ -1137,12 +940,8 @@ let filtroPerfilTexto = "";
 
 function escaparHTML(texto) {
   if (!texto) return "";
-  return String(texto)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  return String(texto).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
 function converterLinks(textoEscapado) {
@@ -1166,13 +965,9 @@ function exibirToast(mensagem, tipo = "info") {
   toast.style.cssText = `background:${corBg};color:#fff;padding:12px 20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-size:0.9em;pointer-events:auto;opacity:0;transform:translateY(20px);transition:all 0.3s ease;font-family:sans-serif;`;
   toast.textContent = mensagem;
   toastContainer.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = "1"; toast.style.transform = "translateY(0)"; }, 10);
   setTimeout(() => {
-    toast.style.opacity = "1";
-    toast.style.transform = "translateY(0)";
-  }, 10);
-  setTimeout(() => {
-    toast.style.opacity = "0";
-    toast.style.transform = "translateY(20px)";
+    toast.style.opacity = "0"; toast.style.transform = "translateY(20px)";
     setTimeout(() => toast.remove(), 300);
   }, 3500);
 }
@@ -1212,10 +1007,7 @@ function calcularTempoRestante(timestampCriacao, duracaoHoras) {
   if (diasRestantes > 1) return `Expira em ${diasRestantes} dias`;
   else if (diasRestantes === 1) return `Expira amanhã`;
   else if (horasRestantes > 0) return `Expira em ${horasRestantes}h`;
-  else {
-    const minRestantes = Math.floor(msRestantes / (1000 * 60));
-    return `Expira em ${minRestantes} min`;
-  }
+  else return `Expira em ${Math.floor(msRestantes / (1000 * 60))} min`;
 }
 
 // ==========================================
@@ -1225,8 +1017,7 @@ const themeToggle = document.getElementById("theme-toggle");
 if (themeToggle) {
   const themeIcon = themeToggle.querySelector("i");
   let currentTheme = localStorage.getItem("theme");
-  if (!currentTheme)
-    currentTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  if (!currentTheme) currentTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
   if (currentTheme === "light") {
     document.body.classList.add("light-theme");
     if (themeIcon) themeIcon.classList.replace("fa-moon", "fa-sun");
@@ -1239,8 +1030,7 @@ if (themeToggle) {
       else themeIcon.classList.replace("fa-sun", "fa-moon");
     }
     localStorage.setItem("theme", theme);
-    if (window.__graficoEvolucao && typeof desenharGraficoEvolucao === "function")
-      desenharGraficoEvolucao();
+    if (window.__graficoEvolucao && typeof desenharGraficoEvolucao === "function") desenharGraficoEvolucao();
   });
 }
 
@@ -1271,18 +1061,15 @@ onValue(perfisRef, (snapshot) => {
   });
   window.renderizarPerfis();
   if (window.usuarioLogado.matricula) {
-    const meuPerfil = bancoDePerfis.find(
-      (p) =>
-        String(p.matricula) === String(window.usuarioLogado.matricula) ||
-        String(p.id) === String(window.usuarioLogado.matricula)
-    );
-    if (meuPerfil && typeof window.aplicarPerfilNoCard === "function")
-      window.aplicarPerfilNoCard(meuPerfil);
+    const meuPerfil = bancoDePerfis.find((p) =>
+      String(p.matricula) === String(window.usuarioLogado.matricula) ||
+      String(p.id) === String(window.usuarioLogado.matricula));
+    if (meuPerfil && typeof window.aplicarPerfilNoCard === "function") window.aplicarPerfilNoCard(meuPerfil);
   }
 });
 
 // ==========================================
-// ENVIO DE RECADOS
+// ENVIO DE RECADOS — 🆕 +10 XP
 // ==========================================
 const formRecado = document.getElementById("form-recado");
 if (formRecado) {
@@ -1292,10 +1079,7 @@ if (formRecado) {
     const linkInput = document.getElementById("recado-link");
     const selectDuracao = document.getElementById("recado-duracao");
     const mensagemBruta = msgInput ? msgInput.value.trim() : "";
-    if (!mensagemBruta) {
-      exibirToast("Escreva uma mensagem antes de enviar!", "erro");
-      return;
-    }
+    if (!mensagemBruta) { exibirToast("Escreva uma mensagem antes de enviar!", "erro"); return; }
     const mensagemSegura = escaparHTML(mensagemBruta);
     const linkAnexo = linkInput ? escaparHTML(linkInput.value.trim()) : "";
     const nomeSeguro = escaparHTML(window.usuarioLogado.nome);
@@ -1313,7 +1097,9 @@ if (formRecado) {
       comentarios: {},
     })
       .then(() => {
-        exibirToast("Recado publicado com sucesso!", "sucesso");
+        exibirToast("Recado publicado! +10 XP", "sucesso");
+        // 🆕 +10 XP por postar recado
+        adicionarXP(XP_RECOMPENSAS.recado_postado, "recado_postado");
         if (msgInput) msgInput.value = "";
         if (linkInput) linkInput.value = "";
         const contador = document.getElementById("contador-caracteres");
@@ -1332,7 +1118,7 @@ if (recadoMensagemInput) {
 }
 
 // ==========================================
-// MURAL — GLOBAIS
+// MURAL — BUSCAS
 // ==========================================
 const inputBuscaMural = document.getElementById("busca-recados");
 if (inputBuscaMural) {
@@ -1341,7 +1127,6 @@ if (inputBuscaMural) {
     window.renderizarMural();
   });
 }
-
 const inputBuscaPerfis = document.getElementById("busca-perfis");
 if (inputBuscaPerfis) {
   inputBuscaPerfis.addEventListener("input", function (e) {
@@ -1351,7 +1136,7 @@ if (inputBuscaPerfis) {
 }
 
 // ==========================================
-// 🆕 CONQUISTAS NO MODAL DE PERFIL (público)
+// CONQUISTAS NO MODAL DE PERFIL
 // ==========================================
 async function carregarConquistasNoModalPerfil(matricula) {
   const secao = document.getElementById("modal-perfil-conquistas");
@@ -1372,7 +1157,6 @@ async function carregarConquistasNoModalPerfil(matricula) {
     const snap = await get(ref(db, "usuarios_xp/" + matricula + "/conquistas"));
     const conquistas = snap.val() || {};
     const desbloqueadas = CONQUISTAS.filter((c) => !!conquistas[c.id]);
-
     if (contador) contador.textContent = `${desbloqueadas.length}/${CONQUISTAS.length}`;
 
     grid.innerHTML = CONQUISTAS.map((c) => {
@@ -1380,10 +1164,8 @@ async function carregarConquistasNoModalPerfil(matricula) {
       const raridade = c.raridade || "comum";
       const statusIcon = desbl ? "✓" : "🔒";
       return `
-        <div
-          class="modal-conquista-badge ${desbl ? "desbloqueada" : "bloqueada"} ${raridade}"
-          title="${escaparHTML(c.nome)} — ${escaparHTML(c.desc)} ${statusIcon}"
-        >
+        <div class="modal-conquista-badge ${desbl ? "desbloqueada" : "bloqueada"} ${raridade}"
+             title="${escaparHTML(c.nome)} — ${escaparHTML(c.desc)} ${statusIcon}">
           ${c.icone}
         </div>`;
     }).join("");
@@ -1403,10 +1185,8 @@ window.abrirModalPerfil = function (identificador) {
     const alvo = String(identificador || "").trim();
     return mat === alvo || id === alvo;
   });
-  if (!perfil) {
-    exibirToast("Perfil não encontrado.", "erro");
-    return;
-  }
+  if (!perfil) { exibirToast("Perfil não encontrado.", "erro"); return; }
+
   const imgEl = document.getElementById("modal-perfil-foto");
   const nomeEl = document.getElementById("modal-perfil-nome");
   const matEl = document.getElementById("modal-perfil-matricula");
@@ -1418,35 +1198,20 @@ window.abrirModalPerfil = function (identificador) {
   if (imgEl) imgEl.src = fotoExibir;
   if (nomeEl) nomeEl.textContent = nomeExibir;
   if (matEl) matEl.textContent = perfil.matricula || perfil.id || "Não informada";
-  if (acessoEl)
-    acessoEl.textContent = perfil.ultimoAcesso
-      ? new Date(perfil.ultimoAcesso).toLocaleString("pt-BR")
-      : t("nao_registrado");
+  if (acessoEl) acessoEl.textContent = perfil.ultimoAcesso ? new Date(perfil.ultimoAcesso).toLocaleString("pt-BR") : t("nao_registrado");
   if (bioEl) {
-    if (perfil.bio && String(perfil.bio).trim()) {
-      bioEl.textContent = perfil.bio;
-      bioEl.classList.remove("is-hidden");
-    } else {
-      bioEl.textContent = "";
-      bioEl.classList.add("is-hidden");
-    }
+    if (perfil.bio && String(perfil.bio).trim()) { bioEl.textContent = perfil.bio; bioEl.classList.remove("is-hidden"); }
+    else { bioEl.textContent = ""; bioEl.classList.add("is-hidden"); }
   }
   if (redesEl) {
     const links = montarLinksRedes(perfil.redes);
     if (links.length > 0) {
-      redesEl.innerHTML = links
-        .map((l) => `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}" class="modal-rede-link"><i class="${l.icone}"></i></a>`)
-        .join("");
+      redesEl.innerHTML = links.map((l) => `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}" class="modal-rede-link"><i class="${l.icone}"></i></a>`).join("");
       redesEl.classList.remove("is-hidden");
-    } else {
-      redesEl.innerHTML = "";
-      redesEl.classList.add("is-hidden");
-    }
+    } else { redesEl.innerHTML = ""; redesEl.classList.add("is-hidden"); }
   }
 
-  // 🆕 Carrega conquistas do aluno visualizado
   carregarConquistasNoModalPerfil(perfil.matricula || perfil.id);
-
   modal.classList.remove("is-hidden");
 };
 
@@ -1478,27 +1243,19 @@ window.renderizarMural = function () {
     const totalLikes = recado.likes ? recado.likes.length : 0;
     const textoExpiracao = calcularTempoRestante(recado.timestampCriacao, recado.duracaoHoras);
     const ehAutor = recado.autor_matricula === window.usuarioLogado.matricula;
-    const btnExcluir = ehAutor || ehAdmin
-      ? `<button type="button" class="btn-like" style="color: #ff4757;" onclick="excluirRecado('${recado.id}')"><i class="fa-solid fa-trash"></i></button>`
-      : "";
-    const btnEditar = ehAutor || ehAdmin
-      ? `<button type="button" class="btn-like" style="color: #eccc68;" onclick="editarRecado('${recado.id}')"><i class="fa-solid fa-pen"></i></button>`
-      : "";
+    const btnExcluir = ehAutor || ehAdmin ? `<button type="button" class="btn-like" style="color: #ff4757;" onclick="excluirRecado('${recado.id}')"><i class="fa-solid fa-trash"></i></button>` : "";
+    const btnEditar = ehAutor || ehAdmin ? `<button type="button" class="btn-like" style="color: #eccc68;" onclick="editarRecado('${recado.id}')"><i class="fa-solid fa-pen"></i></button>` : "";
     const mensagemComLinks = converterLinks(escaparHTML(recado.mensagem));
     const nomeSeguro = escaparHTML(nomeParaExibicao(recado.autor_nome));
     const tagEditado = recado.editado ? ' <small style="opacity:0.6;font-style:italic;">(editado)</small>' : "";
-    const anexoHTML = recado.link_anexo
-      ? `<div class="recado-anexo" style="margin-top:8px;"><a href="${recado.link_anexo}" target="_blank" rel="noopener noreferrer" style="font-size:0.85em;color:#70a1ff;text-decoration:underline;"><i class="fa-solid fa-paperclip"></i> Ver anexo</a></div>`
-      : "";
+    const anexoHTML = recado.link_anexo ? `<div class="recado-anexo" style="margin-top:8px;"><a href="${recado.link_anexo}" target="_blank" rel="noopener noreferrer" style="font-size:0.85em;color:#70a1ff;text-decoration:underline;"><i class="fa-solid fa-paperclip"></i> Ver anexo</a></div>` : "";
     const comentariosObj = recado.comentarios || {};
     const listaComentarios = Object.keys(comentariosObj).map((cId) => ({ cId, ...comentariosObj[cId] }));
     const totalComentarios = listaComentarios.length;
     let htmlComentarios = "";
     listaComentarios.forEach((com) => {
       const ehAutorCom = com.autor_matricula === window.usuarioLogado.matricula;
-      const btnDelCom = ehAutorCom || ehAdmin
-        ? `<button type="button" style="background:none;border:none;color:#ff4757;cursor:pointer;font-size:0.8em;" onclick="excluirComentario('${recado.id}','${com.cId}')"><i class="fa-solid fa-xmark"></i></button>`
-        : "";
+      const btnDelCom = ehAutorCom || ehAdmin ? `<button type="button" style="background:none;border:none;color:#ff4757;cursor:pointer;font-size:0.8em;" onclick="excluirComentario('${recado.id}','${com.cId}')"><i class="fa-solid fa-xmark"></i></button>` : "";
       htmlComentarios += `<div class="comentario-item" style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.05);padding:6px 10px;border-radius:6px;margin-top:5px;font-size:0.85em;"><div style="flex:1;"><strong>${escaparHTML(com.autor_nome)}:</strong> ${converterLinks(escaparHTML(com.texto))}</div>${btnDelCom}</div>`;
     });
     const div = document.createElement("div");
@@ -1532,14 +1289,12 @@ window.alternarComentarios = function (recadoId) {
   if (box) box.style.display = box.style.display === "none" ? "block" : "none";
 };
 
+// 🆕 +3 XP por comentário
 window.adicionarComentario = function (recadoId) {
   const inputEl = document.getElementById(`input-comentario-${recadoId}`);
   if (!inputEl) return;
   const texto = inputEl.value.trim();
-  if (!texto) {
-    exibirToast("Escreva um comentário antes de enviar.", "erro");
-    return;
-  }
+  if (!texto) { exibirToast("Escreva um comentário antes de enviar.", "erro"); return; }
   push(ref(db, `mural_recados/${recadoId}/comentarios`), {
     autor_nome: escaparHTML(window.usuarioLogado.nome),
     autor_matricula: window.usuarioLogado.matricula,
@@ -1547,7 +1302,8 @@ window.adicionarComentario = function (recadoId) {
     timestamp: Date.now(),
   })
     .then(() => {
-      exibirToast("Comentário adicionado!", "sucesso");
+      exibirToast("Comentário adicionado! +3 XP", "sucesso");
+      adicionarXP(XP_RECOMPENSAS.comentario, "comentario");
       inputEl.value = "";
     })
     .catch((err) => exibirToast("Erro: " + err.message, "erro"));
@@ -1560,10 +1316,7 @@ window.excluirComentario = function (recadoId, comentarioId) {
     if (com) {
       const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
       const ehAutor = com.autor_matricula === window.usuarioLogado.matricula;
-      if (!ehAutor && !ehAdmin) {
-        exibirToast("Sem permissão.", "erro");
-        return;
-      }
+      if (!ehAutor && !ehAdmin) { exibirToast("Sem permissão.", "erro"); return; }
       if (confirm("Excluir este comentário?"))
         remove(itemRef).then(() => exibirToast("Comentário removido.", "sucesso"));
     }
@@ -1584,11 +1337,7 @@ window.renderizarPerfis = function () {
   const contadorEl = document.getElementById("contador-membros");
   if (contadorEl) contadorEl.textContent = `${bancoDePerfis.length} membro(s) cadastrado(s)`;
   if (perfisFiltrados.length === 0) {
-    container.innerHTML = `<p class="sem-perfis" style="text-align:center;opacity:0.7;padding:20px;grid-column:1/-1;">${
-      bancoDePerfis.length === 0
-        ? "Nenhum membro cadastrado ainda."
-        : "Nenhum perfil corresponde ao filtro."
-    }</p>`;
+    container.innerHTML = `<p class="sem-perfis" style="text-align:center;opacity:0.7;padding:20px;grid-column:1/-1;">${bancoDePerfis.length === 0 ? "Nenhum membro cadastrado ainda." : "Nenhum perfil corresponde ao filtro."}</p>`;
     return;
   }
   perfisFiltrados.forEach((perfil) => {
@@ -1611,10 +1360,7 @@ window.editarRecado = function (id) {
     if (recado) {
       const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
       const ehAutor = recado.autor_matricula === window.usuarioLogado.matricula;
-      if (!ehAutor && !ehAdmin) {
-        exibirToast("Sem permissão.", "erro");
-        return;
-      }
+      if (!ehAutor && !ehAdmin) { exibirToast("Sem permissão.", "erro"); return; }
       const textoAtual = recado.mensagem.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#039;/g, "'");
       const novaMensagem = prompt("1/2 - Edite a sua mensagem:", textoAtual);
       if (novaMensagem !== null && novaMensagem.trim() !== "") {
@@ -1622,8 +1368,7 @@ window.editarRecado = function (id) {
         const tempoAtualStr = horasAtuais % 24 === 0 ? horasAtuais / 24 + "d" : horasAtuais + "h";
         const novosDiasInput = prompt("2/2 - Duração (ex: 5h, 12h, 2d, 15d)", tempoAtualStr);
         let novasHoras = horasAtuais;
-        if (novosDiasInput !== null && novosDiasInput.trim() !== "")
-          novasHoras = parseDuracaoParaHoras(novosDiasInput);
+        if (novosDiasInput !== null && novosDiasInput.trim() !== "") novasHoras = parseDuracaoParaHoras(novosDiasInput);
         update(itemRef, { mensagem: escaparHTML(novaMensagem.trim()), duracao_horas: novasHoras, editado: true })
           .then(() => exibirToast("Recado atualizado!", "sucesso"))
           .catch((err) => exibirToast("Erro: " + err.message, "erro"));
@@ -1632,6 +1377,7 @@ window.editarRecado = function (id) {
   });
 };
 
+// 🆕 +1 XP só na PRIMEIRA curtida (não ao descurtir)
 window.curtirRecado = function (id) {
   const itemRef = ref(db, "mural_recados/" + id);
   get(itemRef).then((snapshot) => {
@@ -1639,8 +1385,14 @@ window.curtirRecado = function (id) {
     if (recado) {
       let likes = recado.likes || [];
       const i = likes.indexOf(window.usuarioLogado.matricula);
-      if (i === -1) likes.push(window.usuarioLogado.matricula);
-      else likes.splice(i, 1);
+      if (i === -1) {
+        // 🆕 Está curtindo agora → +1 XP
+        likes.push(window.usuarioLogado.matricula);
+        adicionarXP(XP_RECOMPENSAS.curtida, "curtida");
+      } else {
+        // Descurtindo → sem XP
+        likes.splice(i, 1);
+      }
       update(itemRef, { likes });
     }
   });
@@ -1653,13 +1405,9 @@ window.excluirRecado = function (id) {
     if (recado) {
       const ehAdmin = MATRICULAS_ADMIN.includes(window.usuarioLogado.matricula);
       const ehAutor = recado.autor_matricula === window.usuarioLogado.matricula;
-      if (!ehAutor && !ehAdmin) {
-        exibirToast("Sem permissão.", "erro");
-        return;
-      }
+      if (!ehAutor && !ehAdmin) { exibirToast("Sem permissão.", "erro"); return; }
       if (confirm("Excluir este recado?")) {
-        remove(itemRef)
-          .then(() => exibirToast("Recado excluído.", "sucesso"))
+        remove(itemRef).then(() => exibirToast("Recado excluído.", "sucesso"))
           .catch((err) => exibirToast("Erro: " + err.message, "erro"));
       }
     }
@@ -1702,25 +1450,16 @@ function montarLinksRedes(redes) {
 
 function comprimirImagem(file, maxLado = 500, qualidade = 0.82) {
   return new Promise((resolve, reject) => {
-    if (!file.type.startsWith("image/")) {
-      reject(new Error("Arquivo não é uma imagem."));
-      return;
-    }
+    if (!file.type.startsWith("image/")) { reject(new Error("Arquivo não é uma imagem.")); return; }
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
       img.onload = () => {
         let { width, height } = img;
-        if (width > height && width > maxLado) {
-          height = Math.round((height * maxLado) / width);
-          width = maxLado;
-        } else if (height > maxLado) {
-          width = Math.round((width * maxLado) / height);
-          height = maxLado;
-        }
+        if (width > height && width > maxLado) { height = Math.round((height * maxLado) / width); width = maxLado; }
+        else if (height > maxLado) { width = Math.round((width * maxLado) / height); height = maxLado; }
         const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = width; canvas.height = height;
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
         let qualidadeAtual = qualidade;
@@ -1742,20 +1481,14 @@ function comprimirImagem(file, maxLado = 500, qualidade = 0.82) {
 }
 
 function salvarPerfilLocal(matricula, perfil) {
-  try {
-    localStorage.setItem(CHAVE_STORAGE_PERFIL + matricula, JSON.stringify(perfil));
-  } catch (e) {
-    console.warn("Falha ao salvar no localStorage:", e);
-  }
+  try { localStorage.setItem(CHAVE_STORAGE_PERFIL + matricula, JSON.stringify(perfil)); }
+  catch (e) { console.warn("Falha ao salvar no localStorage:", e); }
 }
-
 function lerPerfilLocal(matricula) {
   try {
     const raw = localStorage.getItem(CHAVE_STORAGE_PERFIL + matricula);
     return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 window.aplicarPerfilNoCard = function (perfil) {
@@ -1768,26 +1501,17 @@ window.aplicarPerfilNoCard = function (perfil) {
   if (fotoEl && perfil.foto) fotoEl.src = perfil.foto;
   if (nomeEl) nomeEl.textContent = perfil.nomeCompleto || perfil.nome || window.usuarioLogado.nome || "Usuário";
   if (bioEl) {
-    if (perfil.bio) {
-      bioEl.textContent = perfil.bio;
-      bioEl.classList.remove("is-hidden");
-    } else {
-      bioEl.textContent = "";
-      bioEl.classList.add("is-hidden");
-    }
+    if (perfil.bio) { bioEl.textContent = perfil.bio; bioEl.classList.remove("is-hidden"); }
+    else { bioEl.textContent = ""; bioEl.classList.add("is-hidden"); }
   }
   if (redesEl) {
     const links = montarLinksRedes(perfil.redes);
-    redesEl.innerHTML = links
-      .map((l) => `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}"><i class="${l.icone}"></i></a>`)
-      .join("");
+    redesEl.innerHTML = links.map((l) => `<a href="${l.url}" target="_blank" rel="noopener noreferrer" title="${l.titulo}" aria-label="${l.titulo}"><i class="${l.icone}"></i></a>`).join("");
   }
   if (perfil.foto) window.usuarioLogado.foto = perfil.foto;
   if (perfil.nome) window.usuarioLogado.nome = perfil.nome;
   if (perfil.mascoteAvatar) {
-    try {
-      localStorage.setItem("mascote_avatar", perfil.mascoteAvatar);
-    } catch (e) {}
+    try { localStorage.setItem("mascote_avatar", perfil.mascoteAvatar); } catch (e) {}
   }
   const btn = document.getElementById("btn-editar-perfil");
   const label = document.getElementById("btn-editar-perfil-label");
@@ -1821,26 +1545,22 @@ window.carregarPerfilUsuario = function (matricula) {
       salvarPerfilLocal(matricula, perfilFinal);
       return perfilFinal;
     })
-    .catch((err) => {
-      console.warn("Firebase off, usando local:", err);
-      return local;
-    });
+    .catch((err) => { console.warn("Firebase off, usando local:", err); return local; });
 };
 
 // ==========================================
-// 🎭 SELETOR DE AVATAR DO MASCOTE (com bloqueio)
+// 🎭 SELETOR DE AVATAR DO MASCOTE
+// 🆕 +5 XP só quando muda de skin
 // ==========================================
 function renderizarSeletorAvatar() {
   const grid = document.getElementById("avatar-mascote-grid");
   if (!grid) return;
 
   const cliques = meusCliquesMascote;
-
   grid.innerHTML = AVATARES_MASCOTE.map((av) => {
     const ativo = av.id === avatarSelecionado;
     const bloqueada = !av.gratis && cliques < av.cliquesNecessarios;
     const faltam = bloqueada ? av.cliquesNecessarios - cliques : 0;
-
     let lockHTML = "";
     if (bloqueada) {
       lockHTML = `
@@ -1848,27 +1568,24 @@ function renderizarSeletorAvatar() {
         <span class="avatar-faltam">Faltam ${faltam.toLocaleString("pt-BR")}</span>
       `;
     }
-
     return `
-      <button
-        type="button"
-        class="avatar-mascote-opcao ${ativo ? "ativo" : ""} ${bloqueada ? "bloqueado" : ""}"
-        data-avatar="${av.id}"
-        ${bloqueada ? 'disabled aria-disabled="true"' : ""}
-        title="${av.nome}${bloqueada ? " — Bloqueada (" + faltam.toLocaleString("pt-BR") + " cliques faltando)" : ""}"
-      >
-        ${av.emoji}
-        ${lockHTML}
+      <button type="button" class="avatar-mascote-opcao ${ativo ? "ativo" : ""} ${bloqueada ? "bloqueado" : ""}"
+              data-avatar="${av.id}" ${bloqueada ? 'disabled aria-disabled="true"' : ""}
+              title="${av.nome}${bloqueada ? " — Bloqueada (" + faltam.toLocaleString("pt-BR") + " cliques faltando)" : ""}">
+        ${av.emoji}${lockHTML}
       </button>`;
   }).join("");
 
   grid.querySelectorAll(".avatar-mascote-opcao:not(.bloqueado)").forEach((btn) => {
     btn.addEventListener("click", () => {
+      const anterior = avatarSelecionado;
       avatarSelecionado = btn.dataset.avatar;
       grid.querySelectorAll(".avatar-mascote-opcao").forEach((b) => {
         b.classList.toggle("ativo", b.dataset.avatar === avatarSelecionado);
       });
-      if (window.usuarioLogado.matricula) {
+      // 🆕 Só dá XP se REALMENTE mudou de skin
+      if (anterior !== avatarSelecionado && window.usuarioLogado.matricula) {
+        adicionarXP(XP_RECOMPENSAS.trocar_avatar, "trocar_avatar");
         desbloquearConquista("estiloso");
       }
     });
@@ -1876,10 +1593,7 @@ function renderizarSeletorAvatar() {
 }
 
 window.abrirModalEditarPerfil = function () {
-  if (!perfilUsuarioAtual) {
-    exibirToast("Perfil ainda não carregado.", "erro");
-    return;
-  }
+  if (!perfilUsuarioAtual) { exibirToast("Perfil ainda não carregado.", "erro"); return; }
   const bloqueioEl = document.getElementById("edit-perfil-bloqueio");
   const btnSalvar = document.getElementById("btn-salvar-perfil");
   const inputFoto = document.getElementById("edit-foto-input");
@@ -1893,26 +1607,17 @@ window.abrirModalEditarPerfil = function () {
   document.getElementById("edit-email").value = redes.email || "";
   document.getElementById("edit-site").value = redes.site || "";
   document.getElementById("edit-avatar-preview").src = perfilUsuarioAtual.foto || "";
-  if (inputFoto) {
-    inputFoto.value = "";
-    delete inputFoto.dataset.novaFoto;
-    delete inputFoto.dataset.restaurar;
-    inputFoto.disabled = false;
-  }
+  if (inputFoto) { inputFoto.value = ""; delete inputFoto.dataset.novaFoto; delete inputFoto.dataset.restaurar; inputFoto.disabled = false; }
   if (bloqueioEl) bloqueioEl.classList.add("is-hidden");
   if (btnSalvar) btnSalvar.disabled = false;
   document.querySelectorAll("#form-editar-perfil input, #form-editar-perfil textarea").forEach((el) => (el.disabled = false));
   const btnRestaurar = document.getElementById("btn-restaurar-foto");
   if (btnRestaurar) btnRestaurar.disabled = false;
   const btnUpload = document.querySelector(".btn-upload");
-  if (btnUpload) {
-    btnUpload.style.pointerEvents = "auto";
-    btnUpload.style.opacity = "1";
-  }
+  if (btnUpload) { btnUpload.style.pointerEvents = "auto"; btnUpload.style.opacity = "1"; }
 
   avatarSelecionado = perfilUsuarioAtual.mascoteAvatar || "padrao";
   renderizarSeletorAvatar();
-
   document.getElementById("modal-editar-perfil")?.classList.remove("is-hidden");
 };
 
@@ -1928,18 +1633,13 @@ function inicializarModalEditarPerfil() {
     inputFoto.addEventListener("change", async (e) => {
       const file = e.target.files[0];
       if (!file) return;
-      if (file.size > 5 * 1024 * 1024) {
-        exibirToast("Imagem muito grande (máx 5MB).", "erro");
-        return;
-      }
+      if (file.size > 5 * 1024 * 1024) { exibirToast("Imagem muito grande (máx 5MB).", "erro"); return; }
       try {
         const dataUrl = await comprimirImagem(file);
         document.getElementById("edit-avatar-preview").src = dataUrl;
         inputFoto.dataset.novaFoto = dataUrl;
         delete inputFoto.dataset.restaurar;
-      } catch (err) {
-        exibirToast("Erro: " + err.message, "erro");
-      }
+      } catch (err) { exibirToast("Erro: " + err.message, "erro"); }
     });
   }
   const btnRestaurar = document.getElementById("btn-restaurar-foto");
@@ -1947,11 +1647,7 @@ function inicializarModalEditarPerfil() {
     btnRestaurar.addEventListener("click", () => {
       const fotoOriginal = window.usuarioLogado.fotoOriginal || window.usuarioLogado.foto;
       document.getElementById("edit-avatar-preview").src = fotoOriginal;
-      if (inputFoto) {
-        delete inputFoto.dataset.novaFoto;
-        inputFoto.dataset.restaurar = "1";
-        inputFoto.value = "";
-      }
+      if (inputFoto) { delete inputFoto.dataset.novaFoto; inputFoto.dataset.restaurar = "1"; inputFoto.value = ""; }
     });
   }
   const bioInput = document.getElementById("edit-bio");
@@ -1963,36 +1659,21 @@ function inicializarModalEditarPerfil() {
     });
   }
   const form = document.getElementById("form-editar-perfil");
-  if (form)
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      await salvarPerfilEditado();
-    });
+  if (form) form.addEventListener("submit", async (e) => { e.preventDefault(); await salvarPerfilEditado(); });
   const modal = document.getElementById("modal-editar-perfil");
-  if (modal)
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) window.fecharModalEditarPerfil();
-    });
+  if (modal) modal.addEventListener("click", (e) => { if (e.target === modal) window.fecharModalEditarPerfil(); });
 }
 
 async function salvarPerfilEditado() {
   const matricula = window.usuarioLogado.matricula;
-  if (!matricula) {
-    exibirToast("Matrícula não encontrada.", "erro");
-    return;
-  }
+  if (!matricula) { exibirToast("Matrícula não encontrada.", "erro"); return; }
   const inputFoto = document.getElementById("edit-foto-input");
   let fotoFinal;
-  if (inputFoto && inputFoto.dataset.restaurar === "1")
-    fotoFinal = window.usuarioLogado.fotoOriginal || window.usuarioLogado.foto;
-  else if (inputFoto && inputFoto.dataset.novaFoto)
-    fotoFinal = inputFoto.dataset.novaFoto;
+  if (inputFoto && inputFoto.dataset.restaurar === "1") fotoFinal = window.usuarioLogado.fotoOriginal || window.usuarioLogado.foto;
+  else if (inputFoto && inputFoto.dataset.novaFoto) fotoFinal = inputFoto.dataset.novaFoto;
   else fotoFinal = perfilUsuarioAtual.foto || window.usuarioLogado.foto;
   const nome = document.getElementById("edit-nome").value.trim();
-  if (!nome) {
-    exibirToast("Informe um nome.", "erro");
-    return;
-  }
+  if (!nome) { exibirToast("Informe um nome.", "erro"); return; }
   const bio = document.getElementById("edit-bio").value.replace(/[\r\n]+/g, " ").trim().slice(0, 160);
   const redes = {
     tiktok: limparArroba(document.getElementById("edit-tiktok").value),
@@ -2001,24 +1682,14 @@ async function salvarPerfilEditado() {
     email: document.getElementById("edit-email").value.trim(),
     site: document.getElementById("edit-site").value.trim(),
   };
-  if (redes.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(redes.email)) {
-    exibirToast("Email inválido.", "erro");
-    return;
-  }
-  if (redes.site && !/^https?:\/\/.+/.test(redes.site)) {
-    exibirToast("Site deve começar com http:// ou https://", "erro");
-    return;
-  }
+  if (redes.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(redes.email)) { exibirToast("Email inválido.", "erro"); return; }
+  if (redes.site && !/^https?:\/\/.+/.test(redes.site)) { exibirToast("Site deve começar com http:// ou https://", "erro"); return; }
   const agora = Date.now();
   const perfilAtualizado = {
     nome,
     nomeCompleto: perfilUsuarioAtual.nomeCompleto || window.usuarioLogado.nome,
-    matricula,
-    foto: fotoFinal,
-    bio,
-    redes,
-    perfilEditadoEm: agora,
-    ultimoAcesso: agora,
+    matricula, foto: fotoFinal, bio, redes,
+    perfilEditadoEm: agora, ultimoAcesso: agora,
     mascoteAvatar: avatarSelecionado,
   };
   const btnSalvar = document.getElementById("btn-salvar-perfil");
@@ -2033,14 +1704,11 @@ async function salvarPerfilEditado() {
       await update(ref(db, "mascote/avatares/" + matricula), { avatar: avatarSelecionado });
       localStorage.setItem("mascote_avatar", avatarSelecionado);
       localStorage.setItem("skin_ativa", avatarSelecionado);
-    } catch (e) {
-      console.warn("[mascote avatar] Erro:", e);
-    }
+    } catch (e) { console.warn("[mascote avatar] Erro:", e); }
     exibirToast("Perfil atualizado!", "sucesso");
     window.fecharModalEditarPerfil();
-  } catch (err) {
-    exibirToast("Erro: " + err.message, "erro");
-  } finally {
+  } catch (err) { exibirToast("Erro: " + err.message, "erro"); }
+  finally {
     btnSalvar.disabled = false;
     btnSalvar.innerHTML = textoOriginal;
   }
@@ -2057,21 +1725,13 @@ function formatarNota(valor) {
   var nota = Number(String(valor).replace(",", "."));
   return Number.isFinite(nota) ? nota : null;
 }
-
-function textoNota(valor) {
-  return valor === null ? "-" : valor.toFixed(1);
-}
+function textoNota(valor) { return valor === null ? "-" : valor.toFixed(1); }
 
 function atualizarStatusNotas(mensagem, tipo) {
   var status = document.getElementById("notas-status");
   if (!status) return;
   var variante = tipo === true ? "erro" : typeof tipo === "string" ? tipo : "info";
-  var icones = {
-    info: "fa-circle-info",
-    loading: "fa-spinner",
-    sucesso: "fa-circle-check",
-    erro: "fa-circle-exclamation",
-  };
+  var icones = { info: "fa-circle-info", loading: "fa-spinner", sucesso: "fa-circle-check", erro: "fa-circle-exclamation" };
   status.className = "notas-status" + (variante === "loading" ? " loading" : variante === "info" ? "" : " " + variante);
   status.innerHTML = `<i class="fa-solid ${icones[variante] || icones.info}"></i> <span>${escaparHTML(mensagem)}</span>`;
 }
@@ -2094,8 +1754,7 @@ function obterEtapasDaDisciplina(disciplina) {
     if (temCampo34) return { tipo: "Anual", etapas: [1, 2, 3, 4] };
     return { tipo: "Semestral", etapas: [1, 2] };
   }
-  if ("nota_etapa_3" in disciplina || "nota_etapa_4" in disciplina)
-    return { tipo: "Anual", etapas: [1, 2, 3, 4] };
+  if ("nota_etapa_3" in disciplina || "nota_etapa_4" in disciplina) return { tipo: "Anual", etapas: [1, 2, 3, 4] };
   return { tipo: "Semestral", etapas: [1, 2] };
 }
 
@@ -2114,9 +1773,7 @@ const LIMITE_FALTAS_PCT = 0.25;
 const LIMITE_FALTAS_ALERTA = 0.2;
 const CARGA_HORARIA_PADRAO = 60;
 
-function getCodigoDisc(d) {
-  return String(d.codigo_diario || d.disciplina || d.id || "disc").trim();
-}
+function getCodigoDisc(d) { return String(d.codigo_diario || d.disciplina || d.id || "disc").trim(); }
 function metaEfetiva(d) {
   var cod = getCodigoDisc(d);
   return __metasDisciplinas[cod] != null ? __metasDisciplinas[cod] : __metaAtual;
@@ -2135,39 +1792,17 @@ function calcularMediaSimples(d, etapas, simulacao) {
     var etapa = d["nota_etapa_" + n];
     return formatarNota(etapa && typeof etapa === "object" ? etapa.nota : etapa);
   });
-  var preenchidasReais = notas.filter(function (v) {
-    return v !== null;
-  });
-  var somaReal = preenchidasReais.reduce(function (a, b) {
-    return a + b;
-  }, 0);
+  var preenchidasReais = notas.filter(function (v) { return v !== null; });
+  var somaReal = preenchidasReais.reduce(function (a, b) { return a + b; }, 0);
   var temEtapaAberta = preenchidasReais.length < etapas.length;
   var usarSimulacao = simulacao != null && temEtapaAberta;
   if (usarSimulacao) {
     var comSim = preenchidasReais.concat([simulacao]);
-    var somaSim = comSim.reduce(function (a, b) {
-      return a + b;
-    }, 0);
-    return {
-      media: somaSim / comSim.length,
-      preenchidasReais: preenchidasReais.length,
-      preenchidasComSim: comSim.length,
-      somaReal,
-      somaComSim: somaSim,
-      temEtapaAberta,
-      simulando: true,
-    };
+    var somaSim = comSim.reduce(function (a, b) { return a + b; }, 0);
+    return { media: somaSim / comSim.length, preenchidasReais: preenchidasReais.length, preenchidasComSim: comSim.length, somaReal, somaComSim: somaSim, temEtapaAberta, simulando: true };
   }
   var mediaApi = formatarNota(d.media_disciplina);
-  return {
-    media: preenchidasReais.length ? somaReal / preenchidasReais.length : mediaApi,
-    preenchidasReais: preenchidasReais.length,
-    preenchidasComSim: preenchidasReais.length,
-    somaReal,
-    somaComSim: somaReal,
-    temEtapaAberta,
-    simulando: false,
-  };
+  return { media: preenchidasReais.length ? somaReal / preenchidasReais.length : mediaApi, preenchidasReais: preenchidasReais.length, preenchidasComSim: preenchidasReais.length, somaReal, somaComSim: somaReal, temEtapaAberta, simulando: false };
 }
 
 function calcularProjecaoDisciplina(notasPreenchidas, totalEtapas, soma, meta) {
@@ -2175,9 +1810,7 @@ function calcularProjecaoDisciplina(notasPreenchidas, totalEtapas, soma, meta) {
   if (faltantes <= 0) {
     var mediaFinal = notasPreenchidas ? soma / notasPreenchidas : null;
     if (mediaFinal === null) return { texto: "Sem notas", classe: "projecao-alerta" };
-    return mediaFinal >= meta
-      ? { texto: "Meta atingida", classe: "projecao-ok" }
-      : { texto: "Abaixo da meta", classe: "projecao-ruim" };
+    return mediaFinal >= meta ? { texto: "Meta atingida", classe: "projecao-ok" } : { texto: "Abaixo da meta", classe: "projecao-ruim" };
   }
   var necessaria = (meta * totalEtapas - soma) / faltantes;
   if (necessaria <= 0) return { texto: "Meta garantida", classe: "projecao-ok" };
@@ -2191,34 +1824,24 @@ function carregarMetasDisciplinas() {
   try {
     var local = localStorage.getItem(MATRICULA_STORAGE_KEY());
     if (local) __metasDisciplinas = JSON.parse(local) || {};
-  } catch (e) {
-    __metasDisciplinas = {};
-  }
+  } catch (e) { __metasDisciplinas = {}; }
   get(ref(db, "metas_disciplinas/" + mat))
     .then(function (snap) {
       var dados = snap.val();
       if (dados && typeof dados === "object") {
         __metasDisciplinas = dados;
-        try {
-          localStorage.setItem(MATRICULA_STORAGE_KEY(), JSON.stringify(dados));
-        } catch (e) {}
+        try { localStorage.setItem(MATRICULA_STORAGE_KEY(), JSON.stringify(dados)); } catch (e) {}
         if (__notasCache.length) renderizarNotas(__notasCache);
       }
     })
-    .catch(function (err) {
-      console.warn("[metas] firebase:", err);
-    });
+    .catch(function (err) { console.warn("[metas] firebase:", err); });
 }
 
 function salvarMetasDisciplinas() {
   var mat = window.usuarioLogado.matricula;
   if (!mat) return Promise.resolve();
-  try {
-    localStorage.setItem(MATRICULA_STORAGE_KEY(), JSON.stringify(__metasDisciplinas));
-  } catch (e) {}
-  return update(ref(db, "metas_disciplinas/" + mat), __metasDisciplinas).catch(function (err) {
-    console.warn("[metas] save:", err);
-  });
+  try { localStorage.setItem(MATRICULA_STORAGE_KEY(), JSON.stringify(__metasDisciplinas)); } catch (e) {}
+  return update(ref(db, "metas_disciplinas/" + mat), __metasDisciplinas).catch(function (err) { console.warn("[metas] save:", err); });
 }
 
 function ordenarDisciplinas(lista) {
@@ -2256,10 +1879,7 @@ function ordenarDisciplinas(lista) {
 
 function aplicarSort(key) {
   if (__sortKey === key) __sortDir = __sortDir === "asc" ? "desc" : "asc";
-  else {
-    __sortKey = key;
-    __sortDir = key === "media" ? "desc" : "asc";
-  }
+  else { __sortKey = key; __sortDir = key === "media" ? "desc" : "asc"; }
   document.querySelectorAll(".tabela-notas thead th.sortable").forEach(function (th) {
     th.classList.remove("sort-asc", "sort-desc");
     if (th.dataset.sort === __sortKey) th.classList.add(__sortDir === "asc" ? "sort-asc" : "sort-desc");
@@ -2273,19 +1893,12 @@ function atualizarResumoNotas(disciplinas) {
   var elRisco = document.getElementById("resumo-risco");
   var elFaltas = document.getElementById("resumo-faltas");
   if (!elMedia && !elDisc && !elRisco && !elFaltas) return;
-  var total = disciplinas.length;
-  var somaMedias = 0,
-    contMedias = 0,
-    faltasTotais = 0,
-    emRisco = 0;
+  var total = disciplinas.length, somaMedias = 0, contMedias = 0, faltasTotais = 0, emRisco = 0;
   disciplinas.forEach(function (d) {
     var etapas = obterEtapasDaDisciplina(d).etapas;
     var calc = calcularMediaSimples(d, etapas, __simulacoes[getCodigoDisc(d)]);
     var faltas = Number(d.numero_faltas) || 0;
-    if (calc.media !== null) {
-      somaMedias += calc.media;
-      contMedias++;
-    }
+    if (calc.media !== null) { somaMedias += calc.media; contMedias++; }
     faltasTotais += faltas;
     var st = classificarStatusNota(calc.media, faltas, metaEfetiva(d));
     if (st !== "aprovado") emRisco++;
@@ -2300,8 +1913,7 @@ function atualizarResumoNotas(disciplinas) {
 function alertaDeFaltas(disciplinas) {
   var antigo = document.querySelector(".alerta-faltas");
   if (antigo) antigo.remove();
-  var alertaMax = 0,
-    discCritica = null;
+  var alertaMax = 0, discCritica = null;
   var limiteReprov = CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT;
   var limiteAlerta = CARGA_HORARIA_PADRAO * LIMITE_FALTAS_ALERTA;
   disciplinas.forEach(function (d) {
@@ -2321,10 +1933,9 @@ function alertaDeFaltas(disciplinas) {
   if (!panel) return;
   var banner = document.createElement("div");
   banner.className = "alerta-faltas " + discCritica.nivel;
-  banner.innerHTML =
-    discCritica.nivel === "danger"
-      ? `<i class="fa-solid fa-triangle-exclamation"></i><span><strong>Atenção!</strong> ${discCritica.faltas} faltas em <em>${escaparHTML(discCritica.nome)}</em> — próximo do limite (${limiteReprov}).</span>`
-      : `<i class="fa-solid fa-circle-exclamation"></i><span><strong>Cuidado:</strong> ${discCritica.faltas} faltas em <em>${escaparHTML(discCritica.nome)}</em>.</span>`;
+  banner.innerHTML = discCritica.nivel === "danger"
+    ? `<i class="fa-solid fa-triangle-exclamation"></i><span><strong>Atenção!</strong> ${discCritica.faltas} faltas em <em>${escaparHTML(discCritica.nome)}</em> — próximo do limite (${limiteReprov}).</span>`
+    : `<i class="fa-solid fa-circle-exclamation"></i><span><strong>Cuidado:</strong> ${discCritica.faltas} faltas em <em>${escaparHTML(discCritica.nome)}</em>.</span>`;
   var refEl = panel.querySelector(".notas-controls");
   if (refEl) panel.insertBefore(banner, refEl);
   else panel.insertBefore(banner, panel.firstChild);
@@ -2332,26 +1943,18 @@ function alertaDeFaltas(disciplinas) {
 
 function atualizarHistoricoComDisciplinas(disciplinas, periodoLabel, ano) {
   if (!disciplinas || !disciplinas.length) return;
-  var soma = 0,
-    cont = 0;
+  var soma = 0, cont = 0;
   disciplinas.forEach(function (d) {
     var etapas = obterEtapasDaDisciplina(d).etapas;
     var calc = calcularMediaSimples(d, etapas, null);
-    if (calc.media !== null) {
-      soma += calc.media;
-      cont++;
-    }
+    if (calc.media !== null) { soma += calc.media; cont++; }
   });
   var media = cont ? soma / cont : null;
-  var idx = __historicoPeriodos.findIndex(function (h) {
-    return h.periodo === periodoLabel;
-  });
+  var idx = __historicoPeriodos.findIndex(function (h) { return h.periodo === periodoLabel; });
   var entry = { periodo: periodoLabel, media, disciplinas: disciplinas.length, ano };
   if (idx >= 0) __historicoPeriodos[idx] = entry;
   else __historicoPeriodos.push(entry);
-  __historicoPeriodos.sort(function (a, b) {
-    return b.periodo.localeCompare(a.periodo);
-  });
+  __historicoPeriodos.sort(function (a, b) { return b.periodo.localeCompare(a.periodo); });
   renderizarHistorico();
   var panel = document.getElementById("historico-panel");
   if (panel) panel.classList.remove("is-hidden");
@@ -2365,96 +1968,62 @@ function renderizarHistorico() {
     container.innerHTML = `<p class="historico-vazio">${escaparHTML(t("historico_vazio"))}</p>`;
     return;
   }
-  var cronologico = __historicoPeriodos.slice().sort(function (a, b) {
-    return a.periodo.localeCompare(b.periodo);
-  });
+  var cronologico = __historicoPeriodos.slice().sort(function (a, b) { return a.periodo.localeCompare(b.periodo); });
   var mapa = {};
   cronologico.forEach(function (h, i) {
-    mapa[h.periodo] =
-      i > 0
-        ? h.media !== null && cronologico[i - 1].media !== null
-          ? h.media - cronologico[i - 1].media
-          : null
-        : null;
+    mapa[h.periodo] = i > 0
+      ? (h.media !== null && cronologico[i - 1].media !== null ? h.media - cronologico[i - 1].media : null)
+      : null;
   });
-  container.innerHTML = __historicoPeriodos
-    .map(function (h) {
-      var diff = mapa[h.periodo];
-      var trendHTML = "";
-      if (diff !== null && diff !== undefined) {
-        if (diff > 0.3) trendHTML = `<span class="periodo-trend up"><i class="fa-solid fa-arrow-up"></i> +${diff.toFixed(1)}</span>`;
-        else if (diff < -0.3) trendHTML = `<span class="periodo-trend down"><i class="fa-solid fa-arrow-down"></i> ${diff.toFixed(1)}</span>`;
-        else trendHTML = `<span class="periodo-trend eq"><i class="fa-solid fa-minus"></i> estável</span>`;
-      }
-      return `<div class="historico-card"><span class="periodo-label">${escaparHTML(h.periodo)}</span><span class="periodo-media">${h.media !== null ? h.media.toFixed(1) : "—"}</span><span class="periodo-info">${h.disciplinas} disciplina(s)</span>${trendHTML}</div>`;
-    })
-    .join("");
+  container.innerHTML = __historicoPeriodos.map(function (h) {
+    var diff = mapa[h.periodo];
+    var trendHTML = "";
+    if (diff !== null && diff !== undefined) {
+      if (diff > 0.3) trendHTML = `<span class="periodo-trend up"><i class="fa-solid fa-arrow-up"></i> +${diff.toFixed(1)}</span>`;
+      else if (diff < -0.3) trendHTML = `<span class="periodo-trend down"><i class="fa-solid fa-arrow-down"></i> ${diff.toFixed(1)}</span>`;
+      else trendHTML = `<span class="periodo-trend eq"><i class="fa-solid fa-minus"></i> estável</span>`;
+    }
+    return `<div class="historico-card"><span class="periodo-label">${escaparHTML(h.periodo)}</span><span class="periodo-media">${h.media !== null ? h.media.toFixed(1) : "—"}</span><span class="periodo-info">${h.disciplinas} disciplina(s)</span>${trendHTML}</div>`;
+  }).join("");
 }
 
 // ==========================================
 // GRÁFICO DE EVOLUÇÃO
 // ==========================================
 window.__graficoEvolucao = null;
-
 function desenharGraficoEvolucao() {
   var canvas = document.getElementById("grafico-evolucao");
   var panel = document.getElementById("evolucao-panel");
-
   if (!canvas || !panel) return;
-  if (typeof Chart === "undefined") {
-    panel.classList.add("is-hidden");
-    return;
-  }
-
-  var comMedia = (__historicoPeriodos || []).filter(function (h) {
-    return h && h.media !== null && h.media !== undefined;
-  });
-
-  if (comMedia.length === 0) {
-    panel.classList.add("is-hidden");
-    return;
-  }
+  if (typeof Chart === "undefined") { panel.classList.add("is-hidden"); return; }
+  var comMedia = (__historicoPeriodos || []).filter(function (h) { return h && h.media !== null && h.media !== undefined; });
+  if (comMedia.length === 0) { panel.classList.add("is-hidden"); return; }
   panel.classList.remove("is-hidden");
-
-  var ordenado = __historicoPeriodos.slice().sort(function (a, b) {
-    return a.periodo.localeCompare(b.periodo);
-  });
+  var ordenado = __historicoPeriodos.slice().sort(function (a, b) { return a.periodo.localeCompare(b.periodo); });
   var labels = ordenado.map(function (h) { return h.periodo; });
   var dados = ordenado.map(function (h) { return h.media !== null ? h.media : 0; });
-
   if (window.__graficoEvolucao) {
     try { window.__graficoEvolucao.destroy(); } catch (e) {}
     window.__graficoEvolucao = null;
   }
-
   var estilo = getComputedStyle(document.body);
   var corAccent = corParaHex(estilo.getPropertyValue("--accent-strong").trim(), "#8b5edd");
   var corAccent2 = corParaHex(estilo.getPropertyValue("--accent").trim(), "#cebdec");
   var corTexto = corParaHex(estilo.getPropertyValue("--text-muted").trim(), "#b8a8d9");
   var corGrade = estilo.getPropertyValue("--border-color").trim() || "rgba(206,189,236,0.18)";
   var corMeta = corParaHex(estilo.getPropertyValue("--warning").trim(), "#f59e0b");
-
   var ctx = canvas.getContext("2d");
   var gradient = ctx.createLinearGradient(0, 0, 0, 260);
   addStopSeguro(gradient, 0, corAccent + "cc", "rgba(139,94,221,0.8)");
   addStopSeguro(gradient, 1, corAccent + "08", "rgba(139,94,221,0.03)");
-
   try {
     window.__graficoEvolucao = new Chart(ctx, {
       type: "line",
       data: {
         labels: labels,
         datasets: [
-          {
-            label: "Média", data: dados,
-            borderColor: corAccent, backgroundColor: gradient, borderWidth: 3,
-            pointBackgroundColor: corAccent2, pointBorderColor: corAccent, pointBorderWidth: 2,
-            pointRadius: 6, pointHoverRadius: 9, tension: 0.35, fill: true,
-          },
-          {
-            label: "Meta", data: labels.map(function () { return __metaAtual; }),
-            borderColor: corMeta, borderWidth: 2, borderDash: [6, 6], pointRadius: 0, fill: false,
-          },
+          { label: "Média", data: dados, borderColor: corAccent, backgroundColor: gradient, borderWidth: 3, pointBackgroundColor: corAccent2, pointBorderColor: corAccent, pointBorderWidth: 2, pointRadius: 6, pointHoverRadius: 9, tension: 0.35, fill: true },
+          { label: "Meta", data: labels.map(function () { return __metaAtual; }), borderColor: corMeta, borderWidth: 2, borderDash: [6, 6], pointRadius: 0, fill: false },
         ],
       },
       options: {
@@ -2462,12 +2031,7 @@ function desenharGraficoEvolucao() {
         interaction: { mode: "index", intersect: false },
         plugins: {
           legend: { labels: { color: corTexto, font: { family: "Inter", size: 12, weight: "600" }, usePointStyle: true } },
-          tooltip: {
-            backgroundColor: "rgba(0,0,0,0.85)",
-            titleFont: { family: "Inter", size: 13 }, bodyFont: { family: "Inter", size: 12 },
-            padding: 10, cornerRadius: 8,
-            callbacks: { label: function (context) { return context.dataset.label + ": " + context.parsed.y.toFixed(1); } },
-          },
+          tooltip: { backgroundColor: "rgba(0,0,0,0.85)", titleFont: { family: "Inter", size: 13 }, bodyFont: { family: "Inter", size: 12 }, padding: 10, cornerRadius: 8, callbacks: { label: function (context) { return context.dataset.label + ": " + context.parsed.y.toFixed(1); } } },
         },
         scales: {
           y: { beginAtZero: true, max: 100, ticks: { color: corTexto, font: { family: "Inter", size: 11 }, stepSize: 20 }, grid: { color: corGrade, drawBorder: false } },
@@ -2475,10 +2039,7 @@ function desenharGraficoEvolucao() {
         },
       },
     });
-  } catch (err) {
-    console.error("[evolução] Erro ao criar gráfico:", err);
-    panel.classList.add("is-hidden");
-  }
+  } catch (err) { console.error("[evolução] Erro ao criar gráfico:", err); panel.classList.add("is-hidden"); }
 }
 
 // ==========================================
@@ -2495,11 +2056,7 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
     var tr = corpo.querySelector(`tr[data-codigo="${CSS.escape(apenasLinhaCodigo)}"]`);
     if (tr) {
       var d = __notasCache.find(function (x) { return getCodigoDisc(x) === apenasLinhaCodigo; });
-      if (d) {
-        atualizarLinhaNota(tr, d, meta);
-        atualizarResumoNotas(__notasCache);
-        return;
-      }
+      if (d) { atualizarLinhaNota(tr, d, meta); atualizarResumoNotas(__notasCache); return; }
     }
   }
 
@@ -2529,7 +2086,6 @@ function renderizarNotas(disciplinas, apenasLinhaCodigo) {
   }
 
   visiveis = ordenarDisciplinas(visiveis);
-
   var grupos = { Semestral: [], Anual: [] };
   visiveis.forEach(function (d) {
     var cfg = obterEtapasDaDisciplina(d);
@@ -2574,21 +2130,12 @@ function criarLinhaNota(d, etapas, tipo, meta) {
   var status = classificarStatusNota(media, faltas, metaDisc);
   var proj = calcularProjecaoDisciplina(calc.preenchidasComSim, etapas.length, calc.somaComSim, metaDisc);
   var faltasClasse = faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_PCT ? "critico" : faltas > CARGA_HORARIA_PADRAO * LIMITE_FALTAS_ALERTA ? "alerta" : "";
-  var badgeLabel = {
-    aprovado: '<i class="fa-solid fa-check"></i> ' + t("leg_aprovado"),
-    recuperacao: '<i class="fa-solid fa-rotate"></i> ' + t("leg_recuperacao"),
-    reprovado: '<i class="fa-solid fa-xmark"></i> ' + t("leg_reprovado"),
-  }[status];
+  var badgeLabel = { aprovado: '<i class="fa-solid fa-check"></i> ' + t("leg_aprovado"), recuperacao: '<i class="fa-solid fa-rotate"></i> ' + t("leg_recuperacao"), reprovado: '<i class="fa-solid fa-xmark"></i> ' + t("leg_reprovado") }[status];
   var linhaRisco = status === "reprovado" || faltasClasse === "critico" ? "linha-risco" : "";
   var linhaSim = calc.simulando ? "simulando" : "";
-  var etapasHTML = notasEtapas.map(function (n) {
-    return '<span class="etapa-pill">' + textoNota(n) + "</span>";
-  }).join("");
+  var etapasHTML = notasEtapas.map(function (n) { return '<span class="etapa-pill">' + textoNota(n) + "</span>"; }).join("");
   var percentual = media !== null ? Math.min(media, 100) : 0;
-  var mediaHTML =
-    '<div class="media-cell"><span>' + textoNota(media) +
-    '</span><div class="media-bar"><div class="media-bar-fill ' + status +
-    '" style="width:' + percentual + '%"></div></div></div>';
+  var mediaHTML = '<div class="media-cell"><span>' + textoNota(media) + '</span><div class="media-bar"><div class="media-bar-fill ' + status + '" style="width:' + percentual + '%"></div></div></div>';
   var temEtapaEmAberto = calc.temEtapaAberta;
   var simuladorHTML = temEtapaEmAberto
     ? `<div class="simulador-cell"><input type="number" class="simulador-input" data-codigo="${escaparHTML(codigo)}" min="0" max="100" step="0.1" placeholder="Nota" value="${sim != null ? sim : ""}" />${calc.simulando ? `<span class="simulador-resultado ${status === "aprovado" ? "ok" : status === "recuperacao" ? "mid" : "ruim"}">${textoNota(media)}</span>` : ""}</div>`
@@ -2599,8 +2146,7 @@ function criarLinhaNota(d, etapas, tipo, meta) {
   tr.className = [linhaRisco, linhaSim].filter(Boolean).join(" ");
   tr.dataset.grupoLinha = tipo;
   tr.dataset.codigo = codigo;
-  tr.innerHTML =
-    '<td class="td-disciplina"><strong>' + escaparHTML(d.disciplina || d.codigo_diario || "Disciplina") + "</strong></td>" +
+  tr.innerHTML = '<td class="td-disciplina"><strong>' + escaparHTML(d.disciplina || d.codigo_diario || "Disciplina") + "</strong></td>" +
     '<td><div class="etapas-cell">' + (etapasHTML || '<span class="etapa-pill">—</span>') + "</div></td>" +
     '<td class="td-media">' + mediaHTML + "</td>" +
     '<td class="td-faltas"><span class="faltas-cell ' + faltasClasse + '">' + faltas + "</span></td>" +
@@ -2632,11 +2178,7 @@ function atualizarLinhaNota(tr, d, meta) {
   if (tdProj) tdProj.innerHTML = '<span class="projecao-cell ' + proj.classe + '">' + proj.texto + "</span>";
   var tdStatus = tr.querySelector(".td-status");
   if (tdStatus) {
-    var badgeLabel = {
-      aprovado: '<i class="fa-solid fa-check"></i> ' + t("leg_aprovado"),
-      recuperacao: '<i class="fa-solid fa-rotate"></i> ' + t("leg_recuperacao"),
-      reprovado: '<i class="fa-solid fa-xmark"></i> ' + t("leg_reprovado"),
-    }[status];
+    var badgeLabel = { aprovado: '<i class="fa-solid fa-check"></i> ' + t("leg_aprovado"), recuperacao: '<i class="fa-solid fa-rotate"></i> ' + t("leg_recuperacao"), reprovado: '<i class="fa-solid fa-xmark"></i> ' + t("leg_reprovado") }[status];
     tdStatus.innerHTML = '<span class="badge badge-' + status + '">' + badgeLabel + "</span>";
   }
   var tdSim = tr.querySelector(".td-simulador");
@@ -2644,10 +2186,8 @@ function atualizarLinhaNota(tr, d, meta) {
     var resultadoEl = tdSim.querySelector(".simulador-resultado");
     if (calc.simulando) {
       var classeRes = status === "aprovado" ? "ok" : status === "recuperacao" ? "mid" : "ruim";
-      if (resultadoEl) {
-        resultadoEl.className = "simulador-resultado " + classeRes;
-        resultadoEl.textContent = textoNota(media);
-      } else {
+      if (resultadoEl) { resultadoEl.className = "simulador-resultado " + classeRes; resultadoEl.textContent = textoNota(media); }
+      else {
         var input = tdSim.querySelector(".simulador-input");
         if (input) {
           var span = document.createElement("span");
@@ -2660,6 +2200,7 @@ function atualizarLinhaNota(tr, d, meta) {
   }
 }
 
+// 🆕 +2 XP ao usar o simulador (limite diário: 10 usos)
 function bindSimuladores(corpo) {
   corpo.querySelectorAll(".simulador-input").forEach(function (input) {
     if (input.dataset.bound) return;
@@ -2678,6 +2219,11 @@ function bindSimuladores(corpo) {
         atualizarLinhaNota(tr, d, __metaAtual);
         atualizarResumoNotas(__notasCache);
       }
+      // 🆕 +2 XP por uso do simulador (limite diário)
+      if (val !== "" && podeGanharXPSimulador()) {
+        registrarXPSimulador();
+        adicionarXP(XP_RECOMPENSAS.simulador, "simulador");
+      }
       contadorSimulador++;
       if (contadorSimulador >= 10) desbloquearConquista("cientista");
     });
@@ -2691,6 +2237,7 @@ function bindSimuladores(corpo) {
   });
 }
 
+// 🆕 +5 XP ao salvar meta
 function abrirModalMetaDisciplina(codigo, nome) {
   var modal = document.getElementById("modal-meta-disciplina");
   if (!modal) return;
@@ -2713,10 +2260,15 @@ function abrirModalMetaDisciplina(codigo, nome) {
     exibirToast("Meta removida.", "sucesso");
   };
   btnSalvar.onclick = function () {
+    const valorAnterior = __metasDisciplinas[codigo];
     __metasDisciplinas[codigo] = Number(rangeInput.value);
     salvarMetasDisciplinas();
     modal.classList.add("is-hidden");
     if (__notasCache.length) renderizarNotas(__notasCache);
+    // 🆕 +5 XP (só se realmente mudou o valor)
+    if (valorAnterior !== __metasDisciplinas[codigo]) {
+      adicionarXP(XP_RECOMPENSAS.definir_meta, "definir_meta");
+    }
     exibirToast("Meta salva (" + rangeInput.value + ").", "sucesso");
   };
   btnFechar.onclick = function () { modal.classList.add("is-hidden"); };
@@ -2742,8 +2294,7 @@ function exportarCSV() {
   var url = URL.createObjectURL(blob);
   var a = document.createElement("a");
   var periodo = (document.getElementById("periodo-notas")?.value || "boletim").replace("/", ".");
-  a.href = url;
-  a.download = "boletim_" + periodo + ".csv";
+  a.href = url; a.download = "boletim_" + periodo + ".csv";
   document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(url);
   exibirToast("CSV exportado!", "sucesso");
@@ -2779,12 +2330,8 @@ function salvarResumoBoletimFirebase(ano, periodo, disciplinas) {
   var mat = window.usuarioLogado.matricula;
   if (!mat || mat === "Matrícula não disponível") return;
   if (!disciplinas || !disciplinas.length) return;
-
   try {
-    var somaMedias = 0;
-    var contMedias = 0;
-    var faltasTotais = 0;
-
+    var somaMedias = 0, contMedias = 0, faltasTotais = 0;
     disciplinas.forEach(function (d) {
       var etapas = obterEtapasDaDisciplina(d).etapas;
       var notas = etapas.map(function (n) {
@@ -2795,35 +2342,23 @@ function salvarResumoBoletimFirebase(ano, periodo, disciplinas) {
       var soma = preenchidas.reduce(function (a, b) { return a + b; }, 0);
       var mediaApi = formatarNota(d.media_disciplina);
       var media = preenchidas.length ? soma / preenchidas.length : mediaApi;
-
       if (media !== null) { somaMedias += media; contMedias++; }
       faltasTotais += Number(d.numero_faltas) || 0;
-
-      if (media !== null && media >= 100) {
-        desbloquearConquista("nota_100");
-      }
+      if (media !== null && media >= 100) desbloquearConquista("nota_100");
     });
-
     var mediaGeral = contMedias ? somaMedias / contMedias : null;
-
-    if (mediaGeral !== null && mediaGeral >= 90) {
-      desbloquearConquista("nota_maxima");
-    }
-
+    if (mediaGeral !== null && mediaGeral >= 90) desbloquearConquista("nota_maxima");
     update(ref(db, "resumo_boletim/" + mat), {
       mediaGeral: mediaGeral,
       faltasTotais: faltasTotais,
       disciplinasCount: disciplinas.length,
       periodo: ano + "." + periodo,
       atualizadoEm: Date.now(),
-    }).catch(function (err) {
-      console.warn("[resumo boletim] erro:", err);
-    });
-  } catch (e) {
-    console.warn("[resumo boletim] exceção:", e);
-  }
+    }).catch(function (err) { console.warn("[resumo boletim] erro:", err); });
+  } catch (e) { console.warn("[resumo boletim] exceção:", e); }
 }
 
+// 🆕 +5 XP ao ver boletim (1x por período)
 function carregarBoletim(ano, periodo) {
   atualizarStatusNotas("Buscando notas no SUAP...", "loading");
   suap.getAuthenticatedResource(
@@ -2836,6 +2371,11 @@ function carregarBoletim(ano, periodo) {
       var total = resposta.count || disciplinas.length;
       atualizarStatusNotas(total + " disciplina(s) carregada(s).", "sucesso");
       salvarResumoBoletimFirebase(ano, periodo, disciplinas);
+      // 🆕 +5 XP por período (só a primeira consulta)
+      if (!jaGanhouXPBoletim(label)) {
+        marcarXPBoletim(label);
+        adicionarXP(XP_RECOMPENSAS.ver_boletim, "ver_boletim");
+      }
     },
     function (xhr) {
       renderizarNotas([]);
@@ -2863,9 +2403,7 @@ function carregarPeriodosNotas() {
       if (periodos.length) carregarBoletim(periodos[0].ano_letivo, periodos[0].periodo_letivo);
       else atualizarStatusNotas("Nenhum período disponível.", "erro");
     },
-    function (xhr) {
-      atualizarStatusNotas("Erro nos períodos (HTTP " + xhr.status + ").", "erro");
-    }
+    function (xhr) { atualizarStatusNotas("Erro nos períodos (HTTP " + xhr.status + ").", "erro"); }
   );
 }
 
@@ -2882,22 +2420,17 @@ function gerarNotificacoesRecados() {
   try {
     var raw = localStorage.getItem(CHAVE_NOTIF_LIDAS());
     lidas = raw ? JSON.parse(raw) : {};
-  } catch (e) {
-    lidas = {};
-  }
+  } catch (e) { lidas = {}; }
   __notificacoes = [];
   bancoDeRecados.forEach(function (r) {
     if (r.autor_matricula === mat) return;
     var idade = Date.now() - (r.timestampCriacao || 0);
     if (idade > 30 * 24 * 60 * 60 * 1000) return;
     __notificacoes.push({
-      id: r.id,
-      tipo: "recado",
-      icone: "fa-regular fa-comment-dots",
+      id: r.id, tipo: "recado", icone: "fa-regular fa-comment-dots",
       titulo: "Novo recado de " + nomeParaExibicao(r.autor_nome),
       descricao: (r.mensagem || "").slice(0, 80) + ((r.mensagem || "").length > 80 ? "..." : ""),
-      data: r.timestampCriacao,
-      lida: !!lidas[r.id],
+      data: r.timestampCriacao, lida: !!lidas[r.id],
     });
   });
   __notificacoes.sort(function (a, b) { return b.data - a.data; });
@@ -2910,26 +2443,19 @@ function atualizarBadgeNotificacoes() {
   var naoLidas = __notificacoes.filter(function (n) { return !n.lida; }).length;
   if (btn) btn.classList.remove("is-hidden");
   if (badge) {
-    if (naoLidas > 0) {
-      badge.textContent = naoLidas > 9 ? "9+" : naoLidas;
-      badge.classList.remove("is-hidden");
-    } else badge.classList.add("is-hidden");
+    if (naoLidas > 0) { badge.textContent = naoLidas > 9 ? "9+" : naoLidas; badge.classList.remove("is-hidden"); }
+    else badge.classList.add("is-hidden");
   }
 }
 
 function renderizarPainelNotificacoes() {
   var lista = document.getElementById("lista-notificacoes");
   if (!lista) return;
-  if (__notificacoes.length === 0) {
-    lista.innerHTML = `<p class="notif-vazio">${escaparHTML(t("sem_notif"))}</p>`;
-    return;
-  }
-  lista.innerHTML = __notificacoes
-    .map(function (n) {
-      var dataStr = new Date(n.data).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
-      return `<div class="notif-item ${n.lida ? "" : "nao-lida"}" data-id="${n.id}"><div class="notif-icone"><i class="${n.icone}"></i></div><div class="notif-corpo"><div class="notif-titulo">${escaparHTML(n.titulo)}</div><div class="notif-descricao">${escaparHTML(n.descricao)}</div><div class="notif-data">${dataStr}</div></div></div>`;
-    })
-    .join("");
+  if (__notificacoes.length === 0) { lista.innerHTML = `<p class="notif-vazio">${escaparHTML(t("sem_notif"))}</p>`; return; }
+  lista.innerHTML = __notificacoes.map(function (n) {
+    var dataStr = new Date(n.data).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+    return `<div class="notif-item ${n.lida ? "" : "nao-lida"}" data-id="${n.id}"><div class="notif-icone"><i class="${n.icone}"></i></div><div class="notif-corpo"><div class="notif-titulo">${escaparHTML(n.titulo)}</div><div class="notif-descricao">${escaparHTML(n.descricao)}</div><div class="notif-data">${dataStr}</div></div></div>`;
+  }).join("");
   lista.querySelectorAll(".notif-item").forEach(function (el) {
     el.addEventListener("click", function () {
       var id = el.dataset.id;
@@ -2973,18 +2499,15 @@ function renderizarProximosEventos(eventos) {
   hoje.setHours(0, 0, 0, 0);
   var em7dias = new Date(hoje);
   em7dias.setDate(em7dias.getDate() + 7);
-  var proximos = eventos
-    .filter(function (ev) {
-      var inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
-      inicio.setHours(0, 0, 0, 0);
-      return inicio >= hoje && inicio <= em7dias;
-    })
-    .sort(function (a, b) {
-      var da = a.start instanceof Date ? a.start : new Date(a.start);
-      var db = b.start instanceof Date ? b.start : new Date(b.start);
-      return da - db;
-    })
-    .slice(0, 4);
+  var proximos = eventos.filter(function (ev) {
+    var inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
+    inicio.setHours(0, 0, 0, 0);
+    return inicio >= hoje && inicio <= em7dias;
+  }).sort(function (a, b) {
+    var da = a.start instanceof Date ? a.start : new Date(a.start);
+    var db = b.start instanceof Date ? b.start : new Date(b.start);
+    return da - db;
+  }).slice(0, 4);
 
   if (proximos.length === 0) {
     container.innerHTML = "";
@@ -2992,98 +2515,60 @@ function renderizarProximosEventos(eventos) {
   } else {
     document.getElementById("proximos-eventos")?.classList.remove("is-hidden");
     var MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-    container.innerHTML = proximos
-      .map(function (ev) {
-        var inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
-        var dia = inicio.getDate();
-        var mes = MESES[inicio.getMonth()];
-        var diffDias = Math.floor((inicio - hoje) / (1000 * 60 * 60 * 24));
-        var classeCard = "evento-card";
-        var badgeHTML = "";
-        if (diffDias === 0) {
-          classeCard += " hoje";
-          badgeHTML = '<span class="evento-badge hoje"><i class="fa-solid fa-fire"></i> HOJE</span>';
-        } else if (diffDias === 1) {
-          classeCard += " destaque";
-          badgeHTML = '<span class="evento-badge amanha">Amanhã</span>';
-        } else if (diffDias <= 3) {
-          classeCard += " destaque";
-          badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`;
-        } else badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`;
-        var cor = ev.backgroundColor || ev.borderColor || "#8b5edd";
-        return `<div class="${classeCard}" style="border-left-color:${cor}"><div class="evento-data" style="background:${cor}22"><span class="evento-dia" style="color:${cor}">${String(dia).padStart(2, "0")}</span><span class="evento-mes">${mes}</span></div><div class="evento-info"><div class="evento-titulo">${escaparHTML(ev.title || "Sem título")}</div><div class="evento-descricao">${inicio.toLocaleDateString("pt-BR", { weekday: "long" })}</div>${badgeHTML}</div></div>`;
-      })
-      .join("");
+    container.innerHTML = proximos.map(function (ev) {
+      var inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
+      var dia = inicio.getDate();
+      var mes = MESES[inicio.getMonth()];
+      var diffDias = Math.floor((inicio - hoje) / (1000 * 60 * 60 * 24));
+      var classeCard = "evento-card";
+      var badgeHTML = "";
+      if (diffDias === 0) { classeCard += " hoje"; badgeHTML = '<span class="evento-badge hoje"><i class="fa-solid fa-fire"></i> HOJE</span>'; }
+      else if (diffDias === 1) { classeCard += " destaque"; badgeHTML = '<span class="evento-badge amanha">Amanhã</span>'; }
+      else if (diffDias <= 3) { classeCard += " destaque"; badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`; }
+      else badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`;
+      var cor = ev.backgroundColor || ev.borderColor || "#8b5edd";
+      return `<div class="${classeCard}" style="border-left-color:${cor}"><div class="evento-data" style="background:${cor}22"><span class="evento-dia" style="color:${cor}">${String(dia).padStart(2, "0")}</span><span class="evento-mes">${mes}</span></div><div class="evento-info"><div class="evento-titulo">${escaparHTML(ev.title || "Sem título")}</div><div class="evento-descricao">${inicio.toLocaleDateString("pt-BR", { weekday: "long" })}</div>${badgeHTML}</div></div>`;
+    }).join("");
   }
-
   atualizarContagemRegressiva(eventos);
 }
 
 function atualizarContagemRegressiva(eventos) {
   const grid = document.getElementById("contagem-grid");
   if (!grid) return;
-
   const agora = Date.now();
   const em30dias = agora + 30 * 24 * 60 * 60 * 1000;
-
-  const proximos = (eventos || [])
-    .map((ev) => {
-      const inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
-      return { titulo: ev.title || "Evento", data: inicio };
-    })
-    .filter((e) => e.data.getTime() >= agora && e.data.getTime() <= em30dias)
-    .sort((a, b) => a.data - b.data)
-    .slice(0, 4);
+  const proximos = (eventos || []).map((ev) => {
+    const inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
+    return { titulo: ev.title || "Evento", data: inicio };
+  }).filter((e) => e.data.getTime() >= agora && e.data.getTime() <= em30dias)
+    .sort((a, b) => a.data - b.data).slice(0, 4);
 
   if (proximos.length === 0) {
-    grid.innerHTML = `
-      <div class="contagem-vazio">
-        <i class="fa-regular fa-calendar"></i>
-        <p data-i18n="contagem_vazio">Nenhum evento próximo nos próximos 30 dias.</p>
-      </div>`;
+    grid.innerHTML = `<div class="contagem-vazio"><i class="fa-regular fa-calendar"></i><p data-i18n="contagem_vazio">Nenhum evento próximo nos próximos 30 dias.</p></div>`;
     if (__contagemInterval) clearInterval(__contagemInterval);
     return;
   }
 
-  grid.innerHTML = proximos
-    .map((ev, i) => {
-      const diffMs = ev.data.getTime() - agora;
-      const diffHoras = diffMs / (1000 * 60 * 60);
-      let classe = "";
-      if (diffHoras < 24) classe = "urgente";
-      else if (diffHoras < 72) classe = "proximo";
-
-      return `
-        <div class="contagem-card ${classe}" data-index="${i}" data-data="${ev.data.toISOString()}">
-          <div class="contagem-titulo">${escaparHTML(ev.titulo)}</div>
-          <div class="contagem-timer" id="timer-${i}">
-            <div class="contagem-bloco">
-              <span class="contagem-num" data-tipo="dias">0</span>
-              <span class="contagem-label" data-i18n="contagem_dias">dias</span>
-            </div>
-            <div class="contagem-bloco">
-              <span class="contagem-num" data-tipo="horas">00</span>
-              <span class="contagem-label" data-i18n="contagem_horas">horas</span>
-            </div>
-            <div class="contagem-bloco">
-              <span class="contagem-num" data-tipo="min">00</span>
-              <span class="contagem-label" data-i18n="contagem_min">min</span>
-            </div>
-            <div class="contagem-bloco">
-              <span class="contagem-num" data-tipo="seg">00</span>
-              <span class="contagem-label" data-i18n="contagem_seg">seg</span>
-            </div>
-          </div>
-          <div class="contagem-data">
-            <i class="fa-regular fa-calendar-check"></i>
-            ${ev.data.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
-          </div>
-        </div>`;
-    })
-    .join("");
+  grid.innerHTML = proximos.map((ev, i) => {
+    const diffMs = ev.data.getTime() - agora;
+    const diffHoras = diffMs / (1000 * 60 * 60);
+    let classe = "";
+    if (diffHoras < 24) classe = "urgente";
+    else if (diffHoras < 72) classe = "proximo";
+    return `<div class="contagem-card ${classe}" data-index="${i}" data-data="${ev.data.toISOString()}">
+      <div class="contagem-titulo">${escaparHTML(ev.titulo)}</div>
+      <div class="contagem-timer" id="timer-${i}">
+        <div class="contagem-bloco"><span class="contagem-num" data-tipo="dias">0</span><span class="contagem-label" data-i18n="contagem_dias">dias</span></div>
+        <div class="contagem-bloco"><span class="contagem-num" data-tipo="horas">00</span><span class="contagem-label" data-i18n="contagem_horas">horas</span></div>
+        <div class="contagem-bloco"><span class="contagem-num" data-tipo="min">00</span><span class="contagem-label" data-i18n="contagem_min">min</span></div>
+        <div class="contagem-bloco"><span class="contagem-num" data-tipo="seg">00</span><span class="contagem-label" data-i18n="contagem_seg">seg</span></div>
+      </div>
+      <div class="contagem-data"><i class="fa-regular fa-calendar-check"></i>${ev.data.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}</div>
+    </div>`;
+  }).join("");
 
   if (typeof aplicarTraducoes === "function") aplicarTraducoes();
-
   if (__contagemInterval) clearInterval(__contagemInterval);
   atualizarTimersContagem();
   __contagemInterval = setInterval(atualizarTimersContagem, 1000);
@@ -3092,24 +2577,19 @@ function atualizarContagemRegressiva(eventos) {
 function atualizarTimersContagem() {
   const cards = document.querySelectorAll(".contagem-card[data-data]");
   const agora = Date.now();
-
   cards.forEach((card) => {
     const data = new Date(card.dataset.data).getTime();
     const diff = Math.max(0, data - agora);
-
     const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
     const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
     const min = Math.floor((diff / (1000 * 60)) % 60);
     const seg = Math.floor((diff / 1000) % 60);
-
     const timer = card.querySelector(".contagem-timer");
     if (!timer) return;
-
     const elDias = timer.querySelector('[data-tipo="dias"]');
     const elHoras = timer.querySelector('[data-tipo="horas"]');
     const elMin = timer.querySelector('[data-tipo="min"]');
     const elSeg = timer.querySelector('[data-tipo="seg"]');
-
     if (elDias) elDias.textContent = dias;
     if (elHoras) elHoras.textContent = String(horas).padStart(2, "0");
     if (elMin) elMin.textContent = String(min).padStart(2, "0");
@@ -3123,7 +2603,6 @@ function atualizarTimersContagem() {
 async function carregarSalaProfessores() {
   if (__salaDadosCarregados) return;
   __salaDadosCarregados = true;
-
   const tbody = document.getElementById("sala-lista-alunos");
   if (!tbody) return;
 
@@ -3142,114 +2621,80 @@ async function carregarSalaProfessores() {
     const xpData = xpSnap.val() || {};
     const totalRecados = recadosSnap.exists() ? Object.keys(recadosSnap.val()).length : 0;
 
-    const alunos = Object.keys(perfis)
-      .filter((mat) => !String(mat).startsWith("anon_"))
-      .map((mat) => {
-        const p = perfis[mat] || {};
-        const r = resumos[mat] || {};
-        const xp = xpData[mat] || {};
-        const conquistas = xp.conquistas || {};
-        const numConquistas = Object.keys(conquistas).length;
-        return {
-          matricula: mat,
-          nome: p.nome || p.nomeCompleto || "Aluno " + mat.slice(-4),
-          nomeCompleto: p.nomeCompleto || p.nome || "",
-          foto: p.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.nome || mat)}&background=random`,
-          carinhos: Number(carinhos[mat]) || 0,
-          ultimoAcesso: p.ultimoAcesso || 0,
-          mediaGeral: typeof r.mediaGeral === "number" ? r.mediaGeral : null,
-          faltasTotais: typeof r.faltasTotais === "number" ? r.faltasTotais : null,
-          periodo: r.periodo || "—",
-          atualizadoEm: r.atualizadoEm || 0,
-          numConquistas: numConquistas,
-          xpTotal: Number(xp.xp) || 0,
-        };
-      });
+    const alunos = Object.keys(perfis).filter((mat) => !String(mat).startsWith("anon_")).map((mat) => {
+      const p = perfis[mat] || {};
+      const r = resumos[mat] || {};
+      const xp = xpData[mat] || {};
+      const conquistas = xp.conquistas || {};
+      const numConquistas = Object.keys(conquistas).length;
+      return {
+        matricula: mat,
+        nome: p.nome || p.nomeCompleto || "Aluno " + mat.slice(-4),
+        nomeCompleto: p.nomeCompleto || p.nome || "",
+        foto: p.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.nome || mat)}&background=random`,
+        carinhos: Number(carinhos[mat]) || 0,
+        ultimoAcesso: p.ultimoAcesso || 0,
+        mediaGeral: typeof r.mediaGeral === "number" ? r.mediaGeral : null,
+        faltasTotais: typeof r.faltasTotais === "number" ? r.faltasTotais : null,
+        periodo: r.periodo || "—",
+        atualizadoEm: r.atualizadoEm || 0,
+        numConquistas: numConquistas,
+        xpTotal: Number(xp.xp) || 0,
+      };
+    });
 
     alunos.sort((a, b) => a.nome.localeCompare(b.nome));
 
     if (alunos.length === 0) {
       tbody.innerHTML = `<tr><td colspan="7" class="sala-vazio"><i class="fa-regular fa-folder-open"></i> Nenhum aluno cadastrado.</td></tr>`;
     } else {
-      tbody.innerHTML = alunos
-        .map((a) => {
-          const diasSemAcesso = a.ultimoAcesso
-            ? Math.floor((Date.now() - a.ultimoAcesso) / (1000 * 60 * 60 * 24))
-            : null;
-          let statusClasse = "ok";
-          let statusLabel = "Ativo";
-          if (diasSemAcesso !== null && diasSemAcesso > 14) {
-            statusClasse = "danger";
-            statusLabel = `${diasSemAcesso}d sem acesso`;
-          } else if (diasSemAcesso !== null && diasSemAcesso > 7) {
-            statusClasse = "warn";
-            statusLabel = `${diasSemAcesso}d sem acesso`;
-          }
+      tbody.innerHTML = alunos.map((a) => {
+        const diasSemAcesso = a.ultimoAcesso ? Math.floor((Date.now() - a.ultimoAcesso) / (1000 * 60 * 60 * 24)) : null;
+        let statusClasse = "ok", statusLabel = "Ativo";
+        if (diasSemAcesso !== null && diasSemAcesso > 14) { statusClasse = "danger"; statusLabel = `${diasSemAcesso}d sem acesso`; }
+        else if (diasSemAcesso !== null && diasSemAcesso > 7) { statusClasse = "warn"; statusLabel = `${diasSemAcesso}d sem acesso`; }
 
-          let mediaHTML;
-          if (a.mediaGeral !== null) {
-            const cor = a.mediaGeral >= 60 ? "var(--success)" : a.mediaGeral >= 40 ? "var(--warning)" : "var(--danger)";
-            mediaHTML = `<strong style="color:${cor}">${a.mediaGeral.toFixed(1)}</strong>`;
-          } else {
-            mediaHTML = `<span class="sala-sem-dados" title="Aluno ainda não abriu o site desde que essa funcionalidade foi criada"><i class="fa-solid fa-clock"></i> Pendente</span>`;
-          }
+        let mediaHTML;
+        if (a.mediaGeral !== null) {
+          const cor = a.mediaGeral >= 60 ? "var(--success)" : a.mediaGeral >= 40 ? "var(--warning)" : "var(--danger)";
+          mediaHTML = `<strong style="color:${cor}">${a.mediaGeral.toFixed(1)}</strong>`;
+        } else mediaHTML = `<span class="sala-sem-dados" title="Aluno ainda não abriu o site"><i class="fa-solid fa-clock"></i> Pendente</span>`;
 
-          let faltasHTML;
-          if (a.faltasTotais !== null) {
-            const cor = a.faltasTotais > 15 ? "var(--danger)" : a.faltasTotais > 10 ? "var(--warning)" : "var(--text-main)";
-            faltasHTML = `<span style="color:${cor};font-weight:600">${a.faltasTotais}</span>`;
-          } else {
-            faltasHTML = `<span class="sala-sem-dados"><i class="fa-solid fa-clock"></i> Pendente</span>`;
-          }
+        let faltasHTML;
+        if (a.faltasTotais !== null) {
+          const cor = a.faltasTotais > 15 ? "var(--danger)" : a.faltasTotais > 10 ? "var(--warning)" : "var(--text-main)";
+          faltasHTML = `<span style="color:${cor};font-weight:600">${a.faltasTotais}</span>`;
+        } else faltasHTML = `<span class="sala-sem-dados"><i class="fa-solid fa-clock"></i> Pendente</span>`;
 
-          return `
-            <tr data-nome="${a.nome.toLowerCase()}" data-mat="${a.matricula}">
-              <td>
-                <div class="td-aluno">
-                  <img src="${a.foto}" alt="${a.nome}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=random'">
-                  <span>${escaparHTML(a.nome)}</span>
-                </div>
-              </td>
-              <td>${a.matricula}</td>
-              <td>${mediaHTML}</td>
-              <td>${faltasHTML}</td>
-              <td><i class="fa-solid fa-heart" style="color:#ff6b6b;font-size:0.8rem;"></i> ${a.carinhos.toLocaleString("pt-BR")}</td>
-              <td>
-                <span title="${a.numConquistas} de ${CONQUISTAS.length} conquistas • ${a.xpTotal} XP" style="font-weight:700;color:${a.numConquistas >= 9 ? 'var(--success)' : a.numConquistas >= 5 ? 'var(--warning)' : 'var(--text-main)'};">
-                  🎖️ ${a.numConquistas}/${CONQUISTAS.length}
-                </span>
-              </td>
-              <td><span class="sala-badge ${statusClasse}">${statusLabel}</span></td>
-            </tr>`;
-        })
-        .join("");
+        return `<tr data-nome="${a.nome.toLowerCase()}" data-mat="${a.matricula}">
+          <td><div class="td-aluno"><img src="${a.foto}" alt="${a.nome}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=random'"><span>${escaparHTML(a.nome)}</span></div></td>
+          <td>${a.matricula}</td>
+          <td>${mediaHTML}</td>
+          <td>${faltasHTML}</td>
+          <td><i class="fa-solid fa-heart" style="color:#ff6b6b;font-size:0.8rem;"></i> ${a.carinhos.toLocaleString("pt-BR")}</td>
+          <td><span title="${a.numConquistas} de ${CONQUISTAS.length} conquistas • ${a.xpTotal} XP" style="font-weight:700;color:${a.numConquistas >= 9 ? 'var(--success)' : a.numConquistas >= 5 ? 'var(--warning)' : 'var(--text-main)'};">🎖️ ${a.numConquistas}/${CONQUISTAS.length}</span></td>
+          <td><span class="sala-badge ${statusClasse}">${statusLabel}</span></td>
+        </tr>`;
+      }).join("");
     }
 
     const totalCarinhos = Object.values(carinhos).reduce((a, b) => a + (Number(b) || 0), 0);
     document.getElementById("sala-stat-total-carinhos").textContent = totalCarinhos.toLocaleString("pt-BR");
     document.getElementById("sala-stat-total-recados").textContent = totalRecados;
     document.getElementById("sala-stat-total-alunos").textContent = alunos.length;
-
     const top = alunos.reduce((max, a) => (a.carinhos > (max?.carinhos || 0) ? a : max), null);
     document.getElementById("sala-stat-top-carinhos").textContent = top ? `${top.nome} (${top.carinhos})` : "—";
 
     const engajamentoLista = document.getElementById("sala-engajamento-lista");
     if (engajamentoLista) {
       const ordenados = [...alunos].sort((a, b) => b.carinhos - a.carinhos).slice(0, 10);
-      engajamentoLista.innerHTML = ordenados
-        .filter((a) => a.carinhos > 0)
-        .map((a, i) => `
-          <div class="sala-engajamento-item">
-            <span style="font-weight:800;color:var(--accent);min-width:26px;">${i + 1}º</span>
-            <img src="${a.foto}" alt="${a.nome}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=random'">
-            <div class="sala-engajamento-info">
-              <div class="sala-engajamento-nome">${escaparHTML(a.nome)}</div>
-              <div class="sala-engajamento-metricas">
-                <span><i class="fa-solid fa-heart" style="color:#ff6b6b;"></i> ${a.carinhos.toLocaleString("pt-BR")} carinhos</span>
-              </div>
-            </div>
-          </div>`)
-        .join("") || '<p class="sala-vazio-msg">Sem dados de engajamento ainda.</p>';
+      engajamentoLista.innerHTML = ordenados.filter((a) => a.carinhos > 0).map((a, i) => `
+        <div class="sala-engajamento-item">
+          <span style="font-weight:800;color:var(--accent);min-width:26px;">${i + 1}º</span>
+          <img src="${a.foto}" alt="${a.nome}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=random'">
+          <div class="sala-engajamento-info"><div class="sala-engajamento-nome">${escaparHTML(a.nome)}</div>
+          <div class="sala-engajamento-metricas"><span><i class="fa-solid fa-heart" style="color:#ff6b6b;"></i> ${a.carinhos.toLocaleString("pt-BR")} carinhos</span></div></div>
+        </div>`).join("") || '<p class="sala-vazio-msg">Sem dados de engajamento ainda.</p>';
     }
 
     const buscaInput = document.getElementById("sala-busca-aluno");
@@ -3279,9 +2724,7 @@ async function carregarSalaProfessores() {
 
   } catch (err) {
     console.error("[sala] Erro ao carregar:", err);
-    if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="7" class="sala-vazio">Erro ao carregar dados. Tente novamente.</td></tr>`;
-    }
+    if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="sala-vazio">Erro ao carregar dados. Tente novamente.</td></tr>`;
   }
 }
 
@@ -3301,9 +2744,7 @@ function initCalculadoraNotas() {
   const elMetaValor = document.getElementById("meta-valor");
   if (elMeta && !elMeta.dataset.bound) {
     elMeta.dataset.bound = "1";
-    elMeta.addEventListener("input", function (e) {
-      if (elMetaValor) elMetaValor.textContent = e.target.value;
-    });
+    elMeta.addEventListener("input", function (e) { if (elMetaValor) elMetaValor.textContent = e.target.value; });
     elMeta.addEventListener("change", function (e) {
       __metaAtual = Number(e.target.value) || 60;
       if (__notasCache.length) renderizarNotas(__notasCache);
@@ -3358,8 +2799,7 @@ function initCalculadoraNotas() {
   document.getElementById("btn-marcar-lidas")?.addEventListener("click", marcarTodasLidas);
   document.addEventListener("click", function (e) {
     if (!painelNotif || painelNotif.classList.contains("is-hidden")) return;
-    if (!e.target.closest("#painel-notificacoes") && !e.target.closest("#btn-notificacoes"))
-      painelNotif.classList.add("is-hidden");
+    if (!e.target.closest("#painel-notificacoes") && !e.target.closest("#btn-notificacoes")) painelNotif.classList.add("is-hidden");
   });
   carregarMetasDisciplinas();
 }
@@ -3381,7 +2821,6 @@ function initMenuLateral() {
     btnMenuLateral?.blur();
     setTimeout(() => btnFecharMenu?.focus(), 100);
   }
-
   function fecharMenuLateral() {
     menuLateral?.classList.remove("aberto");
     menuLateralOverlay?.classList.remove("aberto");
@@ -3398,17 +2837,11 @@ function initMenuLateral() {
   btnMenuLateral?.addEventListener("click", abrirMenuLateral);
   btnFecharMenu?.addEventListener("click", fecharMenuLateral);
   menuLateralOverlay?.addEventListener("click", fecharMenuLateral);
-
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && menuLateral?.classList.contains("aberto")) {
-      fecharMenuLateral();
-    }
+    if (e.key === "Escape" && menuLateral?.classList.contains("aberto")) fecharMenuLateral();
   });
-
   document.querySelectorAll(".menu-lateral-nav .menu-item").forEach((item) => {
-    item.addEventListener("click", () => {
-      fecharMenuLateral();
-    });
+    item.addEventListener("click", () => { fecharMenuLateral(); });
   });
 
   const btnSubmenuIdioma = document.getElementById("menu-btn-idioma");
@@ -3431,25 +2864,15 @@ function initMenuLateral() {
     submenuIdioma?.classList.remove("aberto");
     btnSubmenuIdioma?.setAttribute("aria-expanded", "false");
     const modoAtual = document.body.classList.contains("light-theme") ? "claro" : "escuro";
-    document.querySelectorAll(".submenu-modo").forEach((b) => {
-      b.classList.toggle("ativo", b.dataset.tema === modoAtual);
-    });
+    document.querySelectorAll(".submenu-modo").forEach((b) => { b.classList.toggle("ativo", b.dataset.tema === modoAtual); });
   });
 
   document.querySelectorAll("#submenu-idioma .menu-submenu-item").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      trocarIdioma(btn.dataset.idioma);
-      marcarAtivosMenuLateral();
-    });
+    btn.addEventListener("click", () => { trocarIdioma(btn.dataset.idioma); marcarAtivosMenuLateral(); });
   });
-
   document.querySelectorAll("#submenu-tema .submenu-cor").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      aplicarTema(btn.dataset.tema);
-      marcarAtivosMenuLateral();
-    });
+    btn.addEventListener("click", () => { aplicarTema(btn.dataset.tema); marcarAtivosMenuLateral(); });
   });
-
   document.querySelectorAll("#submenu-tema .submenu-modo").forEach((btn) => {
     btn.addEventListener("click", () => {
       const modo = btn.dataset.tema;
@@ -3488,31 +2911,23 @@ function initMenuLateral() {
   const menuItems = document.querySelectorAll(".menu-lateral-nav .menu-item");
   if (menuItems.length > 0) {
     let ticking = false;
-    window.addEventListener(
-      "scroll",
-      () => {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(() => {
-          let current = "";
-          sections.forEach((section) => {
-            const sectionTop = section.offsetTop;
-            if (pageYOffset >= sectionTop - 250) {
-              current = section.getAttribute("id");
-            }
-          });
-          menuItems.forEach((item) => {
-            item.classList.remove("active");
-            const href = item.getAttribute("href") || "";
-            if (href.startsWith("#") && href.substring(1) === current) {
-              item.classList.add("active");
-            }
-          });
-          ticking = false;
+    window.addEventListener("scroll", () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        let current = "";
+        sections.forEach((section) => {
+          const sectionTop = section.offsetTop;
+          if (pageYOffset >= sectionTop - 250) current = section.getAttribute("id");
         });
-      },
-      { passive: true }
-    );
+        menuItems.forEach((item) => {
+          item.classList.remove("active");
+          const href = item.getAttribute("href") || "";
+          if (href.startsWith("#") && href.substring(1) === current) item.classList.add("active");
+        });
+        ticking = false;
+      });
+    }, { passive: true });
   }
 }
 
@@ -3522,7 +2937,6 @@ function initMenuLateral() {
 document.addEventListener("DOMContentLoaded", function () {
   aplicarTema(obterTemaAtual());
   aplicarTraducoes();
-
   filtroRecadoTexto = "";
   filtroPerfilTexto = "";
   inicializarModalEditarPerfil();
@@ -3531,42 +2945,33 @@ document.addEventListener("DOMContentLoaded", function () {
   initMenuLateral();
   inicializarFiltrosConquistas();
 
-  document
-    .querySelectorAll("#menu-idioma .dropdown-item")
-    .forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        trocarIdioma(btn.dataset.idioma);
-      });
+  document.querySelectorAll("#menu-idioma .dropdown-item").forEach(function (btn) {
+    btn.addEventListener("click", function () { trocarIdioma(btn.dataset.idioma); });
+  });
+  document.querySelectorAll("#menu-tema .dropdown-item").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var tema = btn.dataset.tema;
+      var themeToggleBtnRef = document.getElementById("theme-toggle");
+      var themeIconRef = themeToggleBtnRef?.querySelector("i");
+      if (tema === "claro") {
+        document.body.classList.add("light-theme");
+        localStorage.setItem("theme", "light");
+        if (themeIconRef) themeIconRef.classList.replace("fa-moon", "fa-sun");
+        return;
+      }
+      if (tema === "escuro") {
+        document.body.classList.remove("light-theme");
+        localStorage.setItem("theme", "dark");
+        if (themeIconRef) themeIconRef.classList.replace("fa-sun", "fa-moon");
+        return;
+      }
+      aplicarTema(tema);
     });
-
-  document
-    .querySelectorAll("#menu-tema .dropdown-item")
-    .forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var tema = btn.dataset.tema;
-        var themeToggleBtnRef = document.getElementById("theme-toggle");
-        var themeIconRef = themeToggleBtnRef?.querySelector("i");
-        if (tema === "claro") {
-          document.body.classList.add("light-theme");
-          localStorage.setItem("theme", "light");
-          if (themeIconRef) themeIconRef.classList.replace("fa-moon", "fa-sun");
-          return;
-        }
-        if (tema === "escuro") {
-          document.body.classList.remove("light-theme");
-          localStorage.setItem("theme", "dark");
-          if (themeIconRef) themeIconRef.classList.replace("fa-sun", "fa-moon");
-          return;
-        }
-        aplicarTema(tema);
-      });
-    });
+  });
 
   document.getElementById("btn-instalar-app")?.addEventListener("click", instalarPWA);
-
   const btnLogin = document.getElementById("suap-login-button");
   if (btnLogin) btnLogin.setAttribute("href", suap.getLoginURL());
-
   const btnLogout = document.getElementById("suap-logout-button");
   if (btnLogout) {
     btnLogout.addEventListener("click", function (e) {
@@ -3582,11 +2987,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (window.location.hash.includes("access_token")) {
       history.replaceState(null, null, window.location.pathname);
     }
-
-    document.querySelectorAll(".is-authenticated").forEach(function (el) {
-      el.classList.remove("is-hidden");
-    });
-
+    document.querySelectorAll(".is-authenticated").forEach(function (el) { el.classList.remove("is-hidden"); });
     carregarPeriodosNotas();
 
     var calendarEl = document.getElementById("calendar");
@@ -3597,7 +2998,6 @@ document.addEventListener("DOMContentLoaded", function () {
         el.style.setProperty("border-color", cor, "important");
         el.style.setProperty("color", "#ffffff", "important");
       }
-
       var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: "dayGridMonth",
         locale: obterIdiomaAtual(),
@@ -3605,21 +3005,14 @@ document.addEventListener("DOMContentLoaded", function () {
         validRange: { start: "2026-09-01", end: "2026-12-31" },
         googleCalendarApiKey: "AIzaSyB9XFKFwtZNQJrN2Kh7UPZxraPXEwqFytw",
         events: "acb20a08d58749d48304dbda5c87bfb7f0671483ecc4ed942683ad5a1307e78d@group.calendar.google.com",
-        eventDidMount: function (info) {
-          pintarElementoEvento(info.el, info.event.title);
-        },
+        eventDidMount: function (info) { pintarElementoEvento(info.el, info.event.title); },
         eventsSet: function (eventos) {
           renderizarProximosEventos(eventos);
           setTimeout(function () {
-            document.querySelectorAll(".fc-event").forEach(function (el) {
-              pintarElementoEvento(el, el.innerText || "");
-            });
+            document.querySelectorAll(".fc-event").forEach(function (el) { pintarElementoEvento(el, el.innerText || ""); });
           }, 50);
         },
-        eventClick: function (arg) {
-          window.open(arg.event.url, "_blank");
-          arg.jsEvent.preventDefault();
-        },
+        eventClick: function (arg) { window.open(arg.event.url, "_blank"); arg.jsEvent.preventDefault(); },
       });
       calendar.render();
 
@@ -3627,16 +3020,10 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".fc-event").forEach(function (el) {
           var texto = el.innerText || "";
           var cor = corDoEvento(texto);
-          if (el.style.getPropertyValue("background-color") !== cor)
-            pintarElementoEvento(el, texto);
+          if (el.style.getPropertyValue("background-color") !== cor) pintarElementoEvento(el, texto);
         });
       });
-      observer.observe(calendarEl, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ["style"],
-      });
+      observer.observe(calendarEl, { childList: true, subtree: true, attributes: true, attributeFilter: ["style"] });
     }
 
     var scope = suap.getToken().getScope();
@@ -3644,8 +3031,7 @@ document.addEventListener("DOMContentLoaded", function () {
       var fotoPath = dados_suap.url_foto_150x200 || dados_suap.url_foto_75x100 || dados_suap.foto || "";
       var fotoUrl = "";
       if (fotoPath) {
-        if (fotoPath.startsWith("http://") || fotoPath.startsWith("https://"))
-          fotoUrl = fotoPath;
+        if (fotoPath.startsWith("http://") || fotoPath.startsWith("https://")) fotoUrl = fotoPath;
         else {
           var fotoBaseUrl = "https://suap.ifrn.edu.br";
           fotoUrl = fotoBaseUrl + (fotoPath.startsWith("/") ? "" : "/") + fotoPath;
@@ -3656,14 +3042,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const userFotoEl = document.getElementById("user-foto");
       if (userFotoEl) userFotoEl.src = fotoUrl;
-
       const nomeSuap = dados_suap.nome_usual || dados_suap.nome;
       const nomeCompletoSuap = dados_suap.nome || nomeSuap;
       const matriculaSuap = dados_suap.matricula || dados_suap.siape || "Matrícula não disponível";
-
       const userNomeEl = document.getElementById("user-nome");
       if (userNomeEl) userNomeEl.textContent = nomeParaExibicao(nomeSuap);
-
       const userMatEl = document.getElementById("user-matricula");
       if (userMatEl) userMatEl.textContent = matriculaSuap;
 
@@ -3681,23 +3064,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const perfilAlunoRef = ref(db, "perfis_alunos/" + matriculaSuap);
         get(perfilAlunoRef).then((snap) => {
           const dadosExistentes = snap.val() || {};
-          const payload = {
-            nomeCompleto: nomeCompletoSuap,
-            matricula: matriculaSuap,
-            ultimoAcesso: Date.now(),
-          };
-          if (!dadosExistentes.nome || !String(dadosExistentes.nome).trim())
-            payload.nome = nomeParaExibicao(nomeSuap);
-          if (!dadosExistentes.foto || !String(dadosExistentes.foto).trim())
-            payload.foto = fotoUrl;
-          update(perfilAlunoRef, payload).then(() => {
-            window.carregarPerfilUsuario(matriculaSuap);
-          });
+          const payload = { nomeCompleto: nomeCompletoSuap, matricula: matriculaSuap, ultimoAcesso: Date.now() };
+          if (!dadosExistentes.nome || !String(dadosExistentes.nome).trim()) payload.nome = nomeParaExibicao(nomeSuap);
+          if (!dadosExistentes.foto || !String(dadosExistentes.foto).trim()) payload.foto = fotoUrl;
+          update(perfilAlunoRef, payload).then(() => { window.carregarPerfilUsuario(matriculaSuap); });
         });
 
         carregarMetasDisciplinas();
         gerarNotificacoesRecados();
-
         carregarPainelXP();
         atualizarStreakLogin();
 
@@ -3705,27 +3079,20 @@ document.addEventListener("DOMContentLoaded", function () {
           setTimeout(() => {
             const secaoSala = document.getElementById("sala-professores");
             if (secaoSala) secaoSala.classList.remove("is-admin-hidden");
-
             const menuItemSala = document.getElementById("menu-item-sala");
             if (menuItemSala) menuItemSala.classList.remove("is-hidden");
-
             carregarSalaProfessores();
           }, 1000);
         }
       }
 
       const inputRecadoNome = document.getElementById("recado-nome");
-      if (inputRecadoNome) {
-        inputRecadoNome.style.display = "none";
-        inputRecadoNome.removeAttribute("required");
-      }
+      if (inputRecadoNome) { inputRecadoNome.style.display = "none"; inputRecadoNome.removeAttribute("required"); }
 
       window.renderizarMural();
       window.renderizarPerfis();
     });
   } else {
-    document.querySelectorAll(".is-anonymous").forEach(function (el) {
-      el.classList.remove("is-hidden");
-    });
+    document.querySelectorAll(".is-anonymous").forEach(function (el) { el.classList.remove("is-hidden"); });
   }
 });
