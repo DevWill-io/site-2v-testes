@@ -128,13 +128,13 @@
           </span>
         </a>
 
-<a href="tutorial.html" class="menu-item">
-  <span class="menu-item-icone"><i class="fa-solid fa-graduation-cap"></i></span>
-  <span class="menu-item-texto">
-    <span class="menu-item-titulo">Tutorial</span>
-    <span class="menu-item-desc">Como usar o site</span>
-  </span>
-</a>
+        <a href="tutorial.html" class="menu-item">
+          <span class="menu-item-icone"><i class="fa-solid fa-graduation-cap"></i></span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo">Tutorial</span>
+            <span class="menu-item-desc">Como usar o site</span>
+          </span>
+        </a>
 
         <a href="#sala-professores" class="menu-item is-admin-item is-hidden" id="menu-item-sala">
           <span class="menu-item-icone"><i class="fa-solid fa-user-tie"></i></span>
@@ -727,6 +727,11 @@
           <div id="calendar"></div>
         </div>
 
+        <button type="button" id="btn-novo-evento" class="btn-novo-evento is-hidden">
+          <i class="fa-solid fa-plus"></i>
+          <span>Novo Evento</span>
+        </button>
+
         <div class="calendario-legenda" id="calendario-legenda"></div>
       </div>
     </section>
@@ -842,7 +847,6 @@
             <span id="modal-perfil-matricula"></span>
           </p>
 
-          <!-- 🐾 Badges agrupados: mascote + nível -->
           <div class="modal-perfil-badges">
             <div id="modal-perfil-mascote" class="modal-perfil-mascote is-hidden">
               <div class="modal-perfil-mascote-emoji" id="modal-perfil-mascote-emoji"></div>
@@ -1020,6 +1024,62 @@
           </button>
           <button type="button" class="button is-success" data-salvar data-i18n="salvar">Salvar</button>
         </div>
+      </div>
+    </div>
+
+    <!-- MODAL NOVO EVENTO -->
+    <div id="modal-novo-evento" class="modal-overlay is-hidden">
+      <div class="modal-content modal-evento" onclick="event.stopPropagation()">
+        <button type="button" class="modal-close" id="btn-fechar-evento" aria-label="Fechar">
+          &times;
+        </button>
+
+        <h2 class="modal-title">
+          <i class="fa-solid fa-calendar-plus"></i>
+          <span>Novo Evento</span>
+        </h2>
+        <p class="modal-subtitle">O evento aparece pra todos os alunos na hora.</p>
+
+        <form id="form-novo-evento">
+          <label class="field-label" for="evento-titulo">Título *</label>
+          <input type="text" id="evento-titulo" maxlength="200" placeholder="Ex: Prova de Matemática" required />
+
+          <label class="field-label" for="evento-descricao">Descrição</label>
+          <textarea id="evento-descricao" maxlength="2000" rows="3" placeholder="Detalhes (opcional)"></textarea>
+
+          <label class="field-label" for="evento-local">Local</label>
+          <input type="text" id="evento-local" maxlength="200" placeholder="Ex: Sala 12 (opcional)" />
+
+          <div class="evento-datas-grid">
+            <div>
+              <label class="field-label" for="evento-inicio">Início *</label>
+              <input type="datetime-local" id="evento-inicio" required />
+            </div>
+            <div>
+              <label class="field-label" for="evento-fim">Fim *</label>
+              <input type="datetime-local" id="evento-fim" required />
+            </div>
+          </div>
+
+          <label class="field-label" for="evento-cor">Cor do evento</label>
+          <select id="evento-cor">
+            <option value="roxo" selected>🟣 Roxo (Reuniões/Aulas)</option>
+            <option value="vermelho">🔴 Vermelho (Provas)</option>
+            <option value="laranja">🟠 Laranja (Trabalhos)</option>
+            <option value="verde">🟢 Verde (Feriados)</option>
+            <option value="azul">🔵 Azul (Esportes)</option>
+            <option value="rosa">🩷 Rosa (Festas)</option>
+          </select>
+
+          <div id="evento-status" class="evento-status is-hidden"></div>
+
+          <div class="modal-actions">
+            <button type="button" class="button btn-cancelar" id="btn-cancelar-evento">Cancelar</button>
+            <button type="submit" class="button is-success" id="btn-criar-evento">
+              <i class="fa-solid fa-calendar-plus"></i> Criar evento
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
