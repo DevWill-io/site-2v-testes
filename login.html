@@ -20,3 +20,1039 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.11/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600&family=Poppins:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
+
+    <link rel="stylesheet" href="styles/login.css" />
+  </head>
+  <body>
+    <header class="login-header">
+      <a href="../index.html" class="login-logo">
+        <i class="fa-solid fa-code-branch"></i>InfoWeb<span>- 2V</span>
+      </a>
+
+      <div class="header-actions">
+        <button
+          id="btn-instalar-app"
+          class="btn-theme btn-instalar-app is-hidden"
+          aria-label="Instalar app"
+          data-i18n-title="instalar_app"
+        >
+          <i class="fa-solid fa-download"></i>
+        </button>
+
+        <button
+          id="btn-notificacoes"
+          class="btn-theme btn-notificacoes is-hidden"
+          aria-label="Notificações"
+          data-i18n-title="notificacoes"
+        >
+          <i class="fa-regular fa-bell"></i>
+          <span id="badge-notificacoes" class="badge-notif is-hidden">0</span>
+        </button>
+
+        <button id="btn-menu" class="btn-menu-hamburguer" aria-label="Abrir menu">
+          <i class="fa-solid fa-bars-staggered"></i>
+          <span class="btn-menu-label" data-i18n="menu">Menu</span>
+        </button>
+      </div>
+    </header>
+
+    <div id="menu-lateral-overlay" class="menu-lateral-overlay"></div>
+    <aside id="menu-lateral" class="menu-lateral" aria-hidden="true">
+      <div class="menu-lateral-header">
+        <span class="menu-lateral-titulo">
+          <i class="fa-solid fa-code-branch"></i> InfoWeb 2V
+        </span>
+        <button id="btn-fechar-menu" class="btn-fechar-menu" aria-label="Fechar menu">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <nav class="menu-lateral-nav">
+        <a href="../index.html" class="menu-item">
+          <span class="menu-item-icone"><i class="fa-solid fa-house"></i></span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_inicio">Início</span>
+            <span class="menu-item-desc" data-i18n="nav_inicio_desc_login">Página inicial</span>
+          </span>
+        </a>
+        <a href="login.html" class="menu-item">
+          <span class="menu-item-icone"><i class="fa-solid fa-chart-line"></i></span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_notas">Notas</span>
+            <span class="menu-item-desc" data-i18n="nav_notas_desc">Sua calculadora</span>
+          </span>
+        </a>
+        <a href="#horarios" class="menu-item">
+          <span class="menu-item-icone"><i class="fa-solid fa-calendar-days"></i></span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_horarios">Horários</span>
+            <span class="menu-item-desc" data-i18n="nav_horarios_desc">Rotina semanal</span>
+          </span>
+        </a>
+        <a href="#mural" class="menu-item">
+          <span class="menu-item-icone"><i class="fa-solid fa-comments"></i></span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_mural">Mural</span>
+            <span class="menu-item-desc" data-i18n="nav_mural_desc">Recados da turma</span>
+          </span>
+        </a>
+        <a href="#perfis" class="menu-item">
+          <span class="menu-item-icone"><i class="fa-solid fa-users"></i></span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_membros">Membros</span>
+            <span class="menu-item-desc" data-i18n="nav_membros_desc">Colegas do sistema</span>
+          </span>
+        </a>
+        <a href="#agenda" class="menu-item">
+          <span class="menu-item-icone"><i class="fa-solid fa-calendar-check"></i></span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_agenda">Agenda</span>
+            <span class="menu-item-desc" data-i18n="nav_agenda_desc">Eventos do calendário</span>
+          </span>
+        </a>
+        <a href="../index.html#mascote" class="menu-item">
+          <span class="menu-item-icone"><i class="fa-solid fa-paw"></i></span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_mascote">Mascote</span>
+            <span class="menu-item-desc" data-i18n="nav_mascote_desc">Interaja com ele</span>
+          </span>
+        </a>
+
+<a href="tutorial.html" class="menu-item">
+  <span class="menu-item-icone"><i class="fa-solid fa-graduation-cap"></i></span>
+  <span class="menu-item-texto">
+    <span class="menu-item-titulo">Tutorial</span>
+    <span class="menu-item-desc">Como usar o site</span>
+  </span>
+</a>
+
+        <a href="#sala-professores" class="menu-item is-admin-item is-hidden" id="menu-item-sala">
+          <span class="menu-item-icone"><i class="fa-solid fa-user-tie"></i></span>
+          <span class="menu-item-texto">
+            <span class="menu-item-titulo" data-i18n="nav_sala">Sala dos Professores</span>
+            <span class="menu-item-desc" data-i18n="nav_sala_desc">Acesso restrito</span>
+          </span>
+        </a>
+      </nav>
+
+      <div class="menu-lateral-footer">
+        <div class="menu-lateral-acoes">
+          <button type="button" class="menu-acao-btn" id="menu-btn-idioma" aria-expanded="false">
+            <i class="fa-solid fa-globe"></i>
+            <span data-i18n="idioma">Idioma</span>
+          </button>
+          <button type="button" class="menu-acao-btn" id="menu-btn-tema" aria-expanded="false">
+            <i class="fa-solid fa-palette"></i>
+            <span data-i18n="tema">Tema</span>
+          </button>
+        </div>
+
+        <div class="menu-submenu" id="submenu-idioma">
+          <button type="button" class="menu-submenu-item" data-idioma="pt-BR">
+            <span class="submenu-flag">🇧🇷</span><span>Português</span>
+          </button>
+          <button type="button" class="menu-submenu-item" data-idioma="en">
+            <span class="submenu-flag">🇺🇸</span><span>English</span>
+          </button>
+          <button type="button" class="menu-submenu-item" data-idioma="es">
+            <span class="submenu-flag">🇪🇸</span><span>Español</span>
+          </button>
+        </div>
+
+        <div class="menu-submenu" id="submenu-tema">
+          <div class="submenu-titulo">
+            <i class="fa-solid fa-swatchbook"></i>
+            <span data-i18n="cor_tema">Cor do tema</span>
+          </div>
+          <div class="submenu-cores">
+            <button type="button" class="submenu-cor" data-tema="roxo" title="Roxo">
+              <span class="tema-swatch tema-swatch-roxo"></span>
+              <span data-i18n="cor_roxo">Roxo</span>
+            </button>
+            <button type="button" class="submenu-cor" data-tema="azul" title="Azul">
+              <span class="tema-swatch tema-swatch-azul"></span>
+              <span data-i18n="cor_azul">Azul</span>
+            </button>
+            <button type="button" class="submenu-cor" data-tema="verde" title="Verde">
+              <span class="tema-swatch tema-swatch-verde"></span>
+              <span data-i18n="cor_verde">Verde</span>
+            </button>
+            <button type="button" class="submenu-cor" data-tema="rosa" title="Rosa">
+              <span class="tema-swatch tema-swatch-rosa"></span>
+              <span data-i18n="cor_rosa">Rosa</span>
+            </button>
+            <button type="button" class="submenu-cor" data-tema="laranja" title="Laranja">
+              <span class="tema-swatch tema-swatch-laranja"></span>
+              <span data-i18n="cor_laranja">Laranja</span>
+            </button>
+          </div>
+
+          <div class="submenu-titulo submenu-titulo-modo">
+            <i class="fa-solid fa-circle-half-stroke"></i>
+            <span data-i18n="modo">Modo</span>
+          </div>
+          <div class="submenu-modos">
+            <button type="button" class="submenu-modo" data-tema="claro">
+              <i class="fa-solid fa-sun"></i>
+              <span data-i18n="modo_claro">Claro</span>
+            </button>
+            <button type="button" class="submenu-modo" data-tema="escuro">
+              <i class="fa-solid fa-moon"></i>
+              <span data-i18n="modo_escuro">Escuro</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="menu-lateral-redes">
+          <a href="https://github.com/infoWeb2026-2V" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <i class="fa-brands fa-github"></i>
+          </a>
+          <a href="https://instagram.com/InfoWeb2026.1" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+          <a href="https://www.tiktok.com/@infoweb2026_2v" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+            <i class="fa-brands fa-tiktok"></i>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <main class="login-main">
+      <div class="login-container">
+        <div class="login-card">
+          <h1 class="login-card-title" data-i18n="portal_suap">Portal SUAP</h1>
+          <p class="login-card-subtitle" data-i18n="area_auth">Área de autenticação acadêmica</p>
+
+          <div class="is-anonymous is-hidden content login-prompt">
+            <p data-i18n="acesse_credenciais">
+              Acesse com suas credenciais institucionais do IFRN para integrar e
+              visualizar seus dados acadêmicos.
+            </p>
+            <a class="button is-success is-large" id="suap-login-button">
+              <i class="fa-solid fa-right-to-bracket"></i>
+              <span data-i18n="login_suap">Login com SUAP</span>
+            </a>
+          </div>
+
+          <div class="is-authenticated is-hidden content login-success">
+            <div class="success-header">
+              <i class="fa-solid fa-circle-check"></i>
+              <h3 data-i18n="login_ok">Você foi logado com sucesso!</h3>
+              <p data-i18n="sessao_ativa">Sessão ativa e conectada ao SUAP.</p>
+            </div>
+
+            <div id="user-profile-info" class="user-profile-card">
+              <img id="user-foto" src="" alt="Foto SUAP" class="user-avatar" />
+              <div class="user-details">
+                <span class="user-greeting" data-i18n="bem_vindo">Bem-vindo,</span>
+                <h4 id="user-nome" class="user-name"></h4>
+                <span id="user-matricula" class="user-enrollment"></span>
+                <p id="user-bio" class="user-bio is-hidden"></p>
+                <div id="user-redes" class="user-redes"></div>
+              </div>
+              <button
+                type="button"
+                id="btn-editar-perfil"
+                class="button is-link btn-editar-perfil"
+              >
+                <i class="fa-solid fa-user-pen"></i>
+                <span id="btn-editar-perfil-label" data-i18n="editar_perfil">Editar Perfil</span>
+              </button>
+            </div>
+
+            <div class="logout-action">
+              <button
+                type="button"
+                class="button is-danger"
+                id="suap-logout-button"
+              >
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span data-i18n="encerrar_sessao">Encerrar Sessão</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <section id="xp-painel" class="xp-painel is-authenticated is-hidden">
+      <div class="container">
+        <div class="xp-card">
+          <div class="xp-header">
+            <div class="xp-nivel-badge" id="xp-nivel-badge">
+              <span class="xp-nivel-num" id="xp-nivel-num">1</span>
+            </div>
+            <div class="xp-info">
+              <span class="xp-nome-nivel" id="xp-nome-nivel">Novato</span>
+              <span class="xp-total" id="xp-total">0 XP</span>
+            </div>
+            <div class="xp-streak" id="xp-streak-box">
+              <i class="fa-solid fa-fire"></i>
+              <span id="xp-streak">0</span>
+              <small data-i18n="dias">dias</small>
+            </div>
+          </div>
+          <div class="xp-barra">
+            <div class="xp-barra-fill" id="xp-barra-fill"></div>
+          </div>
+          <span class="xp-proximo" id="xp-proximo">Próximo nível: Curioso (100 XP)</span>
+        </div>
+
+        <div class="conquistas-box">
+          <div class="conquistas-header">
+            <h3>
+              <i class="fa-solid fa-medal"></i>
+              <span data-i18n="conquistas_titulo">Conquistas</span>
+            </h3>
+            <span class="conquistas-contador" id="conquistas-contador">0/0</span>
+          </div>
+          <div class="conquistas-filtros">
+            <button type="button" class="conquista-filtro ativo" data-filtro="todas">
+              <span data-i18n="todas">Todas</span>
+            </button>
+            <button type="button" class="conquista-filtro" data-filtro="desbloqueadas">
+              <i class="fa-solid fa-check"></i>
+              <span data-i18n="desbloqueadas">Desbloqueadas</span>
+            </button>
+            <button type="button" class="conquista-filtro" data-filtro="bloqueadas">
+              <i class="fa-solid fa-lock"></i>
+              <span data-i18n="bloqueadas">Bloqueadas</span>
+            </button>
+          </div>
+          <div class="conquistas-grid" id="conquistas-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="proximos-eventos" class="proximos-eventos is-authenticated is-hidden">
+      <div class="container">
+        <div id="proximos-eventos-lista" class="proximos-eventos-lista"></div>
+      </div>
+    </section>
+
+    <section id="contagem-regressiva" class="contagem-regressiva is-authenticated is-hidden">
+      <div class="container">
+        <div class="section-title">
+          <h2>
+            <span data-i18n="contagem_titulo_1">Faltam</span>
+            <span class="highlight" data-i18n="contagem_titulo_2">pouco!</span>
+          </h2>
+          <p data-i18n="contagem_sub">Próximos eventos importantes</p>
+        </div>
+
+        <div class="contagem-grid" id="contagem-grid">
+          <div class="contagem-vazio">
+            <i class="fa-regular fa-calendar"></i>
+            <p data-i18n="contagem_vazio">Nenhum evento próximo nos próximos 30 dias.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="notas" class="notas is-authenticated is-hidden">
+      <div class="container">
+        <div class="section-title">
+          <h2>
+            <span data-i18n="calc_titulo_1">Calculadora de</span>
+            <span class="highlight" data-i18n="calc_titulo_2">Notas</span>
+          </h2>
+          <p data-i18n="calc_sub">Boletim atualizado diretamente pelo SUAP</p>
+        </div>
+
+        <div class="notas-resumo">
+          <div class="resumo-card">
+            <i class="fa-solid fa-chart-line"></i>
+            <span class="resumo-label" data-i18n="media_geral">Média Geral</span>
+            <strong id="resumo-media" class="resumo-valor">—</strong>
+          </div>
+          <div class="resumo-card">
+            <i class="fa-solid fa-book"></i>
+            <span class="resumo-label" data-i18n="disciplinas">Disciplinas</span>
+            <strong id="resumo-disciplinas" class="resumo-valor">—</strong>
+          </div>
+          <div class="resumo-card">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span class="resumo-label" data-i18n="em_risco">Em Risco</span>
+            <strong id="resumo-risco" class="resumo-valor">—</strong>
+          </div>
+          <div class="resumo-card">
+            <i class="fa-solid fa-user-xmark"></i>
+            <span class="resumo-label" data-i18n="faltas_totais">Faltas Totais</span>
+            <strong id="resumo-faltas" class="resumo-valor">—</strong>
+          </div>
+        </div>
+
+        <div class="notas-panel">
+          <div class="notas-controls">
+            <label for="periodo-notas" data-i18n="periodo">Período</label>
+            <select id="periodo-notas" disabled>
+              <option value="">Carregando períodos...</option>
+            </select>
+
+            <label for="meta-notas">
+              <span data-i18n="meta">Meta</span>: <span id="meta-valor">60</span>
+            </label>
+            <input id="meta-notas" type="range" min="0" max="100" step="5" value="60" />
+
+            <button id="atualizar-notas" type="button" class="button is-link">
+              <i class="fa-solid fa-rotate"></i>
+              <span data-i18n="atualizar">Atualizar</span>
+            </button>
+          </div>
+
+          <div class="notas-acoes">
+            <button type="button" id="btn-export-csv" class="btn-acao">
+              <i class="fa-solid fa-file-csv"></i>
+              <span data-i18n="export_csv">Exportar CSV</span>
+            </button>
+            <button type="button" id="btn-export-pdf" class="btn-acao">
+              <i class="fa-solid fa-file-pdf"></i>
+              <span data-i18n="export_pdf">Exportar PDF</span>
+            </button>
+            <button type="button" id="btn-limpar-simulador" class="btn-acao">
+              <i class="fa-solid fa-eraser"></i>
+              <span data-i18n="limpar_simulador">Limpar simulador</span>
+            </button>
+          </div>
+
+          <div class="notas-filtros" role="tablist">
+            <button type="button" class="filtro-chip ativo" data-filtro="todas">
+              <span data-i18n="filtro_todas">Todas</span>
+            </button>
+            <button type="button" class="filtro-chip" data-filtro="aprovado">
+              <i class="fa-solid fa-check"></i>
+              <span data-i18n="filtro_aprovadas">Aprovadas</span>
+            </button>
+            <button type="button" class="filtro-chip" data-filtro="recuperacao">
+              <i class="fa-solid fa-rotate"></i>
+              <span data-i18n="filtro_recuperacao">Recuperação</span>
+            </button>
+            <button type="button" class="filtro-chip" data-filtro="reprovado">
+              <i class="fa-solid fa-xmark"></i>
+              <span data-i18n="filtro_reprovadas">Reprovadas</span>
+            </button>
+            <button type="button" class="filtro-chip" data-filtro="risco">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span data-i18n="filtro_risco">Em risco</span>
+            </button>
+          </div>
+
+          <p id="notas-status" class="notas-status" role="status">
+            <i class="fa-solid fa-circle-info"></i>
+            <span data-i18n="aguardando_suap">Aguardando dados do SUAP...</span>
+          </p>
+
+          <div class="notas-table-wrapper">
+            <table class="tabela-notas" id="tabela-notas">
+              <thead>
+                <tr>
+                  <th data-sort="nome" class="sortable">
+                    <span data-i18n="th_disciplina">Disciplina</span>
+                    <i class="fa-solid fa-sort"></i>
+                  </th>
+                  <th data-i18n="th_etapas">Etapas</th>
+                  <th data-sort="media" class="sortable">
+                    <span data-i18n="th_media">Média</span>
+                    <i class="fa-solid fa-sort"></i>
+                  </th>
+                  <th data-sort="faltas" class="sortable">
+                    <span data-i18n="th_faltas">Faltas</span>
+                    <i class="fa-solid fa-sort"></i>
+                  </th>
+                  <th data-i18n="th_projecao">Projeção</th>
+                  <th data-sort="status" class="sortable">
+                    <span data-i18n="th_status">Status</span>
+                    <i class="fa-solid fa-sort"></i>
+                  </th>
+                  <th data-i18n-title="th_simulador">🧪 E se...?</th>
+                  <th data-i18n-title="th_meta_ind">🎯</th>
+                </tr>
+              </thead>
+              <tbody id="lista-notas">
+                <tr>
+                  <td colspan="8" class="notas-vazia">
+                    <i class="fa-solid fa-lock"></i>
+                    <span data-i18n="notas_vazio">Faça login para carregar suas notas.</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="notas-legenda">
+            <span><i class="dot dot-aprovado"></i> <span data-i18n="leg_aprovado">Aprovado</span></span>
+            <span><i class="dot dot-recuperacao"></i> <span data-i18n="leg_recuperacao">Recuperação</span></span>
+            <span><i class="dot dot-reprovado"></i> <span data-i18n="leg_reprovado">Reprovado</span></span>
+            <span style="margin-left:auto;opacity:.8;" data-i18n="leg_extra">🧪 Simulador • 🎯 Meta individual</span>
+          </div>
+        </div>
+
+        <div class="evolucao-panel is-hidden" id="evolucao-panel">
+          <div class="evolucao-header">
+            <h3>
+              <i class="fa-solid fa-chart-line"></i>
+              <span data-i18n="evolucao_titulo">Evolução das Médias</span>
+            </h3>
+            <p class="evolucao-sub" data-i18n="evolucao_sub">Sua média por período letivo</p>
+          </div>
+          <div class="evolucao-chart-wrap">
+            <canvas id="grafico-evolucao"></canvas>
+          </div>
+        </div>
+
+        <div class="historico-panel is-hidden" id="historico-panel">
+          <div class="historico-header">
+            <h3>
+              <i class="fa-solid fa-clock-rotate-left"></i>
+              <span data-i18n="historico_titulo">Histórico de Períodos</span>
+            </h3>
+            <button type="button" id="btn-toggle-historico" class="btn-acao">
+              <i class="fa-solid fa-chevron-up"></i>
+            </button>
+          </div>
+          <div id="historico-content" class="historico-content">
+            <p class="historico-vazio" data-i18n="historico_vazio">Carregue pelo menos 2 períodos para comparar.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="horarios" class="horarios is-authenticated is-hidden">
+      <div class="container">
+        <div class="section-title reveal">
+          <h2>
+            <span data-i18n="horarios_titulo_1">Quadro de</span>
+            <span class="highlight" data-i18n="horarios_titulo_2">Horários</span>
+          </h2>
+          <p data-i18n="horarios_sub">Nossa rotina semanal</p>
+        </div>
+        <div class="table-responsive reveal">
+          <table class="tabela-horarios">
+            <thead>
+              <tr>
+                <th data-i18n="th_horario">Horário</th>
+                <th data-i18n="dia_seg">Segunda</th>
+                <th data-i18n="dia_ter">Terça</th>
+                <th data-i18n="dia_qua">Quarta</th>
+                <th data-i18n="dia_qui">Quinta</th>
+                <th data-i18n="dia_sex">Sexta</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>13:00 - 13:45</td>
+                <td>Química</td>
+                <td>Matemática I</td>
+                <td>Matemática I</td>
+                <td>Química</td>
+                <td>Língua Portuguesa e Literatura</td>
+              </tr>
+              <tr>
+                <td>13:45 - 14:30</td>
+                <td>Química</td>
+                <td>Matemática I</td>
+                <td>Matemática I</td>
+                <td>Química</td>
+                <td>Língua Portuguesa e Literatura</td>
+              </tr>
+              <tr>
+                <td>14:30 - 14:50</td>
+                <td colspan="5" class="intervalo" data-i18n="intervalo_1">I Intervalo</td>
+              </tr>
+              <tr>
+                <td>14:50 - 15:35</td>
+                <td>Introdução à Lógica e Programação</td>
+                <td>Ed. Física</td>
+                <td>Introdução à Lógica e Programação</td>
+                <td>Sociologia I</td>
+                <td>Autoria Web</td>
+              </tr>
+              <tr>
+                <td>15:35 - 16:20</td>
+                <td>Introdução à Lógica e Programação</td>
+                <td>Ed. Física</td>
+                <td>Introdução à Lógica e Programação</td>
+                <td>Sociologia I</td>
+                <td>Autoria Web</td>
+              </tr>
+              <tr>
+                <td>16:20 - 16:30</td>
+                <td colspan="5" class="intervalo" data-i18n="intervalo_2">II Intervalo</td>
+              </tr>
+              <tr>
+                <td>16:30 - 17:15</td>
+                <td>Arte I</td>
+                <td>Geografia I</td>
+                <td>Geografia I</td>
+                <td>Língua Portuguesa e Literatura</td>
+                <td>Princípios de Design</td>
+              </tr>
+              <tr>
+                <td>17:15 - 18:00</td>
+                <td>Arte I</td>
+                <td>Geografia I</td>
+                <td>Geografia I</td>
+                <td>Língua Portuguesa e Literatura</td>
+                <td>Princípios de Design</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="horario-legenda reveal">
+          <i class="fa-regular fa-calendar"></i>
+          <span data-i18n="horario_sujeito">Horário sujeito a alterações. Consulte o</span>
+          <a href="https://suap.ifrn.edu.br/" target="_blank" rel="noopener noreferrer">SUAP</a>
+          <span data-i18n="horario_versao">para a versão oficial.</span>
+        </p>
+      </div>
+    </section>
+
+    <section id="mural" class="mural is-authenticated is-hidden">
+      <div class="container">
+        <div class="section-title reveal">
+          <h2>
+            <span data-i18n="mural_titulo_1">Mural de</span>
+            <span class="highlight" data-i18n="mural_titulo_2">Recados</span>
+          </h2>
+          <p data-i18n="mural_sub">Deixe um recado para a turma</p>
+        </div>
+        <div class="mural-container reveal">
+          <input
+            type="text"
+            id="busca-recados"
+            placeholder="🔍 Buscar recados..."
+            class="input-search"
+            autocomplete="off"
+            data-i18n-placeholder="busca_recados"
+          />
+
+          <form id="form-recado" class="form-recado">
+            <div class="input-group">
+              <input type="text" id="recado-nome" placeholder="Seu nome" maxlength="30" required />
+              <div class="textarea-wrapper">
+                <textarea
+                  id="recado-mensagem"
+                  placeholder="Sua mensagem..."
+                  rows="3"
+                  maxlength="200"
+                  required
+                  data-i18n-placeholder="recado_msg"
+                ></textarea>
+                <div class="char-counter">
+                  <span id="contador-caracteres">0</span>/200
+                </div>
+              </div>
+              <input
+                type="url"
+                id="recado-link"
+                placeholder="Link/Anexo opcional (https://...)"
+                class="input-url"
+                data-i18n-placeholder="recado_link"
+              />
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <label for="recado-duracao" style="font-size: 0.9em; color: var(--text-muted);">
+                  <i class="fa-regular fa-clock"></i>
+                  <span data-i18n="expirar_em">Expirar em:</span>
+                </label>
+                <select
+                  id="recado-duracao"
+                  style="padding: 8px; border-radius: 6px; border: none; outline: none; background-color: var(--bg-card); color: var(--text-main); font-family: inherit; cursor: pointer; box-shadow: 0 2px 4px var(--shadow);"
+                >
+                  <option value="1" data-i18n="dia_1">1 Dia</option>
+                  <option value="7" selected data-i18n="dias_7">7 Dias</option>
+                  <option value="15" data-i18n="dias_15">15 Dias</option>
+                </select>
+              </div>
+
+              <button type="submit" class="btn btn-primary">
+                <i class="fa-regular fa-paper-plane"></i>
+                <span data-i18n="publicar">Publicar</span>
+              </button>
+            </div>
+          </form>
+
+          <div id="lista-recados" class="lista-recados"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="perfis" class="perfis is-authenticated is-hidden">
+      <div class="container">
+        <div class="section-title reveal">
+          <h2>
+            <span data-i18n="membros_titulo_1">Membros do</span>
+            <span class="highlight" data-i18n="membros_titulo_2">Sistema</span>
+          </h2>
+          <p data-i18n="membros_sub">Membros integrados ao sistema</p>
+          <p id="contador-membros" style="margin-top: 8px; font-size: 0.85rem; color: var(--accent); font-weight: 600;"></p>
+        </div>
+        <div class="calendar-wrapper">
+          <input
+            type="text"
+            id="busca-perfis"
+            placeholder="🔍 Filtrar por nome ou matrícula..."
+            class="input-search"
+            autocomplete="off"
+            data-i18n-placeholder="busca_perfis"
+          />
+          <div id="lista-perfis" class="lista-perfis"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="agenda" class="agenda is-authenticated is-hidden">
+      <div class="container">
+        <div class="section-title reveal">
+          <h2>
+            <span data-i18n="agenda_titulo_1">Agenda da</span>
+            <span class="highlight" data-i18n="agenda_titulo_2">Turma</span>
+          </h2>
+          <p data-i18n="agenda_sub">Eventos de Setembro a Dezembro de 2026</p>
+        </div>
+
+        <div class="calendar-wrapper">
+          <div id="calendar"></div>
+        </div>
+
+        <div class="calendario-legenda" id="calendario-legenda"></div>
+      </div>
+    </section>
+
+    <section id="sala-professores" class="sala-professores is-authenticated is-hidden is-admin-hidden">
+      <div class="container">
+        <div class="section-title">
+          <h2>
+            <i class="fa-solid fa-user-tie" style="color: var(--accent);"></i>
+            <span data-i18n="sala_titulo">Sala dos Professores</span>
+          </h2>
+          <p data-i18n="sala_sub">Visão geral da turma (acesso restrito)</p>
+        </div>
+
+        <div class="sala-tabs">
+          <button type="button" class="sala-tab ativo" data-tab="alunos">
+            <i class="fa-solid fa-users"></i>
+            <span data-i18n="sala_tab_alunos">Alunos</span>
+          </button>
+          <button type="button" class="sala-tab" data-tab="risco">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span data-i18n="sala_tab_risco">Em Risco</span>
+          </button>
+          <button type="button" class="sala-tab" data-tab="engajamento">
+            <i class="fa-solid fa-heart"></i>
+            <span data-i18n="sala_tab_engajamento">Engajamento</span>
+          </button>
+        </div>
+
+        <div class="sala-painel">
+          <div class="sala-tab-content ativo" id="sala-tab-alunos">
+            <input
+              type="text"
+              id="sala-busca-aluno"
+              class="input-search"
+              placeholder="🔍 Buscar aluno por nome ou matrícula..."
+              data-i18n-placeholder="sala_busca"
+              autocomplete="off"
+            />
+            <div class="sala-tabela-wrapper">
+              <table class="sala-tabela">
+                <thead>
+                  <tr>
+                    <th data-i18n="sala_th_aluno">Aluno</th>
+                    <th data-i18n="sala_th_matricula">Matrícula</th>
+                    <th data-i18n="sala_th_media">Média</th>
+                    <th data-i18n="sala_th_faltas">Faltas</th>
+                    <th data-i18n="sala_th_carinhos">Carinhos</th>
+                    <th data-i18n="sala_th_conquistas">Conquistas</th>
+                    <th data-i18n="sala_th_status">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="sala-lista-alunos">
+                  <tr>
+                    <td colspan="7" class="sala-vazio">
+                      <i class="fa-solid fa-spinner fa-spin"></i>
+                      <span data-i18n="sala_carregando">Carregando dados...</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="sala-tab-content" id="sala-tab-risco">
+            <div id="sala-lista-risco" class="sala-cards">
+              <p class="sala-vazio-msg" data-i18n="sala_risco_carregando">
+                Carregando...
+              </p>
+            </div>
+          </div>
+
+          <div class="sala-tab-content" id="sala-tab-engajamento">
+            <div class="sala-stats-grid">
+              <div class="sala-stat-card">
+                <i class="fa-solid fa-heart"></i>
+                <h3 id="sala-stat-total-carinhos">—</h3>
+                <p data-i18n="sala_stat_carinhos">Carinhos totais</p>
+              </div>
+              <div class="sala-stat-card">
+                <i class="fa-solid fa-message"></i>
+                <h3 id="sala-stat-total-recados">—</h3>
+                <p data-i18n="sala_stat_recados">Recados publicados</p>
+              </div>
+              <div class="sala-stat-card">
+                <i class="fa-solid fa-users"></i>
+                <h3 id="sala-stat-total-alunos">—</h3>
+                <p data-i18n="sala_stat_alunos">Alunos ativos</p>
+              </div>
+              <div class="sala-stat-card">
+                <i class="fa-solid fa-fire"></i>
+                <h3 id="sala-stat-top-carinhos">—</h3>
+                <p data-i18n="sala_stat_top">Top contribuinte</p>
+              </div>
+            </div>
+
+            <div class="sala-engajamento-lista" id="sala-engajamento-lista"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="modal-perfil" class="modal-overlay is-hidden" onclick="fecharModalPerfil()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <button type="button" class="modal-close" onclick="fecharModalPerfil()" aria-label="Fechar">
+          &times;
+        </button>
+        <div class="text-center">
+          <img id="modal-perfil-foto" src="" alt="Foto Aluno" class="modal-avatar" />
+          <h3 id="modal-perfil-nome"></h3>
+          <p style="margin-top: 6px;">
+            <strong data-i18n="matricula">Matrícula:</strong>
+            <span id="modal-perfil-matricula"></span>
+          </p>
+
+          <!-- 🐾 Badges agrupados: mascote + nível -->
+          <div class="modal-perfil-badges">
+            <div id="modal-perfil-mascote" class="modal-perfil-mascote is-hidden">
+              <div class="modal-perfil-mascote-emoji" id="modal-perfil-mascote-emoji"></div>
+              <div class="modal-perfil-mascote-info">
+                <span class="modal-perfil-mascote-label">Mascote</span>
+                <span class="modal-perfil-mascote-nome" id="modal-perfil-mascote-nome">Padrão</span>
+              </div>
+            </div>
+
+            <div id="modal-perfil-nivel" class="modal-perfil-nivel is-hidden">
+              <div class="modal-perfil-nivel-badge" id="modal-perfil-nivel-badge">1</div>
+              <div class="modal-perfil-nivel-info">
+                <span class="modal-perfil-nivel-nome" id="modal-perfil-nivel-nome">Novato</span>
+                <span class="modal-perfil-nivel-xp" id="modal-perfil-nivel-xp">0 XP</span>
+              </div>
+            </div>
+          </div>
+
+          <p id="modal-perfil-bio" class="modal-perfil-bio is-hidden"></p>
+          <div id="modal-perfil-redes" class="modal-perfil-redes is-hidden"></div>
+
+          <div id="modal-perfil-conquistas" class="modal-perfil-conquistas is-hidden">
+            <h4 class="modal-perfil-conquistas-titulo">
+              <i class="fa-solid fa-medal"></i>
+              <span data-i18n="conquistas_titulo">Conquistas</span>
+              <span id="modal-perfil-conquistas-contador" class="modal-perfil-conquistas-contador">0/0</span>
+            </h4>
+            <div id="modal-perfil-conquistas-grid" class="modal-perfil-conquistas-grid"></div>
+          </div>
+
+          <p style="margin-top: 12px; font-size: 0.85em; color: var(--text-muted);">
+            <span data-i18n="ultimo_acesso">Último Acesso:</span>
+            <span id="modal-perfil-acesso" data-i18n="nao_registrado">Não registrado</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-editar-perfil" class="modal-overlay is-hidden" onclick="fecharModalEditarPerfil()">
+      <div class="modal-content modal-editar" onclick="event.stopPropagation()">
+        <button type="button" class="modal-close" onclick="fecharModalEditarPerfil()" aria-label="Fechar">
+          &times;
+        </button>
+
+        <h2 class="modal-title">
+          <i class="fa-solid fa-user-pen"></i>
+          <span data-i18n="editar_perfil">Editar Perfil</span>
+        </h2>
+        <p class="modal-subtitle" data-i18n="editar_perfil_sub">
+          Personalize como você aparece para a turma.
+        </p>
+
+        <form id="form-editar-perfil">
+          <div class="avatar-edit-area">
+            <img id="edit-avatar-preview" src="" alt="Preview" class="edit-avatar" />
+            <div class="avatar-actions">
+              <label for="edit-foto-input" class="btn-upload">
+                <i class="fa-solid fa-camera"></i>
+                <span data-i18n="trocar_foto">Trocar foto</span>
+              </label>
+              <input type="file" id="edit-foto-input" accept="image/*" hidden />
+              <button type="button" id="btn-restaurar-foto" class="btn-restaurar" data-i18n-title="restaurar_suap">
+                <i class="fa-solid fa-rotate-left"></i> SUAP
+              </button>
+            </div>
+            <small class="avatar-hint" data-i18n="foto_hint">
+              JPG/PNG até 5MB — será otimizada.
+            </small>
+          </div>
+
+          <label class="field-label" for="edit-nome" data-i18n="nome_exibicao">
+            Nome de exibição
+          </label>
+          <input type="text" id="edit-nome" maxlength="30" placeholder="Como quer ser chamado" required data-i18n-placeholder="nome_placeholder" />
+
+          <label class="field-label" for="edit-bio">
+            <span data-i18n="bio">Bio</span>
+            <span class="char-counter-inline">
+              <span id="edit-bio-count">0</span>/160
+            </span>
+          </label>
+          <textarea id="edit-bio" maxlength="160" rows="3" placeholder="Fale um pouco sobre você..." data-i18n-placeholder="bio_placeholder"></textarea>
+
+          <p class="field-section-title">
+            <i class="fa-solid fa-share-nodes"></i>
+            <span data-i18n="redes_sociais">Redes sociais</span>
+          </p>
+
+          <div class="redes-grid">
+            <div class="input-icon">
+              <i class="fa-brands fa-tiktok"></i>
+              <input type="text" id="edit-tiktok" placeholder="@usuario" maxlength="30" />
+            </div>
+            <div class="input-icon">
+              <i class="fa-brands fa-instagram"></i>
+              <input type="text" id="edit-instagram" placeholder="@usuario" maxlength="30" />
+            </div>
+            <div class="input-icon">
+              <i class="fa-brands fa-github"></i>
+              <input type="text" id="edit-github" placeholder="@usuario" maxlength="30" />
+            </div>
+            <div class="input-icon">
+              <i class="fa-solid fa-envelope"></i>
+              <input type="email" id="edit-email" placeholder="email@exemplo.com" maxlength="80" />
+            </div>
+            <div class="input-icon input-icon-full">
+              <i class="fa-solid fa-globe"></i>
+              <input type="url" id="edit-site" placeholder="https://seusite.com" maxlength="120" />
+            </div>
+          </div>
+
+          <div class="avatar-mascote-area">
+            <p class="field-section-title">
+              <i class="fa-solid fa-paw"></i>
+              <span data-i18n="mascote_avatar_titulo">Seu mascote</span>
+            </p>
+            <p class="avatar-mascote-desc" data-i18n="mascote_avatar_desc">
+              Personalize o mascote que aparece quando você dá carinho.
+            </p>
+            <div class="avatar-mascote-grid" id="avatar-mascote-grid"></div>
+          </div>
+
+          <div class="conquistas-visiveis-area">
+            <p class="field-section-title">
+              <i class="fa-solid fa-eye"></i>
+              <span data-i18n="conquistas_visiveis_titulo">Conquistas no perfil</span>
+            </p>
+            <p class="conquistas-visiveis-desc" data-i18n="conquistas_visiveis_desc">
+              Escolha quais conquistas os outros verão no seu perfil. Sem seleção = mostra todas.
+            </p>
+            <div class="conquistas-visiveis-acoes">
+              <button type="button" class="btn-mini" id="btn-conquistas-todas">
+                <i class="fa-solid fa-check-double"></i> <span data-i18n="todas">Todas</span>
+              </button>
+              <button type="button" class="btn-mini" id="btn-conquistas-nenhuma">
+                <i class="fa-solid fa-eraser"></i> <span data-i18n="bloqueadas">Nenhuma</span>
+              </button>
+            </div>
+            <div class="conquistas-visiveis-grid" id="conquistas-visiveis-grid"></div>
+          </div>
+
+          <div id="edit-perfil-bloqueio" class="edit-bloqueio is-hidden">
+            <i class="fa-solid fa-lock"></i>
+            <span id="edit-bloqueio-texto"></span>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="button btn-cancelar" onclick="fecharModalEditarPerfil()" data-i18n="cancelar">
+              Cancelar
+            </button>
+            <button type="submit" id="btn-salvar-perfil" class="button is-success">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span data-i18n="salvar">Salvar</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="modal-meta-disciplina" class="modal-overlay is-hidden">
+      <div class="modal-content modal-meta" onclick="event.stopPropagation()">
+        <button type="button" class="modal-close" data-fechar>&times;</button>
+        <h2 class="modal-title">
+          <i class="fa-solid fa-bullseye"></i>
+          <span data-i18n="meta_individual">Meta individual</span>
+        </h2>
+        <p class="meta-disciplina-nome"></p>
+        <div class="meta-slider-wrap">
+          <input type="range" min="0" max="100" step="5" />
+          <span class="meta-num"></span>
+        </div>
+        <div class="meta-actions">
+          <button type="button" class="btn-reset-meta" data-reset data-i18n="usar_meta_global">
+            Usar meta global
+          </button>
+          <button type="button" class="button is-success" data-salvar data-i18n="salvar">Salvar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="painel-notificacoes" class="painel-notificacoes is-hidden">
+      <div class="painel-notif-header">
+        <strong>
+          <i class="fa-regular fa-bell"></i>
+          <span data-i18n="notificacoes">Notificações</span>
+        </strong>
+        <button type="button" id="btn-marcar-lidas" class="btn-acao">
+          <i class="fa-solid fa-check-double"></i>
+          <span data-i18n="marcar_todas">Marcar todas</span>
+        </button>
+      </div>
+      <div id="lista-notificacoes" class="lista-notificacoes">
+        <p class="notif-vazio" data-i18n="sem_notif">Sem notificações.</p>
+      </div>
+    </div>
+
+    <footer class="login-footer">
+      <p>
+        © <span id="ano">2026</span>
+        <span data-i18n="footer_feito">- Feito pela turma</span>
+        <a href="https://github.com/infoWeb2026-2V" target="_blank" rel="noopener noreferrer">InfoWeb2026.2V</a>
+        <span data-i18n="footer_carinho">Com Carinho 💜</span>
+      </p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="suapi/js.cookie.js"></script>
+    <script src="suapi/settings.sample.js"></script>
+    <script src="suapi/client.js"></script>
+    <script type="module" src="scripts/xp-core.js"></script>
+    <script type="module" src="scripts/login.js"></script>
+  </body>
+</html>
