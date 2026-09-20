@@ -100,7 +100,7 @@ const CONQUISTAS = [
   { id: "mafioso_unlocked", icone: "🕴️", nome: "Mafioso no Pedaço", desc: "Desbloqueou a skin Mafioso (3.000 cliques)", raridade: "lendario" },
 ];
 
-// Recompensas de XP por ação
+// Recompensas de XP
 const XP_RECOMPENSAS = {
   recado_postado: 10,
   comentario: 3,
@@ -129,181 +129,85 @@ let filtroConquistasAtivo = "todas";
 const TRADUCOES_LOGIN = {
   "pt-BR": {
     titulo_pagina_login: "Login SUAP | Turma 2V IFRN",
-    voltar: "Voltar",
-    portal_suap: "Portal SUAP",
+    voltar: "Voltar", portal_suap: "Portal SUAP",
     area_auth: "Área de autenticação acadêmica",
     acesse_credenciais: "Acesse com suas credenciais institucionais do IFRN para integrar e visualizar seus dados acadêmicos.",
-    login_suap: "Login com SUAP",
-    login_ok: "Você foi logado com sucesso!",
-    sessao_ativa: "Sessão ativa e conectada ao SUAP.",
-    bem_vindo: "Bem-vindo,",
-    editar_perfil: "Editar Perfil",
-    editar_perfil_sub: "Personalize como você aparece para a turma.",
-    encerrar_sessao: "Encerrar Sessão",
-    idioma: "Idioma",
-    tema: "Tema",
-    cor_tema: "Cor do tema",
-    modo: "Modo",
-    cor_roxo: "Roxo",
-    cor_azul: "Azul",
-    cor_verde: "Verde",
-    cor_rosa: "Rosa",
-    cor_laranja: "Laranja",
-    modo_claro: "Claro",
-    modo_escuro: "Escuro",
-    instalar_app: "Instalar app",
-    notificacoes: "Notificações",
-    marcar_todas: "Marcar todas",
-    sem_notif: "Sem notificações.",
-    dias: "dias",
-    conquistas_titulo: "Conquistas",
-    todas: "Todas",
-    desbloqueadas: "Desbloqueadas",
-    bloqueadas: "Bloqueadas",
-    proxima_skin: "Próxima skin:",
-    skin_bloqueada: "Bloqueada",
-    menu: "Menu",
-    nav_notas: "Notas",
-    nav_notas_desc: "Sua calculadora",
-    nav_horarios: "Horários",
-    nav_horarios_desc: "Rotina semanal",
-    nav_mural: "Mural",
-    nav_mural_desc: "Recados da turma",
-    nav_membros: "Membros",
-    nav_membros_desc: "Colegas do sistema",
-    nav_agenda: "Agenda",
-    nav_agenda_desc: "Eventos do calendário",
-    nav_mascote: "Mascote",
-    nav_mascote_desc: "Interaja com ele",
-    nav_sala: "Sala dos Professores",
-    nav_sala_desc: "Acesso restrito",
-    nav_inicio: "Início",
-    nav_inicio_desc: "Página inicial",
-    calc_titulo_1: "Calculadora de",
-    calc_titulo_2: "Notas",
+    login_suap: "Login com SUAP", login_ok: "Você foi logado com sucesso!",
+    sessao_ativa: "Sessão ativa e conectada ao SUAP.", bem_vindo: "Bem-vindo,",
+    editar_perfil: "Editar Perfil", editar_perfil_sub: "Personalize como você aparece para a turma.",
+    encerrar_sessao: "Encerrar Sessão", idioma: "Idioma", tema: "Tema",
+    cor_tema: "Cor do tema", modo: "Modo", cor_roxo: "Roxo", cor_azul: "Azul",
+    cor_verde: "Verde", cor_rosa: "Rosa", cor_laranja: "Laranja",
+    modo_claro: "Claro", modo_escuro: "Escuro", instalar_app: "Instalar app",
+    notificacoes: "Notificações", marcar_todas: "Marcar todas", sem_notif: "Sem notificações.",
+    dias: "dias", conquistas_titulo: "Conquistas", todas: "Todas",
+    desbloqueadas: "Desbloqueadas", bloqueadas: "Bloqueadas",
+    proxima_skin: "Próxima skin:", skin_bloqueada: "Bloqueada",
+    menu: "Menu", nav_notas: "Notas", nav_notas_desc: "Sua calculadora",
+    nav_horarios: "Horários", nav_horarios_desc: "Rotina semanal",
+    nav_mural: "Mural", nav_mural_desc: "Recados da turma",
+    nav_membros: "Membros", nav_membros_desc: "Colegas do sistema",
+    nav_agenda: "Agenda", nav_agenda_desc: "Eventos do calendário",
+    nav_mascote: "Mascote", nav_mascote_desc: "Interaja com ele",
+    nav_sala: "Sala dos Professores", nav_sala_desc: "Acesso restrito",
+    nav_inicio: "Início", nav_inicio_desc: "Página inicial",
+    calc_titulo_1: "Calculadora de", calc_titulo_2: "Notas",
     calc_sub: "Boletim atualizado diretamente pelo SUAP",
-    media_geral: "Média Geral",
-    disciplinas: "Disciplinas",
-    em_risco: "Em Risco",
-    faltas_totais: "Faltas Totais",
-    periodo: "Período",
-    meta: "Meta",
-    atualizar: "Atualizar",
-    export_csv: "Exportar CSV",
-    export_pdf: "Exportar PDF",
-    limpar_simulador: "Limpar simulador",
-    filtro_todas: "Todas",
-    filtro_aprovadas: "Aprovadas",
-    filtro_recuperacao: "Recuperação",
-    filtro_reprovadas: "Reprovadas",
-    filtro_risco: "Em risco",
-    aguardando_suap: "Aguardando dados do SUAP...",
-    th_disciplina: "Disciplina",
-    th_etapas: "Etapas",
-    th_media: "Média",
-    th_faltas: "Faltas",
-    th_projecao: "Projeção",
-    th_status: "Status",
+    media_geral: "Média Geral", disciplinas: "Disciplinas", em_risco: "Em Risco",
+    faltas_totais: "Faltas Totais", periodo: "Período", meta: "Meta", atualizar: "Atualizar",
+    export_csv: "Exportar CSV", export_pdf: "Exportar PDF", limpar_simulador: "Limpar simulador",
+    filtro_todas: "Todas", filtro_aprovadas: "Aprovadas", filtro_recuperacao: "Recuperação",
+    filtro_reprovadas: "Reprovadas", filtro_risco: "Em risco", aguardando_suap: "Aguardando dados do SUAP...",
+    th_disciplina: "Disciplina", th_etapas: "Etapas", th_media: "Média", th_faltas: "Faltas",
+    th_projecao: "Projeção", th_status: "Status",
     th_simulador: "Simulador: digite uma nota hipotética na próxima etapa",
-    th_meta_ind: "Meta individual",
-    notas_vazio: "Faça login para carregar suas notas.",
-    leg_aprovado: "Aprovado",
-    leg_recuperacao: "Recuperação",
-    leg_reprovado: "Reprovado",
+    th_meta_ind: "Meta individual", notas_vazio: "Faça login para carregar suas notas.",
+    leg_aprovado: "Aprovado", leg_recuperacao: "Recuperação", leg_reprovado: "Reprovado",
     leg_extra: "🧪 Simulador • 🎯 Meta individual",
-    evolucao_titulo: "Evolução das Médias",
-    evolucao_sub: "Sua média por período letivo",
-    historico_titulo: "Histórico de Períodos",
-    historico_vazio: "Carregue pelo menos 2 períodos para comparar.",
-    contagem_titulo_1: "Faltam",
-    contagem_titulo_2: "pouco!",
+    evolucao_titulo: "Evolução das Médias", evolucao_sub: "Sua média por período letivo",
+    historico_titulo: "Histórico de Períodos", historico_vazio: "Carregue pelo menos 2 períodos para comparar.",
+    contagem_titulo_1: "Faltam", contagem_titulo_2: "pouco!",
     contagem_sub: "Próximos eventos importantes",
     contagem_vazio: "Nenhum evento próximo nos próximos 30 dias.",
-    contagem_dias: "dias",
-    contagem_horas: "horas",
-    contagem_min: "min",
-    contagem_seg: "seg",
-    horarios_titulo_1: "Quadro de",
-    horarios_titulo_2: "Horários",
-    horarios_sub: "Nossa rotina semanal",
-    th_horario: "Horário",
-    dia_seg: "Segunda",
-    dia_ter: "Terça",
-    dia_qua: "Quarta",
-    dia_qui: "Quinta",
-    dia_sex: "Sexta",
-    intervalo_1: "I Intervalo",
-    intervalo_2: "II Intervalo",
-    horario_sujeito: "Horário sujeito a alterações. Consulte o",
-    horario_versao: "para a versão oficial.",
-    mural_titulo_1: "Mural de",
-    mural_titulo_2: "Recados",
-    mural_sub: "Deixe um recado para a turma",
-    busca_recados: "🔍 Buscar recados...",
-    recado_msg: "Sua mensagem...",
-    recado_link: "Link/Anexo opcional (https://...)",
-    expirar_em: "Expirar em:",
-    dia_1: "1 Dia",
-    dias_7: "7 Dias",
-    dias_15: "15 Dias",
-    publicar: "Publicar",
-    membros_titulo_1: "Membros do",
-    membros_titulo_2: "Sistema",
-    membros_sub: "Membros integrados ao sistema",
-    busca_perfis: "🔍 Filtrar por nome ou matrícula...",
-    agenda_titulo_1: "Agenda da",
-    agenda_titulo_2: "Turma",
+    contagem_dias: "dias", contagem_horas: "horas", contagem_min: "min", contagem_seg: "seg",
+    horarios_titulo_1: "Quadro de", horarios_titulo_2: "Horários", horarios_sub: "Nossa rotina semanal",
+    th_horario: "Horário", dia_seg: "Segunda", dia_ter: "Terça", dia_qua: "Quarta",
+    dia_qui: "Quinta", dia_sex: "Sexta", intervalo_1: "I Intervalo", intervalo_2: "II Intervalo",
+    horario_sujeito: "Horário sujeito a alterações. Consulte o", horario_versao: "para a versão oficial.",
+    mural_titulo_1: "Mural de", mural_titulo_2: "Recados", mural_sub: "Deixe um recado para a turma",
+    busca_recados: "🔍 Buscar recados...", recado_msg: "Sua mensagem...",
+    recado_link: "Link/Anexo opcional (https://...)", expirar_em: "Expirar em:",
+    dia_1: "1 Dia", dias_7: "7 Dias", dias_15: "15 Dias", publicar: "Publicar",
+    membros_titulo_1: "Membros do", membros_titulo_2: "Sistema",
+    membros_sub: "Membros integrados ao sistema", busca_perfis: "🔍 Filtrar por nome ou matrícula...",
+    agenda_titulo_1: "Agenda da", agenda_titulo_2: "Turma",
     agenda_sub: "Eventos de Setembro a Dezembro de 2026",
-    matricula: "Matrícula:",
-    ultimo_acesso: "Último Acesso:",
-    nao_registrado: "Não registrado",
-    trocar_foto: "Trocar foto",
-    restaurar_suap: "Voltar para a foto do SUAP",
+    matricula: "Matrícula:", ultimo_acesso: "Último Acesso:", nao_registrado: "Não registrado",
+    trocar_foto: "Trocar foto", restaurar_suap: "Voltar para a foto do SUAP",
     foto_hint: "JPG/PNG até 5MB — será otimizada.",
-    nome_exibicao: "Nome de exibição",
-    nome_placeholder: "Como quer ser chamado",
-    bio: "Bio",
-    bio_placeholder: "Fale um pouco sobre você...",
-    redes_sociais: "Redes sociais",
-    cancelar: "Cancelar",
-    salvar: "Salvar",
-    meta_individual: "Meta individual",
-    usar_meta_global: "Usar meta global",
+    nome_exibicao: "Nome de exibição", nome_placeholder: "Como quer ser chamado",
+    bio: "Bio", bio_placeholder: "Fale um pouco sobre você...",
+    redes_sociais: "Redes sociais", cancelar: "Cancelar", salvar: "Salvar",
+    meta_individual: "Meta individual", usar_meta_global: "Usar meta global",
     mascote_avatar_titulo: "Seu mascote",
     mascote_avatar_desc: "Personalize o mascote que aparece quando você dá carinho.",
-    sala_titulo: "Sala dos Professores",
-    sala_sub: "Visão geral da turma (acesso restrito)",
-    sala_tab_alunos: "Alunos",
-    sala_tab_risco: "Em Risco",
-    sala_tab_engajamento: "Engajamento",
+    sala_titulo: "Sala dos Professores", sala_sub: "Visão geral da turma (acesso restrito)",
+    sala_tab_alunos: "Alunos", sala_tab_risco: "Em Risco", sala_tab_engajamento: "Engajamento",
     sala_busca: "🔍 Buscar aluno por nome ou matrícula...",
-    sala_th_aluno: "Aluno",
-    sala_th_matricula: "Matrícula",
-    sala_th_media: "Média",
-    sala_th_faltas: "Faltas",
-    sala_th_carinhos: "Carinhos",
-    sala_th_conquistas: "Conquistas",
-    sala_th_status: "Status",
-    sala_carregando: "Carregando dados...",
-    sala_risco_carregando: "Carregando...",
-    sala_stat_carinhos: "Carinhos totais",
-    sala_stat_recados: "Recados publicados",
-    sala_stat_alunos: "Alunos ativos",
+    sala_th_aluno: "Aluno", sala_th_matricula: "Matrícula", sala_th_media: "Média",
+    sala_th_faltas: "Faltas", sala_th_carinhos: "Carinhos", sala_th_conquistas: "Conquistas",
+    sala_th_status: "Status", sala_carregando: "Carregando dados...",
+    sala_risco_carregando: "Carregando...", sala_stat_carinhos: "Carinhos totais",
+    sala_stat_recados: "Recados publicados", sala_stat_alunos: "Alunos ativos",
     sala_stat_top: "Top contribuinte",
-    cal_provas: "Provas e avaliações",
-    cal_trabalhos: "Trabalhos e listas",
-    cal_feriados: "Feriados e recessos",
-    cal_reunioes: "Reuniões e aulas",
-    cal_esportes: "Esportes e jogos",
-    cal_festas: "Festas e eventos",
-    cal_outros: "Outros eventos",
-    footer_feito: "- Feito pela turma",
-    footer_carinho: "Com Carinho 💜",
+    cal_provas: "Provas e avaliações", cal_trabalhos: "Trabalhos e listas",
+    cal_feriados: "Feriados e recessos", cal_reunioes: "Reuniões e aulas",
+    cal_esportes: "Esportes e jogos", cal_festas: "Festas e eventos",
+    cal_outros: "Outros eventos", footer_feito: "- Feito pela turma", footer_carinho: "Com Carinho 💜",
   },
   en: {
     titulo_pagina_login: "SUAP Login | Class 2V IFRN",
-    voltar: "Back", portal_suap: "SUAP Portal",
-    area_auth: "Academic authentication area",
+    voltar: "Back", portal_suap: "SUAP Portal", area_auth: "Academic authentication area",
     acesse_credenciais: "Log in with your IFRN institutional credentials to integrate and view your academic data.",
     login_suap: "Login with SUAP", login_ok: "You logged in successfully!",
     sessao_ativa: "Active session connected to SUAP.", bem_vindo: "Welcome,",
@@ -352,8 +256,7 @@ const TRADUCOES_LOGIN = {
     recado_link: "Optional link/attachment (https://...)", expirar_em: "Expires in:",
     dia_1: "1 Day", dias_7: "7 Days", dias_15: "15 Days", publicar: "Post",
     membros_titulo_1: "System", membros_titulo_2: "Members",
-    membros_sub: "Members integrated into the system",
-    busca_perfis: "🔍 Filter by name or ID...",
+    membros_sub: "Members integrated into the system", busca_perfis: "🔍 Filter by name or ID...",
     agenda_titulo_1: "Class", agenda_titulo_2: "Agenda",
     agenda_sub: "Events from September to December 2026",
     matricula: "ID:", ultimo_acesso: "Last Access:", nao_registrado: "Not registered",
@@ -381,8 +284,7 @@ const TRADUCOES_LOGIN = {
   },
   es: {
     titulo_pagina_login: "Login SUAP | Clase 2V IFRN",
-    voltar: "Volver", portal_suap: "Portal SUAP",
-    area_auth: "Área de autenticación académica",
+    voltar: "Volver", portal_suap: "Portal SUAP", area_auth: "Área de autenticación académica",
     acesse_credenciais: "Inicia sesión con tus credenciales institucionales del IFRN para integrar y ver tus datos académicos.",
     login_suap: "Entrar con SUAP", login_ok: "¡Iniciaste sesión correctamente!",
     sessao_ativa: "Sesión activa y conectada al SUAP.", bem_vindo: "Bienvenido,",
@@ -417,8 +319,7 @@ const TRADUCOES_LOGIN = {
     leg_aprovado: "Aprobado", leg_recuperacao: "Recuperación", leg_reprovado: "Reprobado",
     leg_extra: "🧪 Simulador • 🎯 Meta individual",
     evolucao_titulo: "Evolución de Promedios", evolucao_sub: "Tu promedio por período lectivo",
-    historico_titulo: "Historial de Períodos",
-    historico_vazio: "Carga al menos 2 períodos para comparar.",
+    historico_titulo: "Historial de Períodos", historico_vazio: "Carga al menos 2 períodos para comparar.",
     contagem_titulo_1: "Falta", contagem_titulo_2: "poco!",
     contagem_sub: "Próximos eventos importantes",
     contagem_vazio: "Ningún evento próximo en los próximos 30 días.",
@@ -432,8 +333,7 @@ const TRADUCOES_LOGIN = {
     recado_link: "Enlace/adjunto opcional (https://...)", expirar_em: "Expira en:",
     dia_1: "1 Día", dias_7: "7 Días", dias_15: "15 Días", publicar: "Publicar",
     membros_titulo_1: "Miembros del", membros_titulo_2: "Sistema",
-    membros_sub: "Miembros integrados al sistema",
-    busca_perfis: "🔍 Filtrar por nombre o matrícula...",
+    membros_sub: "Miembros integrados al sistema", busca_perfis: "🔍 Filtrar por nombre o matrícula...",
     agenda_titulo_1: "Agenda de la", agenda_titulo_2: "Clase",
     agenda_sub: "Eventos de Septiembre a Diciembre de 2026",
     matricula: "Matrícula:", ultimo_acesso: "Último Acceso:", nao_registrado: "No registrado",
@@ -490,19 +390,14 @@ async function adicionarXP(quantidade, motivo) {
     const dados = snap.val() || {};
     const xpAntes = Number(dados.xp) || 0;
     const xpDepois = xpAntes + quantidade;
-
     const nivelAntes = calcularNivel(xpAntes);
     const nivelDepois = calcularNivel(xpDepois);
-
     await update(refXP, { xp: xpDepois });
-
     if (nivelDepois.nivel > nivelAntes.nivel) {
       if (typeof exibirToast === "function") {
         exibirToast(`🎉 SUBIU DE NÍVEL! ${nivelDepois.nome} (Nv ${nivelDepois.nivel})`, "sucesso");
       }
     }
-
-    // Atualiza painel (sem chamar carregarPainelXP pra evitar loop)
     meuXP = xpDepois;
     renderizarPainelXP();
   } catch (e) {
@@ -525,7 +420,7 @@ async function desbloquearConquista(idConquista) {
       exibirToast(`${c.icone} CONQUISTA: ${c.nome}!`, "sucesso");
     }
 
-    // +10 XP por desbloquear (direto no Firebase pra evitar recursão)
+    // +10 XP por conquista
     try {
       const refXP = ref(db, "usuarios_xp/" + mat);
       const snapXP = await get(refXP);
@@ -533,7 +428,6 @@ async function desbloquearConquista(idConquista) {
       const xpAntes = Number(dadosXP.xp) || 0;
       const xpDepois = xpAntes + XP_RECOMPENSAS.conquista;
       await update(refXP, { xp: xpDepois });
-
       const nivelAntes = calcularNivel(xpAntes);
       const nivelDepois = calcularNivel(xpDepois);
       if (nivelDepois.nivel > nivelAntes.nivel) {
@@ -547,7 +441,6 @@ async function desbloquearConquista(idConquista) {
       console.warn("[conquista XP] erro:", e);
     }
 
-    // Atualiza estado local e re-renderiza conquistas
     minhasConquistas[idConquista] = { desbloqueadaEm: Date.now() };
     renderizarConquistas();
   } catch (e) {
@@ -566,13 +459,11 @@ async function atualizarStreakLogin() {
     const hoje = new Date().toISOString().slice(0, 10);
     const ultimaVisita = dados.ultimaVisita || "";
     let streak = Number(dados.streak) || 0;
-
     if (ultimaVisita === hoje) return;
 
     const ontem = new Date();
     ontem.setDate(ontem.getDate() - 1);
     const ontemStr = ontem.toISOString().slice(0, 10);
-
     if (ultimaVisita === ontemStr) streak += 1;
     else streak = 1;
 
@@ -587,18 +478,16 @@ async function atualizarStreakLogin() {
 }
 
 // ==========================================
-// 🆕 HELPERS: LIMITE DIÁRIO / POR PERÍODO
+// HELPERS: LIMITE DIÁRIO / POR PERÍODO
 // ==========================================
-function obterDataHoje() {
-  return new Date().toISOString().slice(0, 10);
-}
+function obterDataHoje() { return new Date().toISOString().slice(0, 10); }
 
 function podeGanharXPSimulador() {
   try {
     const raw = localStorage.getItem("xp_simulador_hoje");
     const dados = raw ? JSON.parse(raw) : {};
     if (dados.data !== obterDataHoje()) return true;
-    return (dados.count || 0) < 10; // limite diário: 10 usos × 2 XP = 20 XP/dia
+    return (dados.count || 0) < 10;
   } catch { return true; }
 }
 function registrarXPSimulador() {
@@ -631,7 +520,7 @@ function marcarXPBoletim(periodo) {
 }
 
 // ==========================================
-// 🆕 MIGRAÇÃO DE XP LOCAL → FIREBASE
+// MIGRAÇÃO DE XP LOCAL → FIREBASE
 // ==========================================
 async function migrarXPLocalParaFirebase(mat) {
   try {
@@ -657,9 +546,7 @@ async function carregarPainelXP() {
   if (!mat || mat === "Matrícula não disponível") return;
 
   try {
-    // Migra XP local (dos cliques no mascote) antes de ler Firebase
     await migrarXPLocalParaFirebase(mat);
-
     const refXP = ref(db, "usuarios_xp/" + mat);
     const snap = await get(refXP);
     const dados = snap.val() || {};
@@ -667,7 +554,6 @@ async function carregarPainelXP() {
     meuXP = Number(dados.xp) || 0;
     minhaStreak = Number(dados.streak) || 0;
     minhasConquistas = dados.conquistas || {};
-
     meusCliquesMascote = parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
 
     renderizarPainelXP();
@@ -676,7 +562,6 @@ async function carregarPainelXP() {
     const avatarSalvo = dados.mascoteAvatar || localStorage.getItem("skin_ativa") || "padrao";
     avatarSelecionado = avatarSalvo;
 
-    // Desbloqueia conquistas automáticas
     if (meusCliquesMascote >= 1500) await desbloquearConquista("simpson_unlocked");
     if (meusCliquesMascote >= 3000) await desbloquearConquista("mafioso_unlocked");
     if (meusCliquesMascote >= 100) await desbloquearConquista("carinhoso");
@@ -694,22 +579,16 @@ async function carregarPainelXP() {
 
 function renderizarPainelXP() {
   const nivelInfo = calcularNivel(meuXP);
-
   const nivelNum = document.getElementById("xp-nivel-num");
   if (nivelNum) nivelNum.textContent = nivelInfo.nivel;
-
   const nomeNivel = document.getElementById("xp-nome-nivel");
   if (nomeNivel) nomeNivel.textContent = nivelInfo.nome;
-
   const totalEl = document.getElementById("xp-total");
   if (totalEl) totalEl.textContent = `${meuXP.toLocaleString("pt-BR")} XP`;
-
   const streakEl = document.getElementById("xp-streak");
   if (streakEl) streakEl.textContent = minhaStreak;
-
   const barraFill = document.getElementById("xp-barra-fill");
   if (barraFill) barraFill.style.width = `${nivelInfo.progresso}%`;
-
   const proximoEl = document.getElementById("xp-proximo");
   if (proximoEl) {
     if (nivelInfo.proximoNome) {
@@ -784,7 +663,6 @@ function t(chave) {
 function aplicarTraducoes() {
   var lang = obterIdiomaAtual();
   document.documentElement.setAttribute("lang", lang);
-
   document.querySelectorAll("[data-i18n]").forEach(function (el) {
     var chave = el.getAttribute("data-i18n");
     var texto = t(chave);
@@ -831,7 +709,6 @@ function aplicarTema(novoTema) {
   TEMAS_DISPONIVEIS.forEach(function (t) { document.body.classList.remove("tema-" + t); });
   document.body.classList.add("tema-" + novoTema);
   localStorage.setItem("tema-cor", novoTema);
-
   var meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
     var cores = { roxo: "#8b5edd", azul: "#3b82f6", verde: "#10b981", rosa: "#ec4899", laranja: "#f97316" };
@@ -1069,7 +946,7 @@ onValue(perfisRef, (snapshot) => {
 });
 
 // ==========================================
-// ENVIO DE RECADOS — 🆕 +10 XP
+// ENVIO DE RECADOS (+10 XP)
 // ==========================================
 const formRecado = document.getElementById("form-recado");
 if (formRecado) {
@@ -1098,7 +975,6 @@ if (formRecado) {
     })
       .then(() => {
         exibirToast("Recado publicado! +10 XP", "sucesso");
-        // 🆕 +10 XP por postar recado
         adicionarXP(XP_RECOMPENSAS.recado_postado, "recado_postado");
         if (msgInput) msgInput.value = "";
         if (linkInput) linkInput.value = "";
@@ -1289,7 +1165,7 @@ window.alternarComentarios = function (recadoId) {
   if (box) box.style.display = box.style.display === "none" ? "block" : "none";
 };
 
-// 🆕 +3 XP por comentário
+// +3 XP por comentário
 window.adicionarComentario = function (recadoId) {
   const inputEl = document.getElementById(`input-comentario-${recadoId}`);
   if (!inputEl) return;
@@ -1377,7 +1253,7 @@ window.editarRecado = function (id) {
   });
 };
 
-// 🆕 +1 XP só na PRIMEIRA curtida (não ao descurtir)
+// +1 XP só na 1ª curtida
 window.curtirRecado = function (id) {
   const itemRef = ref(db, "mural_recados/" + id);
   get(itemRef).then((snapshot) => {
@@ -1386,11 +1262,9 @@ window.curtirRecado = function (id) {
       let likes = recado.likes || [];
       const i = likes.indexOf(window.usuarioLogado.matricula);
       if (i === -1) {
-        // 🆕 Está curtindo agora → +1 XP
         likes.push(window.usuarioLogado.matricula);
         adicionarXP(XP_RECOMPENSAS.curtida, "curtida");
       } else {
-        // Descurtindo → sem XP
         likes.splice(i, 1);
       }
       update(itemRef, { likes });
@@ -1549,8 +1423,7 @@ window.carregarPerfilUsuario = function (matricula) {
 };
 
 // ==========================================
-// 🎭 SELETOR DE AVATAR DO MASCOTE
-// 🆕 +5 XP só quando muda de skin
+// SELETOR DE AVATAR DO MASCOTE (+5 XP se mudar)
 // ==========================================
 function renderizarSeletorAvatar() {
   const grid = document.getElementById("avatar-mascote-grid");
@@ -1583,7 +1456,6 @@ function renderizarSeletorAvatar() {
       grid.querySelectorAll(".avatar-mascote-opcao").forEach((b) => {
         b.classList.toggle("ativo", b.dataset.avatar === avatarSelecionado);
       });
-      // 🆕 Só dá XP se REALMENTE mudou de skin
       if (anterior !== avatarSelecionado && window.usuarioLogado.matricula) {
         adicionarXP(XP_RECOMPENSAS.trocar_avatar, "trocar_avatar");
         desbloquearConquista("estiloso");
@@ -2002,10 +1874,7 @@ function desenharGraficoEvolucao() {
   var ordenado = __historicoPeriodos.slice().sort(function (a, b) { return a.periodo.localeCompare(b.periodo); });
   var labels = ordenado.map(function (h) { return h.periodo; });
   var dados = ordenado.map(function (h) { return h.media !== null ? h.media : 0; });
-  if (window.__graficoEvolucao) {
-    try { window.__graficoEvolucao.destroy(); } catch (e) {}
-    window.__graficoEvolucao = null;
-  }
+  if (window.__graficoEvolucao) { try { window.__graficoEvolucao.destroy(); } catch (e) {} window.__graficoEvolucao = null; }
   var estilo = getComputedStyle(document.body);
   var corAccent = corParaHex(estilo.getPropertyValue("--accent-strong").trim(), "#8b5edd");
   var corAccent2 = corParaHex(estilo.getPropertyValue("--accent").trim(), "#cebdec");
@@ -2200,7 +2069,7 @@ function atualizarLinhaNota(tr, d, meta) {
   }
 }
 
-// 🆕 +2 XP ao usar o simulador (limite diário: 10 usos)
+// +2 XP por uso do simulador
 function bindSimuladores(corpo) {
   corpo.querySelectorAll(".simulador-input").forEach(function (input) {
     if (input.dataset.bound) return;
@@ -2219,7 +2088,6 @@ function bindSimuladores(corpo) {
         atualizarLinhaNota(tr, d, __metaAtual);
         atualizarResumoNotas(__notasCache);
       }
-      // 🆕 +2 XP por uso do simulador (limite diário)
       if (val !== "" && podeGanharXPSimulador()) {
         registrarXPSimulador();
         adicionarXP(XP_RECOMPENSAS.simulador, "simulador");
@@ -2237,7 +2105,7 @@ function bindSimuladores(corpo) {
   });
 }
 
-// 🆕 +5 XP ao salvar meta
+// +5 XP por definir meta
 function abrirModalMetaDisciplina(codigo, nome) {
   var modal = document.getElementById("modal-meta-disciplina");
   if (!modal) return;
@@ -2265,7 +2133,6 @@ function abrirModalMetaDisciplina(codigo, nome) {
     salvarMetasDisciplinas();
     modal.classList.add("is-hidden");
     if (__notasCache.length) renderizarNotas(__notasCache);
-    // 🆕 +5 XP (só se realmente mudou o valor)
     if (valorAnterior !== __metasDisciplinas[codigo]) {
       adicionarXP(XP_RECOMPENSAS.definir_meta, "definir_meta");
     }
@@ -2358,7 +2225,7 @@ function salvarResumoBoletimFirebase(ano, periodo, disciplinas) {
   } catch (e) { console.warn("[resumo boletim] exceção:", e); }
 }
 
-// 🆕 +5 XP ao ver boletim (1x por período)
+// +5 XP por ver boletim (1x por período)
 function carregarBoletim(ano, periodo) {
   atualizarStatusNotas("Buscando notas no SUAP...", "loading");
   suap.getAuthenticatedResource(
@@ -2371,7 +2238,6 @@ function carregarBoletim(ano, periodo) {
       var total = resposta.count || disciplinas.length;
       atualizarStatusNotas(total + " disciplina(s) carregada(s).", "sucesso");
       salvarResumoBoletimFirebase(ano, periodo, disciplinas);
-      // 🆕 +5 XP por período (só a primeira consulta)
       if (!jaGanhouXPBoletim(label)) {
         marcarXPBoletim(label);
         adicionarXP(XP_RECOMPENSAS.ver_boletim, "ver_boletim");
@@ -2598,30 +2464,55 @@ function atualizarTimersContagem() {
 }
 
 // ==========================================
-// SALA DOS PROFESSORES
+// SALA DOS PROFESSORES (versão robusta)
 // ==========================================
 async function carregarSalaProfessores() {
   if (__salaDadosCarregados) return;
   __salaDadosCarregados = true;
+
   const tbody = document.getElementById("sala-lista-alunos");
-  if (!tbody) return;
+  if (!tbody) {
+    console.warn("[sala] tbody #sala-lista-alunos não encontrado");
+    return;
+  }
 
-  try {
-    const [perfisSnap, carinhosSnap, resumosSnap, recadosSnap, xpSnap] = await Promise.all([
-      get(perfisRef),
-      get(ref(db, "mascote/por_aluno")),
-      get(ref(db, "resumo_boletim")),
-      get(ref(db, "mural_recados")),
-      get(ref(db, "usuarios_xp")),
-    ]);
+  console.log("[sala] Iniciando carregamento...");
 
-    const perfis = perfisSnap.val() || {};
-    const carinhos = carinhosSnap.val() || {};
-    const resumos = resumosSnap.val() || {};
-    const xpData = xpSnap.val() || {};
-    const totalRecados = recadosSnap.exists() ? Object.keys(recadosSnap.val()).length : 0;
+  const resultados = await Promise.allSettled([
+    get(perfisRef),
+    get(ref(db, "mascote/por_aluno")),
+    get(ref(db, "resumo_boletim")),
+    get(ref(db, "mural_recados")),
+    get(ref(db, "usuarios_xp")),
+  ]);
 
-    const alunos = Object.keys(perfis).filter((mat) => !String(mat).startsWith("anon_")).map((mat) => {
+  const [perfisRes, carinhosRes, resumosRes, recadosRes, xpRes] = resultados;
+
+  if (perfisRes.status === "rejected") console.warn("[sala] perfis falhou:", perfisRes.reason);
+  if (carinhosRes.status === "rejected") console.warn("[sala] carinhos falhou:", carinhosRes.reason);
+  if (resumosRes.status === "rejected") console.warn("[sala] resumos falhou:", resumosRes.reason);
+  if (recadosRes.status === "rejected") console.warn("[sala] recados falhou:", recadosRes.reason);
+  if (xpRes.status === "rejected") console.warn("[sala] usuarios_xp falhou:", xpRes.reason);
+
+  const perfisSnap = perfisRes.status === "fulfilled" ? perfisRes.value : { val: () => ({}) };
+  const carinhosSnap = carinhosRes.status === "fulfilled" ? carinhosRes.value : { val: () => ({}) };
+  const resumosSnap = resumosRes.status === "fulfilled" ? resumosRes.value : { val: () => ({}) };
+  const recadosSnap = recadosRes.status === "fulfilled" ? recadosRes.value : { exists: () => false, val: () => ({}) };
+  const xpSnap = xpRes.status === "fulfilled" ? xpRes.value : { val: () => ({}) };
+
+  const perfis = perfisSnap.val() || {};
+  const carinhos = carinhosSnap.val() || {};
+  const resumos = resumosSnap.val() || {};
+  const xpData = xpSnap.val() || {};
+  const totalRecados = recadosSnap.exists() ? Object.keys(recadosSnap.val() || {}).length : 0;
+
+  console.log("[sala] Perfis carregados:", Object.keys(perfis).length);
+  console.log("[sala] Carinhos carregados:", Object.keys(carinhos).length);
+  console.log("[sala] XP carregado:", Object.keys(xpData).length);
+
+  const alunos = Object.keys(perfis)
+    .filter((mat) => !String(mat).startsWith("anon_"))
+    .map((mat) => {
       const p = perfis[mat] || {};
       const r = resumos[mat] || {};
       const xp = xpData[mat] || {};
@@ -2643,89 +2534,127 @@ async function carregarSalaProfessores() {
       };
     });
 
-    alunos.sort((a, b) => a.nome.localeCompare(b.nome));
+  alunos.sort((a, b) => a.nome.localeCompare(b.nome));
 
-    if (alunos.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" class="sala-vazio"><i class="fa-regular fa-folder-open"></i> Nenhum aluno cadastrado.</td></tr>`;
-    } else {
-      tbody.innerHTML = alunos.map((a) => {
-        const diasSemAcesso = a.ultimoAcesso ? Math.floor((Date.now() - a.ultimoAcesso) / (1000 * 60 * 60 * 24)) : null;
-        let statusClasse = "ok", statusLabel = "Ativo";
-        if (diasSemAcesso !== null && diasSemAcesso > 14) { statusClasse = "danger"; statusLabel = `${diasSemAcesso}d sem acesso`; }
-        else if (diasSemAcesso !== null && diasSemAcesso > 7) { statusClasse = "warn"; statusLabel = `${diasSemAcesso}d sem acesso`; }
+  if (alunos.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="sala-vazio"><i class="fa-regular fa-folder-open"></i> Nenhum aluno cadastrado.</td></tr>`;
+  } else {
+    tbody.innerHTML = alunos.map((a) => {
+      const diasSemAcesso = a.ultimoAcesso
+        ? Math.floor((Date.now() - a.ultimoAcesso) / (1000 * 60 * 60 * 24))
+        : null;
+      let statusClasse = "ok";
+      let statusLabel = "Ativo";
+      if (diasSemAcesso !== null && diasSemAcesso > 14) {
+        statusClasse = "danger";
+        statusLabel = `${diasSemAcesso}d sem acesso`;
+      } else if (diasSemAcesso !== null && diasSemAcesso > 7) {
+        statusClasse = "warn";
+        statusLabel = `${diasSemAcesso}d sem acesso`;
+      }
 
-        let mediaHTML;
-        if (a.mediaGeral !== null) {
-          const cor = a.mediaGeral >= 60 ? "var(--success)" : a.mediaGeral >= 40 ? "var(--warning)" : "var(--danger)";
-          mediaHTML = `<strong style="color:${cor}">${a.mediaGeral.toFixed(1)}</strong>`;
-        } else mediaHTML = `<span class="sala-sem-dados" title="Aluno ainda não abriu o site"><i class="fa-solid fa-clock"></i> Pendente</span>`;
+      let mediaHTML;
+      if (a.mediaGeral !== null) {
+        const cor = a.mediaGeral >= 60 ? "var(--success)" : a.mediaGeral >= 40 ? "var(--warning)" : "var(--danger)";
+        mediaHTML = `<strong style="color:${cor}">${a.mediaGeral.toFixed(1)}</strong>`;
+      } else {
+        mediaHTML = `<span class="sala-sem-dados" title="Aluno ainda não abriu o site"><i class="fa-solid fa-clock"></i> Pendente</span>`;
+      }
 
-        let faltasHTML;
-        if (a.faltasTotais !== null) {
-          const cor = a.faltasTotais > 15 ? "var(--danger)" : a.faltasTotais > 10 ? "var(--warning)" : "var(--text-main)";
-          faltasHTML = `<span style="color:${cor};font-weight:600">${a.faltasTotais}</span>`;
-        } else faltasHTML = `<span class="sala-sem-dados"><i class="fa-solid fa-clock"></i> Pendente</span>`;
+      let faltasHTML;
+      if (a.faltasTotais !== null) {
+        const cor = a.faltasTotais > 15 ? "var(--danger)" : a.faltasTotais > 10 ? "var(--warning)" : "var(--text-main)";
+        faltasHTML = `<span style="color:${cor};font-weight:600">${a.faltasTotais}</span>`;
+      } else {
+        faltasHTML = `<span class="sala-sem-dados"><i class="fa-solid fa-clock"></i> Pendente</span>`;
+      }
 
-        return `<tr data-nome="${a.nome.toLowerCase()}" data-mat="${a.matricula}">
-          <td><div class="td-aluno"><img src="${a.foto}" alt="${a.nome}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=random'"><span>${escaparHTML(a.nome)}</span></div></td>
+      return `
+        <tr data-nome="${a.nome.toLowerCase()}" data-mat="${a.matricula}">
+          <td>
+            <div class="td-aluno">
+              <img src="${a.foto}" alt="${a.nome}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=random'">
+              <span>${escaparHTML(a.nome)}</span>
+            </div>
+          </td>
           <td>${a.matricula}</td>
           <td>${mediaHTML}</td>
           <td>${faltasHTML}</td>
           <td><i class="fa-solid fa-heart" style="color:#ff6b6b;font-size:0.8rem;"></i> ${a.carinhos.toLocaleString("pt-BR")}</td>
-          <td><span title="${a.numConquistas} de ${CONQUISTAS.length} conquistas • ${a.xpTotal} XP" style="font-weight:700;color:${a.numConquistas >= 9 ? 'var(--success)' : a.numConquistas >= 5 ? 'var(--warning)' : 'var(--text-main)'};">🎖️ ${a.numConquistas}/${CONQUISTAS.length}</span></td>
+          <td>
+            <span title="${a.numConquistas} de ${CONQUISTAS.length} conquistas • ${a.xpTotal} XP" style="font-weight:700;color:${a.numConquistas >= 9 ? 'var(--success)' : a.numConquistas >= 5 ? 'var(--warning)' : 'var(--text-main)'};">
+              🎖️ ${a.numConquistas}/${CONQUISTAS.length}
+            </span>
+          </td>
           <td><span class="sala-badge ${statusClasse}">${statusLabel}</span></td>
         </tr>`;
-      }).join("");
-    }
+    }).join("");
+  }
 
+  try {
     const totalCarinhos = Object.values(carinhos).reduce((a, b) => a + (Number(b) || 0), 0);
-    document.getElementById("sala-stat-total-carinhos").textContent = totalCarinhos.toLocaleString("pt-BR");
-    document.getElementById("sala-stat-total-recados").textContent = totalRecados;
-    document.getElementById("sala-stat-total-alunos").textContent = alunos.length;
+    const elCar = document.getElementById("sala-stat-total-carinhos");
+    const elRec = document.getElementById("sala-stat-total-recados");
+    const elAlu = document.getElementById("sala-stat-total-alunos");
+    const elTop = document.getElementById("sala-stat-top-carinhos");
+    if (elCar) elCar.textContent = totalCarinhos.toLocaleString("pt-BR");
+    if (elRec) elRec.textContent = totalRecados;
+    if (elAlu) elAlu.textContent = alunos.length;
     const top = alunos.reduce((max, a) => (a.carinhos > (max?.carinhos || 0) ? a : max), null);
-    document.getElementById("sala-stat-top-carinhos").textContent = top ? `${top.nome} (${top.carinhos})` : "—";
+    if (elTop) elTop.textContent = top ? `${top.nome} (${top.carinhos})` : "—";
+  } catch (e) {
+    console.warn("[sala] erro nos stats:", e);
+  }
 
-    const engajamentoLista = document.getElementById("sala-engajamento-lista");
-    if (engajamentoLista) {
+  const engajamentoLista = document.getElementById("sala-engajamento-lista");
+  if (engajamentoLista) {
+    try {
       const ordenados = [...alunos].sort((a, b) => b.carinhos - a.carinhos).slice(0, 10);
-      engajamentoLista.innerHTML = ordenados.filter((a) => a.carinhos > 0).map((a, i) => `
-        <div class="sala-engajamento-item">
-          <span style="font-weight:800;color:var(--accent);min-width:26px;">${i + 1}º</span>
-          <img src="${a.foto}" alt="${a.nome}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=random'">
-          <div class="sala-engajamento-info"><div class="sala-engajamento-nome">${escaparHTML(a.nome)}</div>
-          <div class="sala-engajamento-metricas"><span><i class="fa-solid fa-heart" style="color:#ff6b6b;"></i> ${a.carinhos.toLocaleString("pt-BR")} carinhos</span></div></div>
-        </div>`).join("") || '<p class="sala-vazio-msg">Sem dados de engajamento ainda.</p>';
+      engajamentoLista.innerHTML = ordenados
+        .filter((a) => a.carinhos > 0)
+        .map((a, i) => `
+          <div class="sala-engajamento-item">
+            <span style="font-weight:800;color:var(--accent);min-width:26px;">${i + 1}º</span>
+            <img src="${a.foto}" alt="${a.nome}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=random'">
+            <div class="sala-engajamento-info">
+              <div class="sala-engajamento-nome">${escaparHTML(a.nome)}</div>
+              <div class="sala-engajamento-metricas">
+                <span><i class="fa-solid fa-heart" style="color:#ff6b6b;"></i> ${a.carinhos.toLocaleString("pt-BR")} carinhos</span>
+              </div>
+            </div>
+          </div>`)
+        .join("") || '<p class="sala-vazio-msg">Sem dados de engajamento ainda.</p>';
+    } catch (e) {
+      console.warn("[sala] erro engajamento:", e);
     }
+  }
 
-    const buscaInput = document.getElementById("sala-busca-aluno");
-    if (buscaInput && !buscaInput.dataset.bound) {
-      buscaInput.dataset.bound = "1";
-      buscaInput.addEventListener("input", (e) => {
-        const q = e.target.value.toLowerCase().trim();
-        document.querySelectorAll("#sala-lista-alunos tr[data-nome]").forEach((tr) => {
-          const nome = tr.dataset.nome || "";
-          const mat = tr.dataset.mat || "";
-          tr.style.display = !q || nome.includes(q) || mat.includes(q) ? "" : "none";
-        });
-      });
-    }
-
-    document.querySelectorAll(".sala-tab").forEach((tab) => {
-      if (tab.dataset.bound) return;
-      tab.dataset.bound = "1";
-      tab.addEventListener("click", () => {
-        const alvo = tab.dataset.tab;
-        document.querySelectorAll(".sala-tab").forEach((t) => t.classList.remove("ativo"));
-        document.querySelectorAll(".sala-tab-content").forEach((c) => c.classList.remove("ativo"));
-        tab.classList.add("ativo");
-        document.getElementById("sala-tab-" + alvo)?.classList.add("ativo");
+  const buscaInput = document.getElementById("sala-busca-aluno");
+  if (buscaInput && !buscaInput.dataset.bound) {
+    buscaInput.dataset.bound = "1";
+    buscaInput.addEventListener("input", (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      document.querySelectorAll("#sala-lista-alunos tr[data-nome]").forEach((tr) => {
+        const nome = tr.dataset.nome || "";
+        const mat = tr.dataset.mat || "";
+        tr.style.display = !q || nome.includes(q) || mat.includes(q) ? "" : "none";
       });
     });
-
-  } catch (err) {
-    console.error("[sala] Erro ao carregar:", err);
-    if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="sala-vazio">Erro ao carregar dados. Tente novamente.</td></tr>`;
   }
+
+  document.querySelectorAll(".sala-tab").forEach((tab) => {
+    if (tab.dataset.bound) return;
+    tab.dataset.bound = "1";
+    tab.addEventListener("click", () => {
+      const alvo = tab.dataset.tab;
+      document.querySelectorAll(".sala-tab").forEach((t) => t.classList.remove("ativo"));
+      document.querySelectorAll(".sala-tab-content").forEach((c) => c.classList.remove("ativo"));
+      tab.classList.add("ativo");
+      document.getElementById("sala-tab-" + alvo)?.classList.add("ativo");
+    });
+  });
+
+  console.log("[sala] Carregamento concluído. Alunos:", alunos.length);
 }
 
 // ==========================================
@@ -3075,12 +3004,25 @@ document.addEventListener("DOMContentLoaded", function () {
         carregarPainelXP();
         atualizarStreakLogin();
 
+        // DEBUG: verificar se a matrícula é admin
+        console.log("[admin check] Matrícula logada:", matriculaSuap);
+        console.log("[admin check] Matrículas admin:", ADMIN_MATRICULAS_SALA);
+        console.log("[admin check] É admin?", ADMIN_MATRICULAS_SALA.includes(matriculaSuap));
+
         if (ADMIN_MATRICULAS_SALA.includes(matriculaSuap)) {
           setTimeout(() => {
             const secaoSala = document.getElementById("sala-professores");
-            if (secaoSala) secaoSala.classList.remove("is-admin-hidden");
+            if (secaoSala) {
+              secaoSala.classList.remove("is-admin-hidden");
+              console.log("[sala] Seção destravada");
+            } else {
+              console.warn("[sala] #sala-professores não encontrado no DOM");
+            }
             const menuItemSala = document.getElementById("menu-item-sala");
-            if (menuItemSala) menuItemSala.classList.remove("is-hidden");
+            if (menuItemSala) {
+              menuItemSala.classList.remove("is-hidden");
+              console.log("[sala] Menu item destravado");
+            }
             carregarSalaProfessores();
           }, 1000);
         }
