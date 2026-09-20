@@ -2,9 +2,10 @@
 // 🎯 xp-core.js — Núcleo unificado de XP, contadores e cliques
 // ==========================================
 // Fonte de verdade: Firebase (usuarios_xp/{matricula})
+// Acesso: via API (/api/*) com token SUAP
 // Cache: localStorage + memória (pra UI não travar)
 // Anônimo: só localStorage (comportamento preservado)
-// Rate limiting: proteção client-side contra abuso
+// Rate limiting: client-side (proteção de UX) + server-side (proteção real)
 // ==========================================
 
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
@@ -12,9 +13,7 @@ import {
   getDatabase,
   ref,
   get,
-  set,
   update,
-  runTransaction,
   onValue,
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
@@ -53,15 +52,38 @@ const LS = {
 };
 
 // ==========================================
+// 🌐 CHAMADAS À API (nova camada)
+// ==========================================
+function obterTokenSuap() {
+  const m = document.cookie.match(/(?:^|;\s*)suapToken=([^;]+)/);
+  if (m) return decodeURIComponent(m[1]);
+  return localStorage.getItem("suapToken") || null;
+}
+
+async function chamarAPI(endpoint, corpo) {
+  const token = obterTokenSuap();
+  if (!token) throw new Error("Sem token SUAP");
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+    body: JSON.stringify(corpo || {}),
+  });
+  const dados = await res.json();
+  if (!res.ok) throw new Error(dados.erro || "Erro na API");
+  return dados;
+}
+
+// ==========================================
 // 🛡️ RATE LIMITING (client-side)
 // ==========================================
-// Não é 100% à prova de hacker, mas limita o dano.
-// A defesa real está nas Security Rules do Firebase.
 const __rateLimits = {
-  xp:         { max: 200,  janela: 60_000, historico: [] },  // 200 XP/min
-  cliques:    { max: 60,   janela: 1_000,  historico: [] },  // 60 cliques/s
-  contadores: { max: 30,   janela: 60_000, historico: [] },  // 30/min
-  conquistas: { max: 10,   janela: 60_000, historico: [] },  // 10/min
+  xp:         { max: 200,  janela: 60_000, historico: [] },
+  cliques:    { max: 60,   janela: 1_000,  historico: [] },
+  contadores: { max: 30,   janela: 60_000, historico: [] },
+  conquistas: { max: 10,   janela: 60_000, historico: [] },
 };
 
 function __verificarRateLimit(tipo) {
@@ -77,7 +99,6 @@ function __verificarRateLimit(tipo) {
   return true;
 }
 
-// Teto por chamada individual
 const __tetosPorChamada = {
   xp: 500,
   cliques: 10,
@@ -94,7 +115,7 @@ function __aplicarTeto(tipo, quantidade) {
 }
 
 // ==========================================
-// ESTADO EM MEMÓRIA (cache rápido)
+// ESTADO EM MEMÓRIA
 // ==========================================
 const cache = {
   matricula: null,
@@ -105,12 +126,7 @@ const cache = {
   ultimaVisita: "",
   skinAtiva: "padrao",
   conquistas: {},
-  contadores: {
-    recados: 0,
-    curtidas: 0,
-    simulador: 0,
-    periodos: 0,
-  },
+  contadores: { recados: 0, curtidas: 0, simulador: 0, periodos: 0 },
   pronto: false,
   migrado: false,
 };
@@ -185,19 +201,16 @@ async function incrementarXP(quantidade, motivo) {
   if (!__verificarRateLimit("xp")) return cache.xp;
   quantidade = __aplicarTeto("xp", quantidade);
 
-  // Atualiza cache local imediatamente (UI responde rápido)
   cache.xp += quantidade;
   lsSet(LS.XP, cache.xp);
   emitir("xp:update", { total: cache.xp, quantidade, motivo: motivo || "geral" });
 
   if (!cache.ehAnonimo && cache.matricula) {
     try {
-      await runTransaction(ref(db, `usuarios_xp/${cache.matricula}/xp`), (atual) => {
-        return (Number(atual) || 0) + quantidade;
-      });
+      await chamarAPI("/api/xp/add", { quantidade, motivo });
     } catch (e) {
-      console.warn("[xp-core] erro incrementarXP, enfileirando:", e);
-      filaOffline.push({ tipo: "xp", qtd: quantidade });
+      console.warn("[xp-core] erro API incrementarXP, enfileirando:", e);
+      filaOffline.push({ tipo: "xp", qtd: quantidade, motivo });
     }
   }
   return cache.xp;
@@ -219,11 +232,17 @@ async function incrementarCliquesMascote(quantidade) {
 
   if (!cache.ehAnonimo && cache.matricula) {
     try {
-      await runTransaction(ref(db, `usuarios_xp/${cache.matricula}/cliquesMascote`), (atual) => {
-        return (Number(atual) || 0) + quantidade;
-      });
+      // A API do carinho incrementa cliquesMascote + xp + total + por_aluno
+      // Uma chamada por clique
+      for (let i = 0; i < quantidade; i++) {
+        const r = await chamarAPI("/api/mascote/carinho", {});
+        // Atualiza cache local com o total global retornado
+        if (typeof r.totalGlobal === "number") {
+          emitir("mascote:total-global", { total: r.totalGlobal });
+        }
+      }
     } catch (e) {
-      console.warn("[xp-core] erro incrementarCliquesMascote, enfileirando:", e);
+      console.warn("[xp-core] erro API cliques, enfileirando:", e);
       filaOffline.push({ tipo: "cliques", qtd: quantidade });
     }
   }
@@ -231,7 +250,7 @@ async function incrementarCliquesMascote(quantidade) {
 }
 
 // ==========================================
-// ESCRITA — Contadores genéricos
+// ESCRITA — Contadores
 // ==========================================
 const CONTADORES_VALIDOS = ["recados", "curtidas", "simulador", "periodos"];
 
@@ -260,11 +279,9 @@ async function incrementarContador(nome, quantidade = 1) {
 
   if (!cache.ehAnonimo && cache.matricula) {
     try {
-      await runTransaction(ref(db, `usuarios_xp/${cache.matricula}/contadores/${nome}`), (atual) => {
-        return (Number(atual) || 0) + quantidade;
-      });
+      await chamarAPI("/api/xp/contador", { nome, quantidade });
     } catch (e) {
-      console.warn("[xp-core] erro incrementarContador, enfileirando:", e);
+      console.warn("[xp-core] erro API incrementarContador, enfileirando:", e);
       filaOffline.push({ tipo: "contador", nome, qtd: quantidade });
     }
   }
@@ -299,16 +316,25 @@ async function registrarAcessoDiario() {
 
   if (!cache.ehAnonimo && cache.matricula) {
     try {
-      await update(ref(db, `usuarios_xp/${cache.matricula}`), {
-        streak: novoStreak,
-        ultimaVisita: hoje,
-      });
+      const r = await chamarAPI("/api/xp/acesso-diario", {});
+      cache.streak = r.streak || novoStreak;
+      if (r.bonusXP) {
+        cache.xp += r.bonusXP;
+        lsSet(LS.XP, cache.xp);
+        emitir("xp:update", { total: cache.xp });
+      }
+      return { streak: r.streak, novo: r.novo, bonusXP: r.bonusXP };
     } catch (e) {
-      console.warn("[xp-core] erro registrarAcessoDiario:", e);
+      console.warn("[xp-core] erro API acessoDiario:", e);
+      // Fallback local: soma bônus no cache
+      cache.xp += bonusXP;
+      lsSet(LS.XP, cache.xp);
     }
+  } else {
+    // Anônimo: soma bônus local
+    cache.xp += bonusXP;
+    lsSet(LS.XP, cache.xp);
   }
-
-  await incrementarXP(bonusXP, "login_diario");
 
   return { streak: novoStreak, novo: true, bonusXP };
 }
@@ -319,28 +345,34 @@ async function registrarAcessoDiario() {
 async function desbloquearConquista(id) {
   if (!id) return false;
   if (cache.conquistas[id]) return false;
-
   if (!__verificarRateLimit("conquistas")) return false;
-
-  const agora = Date.now();
-  cache.conquistas[id] = { desbloqueadaEm: agora };
-  emitir("xpCore:conquista", { id, desbloqueadaEm: agora });
 
   if (!cache.ehAnonimo && cache.matricula) {
     try {
-      await set(ref(db, `usuarios_xp/${cache.matricula}/conquistas/${id}`), {
-        desbloqueadaEm: agora,
-      });
+      const r = await chamarAPI("/api/conquista/unlock", { id });
+      if (!r.desbloqueada && r.jaTinha) {
+        cache.conquistas[id] = { desbloqueadaEm: Date.now() };
+        return false;
+      }
+      const agora = r.desbloqueadaEm || Date.now();
+      cache.conquistas[id] = { desbloqueadaEm: agora };
+      emitir("xpCore:conquista", { id, desbloqueadaEm: agora });
+      return true;
     } catch (e) {
-      console.warn("[xp-core] erro desbloquearConquista:", e);
+      console.warn("[xp-core] erro API desbloquearConquista:", e);
       return false;
     }
   }
+
+  // Anônimo
+  const agora = Date.now();
+  cache.conquistas[id] = { desbloqueadaEm: agora };
+  emitir("xpCore:conquista", { id, desbloqueadaEm: agora });
   return true;
 }
 
 // ==========================================
-// ESCRITA — Skin ativa (escreve nos 2 lugares)
+// ESCRITA — Skin ativa
 // ==========================================
 async function definirSkinAtiva(skinId) {
   if (!skinId) return false;
@@ -351,12 +383,9 @@ async function definirSkinAtiva(skinId) {
 
   if (!cache.ehAnonimo && cache.matricula) {
     try {
-      await Promise.all([
-        update(ref(db, `mascote/avatares/${cache.matricula}`), { avatar: skinId }),
-        update(ref(db, `perfis_alunos/${cache.matricula}`), { mascoteAvatar: skinId }),
-      ]);
+      await chamarAPI("/api/mascote/skin", { skinId });
     } catch (e) {
-      console.warn("[xp-core] erro definirSkinAtiva:", e);
+      console.warn("[xp-core] erro API definirSkinAtiva:", e);
       return false;
     }
   }
@@ -412,8 +441,7 @@ async function migrarLocalSeNecessario() {
       },
       migracaoLocal: {
         concluidaEm: Date.now(),
-        xpLocal, xpFB,
-        cliquesLocal, cliquesFB,
+        xpLocal, xpFB, cliquesLocal, cliquesFB,
       },
     });
 
@@ -449,7 +477,7 @@ async function migrarLocalSeNecessario() {
 }
 
 // ==========================================
-// SINCRONIZAÇÃO — puxa do Firebase pro cache
+// SINCRONIZAÇÃO
 // ==========================================
 async function sincronizar() {
   cache.matricula = obterMatricula();
@@ -513,20 +541,19 @@ async function sincronizar() {
 
     cache.pronto = true;
     emitir("xpCore:pronto", { anonimo: false, matricula: cache.matricula });
-
     emitir("xp:update", { total: cache.xp });
     emitir("mascote:cliques", { total: cache.cliquesMascote });
 
     await migrarLocalSeNecessario();
   } catch (e) {
-    console.warn("[xp-core] erro ao sincronizar com Firebase:", e);
+    console.warn("[xp-core] erro ao sincronizar:", e);
     cache.pronto = true;
     emitir("xpCore:pronto", { anonimo: false, erro: true });
   }
 }
 
 // ==========================================
-// OBSERVER EM TEMPO REAL (outros dispositivos)
+// OBSERVER EM TEMPO REAL
 // ==========================================
 function observarFirebase() {
   if (cache.ehAnonimo || !cache.matricula) return;
@@ -551,7 +578,7 @@ function observarFirebase() {
 }
 
 // ==========================================
-// FILA OFFLINE — reenvia pendências ao voltar online
+// FILA OFFLINE
 // ==========================================
 async function processarFilaOffline() {
   if (!filaOffline.length) return;
@@ -562,14 +589,13 @@ async function processarFilaOffline() {
   for (const item of fila) {
     try {
       if (item.tipo === "xp") {
-        await runTransaction(ref(db, `usuarios_xp/${cache.matricula}/xp`),
-          (a) => (Number(a) || 0) + item.qtd);
+        await chamarAPI("/api/xp/add", { quantidade: item.qtd, motivo: item.motivo });
       } else if (item.tipo === "cliques") {
-        await runTransaction(ref(db, `usuarios_xp/${cache.matricula}/cliquesMascote`),
-          (a) => (Number(a) || 0) + item.qtd);
+        for (let i = 0; i < item.qtd; i++) {
+          await chamarAPI("/api/mascote/carinho", {});
+        }
       } else if (item.tipo === "contador") {
-        await runTransaction(ref(db, `usuarios_xp/${cache.matricula}/contadores/${item.nome}`),
-          (a) => (Number(a) || 0) + item.qtd);
+        await chamarAPI("/api/xp/contador", { nome: item.nome, quantidade: item.qtd });
       }
     } catch (e) {
       filaOffline.push(item);
@@ -583,7 +609,6 @@ window.addEventListener("online", processarFilaOffline);
 // ==========================================
 // ATALHOS ESPECÍFICOS
 // ==========================================
-
 async function registrarPeriodoVisto(periodoLabel) {
   if (!periodoLabel) return false;
   let vistos = [];
@@ -651,13 +676,9 @@ window.xpCore = {
 // ==========================================
 (async () => {
   console.log("[xp-core] inicializando...");
-
   await sincronizar();
-
   if (!cache.ehAnonimo) observarFirebase();
-
   if (navigator.onLine && !cache.ehAnonimo) processarFilaOffline();
-
   console.log("[xp-core] pronto.", {
     anonimo: cache.ehAnonimo,
     matricula: cache.matricula,
