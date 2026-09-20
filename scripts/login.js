@@ -97,25 +97,20 @@ const NIVEIS = [
 // 🎖️ CONQUISTAS (com raridade)
 // ==========================================
 const CONQUISTAS = [
-  // Comum
   { id: "primeiro_carinho", icone: "🎯", nome: "Primeiro Carinho", desc: "Deu seu primeiro carinho no mascote", raridade: "comum" },
   { id: "estiloso", icone: "🎨", nome: "Estiloso", desc: "Mudou o avatar do mascote", raridade: "comum" },
   { id: "comunicador", icone: "💬", nome: "Comunicador", desc: "Postou 10 recados", raridade: "comum" },
   { id: "cientista", icone: "🧪", nome: "Cientista", desc: "Usou o simulador 10 vezes", raridade: "comum" },
-  // Raro
   { id: "carinhoso", icone: "❤️", nome: "Carinhoso", desc: "Deu 100 carinhos no mascote", raridade: "raro" },
   { id: "nota_100", icone: "🎓", nome: "Nota 100", desc: "Tirou 100 em alguma matéria", raridade: "raro" },
   { id: "streak_7", icone: "🔥", nome: "Streak 7", desc: "Logou 7 dias seguidos", raridade: "raro" },
-  // Épico
   { id: "apaixonado", icone: "💖", nome: "Apaixonado", desc: "Deu 500 carinhos no mascote", raridade: "epico" },
   { id: "nota_maxima", icone: "🏆", nome: "Nota Máxima", desc: "Média geral ≥ 90", raridade: "epico" },
   { id: "simpson_unlocked", icone: "🍩", nome: "Simpson Chegou", desc: "Desbloqueou a skin do Simpson (1.500 cliques)", raridade: "epico" },
-  // Lendário
   { id: "streak_30", icone: "⭐", nome: "Streak 30", desc: "Logou 30 dias seguidos", raridade: "lendario" },
   { id: "mafioso_unlocked", icone: "🕴️", nome: "Mafioso no Pedaço", desc: "Desbloqueou a skin Mafioso (3.000 cliques)", raridade: "lendario" },
 ];
 
-// Estado local do XP
 let meuXP = 0;
 let minhaStreak = 0;
 let meusCliquesMascote = 0;
@@ -293,6 +288,7 @@ const TRADUCOES_LOGIN = {
     sala_th_media: "Média",
     sala_th_faltas: "Faltas",
     sala_th_carinhos: "Carinhos",
+    sala_th_conquistas: "Conquistas",
     sala_th_status: "Status",
     sala_carregando: "Carregando dados...",
     sala_risco_carregando: "Carregando...",
@@ -477,6 +473,7 @@ const TRADUCOES_LOGIN = {
     sala_th_media: "Average",
     sala_th_faltas: "Absences",
     sala_th_carinhos: "Hugs",
+    sala_th_conquistas: "Achievements",
     sala_th_status: "Status",
     sala_carregando: "Loading data...",
     sala_risco_carregando: "Loading...",
@@ -661,6 +658,7 @@ const TRADUCOES_LOGIN = {
     sala_th_media: "Promedio",
     sala_th_faltas: "Faltas",
     sala_th_carinhos: "Cariños",
+    sala_th_conquistas: "Logros",
     sala_th_status: "Estado",
     sala_carregando: "Cargando datos...",
     sala_risco_carregando: "Cargando...",
@@ -792,7 +790,7 @@ async function atualizarStreakLogin() {
 }
 
 // ==========================================
-// 🆕 PAINEL DE XP E CONQUISTAS
+// PAINEL DE XP E CONQUISTAS
 // ==========================================
 async function carregarPainelXP() {
   const mat = window.usuarioLogado.matricula;
@@ -807,14 +805,11 @@ async function carregarPainelXP() {
     minhaStreak = Number(dados.streak) || 0;
     minhasConquistas = dados.conquistas || {};
 
-    // Pega cliques do localStorage (vem do mascote.js)
     meusCliquesMascote = parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
 
-    // Atualiza painel visual
     renderizarPainelXP();
     renderizarConquistas();
 
-    // Atualiza avatar do mascote
     const avatarSalvo = dados.mascoteAvatar || localStorage.getItem("skin_ativa") || "padrao";
     avatarSelecionado = avatarSalvo;
 
@@ -1355,6 +1350,50 @@ if (inputBuscaPerfis) {
   });
 }
 
+// ==========================================
+// 🆕 CONQUISTAS NO MODAL DE PERFIL (público)
+// ==========================================
+async function carregarConquistasNoModalPerfil(matricula) {
+  const secao = document.getElementById("modal-perfil-conquistas");
+  const grid = document.getElementById("modal-perfil-conquistas-grid");
+  const contador = document.getElementById("modal-perfil-conquistas-contador");
+  if (!secao || !grid) return;
+
+  secao.classList.remove("is-hidden");
+  grid.innerHTML = '<p class="modal-perfil-conquistas-vazio"><i class="fa-solid fa-spinner fa-spin"></i></p>';
+  if (contador) contador.textContent = "—";
+
+  if (!matricula) {
+    grid.innerHTML = '<p class="modal-perfil-conquistas-vazio">Matrícula indisponível.</p>';
+    return;
+  }
+
+  try {
+    const snap = await get(ref(db, "usuarios_xp/" + matricula + "/conquistas"));
+    const conquistas = snap.val() || {};
+    const desbloqueadas = CONQUISTAS.filter((c) => !!conquistas[c.id]);
+
+    if (contador) contador.textContent = `${desbloqueadas.length}/${CONQUISTAS.length}`;
+
+    grid.innerHTML = CONQUISTAS.map((c) => {
+      const desbl = !!conquistas[c.id];
+      const raridade = c.raridade || "comum";
+      const statusIcon = desbl ? "✓" : "🔒";
+      return `
+        <div
+          class="modal-conquista-badge ${desbl ? "desbloqueada" : "bloqueada"} ${raridade}"
+          title="${escaparHTML(c.nome)} — ${escaparHTML(c.desc)} ${statusIcon}"
+        >
+          ${c.icone}
+        </div>`;
+    }).join("");
+  } catch (err) {
+    console.warn("[conquistas perfil] erro:", err);
+    grid.innerHTML = '<p class="modal-perfil-conquistas-vazio">Erro ao carregar conquistas.</p>';
+    if (contador) contador.textContent = "—";
+  }
+}
+
 window.abrirModalPerfil = function (identificador) {
   const modal = document.getElementById("modal-perfil");
   if (!modal) return;
@@ -1404,6 +1443,10 @@ window.abrirModalPerfil = function (identificador) {
       redesEl.classList.add("is-hidden");
     }
   }
+
+  // 🆕 Carrega conquistas do aluno visualizado
+  carregarConquistasNoModalPerfil(perfil.matricula || perfil.id);
+
   modal.classList.remove("is-hidden");
 };
 
@@ -3075,7 +3118,7 @@ function atualizarTimersContagem() {
 }
 
 // ==========================================
-// 🆕 SALA DOS PROFESSORES
+// SALA DOS PROFESSORES
 // ==========================================
 async function carregarSalaProfessores() {
   if (__salaDadosCarregados) return;
@@ -3085,16 +3128,18 @@ async function carregarSalaProfessores() {
   if (!tbody) return;
 
   try {
-    const [perfisSnap, carinhosSnap, resumosSnap, recadosSnap] = await Promise.all([
+    const [perfisSnap, carinhosSnap, resumosSnap, recadosSnap, xpSnap] = await Promise.all([
       get(perfisRef),
       get(ref(db, "mascote/por_aluno")),
       get(ref(db, "resumo_boletim")),
       get(ref(db, "mural_recados")),
+      get(ref(db, "usuarios_xp")),
     ]);
 
     const perfis = perfisSnap.val() || {};
     const carinhos = carinhosSnap.val() || {};
     const resumos = resumosSnap.val() || {};
+    const xpData = xpSnap.val() || {};
     const totalRecados = recadosSnap.exists() ? Object.keys(recadosSnap.val()).length : 0;
 
     const alunos = Object.keys(perfis)
@@ -3102,6 +3147,9 @@ async function carregarSalaProfessores() {
       .map((mat) => {
         const p = perfis[mat] || {};
         const r = resumos[mat] || {};
+        const xp = xpData[mat] || {};
+        const conquistas = xp.conquistas || {};
+        const numConquistas = Object.keys(conquistas).length;
         return {
           matricula: mat,
           nome: p.nome || p.nomeCompleto || "Aluno " + mat.slice(-4),
@@ -3113,13 +3161,15 @@ async function carregarSalaProfessores() {
           faltasTotais: typeof r.faltasTotais === "number" ? r.faltasTotais : null,
           periodo: r.periodo || "—",
           atualizadoEm: r.atualizadoEm || 0,
+          numConquistas: numConquistas,
+          xpTotal: Number(xp.xp) || 0,
         };
       });
 
     alunos.sort((a, b) => a.nome.localeCompare(b.nome));
 
     if (alunos.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" class="sala-vazio"><i class="fa-regular fa-folder-open"></i> Nenhum aluno cadastrado.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" class="sala-vazio"><i class="fa-regular fa-folder-open"></i> Nenhum aluno cadastrado.</td></tr>`;
     } else {
       tbody.innerHTML = alunos
         .map((a) => {
@@ -3164,6 +3214,11 @@ async function carregarSalaProfessores() {
               <td>${mediaHTML}</td>
               <td>${faltasHTML}</td>
               <td><i class="fa-solid fa-heart" style="color:#ff6b6b;font-size:0.8rem;"></i> ${a.carinhos.toLocaleString("pt-BR")}</td>
+              <td>
+                <span title="${a.numConquistas} de ${CONQUISTAS.length} conquistas • ${a.xpTotal} XP" style="font-weight:700;color:${a.numConquistas >= 9 ? 'var(--success)' : a.numConquistas >= 5 ? 'var(--warning)' : 'var(--text-main)'};">
+                  🎖️ ${a.numConquistas}/${CONQUISTAS.length}
+                </span>
+              </td>
               <td><span class="sala-badge ${statusClasse}">${statusLabel}</span></td>
             </tr>`;
         })
@@ -3225,7 +3280,7 @@ async function carregarSalaProfessores() {
   } catch (err) {
     console.error("[sala] Erro ao carregar:", err);
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="6" class="sala-vazio">Erro ao carregar dados. Tente novamente.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" class="sala-vazio">Erro ao carregar dados. Tente novamente.</td></tr>`;
     }
   }
 }
@@ -3310,7 +3365,7 @@ function initCalculadoraNotas() {
 }
 
 // ==========================================
-// 🆕 MENU LATERAL
+// MENU LATERAL
 // ==========================================
 function initMenuLateral() {
   const btnMenuLateral = document.getElementById("btn-menu");
