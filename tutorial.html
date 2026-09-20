@@ -24,9 +24,6 @@
     <link rel="stylesheet" href="styles/login.css" />
 
     <style>
-      /* ==========================================
-         ESTILOS ESPECÍFICOS DO TUTORIAL
-         ========================================== */
       .tutorial-main {
         padding: 100px 16px 60px;
         max-width: 900px;
@@ -317,6 +314,79 @@
         font-family: "Poppins", sans-serif;
       }
 
+      /* ==========================================
+         BOTÃO VOLTAR (padrão do site)
+         ========================================== */
+      .btn-tutorial-voltar {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        background: rgba(139, 94, 221, 0.12);
+        border: 1.5px solid rgba(139, 94, 221, 0.45);
+        color: var(--accent-strong, #8b5edd);
+        border-radius: 10px;
+        text-decoration: none;
+        font-family: "Poppins", sans-serif;
+        font-weight: 700;
+        font-size: 0.88rem;
+        letter-spacing: 0.3px;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        white-space: nowrap;
+      }
+
+      .btn-tutorial-voltar:hover {
+        background: linear-gradient(135deg, #8b5edd, #6b46c1);
+        color: #fff;
+        border-color: transparent;
+        transform: translateX(-3px);
+        box-shadow: 0 6px 18px rgba(139, 94, 221, 0.45);
+      }
+
+      .btn-tutorial-voltar:active {
+        transform: translateX(-1px) scale(0.98);
+      }
+
+      .btn-tutorial-voltar i {
+        font-size: 0.95rem;
+        transition: transform 0.25s ease;
+      }
+
+      .btn-tutorial-voltar:hover i {
+        transform: translateX(-2px);
+      }
+
+      /* Modo claro: ajusta contraste */
+      body.light-theme .btn-tutorial-voltar {
+        background: rgba(139, 94, 221, 0.1);
+        border-color: rgba(139, 94, 221, 0.5);
+        color: #6b46c1;
+      }
+
+      body.light-theme .btn-tutorial-voltar:hover {
+        color: #fff;
+      }
+
+      /* Mobile: compacto */
+      @media (max-width: 480px) {
+        .btn-tutorial-voltar {
+          padding: 9px 14px;
+          font-size: 0.82rem;
+          gap: 6px;
+        }
+        .btn-tutorial-voltar span {
+          display: none;
+        }
+        .btn-tutorial-voltar i {
+          font-size: 1rem;
+        }
+        .btn-tutorial-voltar:hover {
+          transform: translateX(-2px) scale(1.05);
+        }
+      }
+
       body.light-theme .tutorial-secao,
       body.light-theme .tutorial-indice {
         background: rgba(0, 0, 0, 0.03);
@@ -329,7 +399,7 @@
         <i class="fa-solid fa-code-branch"></i>InfoWeb<span>- 2V</span>
       </a>
       <div class="header-actions">
-        <a href="login.html" class="button is-link" style="text-decoration:none;">
+        <a href="login.html" class="btn-tutorial-voltar" title="Voltar para o site">
           <i class="fa-solid fa-arrow-left"></i>
           <span>Voltar</span>
         </a>
@@ -371,7 +441,6 @@
             <li><a href="#notificacoes">Notificações</a></li>
             <li><a href="#temas">Temas e idiomas</a></li>
             <li><a href="#pwa">Instalar como app</a></li>
-            <li><a href="#sala">Sala dos Professores</a></li>
           </ol>
         </div>
 
@@ -421,7 +490,6 @@
             <li><strong>Agenda</strong> — calendário de eventos</li>
             <li><strong>Mascote</strong> — interagir com o mascote</li>
             <li><strong>Tutorial</strong> — esta página</li>
-            <li><strong>Sala dos Professores</strong> — só admin</li>
           </ul>
         </section>
 
@@ -491,7 +559,6 @@
               <tr><td>🧞 Gênio</td><td>Já vem desbloqueada</td></tr>
               <tr><td>🍩 Simpson</td><td><strong>1.500 cliques</strong> no mascote</td></tr>
               <tr><td>🕴️ Mafioso</td><td><strong>3.000 cliques</strong> no mascote</td></tr>
-              <tr><td>👑 Admin</td><td>Exclusivo do admin</td></tr>
             </tbody>
           </table>
 
@@ -645,8 +712,8 @@
           <ul class="tutorial-lista">
             <li><strong>Curtir</strong> — clique no coração (❤️). Você só pode curtir uma vez por recado.</li>
             <li><strong>Comentar</strong> — clique no ícone de comentário e escreva sua resposta. Ganha +3 XP por comentário.</li>
-            <li><strong>Editar</strong> — só o autor (ou admin) pode editar o próprio recado.</li>
-            <li><strong>Excluir</strong> — só o autor (ou admin) pode apagar.</li>
+            <li><strong>Editar</strong> — só o autor pode editar o próprio recado.</li>
+            <li><strong>Excluir</strong> — só o autor pode apagar.</li>
           </ul>
 
           <h3 style="color: var(--text-main); margin-top: 20px; margin-bottom: 10px; font-size: 1rem;">🔍 Buscar recados</h3>
@@ -816,24 +883,6 @@
           </div>
         </section>
 
-        <!-- 14. SALA -->
-        <section id="sala" class="tutorial-secao">
-          <div class="tutorial-secao-cabecalho">
-            <div class="tutorial-secao-icone"><i class="fa-solid fa-user-tie"></i></div>
-            <h2>14. Sala dos Professores</h2>
-          </div>
-          <p>Seção <strong>exclusiva do admin</strong> com visão geral da turma:</p>
-          <ul class="tutorial-lista">
-            <li><strong>Alunos</strong> — tabela com média, faltas, carinhos e conquistas de cada um</li>
-            <li><strong>Em Risco</strong> — alunos com média baixa ou muitas faltas</li>
-            <li><strong>Engajamento</strong> — Top 10 alunos que mais interagem com o site</li>
-            <li><strong>Estatísticas</strong> — totais de carinhos, recados e alunos ativos</li>
-          </ul>
-          <div class="tutorial-aviso">
-            <strong>ℹ️ Importante:</strong> esta seção só aparece se você for admin.
-          </div>
-        </section>
-
         <a href="login.html" class="tutorial-voltar">
           <i class="fa-solid fa-arrow-left"></i>
           Voltar para o site
@@ -867,22 +916,18 @@
         if (anoEl) anoEl.textContent = new Date().getFullYear();
 
         if (suap.isAuthenticated()) {
-          // Mostra o conteúdo
           conteudo.style.display = "block";
           bloqueado.style.display = "none";
 
-          // Aplica tema salvo
           var tema = localStorage.getItem("tema-cor") || "roxo";
           var temas = ["roxo", "azul", "verde", "rosa", "laranja"];
           if (temas.indexOf(tema) === -1) tema = "roxo";
           document.body.classList.add("tema-" + tema);
 
-          // Aplica modo claro/escuro
           if (localStorage.getItem("theme") === "light") {
             document.body.classList.add("light-theme");
           }
         } else {
-          // Bloqueia
           conteudo.style.display = "none";
           bloqueado.style.display = "block";
         }
