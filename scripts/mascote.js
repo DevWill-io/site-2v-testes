@@ -479,6 +479,51 @@ function atualizarBotaoLimite() {
   }
 }
 
+// ==========================================
+// 🔒 BLOQUEIO DE CLIQUE PARA ANÔNIMOS
+// ==========================================
+function aplicarBloqueioAnonimo() {
+  if (!SOU_ANONIMO) return;
+
+  // Adiciona classe de bloqueio no botão
+  if (btnCarinho) {
+    btnCarinho.disabled = true;
+    btnCarinho.classList.add("btn-bloqueado-anon");
+    btnCarinho.innerHTML = '<i class="fa-solid fa-lock"></i> Faça login para dar carinho';
+    btnCarinho.style.opacity = "0.7";
+    btnCarinho.style.cursor = "not-allowed";
+  }
+
+  // Adiciona aviso visual na imagem do mascote
+  if (mascoteImg) {
+    mascoteImg.style.filter = "grayscale(0.5) opacity(0.85)";
+    mascoteImg.style.cursor = "not-allowed";
+    mascoteImg.classList.add("mascote-bloqueado");
+
+    // Tooltip
+    mascoteImg.title = "Faça login com SUAP para interagir";
+  }
+
+  // Esconde barra de progresso da próxima skin (não faz sentido sem cliques)
+  if (skinProgressoBox) {
+    skinProgressoBox.style.opacity = "0.5";
+  }
+
+  // Texto de aviso embaixo do mascote
+  if (mascoteImagem) {
+    const aviso = document.createElement("p");
+    aviso.className = "mascote-aviso-login";
+    aviso.innerHTML = `
+      <i class="fa-solid fa-lock"></i>
+      <a href="login.html">Faça login com SUAP</a> para dar carinho
+    `;
+    mascoteImagem.appendChild(aviso);
+  }
+}
+
+// Chama depois de tudo carregado
+setTimeout(aplicarBloqueioAnonimo, 500);
+
 function renderizarRanking() {
   if (!rankingLista) return;
   const data = rankingDataCache || {};
@@ -571,6 +616,21 @@ onValue(meuRef, (snap) => {
 });
 
 async function darCarinho(event) {
+  // 🆕 BLOQUEIO: só quem tá logado pode dar carinho
+  if (SOU_ANONIMO) {
+    mostrarNotificacao(
+      "🔒 Faça login com SUAP para dar carinho no mascote!",
+      "erro"
+    );
+    // Abre o login em nova aba (opcional)
+    setTimeout(() => {
+      if (confirm("Quer ir para a página de login?")) {
+        window.location.href = "login.html";
+      }
+    }, 1500);
+    return;
+  }
+
   if (!podeClicar) return;
 
   if (atingiuLimite()) {
@@ -595,10 +655,6 @@ async function darCarinho(event) {
 
   if (window.xpCore?.estaPronto?.()) {
     window.xpCore.incrementarCliquesMascote(1);
-  } else {
-    localStorage.setItem("xp_cliques_mascote", String(cliquesAntes + 1));
-    const xpAtual = parseInt(localStorage.getItem("xp_total") || "0", 10);
-    localStorage.setItem("xp_total", String(xpAtual + 1));
   }
 
   atualizarProgressoSkin();
@@ -643,21 +699,8 @@ async function darCarinho(event) {
     }, i * 60);
   }
 
-  if (SOU_ANONIMO) {
-    try {
-      await runTransaction(totalRef, (valorAtual) => {
-        const v = Number(valorAtual) || 0;
-        if (v >= LIMITE_CARINHOS) return v;
-        return v + 1;
-      });
-      await runTransaction(meuRef, (valorAtual) => {
-        const v = Number(valorAtual) || 0;
-        return v + 1;
-      });
-    } catch (err) {
-      console.error("[mascote] Erro ao salvar carinho anônimo:", err);
-    }
-  }
+  // ⚠️ NÃO escreve mais direto no Firebase (agora é só via API)
+  // A API já incrementa cliquesMascote + xp + total + por_aluno
 
   const faltam = LIMITE_CARINHOS - carinhosGlobais - 1;
   let frases;
@@ -677,7 +720,7 @@ async function darCarinho(event) {
     frases = [
       "🥰 Obrigado pelo carinho!",
       "💖 Você é demais!",
-      "🐾 Auuu! Adorei!",
+      "🐾 Adorei!",
       "🤗 Mais um carinho!",
       "✨ Que fofo!",
     ];

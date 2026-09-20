@@ -809,3 +809,52 @@ body.light-theme .marco {
     .skin-progresso-label { font-size: 0.76rem; gap: 6px; }
     .skin-progresso-label #proxima-skin-contagem { font-size: 0.72rem; padding: 2px 8px; }
 }
+
+/* ==========================================
+   🔒 BLOQUEIO DE CLIQUE PARA ANÔNIMOS
+   ========================================== */
+.btn-bloqueado-anon {
+  background: linear-gradient(135deg, #6b7280, #4b5563) !important;
+  cursor: not-allowed !important;
+  filter: grayscale(0.3);
+}
+
+.mascote-bloqueado {
+  position: relative;
+}
+
+.mascote-aviso-login {
+  margin-top: 12px;
+  padding: 10px 16px;
+  background: rgba(139, 94, 221, 0.12);
+  border: 1.5px solid rgba(139, 94, 221, 0.4);
+  border-radius: 10px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-main, #fff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.mascote-aviso-login i {
+  color: var(--accent-strong, #8b5edd);
+}
+
+.mascote-aviso-login a {
+  color: var(--accent-strong, #8b5edd);
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1px dashed var(--accent-strong, #8b5edd);
+  transition: color 0.2s;
+}
+
+.mascote-aviso-login a:hover {
+  color: #fff;
+  border-bottom-color: #fff;
+}
+
+body.light-theme .mascote-aviso-login {
+  background: rgba(139, 94, 221, 0.08);
+}
