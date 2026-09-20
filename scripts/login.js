@@ -94,19 +94,25 @@ const NIVEIS = [
 ];
 
 // ==========================================
-// 🎖️ CONQUISTAS
+// 🎖️ CONQUISTAS (com raridade)
 // ==========================================
 const CONQUISTAS = [
-  { id: "primeiro_carinho", icone: "🎯", nome: "Primeiro Carinho", desc: "Deu seu primeiro carinho no mascote" },
-  { id: "carinhoso", icone: "❤️", nome: "Carinhoso", desc: "Deu 100 carinhos no mascote" },
-  { id: "apaixonado", icone: "💖", nome: "Apaixonado", desc: "Deu 500 carinhos no mascote" },
-  { id: "nota_100", icone: "🎓", nome: "Nota 100", desc: "Tirou 100 em alguma matéria" },
-  { id: "nota_maxima", icone: "🏆", nome: "Nota Máxima", desc: "Média geral ≥ 90" },
-  { id: "streak_7", icone: "🔥", nome: "Streak 7", desc: "Logou 7 dias seguidos" },
-  { id: "streak_30", icone: "⭐", nome: "Streak 30", desc: "Logou 30 dias seguidos" },
-  { id: "comunicador", icone: "💬", nome: "Comunicador", desc: "Postou 10 recados" },
-  { id: "estiloso", icone: "🎨", nome: "Estiloso", desc: "Mudou o avatar do mascote" },
-  { id: "cientista", icone: "🧪", nome: "Cientista", desc: "Usou o simulador 10 vezes" },
+  // Comum
+  { id: "primeiro_carinho", icone: "🎯", nome: "Primeiro Carinho", desc: "Deu seu primeiro carinho no mascote", raridade: "comum" },
+  { id: "estiloso", icone: "🎨", nome: "Estiloso", desc: "Mudou o avatar do mascote", raridade: "comum" },
+  { id: "comunicador", icone: "💬", nome: "Comunicador", desc: "Postou 10 recados", raridade: "comum" },
+  { id: "cientista", icone: "🧪", nome: "Cientista", desc: "Usou o simulador 10 vezes", raridade: "comum" },
+  // Raro
+  { id: "carinhoso", icone: "❤️", nome: "Carinhoso", desc: "Deu 100 carinhos no mascote", raridade: "raro" },
+  { id: "nota_100", icone: "🎓", nome: "Nota 100", desc: "Tirou 100 em alguma matéria", raridade: "raro" },
+  { id: "streak_7", icone: "🔥", nome: "Streak 7", desc: "Logou 7 dias seguidos", raridade: "raro" },
+  // Épico
+  { id: "apaixonado", icone: "💖", nome: "Apaixonado", desc: "Deu 500 carinhos no mascote", raridade: "epico" },
+  { id: "nota_maxima", icone: "🏆", nome: "Nota Máxima", desc: "Média geral ≥ 90", raridade: "epico" },
+  { id: "simpson_unlocked", icone: "🍩", nome: "Simpson Chegou", desc: "Desbloqueou a skin do Simpson (1.500 cliques)", raridade: "epico" },
+  // Lendário
+  { id: "streak_30", icone: "⭐", nome: "Streak 30", desc: "Logou 30 dias seguidos", raridade: "lendario" },
+  { id: "mafioso_unlocked", icone: "🕴️", nome: "Mafioso no Pedaço", desc: "Desbloqueou a skin Mafioso (3.000 cliques)", raridade: "lendario" },
 ];
 
 // Estado local do XP
@@ -117,6 +123,7 @@ let minhasConquistas = {};
 let contadorSimulador = 0;
 
 let avatarSelecionado = "padrao";
+let filtroConquistasAtivo = "todas";
 
 // ==========================================
 // 📋 DICIONÁRIO DE TRADUÇÕES
@@ -151,7 +158,14 @@ const TRADUCOES_LOGIN = {
     marcar_todas: "Marcar todas",
     sem_notif: "Sem notificações.",
 
-    /* 🆕 Menu lateral */
+    dias: "dias",
+    conquistas_titulo: "Conquistas",
+    todas: "Todas",
+    desbloqueadas: "Desbloqueadas",
+    bloqueadas: "Bloqueadas",
+    proxima_skin: "Próxima skin:",
+    skin_bloqueada: "Bloqueada",
+
     menu: "Menu",
     nav_notas: "Notas",
     nav_notas_desc: "Sua calculadora",
@@ -327,6 +341,14 @@ const TRADUCOES_LOGIN = {
     notificacoes: "Notifications",
     marcar_todas: "Mark all",
     sem_notif: "No notifications.",
+
+    dias: "days",
+    conquistas_titulo: "Achievements",
+    todas: "All",
+    desbloqueadas: "Unlocked",
+    bloqueadas: "Locked",
+    proxima_skin: "Next skin:",
+    skin_bloqueada: "Locked",
 
     nav_inicio: "Home",
     nav_inicio_desc: "Homepage",
@@ -504,6 +526,13 @@ const TRADUCOES_LOGIN = {
     marcar_todas: "Marcar todas",
     sem_notif: "Sin notificaciones.",
 
+    dias: "días",
+    conquistas_titulo: "Logros",
+    todas: "Todos",
+    desbloqueadas: "Desbloqueados",
+    bloqueadas: "Bloqueados",
+    proxima_skin: "Próxima skin:",
+    skin_bloqueada: "Bloqueada",
 
     nav_inicio: "Inicio",
     nav_inicio_desc: "Página de inicio",
@@ -703,6 +732,8 @@ async function adicionarXP(quantidade, motivo) {
         exibirToast(`🎉 SUBIU DE NÍVEL! ${nivelDepois.nome} (Nv ${nivelDepois.nivel})`, "sucesso");
       }
     }
+
+    await carregarPainelXP();
   } catch (e) {
     console.warn("[XP] Erro:", e);
   }
@@ -722,6 +753,8 @@ async function desbloquearConquista(idConquista) {
     if (c && typeof exibirToast === "function") {
       exibirToast(`${c.icone} CONQUISTA: ${c.nome}!`, "sucesso");
     }
+
+    await carregarPainelXP();
   } catch (e) {
     console.warn("[conquista] Erro:", e);
   }
@@ -756,6 +789,141 @@ async function atualizarStreakLogin() {
   } catch (e) {
     console.warn("[streak] Erro:", e);
   }
+}
+
+// ==========================================
+// 🆕 PAINEL DE XP E CONQUISTAS
+// ==========================================
+async function carregarPainelXP() {
+  const mat = window.usuarioLogado.matricula;
+  if (!mat || mat === "Matrícula não disponível") return;
+
+  try {
+    const refXP = ref(db, "usuarios_xp/" + mat);
+    const snap = await get(refXP);
+    const dados = snap.val() || {};
+
+    meuXP = Number(dados.xp) || 0;
+    minhaStreak = Number(dados.streak) || 0;
+    minhasConquistas = dados.conquistas || {};
+
+    // Pega cliques do localStorage (vem do mascote.js)
+    meusCliquesMascote = parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
+
+    // Atualiza painel visual
+    renderizarPainelXP();
+    renderizarConquistas();
+
+    // Atualiza avatar do mascote
+    const avatarSalvo = dados.mascoteAvatar || localStorage.getItem("skin_ativa") || "padrao";
+    avatarSelecionado = avatarSalvo;
+
+    // 🆕 Desbloqueia conquistas de skins automaticamente
+    if (meusCliquesMascote >= 1500 && !minhasConquistas["simpson_unlocked"]) {
+      await desbloquearConquista("simpson_unlocked");
+    }
+    if (meusCliquesMascote >= 3000 && !minhasConquistas["mafioso_unlocked"]) {
+      await desbloquearConquista("mafioso_unlocked");
+    }
+    // 🆕 Conquistas de carinho
+    if (meusCliquesMascote >= 100 && !minhasConquistas["carinhoso"]) {
+      await desbloquearConquista("carinhoso");
+    }
+    if (meusCliquesMascote >= 500 && !minhasConquistas["apaixonado"]) {
+      await desbloquearConquista("apaixonado");
+    }
+    if (meusCliquesMascote >= 1 && !minhasConquistas["primeiro_carinho"]) {
+      await desbloquearConquista("primeiro_carinho");
+    }
+  } catch (e) {
+    console.warn("[painelXP] Erro:", e);
+    meuXP = parseInt(localStorage.getItem("xp_total") || "0", 10);
+    minhaStreak = parseInt(localStorage.getItem("xp_streak") || "0", 10);
+    meusCliquesMascote = parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
+    renderizarPainelXP();
+    renderizarConquistas();
+  }
+}
+
+function renderizarPainelXP() {
+  const nivelInfo = calcularNivel(meuXP);
+
+  const nivelNum = document.getElementById("xp-nivel-num");
+  if (nivelNum) nivelNum.textContent = nivelInfo.nivel;
+
+  const nomeNivel = document.getElementById("xp-nome-nivel");
+  if (nomeNivel) nomeNivel.textContent = nivelInfo.nome;
+
+  const totalEl = document.getElementById("xp-total");
+  if (totalEl) totalEl.textContent = `${meuXP.toLocaleString("pt-BR")} XP`;
+
+  const streakEl = document.getElementById("xp-streak");
+  if (streakEl) streakEl.textContent = minhaStreak;
+
+  const barraFill = document.getElementById("xp-barra-fill");
+  if (barraFill) barraFill.style.width = `${nivelInfo.progresso}%`;
+
+  const proximoEl = document.getElementById("xp-proximo");
+  if (proximoEl) {
+    if (nivelInfo.proximoNome) {
+      const falta = nivelInfo.xpProximo - meuXP;
+      proximoEl.textContent = `Próximo nível: ${nivelInfo.proximoNome} (${falta} XP)`;
+    } else {
+      proximoEl.textContent = "🎉 Você atingiu o nível máximo!";
+    }
+  }
+}
+
+function renderizarConquistas() {
+  const grid = document.getElementById("conquistas-grid");
+  const contador = document.getElementById("conquistas-contador");
+  if (!grid) return;
+
+  const conquistasFiltradas = CONQUISTAS.filter((c) => {
+    const desbloqueada = !!minhasConquistas[c.id];
+    if (filtroConquistasAtivo === "desbloqueadas") return desbloqueada;
+    if (filtroConquistasAtivo === "bloqueadas") return !desbloqueada;
+    return true;
+  });
+
+  const totalDesbloqueadas = CONQUISTAS.filter((c) => !!minhasConquistas[c.id]).length;
+  if (contador) contador.textContent = `${totalDesbloqueadas}/${CONQUISTAS.length}`;
+
+  if (conquistasFiltradas.length === 0) {
+    grid.innerHTML = `<p class="conquistas-vazio">Nenhuma conquista nesta categoria.</p>`;
+    return;
+  }
+
+  grid.innerHTML = conquistasFiltradas
+    .map((c) => {
+      const desbloqueada = !!minhasConquistas[c.id];
+      const raridade = c.raridade || "comum";
+      return `
+        <div
+          class="conquista-card ${desbloqueada ? "desbloqueada" : "bloqueada"} ${raridade}"
+          title="${escaparHTML(c.desc)}"
+        >
+          <div class="conquista-icone">
+            ${c.icone}
+          </div>
+          <div class="conquista-info">
+            <span class="conquista-titulo">${escaparHTML(c.nome)}</span>
+            <span class="conquista-desc">${escaparHTML(c.desc)}</span>
+          </div>
+        </div>`;
+    })
+    .join("");
+}
+
+function inicializarFiltrosConquistas() {
+  document.querySelectorAll(".conquista-filtro").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".conquista-filtro").forEach((b) => b.classList.remove("ativo"));
+      btn.classList.add("ativo");
+      filtroConquistasAtivo = btn.dataset.filtro || "todas";
+      renderizarConquistas();
+    });
+  });
 }
 
 function obterIdiomaAtual() {
@@ -811,6 +979,7 @@ function trocarIdioma(novoIdioma) {
   aplicarTraducoes();
   if (typeof window.renderizarMural === "function") window.renderizarMural();
   if (typeof window.renderizarPerfis === "function") window.renderizarPerfis();
+  if (typeof renderizarConquistas === "function") renderizarConquistas();
 }
 
 // ==========================================
@@ -1465,6 +1634,7 @@ window.forceLogout = function () {
   sessionStorage.clear();
   window.location.replace(window.location.origin + "/login.html");
 };
+
 // ==========================================
 // EDIÇÃO DE PERFIL
 // ==========================================
@@ -1615,31 +1785,49 @@ window.carregarPerfilUsuario = function (matricula) {
 };
 
 // ==========================================
-// 🎭 SELETOR DE AVATAR DO MASCOTE
+// 🎭 SELETOR DE AVATAR DO MASCOTE (com bloqueio)
 // ==========================================
 function renderizarSeletorAvatar() {
   const grid = document.getElementById("avatar-mascote-grid");
   if (!grid) return;
 
+  const cliques = meusCliquesMascote;
+
   grid.innerHTML = AVATARES_MASCOTE.map((av) => {
     const ativo = av.id === avatarSelecionado;
+    const bloqueada = !av.gratis && cliques < av.cliquesNecessarios;
+    const faltam = bloqueada ? av.cliquesNecessarios - cliques : 0;
+
+    let lockHTML = "";
+    if (bloqueada) {
+      lockHTML = `
+        <span class="avatar-lock"><i class="fa-solid fa-lock"></i></span>
+        <span class="avatar-faltam">Faltam ${faltam.toLocaleString("pt-BR")}</span>
+      `;
+    }
+
     return `
       <button
         type="button"
-        class="avatar-mascote-opcao ${ativo ? "ativo" : ""}"
+        class="avatar-mascote-opcao ${ativo ? "ativo" : ""} ${bloqueada ? "bloqueado" : ""}"
         data-avatar="${av.id}"
-        title="${av.nome}"
+        ${bloqueada ? 'disabled aria-disabled="true"' : ""}
+        title="${av.nome}${bloqueada ? " — Bloqueada (" + faltam.toLocaleString("pt-BR") + " cliques faltando)" : ""}"
       >
         ${av.emoji}
+        ${lockHTML}
       </button>`;
   }).join("");
 
-  grid.querySelectorAll(".avatar-mascote-opcao").forEach((btn) => {
+  grid.querySelectorAll(".avatar-mascote-opcao:not(.bloqueado)").forEach((btn) => {
     btn.addEventListener("click", () => {
       avatarSelecionado = btn.dataset.avatar;
       grid.querySelectorAll(".avatar-mascote-opcao").forEach((b) => {
         b.classList.toggle("ativo", b.dataset.avatar === avatarSelecionado);
       });
+      if (window.usuarioLogado.matricula) {
+        desbloquearConquista("estiloso");
+      }
     });
   });
 }
@@ -1801,6 +1989,7 @@ async function salvarPerfilEditado() {
     try {
       await update(ref(db, "mascote/avatares/" + matricula), { avatar: avatarSelecionado });
       localStorage.setItem("mascote_avatar", avatarSelecionado);
+      localStorage.setItem("skin_ativa", avatarSelecionado);
     } catch (e) {
       console.warn("[mascote avatar] Erro:", e);
     }
@@ -2446,6 +2635,8 @@ function bindSimuladores(corpo) {
         atualizarLinhaNota(tr, d, __metaAtual);
         atualizarResumoNotas(__notasCache);
       }
+      contadorSimulador++;
+      if (contadorSimulador >= 10) desbloquearConquista("cientista");
     });
   });
   corpo.querySelectorAll(".btn-meta-disciplina").forEach(function (btn) {
@@ -2564,9 +2755,17 @@ function salvarResumoBoletimFirebase(ano, periodo, disciplinas) {
 
       if (media !== null) { somaMedias += media; contMedias++; }
       faltasTotais += Number(d.numero_faltas) || 0;
+
+      if (media !== null && media >= 100) {
+        desbloquearConquista("nota_100");
+      }
     });
 
     var mediaGeral = contMedias ? somaMedias / contMedias : null;
+
+    if (mediaGeral !== null && mediaGeral >= 90) {
+      desbloquearConquista("nota_maxima");
+    }
 
     update(ref(db, "resumo_boletim/" + mat), {
       mediaGeral: mediaGeral,
@@ -3230,7 +3429,6 @@ function initMenuLateral() {
   }
   marcarAtivosMenuLateral();
 
-  // Highlight do item ativo ao rolar
   const sections = document.querySelectorAll("section[id]");
   const menuItems = document.querySelectorAll(".menu-lateral-nav .menu-item");
   if (menuItems.length > 0) {
@@ -3267,7 +3465,6 @@ function initMenuLateral() {
 // INICIALIZAÇÃO
 // ==========================================
 document.addEventListener("DOMContentLoaded", function () {
-  // Aplica tema e idioma salvos
   aplicarTema(obterTemaAtual());
   aplicarTraducoes();
 
@@ -3277,8 +3474,8 @@ document.addEventListener("DOMContentLoaded", function () {
   initCalculadoraNotas();
   renderizarLegendaCalendario();
   initMenuLateral();
+  inicializarFiltrosConquistas();
 
-  // Dropdown de idioma (header desktop)
   document
     .querySelectorAll("#menu-idioma .dropdown-item")
     .forEach(function (btn) {
@@ -3287,7 +3484,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
 
-  // Dropdown de tema (header desktop)
   document
     .querySelectorAll("#menu-tema .dropdown-item")
     .forEach(function (btn) {
@@ -3311,14 +3507,11 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
 
-  // Botão instalar PWA
   document.getElementById("btn-instalar-app")?.addEventListener("click", instalarPWA);
 
-  // Botão login
   const btnLogin = document.getElementById("suap-login-button");
   if (btnLogin) btnLogin.setAttribute("href", suap.getLoginURL());
 
-  // Botão logout
   const btnLogout = document.getElementById("suap-logout-button");
   if (btnLogout) {
     btnLogout.addEventListener("click", function (e) {
@@ -3327,13 +3520,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Ano dinâmico
   const anoEl = document.getElementById("ano");
   if (anoEl) anoEl.textContent = new Date().getFullYear();
 
-  // ==========================================
-  // AUTENTICAÇÃO
-  // ==========================================
   if (suap.isAuthenticated()) {
     if (window.location.hash.includes("access_token")) {
       history.replaceState(null, null, window.location.pathname);
@@ -3345,9 +3534,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     carregarPeriodosNotas();
 
-    // ==========================================
-    // CALENDÁRIO
-    // ==========================================
     var calendarEl = document.getElementById("calendar");
     if (calendarEl && typeof FullCalendar !== "undefined") {
       function pintarElementoEvento(el, titulo) {
@@ -3398,9 +3584,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    // ==========================================
-    // DADOS DO USUÁRIO (SUAP)
-    // ==========================================
     var scope = suap.getToken().getScope();
     suap.getResource(scope, function (dados_suap) {
       var fotoPath = dados_suap.url_foto_150x200 || dados_suap.url_foto_75x100 || dados_suap.foto || "";
@@ -3434,7 +3617,6 @@ document.addEventListener("DOMContentLoaded", function () {
       window.usuarioLogado.foto = fotoUrl;
       window.usuarioLogado.fotoOriginal = fotoUrl;
 
-      // 🆕 Salva matrícula em localStorage + cookie pra o mascote usar
       try {
         localStorage.setItem("matricula_suap", matriculaSuap);
         document.cookie = `matricula=${matriculaSuap}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`;
@@ -3461,7 +3643,9 @@ document.addEventListener("DOMContentLoaded", function () {
         carregarMetasDisciplinas();
         gerarNotificacoesRecados();
 
-        // 🆕 SALA DOS PROFESSORES — só admin
+        carregarPainelXP();
+        atualizarStreakLogin();
+
         if (ADMIN_MATRICULAS_SALA.includes(matriculaSuap)) {
           setTimeout(() => {
             const secaoSala = document.getElementById("sala-professores");
@@ -3475,14 +3659,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
 
-      // Remove campo "nome" do mural
       const inputRecadoNome = document.getElementById("recado-nome");
       if (inputRecadoNome) {
         inputRecadoNome.style.display = "none";
         inputRecadoNome.removeAttribute("required");
       }
 
-      // Renderiza mural e perfis
       window.renderizarMural();
       window.renderizarPerfis();
     });
