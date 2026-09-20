@@ -2873,7 +2873,7 @@ async function carregarSalaProfessores() {
       });
     });
   }
-  document.querySelectorAll(".sala-tab").forEach((tab) => {
+    document.querySelectorAll(".sala-tab").forEach((tab) => {
     if (tab.dataset.bound) return;
     tab.dataset.bound = "1";
     tab.addEventListener("click", () => {
@@ -2882,8 +2882,21 @@ async function carregarSalaProfessores() {
       document.querySelectorAll(".sala-tab-content").forEach((c) => c.classList.remove("ativo"));
       tab.classList.add("ativo");
       document.getElementById("sala-tab-" + alvo)?.classList.add("ativo");
+
+      // 🆕 Carrega admins quando clicar na aba de admins
+      if (alvo === "admins") {
+        carregarAdmins();
+        carregarLogsAdm();
+      }
     });
   });
+
+  // 🆕 Inicializa painel de admins (botão + carregamento inicial)
+  const btnAddAdm = document.getElementById("adm-btn-adicionar");
+  if (btnAddAdm && !btnAddAdm.dataset.bound) {
+    btnAddAdm.dataset.bound = "1";
+    btnAddAdm.addEventListener("click", window.adicionarAdmin);
+  }
   console.log("[sala] Carregamento concluído. Alunos:", alunos.length);
 }
 
@@ -3269,4 +3282,133 @@ document.addEventListener("DOMContentLoaded", function () {
   } else {
     document.querySelectorAll(".is-anonymous").forEach(function (el) { el.classList.remove("is-hidden"); });
   }
+  // ==========================================
+// 🛡️ PAINEL DE ADMINS (só admin)
+// ==========================================
+async function carregarAdmins() {
+  const listaEl = document.getElementById("adm-lista");
+  if (!listaEl) return;
+
+  listaEl.innerHTML = '<p class="adm-vazio"><i class="fa-solid fa-spinner fa-spin"></i> Carregando...</p>';
+
+  try {
+    const r = await chamarAPI("/api/admin?tipo=listar", {});
+    if (!r.sucesso) throw new Error(r.erro);
+
+    if (r.admins.length === 0) {
+      listaEl.innerHTML = '<p class="adm-vazio">Nenhum admin cadastrado.</p>';
+      return;
+    }
+
+    listaEl.innerHTML = r.admins.map((a) => {
+      const euMesmo = a.matricula === window.usuarioLogado.matricula;
+      const desde = a.desde ? new Date(a.desde).toLocaleDateString("pt-BR") : "—";
+      return `
+        <div class="adm-item">
+          <img src="${a.foto}" alt="${a.nome}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=random'">
+          <div class="adm-item-info">
+            <span class="adm-item-nome">${escaparHTML(a.nome)}${euMesmo ? " (você)" : ""}</span>
+            <span class="adm-item-matricula">${a.matricula}</span>
+            <span class="adm-item-desde">Admin desde ${desde}</span>
+          </div>
+          <button
+            type="button"
+            class="adm-item-btn"
+            onclick="removerAdmin('${a.matricula}', '${escaparHTML(a.nome)}')"
+            ${euMesmo ? "disabled" : ""}
+          >
+            <i class="fa-solid fa-user-minus"></i> Remover
+          </button>
+        </div>
+      `;
+    }).join("");
+  } catch (e) {
+    listaEl.innerHTML = `<p class="adm-vazio" style="color:#ef4444;">Erro: ${e.message}</p>`;
+  }
+}
+
+async function carregarLogsAdm() {
+  const logsEl = document.getElementById("adm-logs");
+  if (!logsEl) return;
+
+  try {
+    const r = await chamarAPI("/api/admin?tipo=logs", {});
+    if (!r.sucesso) throw new Error(r.erro);
+
+    if (r.logs.length === 0) {
+      logsEl.innerHTML = '<p class="adm-vazio">Nenhuma ação registrada ainda.</p>';
+      return;
+    }
+
+    logsEl.innerHTML = r.logs.map((log) => {
+      const data = new Date(log.timestamp).toLocaleString("pt-BR", {
+        day: "2-digit", month: "2-digit",
+        hour: "2-digit", minute: "2-digit"
+      });
+      let texto = "";
+      if (log.acao === "adicionar_admin") texto = `Adicionou <strong>${log.alvo}</strong> como admin`;
+      else if (log.acao === "remover_admin") texto = `Removeu <strong>${log.alvo}</strong> dos admins`;
+      else texto = `${log.acao} → ${log.alvo || ""}`;
+
+      return `
+        <div class="adm-log-item">
+          <span class="adm-log-texto">${texto}</span>
+          <span class="adm-log-data">${data}</span>
+        </div>
+      `;
+    }).join("");
+  } catch (e) {
+    logsEl.innerHTML = `<p class="adm-vazio" style="color:#ef4444;">Erro: ${e.message}</p>`;
+  }
+}
+
+window.adicionarAdmin = async function () {
+  const input = document.getElementById("adm-input-matricula");
+  const btn = document.getElementById("adm-btn-adicionar");
+  if (!input || !btn) return;
+
+  const matricula = input.value.trim();
+  if (!matricula) {
+    exibirToast("Digite uma matrícula", "erro");
+    return;
+  }
+
+  btn.disabled = true;
+  const original = btn.innerHTML;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Adicionando...';
+
+  try {
+    const r = await chamarAPI("/api/admin?tipo=adicionar", {
+      matricula,
+      acao: "adicionar",
+    });
+    if (!r.sucesso) throw new Error(r.erro);
+    exibirToast("Admin adicionado!", "sucesso");
+    input.value = "";
+    carregarAdmins();
+    carregarLogsAdm();
+  } catch (e) {
+    exibirToast("Erro: " + e.message, "erro");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+};
+
+window.removerAdmin = async function (matricula, nome) {
+  if (!confirm(`Remover ${nome} dos admins?`)) return;
+
+  try {
+    const r = await chamarAPI("/api/admin?tipo=adicionar", {
+      matricula,
+      acao: "remover",
+    });
+    if (!r.sucesso) throw new Error(r.erro);
+    exibirToast("Admin removido!", "sucesso");
+    carregarAdmins();
+    carregarLogsAdm();
+  } catch (e) {
+    exibirToast("Erro: " + e.message, "erro");
+  }
+};
 });

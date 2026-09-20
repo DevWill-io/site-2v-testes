@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
   const com = snap.val();
   const ehAutor = com.autor_matricula === matricula;
-  const admin = ehAdmin(matricula);
+  const admin = await ehAdmin(matricula);
 
   if (!ehAutor && !admin) return erro(res, 403, "Sem permissão");
 

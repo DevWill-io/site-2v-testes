@@ -1,5 +1,5 @@
 import { db } from "../../_lib/firebase.js";
-import { autenticar } from "../../_lib/auth.js";
+import { autenticar, ehAdmin } from "../../_lib/auth.js";
 import { ok, erro, metodoObrigatorio, cors, sanitizar } from "../../_lib/helpers.js";
 
 export default async function handler(req, res) {
