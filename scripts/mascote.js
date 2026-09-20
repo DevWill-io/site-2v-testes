@@ -34,23 +34,52 @@ const COOLDOWN_MS = 350;
 const MATRICULA_STORAGE_KEY = "mascote_matricula_temp";
 const MATRICULA_ADMIN = "20261101110002";
 
+// ==========================================
+// 🎭 SKINS DO MASCOTE (deve espelhar o AVATARES_MASCOTE do login.js)
+// ==========================================
 const AVATARES = {
+  // Gratuitas
   padrao: "🐾",
   genio: "🧠",
   pirata: "🏴‍☠️",
   alien: "👽",
+  // Por cliques
+  if: "🎓",
+  jojo: "✨",
   simpson: "🍩",
+  antigo: "🕰️",
   mafioso: "🕴️",
+  retro: "📼",
+  turma1: "1️⃣",
+  turma2: "2️⃣",
+  turma3: "3️⃣",
+  // Por conquista
+  "100": "💯",
+  vestuario: "👕",
+  // Admin
   admin: "👑",
 };
 
 const IMAGENS_MASCOTE = {
+  // Gratuitas
   padrao: "img/MascotePadrao.png",
   genio: "img/MascoteGenio.png",
   pirata: "img/MascotePirata.png",
   alien: "img/MascoteAlien.png",
+  // Por cliques
+  if: "img/MascoteIf.png",
+  jojo: "img/MascoteJojo.png",
   simpson: "img/MascoteSimpson.png",
+  antigo: "img/MascoteAntigo.png",
   mafioso: "img/MascoteMafioso.png",
+  retro: "img/MascoteRetro.png",
+  turma1: "img/MascoteTurma1.png",
+  turma2: "img/MascoteTurma2.png",
+  turma3: "img/MascoteTurma3.png",
+  // Por conquista
+  "100": "img/Mascote100.png",
+  vestuario: "img/MascoteVestuario.png",
+  // Admin
   admin: "img/MascoteAdmin.png",
 };
 
@@ -243,8 +272,15 @@ function atualizarProgressoSkin() {
   }
 
   const SKINS_BLOQUEAVEIS = [
+    { id: "if",      nomeKey: "skin_if",      meta: 500 },
+    { id: "jojo",    nomeKey: "skin_jojo",    meta: 1000 },
     { id: "simpson", nomeKey: "skin_simpson", meta: 1500 },
-    { id: "mafioso", nomeKey: "skin_mafioso", meta: 3000 },
+    { id: "antigo",  nomeKey: "skin_antigo",  meta: 2000 },
+    { id: "mafioso", nomeKey: "skin_mafioso", meta: 2500 },
+    { id: "retro",   nomeKey: "skin_retro",   meta: 3000 },
+    { id: "turma1",  nomeKey: "skin_turma1",  meta: 4000 },
+    { id: "turma2",  nomeKey: "skin_turma2",  meta: 5000 },
+    { id: "turma3",  nomeKey: "skin_turma3",  meta: 10000 },
   ];
 
   const proxima = SKINS_BLOQUEAVEIS.find((s) => cliques < s.meta);
@@ -492,7 +528,6 @@ function atualizarBotaoLimite() {
 function aplicarBloqueioAnonimo() {
   if (!SOU_ANONIMO) return;
 
-  // Adiciona classe de bloqueio no botão
   if (btnCarinho) {
     btnCarinho.disabled = true;
     btnCarinho.classList.add("btn-bloqueado-anon");
@@ -501,22 +536,17 @@ function aplicarBloqueioAnonimo() {
     btnCarinho.style.cursor = "not-allowed";
   }
 
-  // Adiciona aviso visual na imagem do mascote
   if (mascoteImg) {
     mascoteImg.style.filter = "grayscale(0.5) opacity(0.85)";
     mascoteImg.style.cursor = "not-allowed";
     mascoteImg.classList.add("mascote-bloqueado");
-
-    // Tooltip
     mascoteImg.title = "Faça login com SUAP para interagir";
   }
 
-  // Esconde barra de progresso da próxima skin (não faz sentido sem cliques)
   if (skinProgressoBox) {
     skinProgressoBox.style.opacity = "0.5";
   }
 
-  // Texto de aviso embaixo do mascote
   if (mascoteImagem) {
     const aviso = document.createElement("p");
     aviso.className = "mascote-aviso-login";
@@ -528,7 +558,6 @@ function aplicarBloqueioAnonimo() {
   }
 }
 
-// Chama depois de tudo carregado
 setTimeout(aplicarBloqueioAnonimo, 500);
 
 function renderizarRanking() {
@@ -623,13 +652,11 @@ onValue(meuRef, (snap) => {
 });
 
 async function darCarinho(event) {
-  // 🆕 BLOQUEIO: só quem tá logado pode dar carinho
   if (SOU_ANONIMO) {
     mostrarNotificacao(
       "🔒 Faça login com SUAP para dar carinho no mascote!",
       "erro"
     );
-    // Abre o login em nova aba (opcional)
     setTimeout(() => {
       if (confirm("Quer ir para a página de login?")) {
         window.location.href = "login.html";
@@ -668,8 +695,15 @@ async function darCarinho(event) {
 
   const cliquesDepois = cliquesAntes + 1;
   const SKINS_BLOQUEAVEIS = [
-    { id: "simpson", meta: 1500, nomeKey: "skin_simpson" },
-    { id: "mafioso", meta: 3000, nomeKey: "skin_mafioso" },
+    { id: "if",      meta: 500,   nomeKey: "skin_if" },
+    { id: "jojo",    meta: 1000,  nomeKey: "skin_jojo" },
+    { id: "simpson", meta: 1500,  nomeKey: "skin_simpson" },
+    { id: "antigo",  meta: 2000,  nomeKey: "skin_antigo" },
+    { id: "mafioso", meta: 2500,  nomeKey: "skin_mafioso" },
+    { id: "retro",   meta: 3000,  nomeKey: "skin_retro" },
+    { id: "turma1",  meta: 4000,  nomeKey: "skin_turma1" },
+    { id: "turma2",  meta: 5000,  nomeKey: "skin_turma2" },
+    { id: "turma3",  meta: 10000, nomeKey: "skin_turma3" },
   ];
   const traduzir = window.t ? window.t : (k) => k;
 
@@ -705,9 +739,6 @@ async function darCarinho(event) {
       );
     }, i * 60);
   }
-
-  // ⚠️ NÃO escreve mais direto no Firebase (agora é só via API)
-  // A API já incrementa cliquesMascote + xp + total + por_aluno
 
   const faltam = LIMITE_CARINHOS - carinhosGlobais - 1;
   let frases;
