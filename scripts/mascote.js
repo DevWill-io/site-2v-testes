@@ -1,7 +1,11 @@
 // ==========================================
 // 🐾 MASCOTE — Firebase v12 modular + Interações
 // ==========================================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+// Leitura em tempo real: Firebase onValue (permitido)
+// Escrita de carinho: /api/mascote/carinho (via API quando logado)
+// Anônimo: mantém comportamento antigo (localStorage + runTransaction)
+// ==========================================
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import {
   getDatabase,
   ref,
@@ -22,7 +26,8 @@ const firebaseConfig = {
   appId: "1:993749229757:web:ec87d8ca3b8950d70d57d4",
 };
 
-const app = initializeApp(firebaseConfig, "mascoteApp");
+const app = getApps().find((a) => a.name === "mascoteApp")
+  || initializeApp(firebaseConfig, "mascoteApp");
 const db = getDatabase(app);
 
 // ==========================================
@@ -59,6 +64,31 @@ const IMAGENS_MASCOTE = {
 const IMAGEM_MASCOTE_PADRAO = "img/MascotePadrao.png";
 
 // ==========================================
+// 🌐 CHAMADA À API (helper)
+// ==========================================
+function obterTokenSuap() {
+  const m = document.cookie.match(/(?:^|;\s*)suapToken=([^;]+)/);
+  if (m) return decodeURIComponent(m[1]);
+  return localStorage.getItem("suapToken") || null;
+}
+
+async function chamarAPI(endpoint, corpo) {
+  const token = obterTokenSuap();
+  if (!token) throw new Error("Sem token SUAP");
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+    body: JSON.stringify(corpo || {}),
+  });
+  const dados = await res.json();
+  if (!res.ok) throw new Error(dados.erro || "Erro na API");
+  return dados;
+}
+
+// ==========================================
 // ESTADO
 // ==========================================
 let carinhosGlobais = 0;
@@ -73,17 +103,14 @@ let rankingDataCache = {};
 // PEGA MATRÍCULA (SUAP → cookie → localStorage → anônimo)
 // ==========================================
 function obterMatricula() {
-  // 1) Cookie do SUAP
   const matCookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("matricula="));
   if (matCookie) return matCookie.split("=")[1];
 
-  // 2) LocalStorage
   const matLocal = localStorage.getItem("matricula_suap");
   if (matLocal) return matLocal;
 
-  // 3) Anônimo
   let temp = localStorage.getItem(MATRICULA_STORAGE_KEY);
   if (!temp) {
     temp = "anon_" + Math.random().toString(36).slice(2, 11);
@@ -94,23 +121,13 @@ function obterMatricula() {
 
 const MINHA_MATRICULA = obterMatricula();
 const SOU_ADMIN = MINHA_MATRICULA === MATRICULA_ADMIN;
-console.log("[mascote] Matrícula usada:", MINHA_MATRICULA, "| É admin?", SOU_ADMIN);
+const SOU_ANONIMO = MINHA_MATRICULA.startsWith("anon_");
+console.log("[mascote] Matrícula usada:", MINHA_MATRICULA, "| É admin?", SOU_ADMIN, "| Anônimo?", SOU_ANONIMO);
 
 // ==========================================
 // Inicializa avatarAtual com prioridade correta
-// Fonte de verdade: xpCore (que puxa do Firebase) > localStorage
 // ==========================================
-function _resolverAvatarInicial() {
-  // 1) Se xpCore está pronto, ele é a fonte de verdade (Firebase)
-  if (window.xpCore?.estaPronto?.()) {
-    const skin = window.xpCore.obterSkinAtiva();
-    if (skin && IMAGENS_MASCOTE[skin]) {
-      if (skin === "admin" && !SOU_ADMIN) return "padrao";
-      return skin;
-    }
-  }
-
-  // 2) Fallback: localStorage (comportamento antigo)
+let avatarAtual = (function () {
   if (SOU_ADMIN) {
     const skinSalva = localStorage.getItem("skin_ativa");
     if (!skinSalva || !IMAGENS_MASCOTE[skinSalva]) return "admin";
@@ -121,29 +138,8 @@ function _resolverAvatarInicial() {
   const escolhido = skinAtiva || avatarLegado || "padrao";
   if (escolhido === "admin") return "padrao";
   return IMAGENS_MASCOTE[escolhido] ? escolhido : "padrao";
-}
+})();
 
-let avatarAtual = _resolverAvatarInicial();
-
-// Se xpCore ainda não estava pronto, escuta o evento pra atualizar
-if (!window.xpCore?.estaPronto?.()) {
-  window.addEventListener("xpCore:pronto", () => {
-    const skin = window.xpCore?.obterSkinAtiva?.();
-    if (skin && IMAGENS_MASCOTE[skin]) {
-      if (skin === "admin" && !SOU_ADMIN) return;
-      if (skin !== avatarAtual) {
-        avatarAtual = skin;
-        try {
-          localStorage.setItem("skin_ativa", skin);
-          localStorage.setItem("mascote_avatar", skin);
-        } catch (e) {}
-        mostrarAvatarFlutuante();
-      }
-    }
-  }, { once: true });
-}
-
-// Se for admin e a skin salva não for admin, força admin
 if (SOU_ADMIN) {
   const skinSalva = localStorage.getItem("skin_ativa");
   if (!skinSalva || skinSalva === "padrao") {
@@ -169,7 +165,6 @@ const rankingMeusCarinhos = document.getElementById("ranking-meus-carinhos");
 const btnToggleRanking = document.getElementById("btn-toggle-ranking");
 const mascoteRankingEl = document.getElementById("mascote-ranking");
 
-// Elementos da barra de progresso da skin
 const skinProgressoBox = document.getElementById("mascote-skin-progresso");
 const proximaSkinNome = document.getElementById("proxima-skin-nome");
 const proximaSkinContagem = document.getElementById("proxima-skin-contagem");
@@ -236,9 +231,7 @@ function tocarSom(tipo = "carinho") {
         o.stop(audioCtx.currentTime + i * 0.1 + 0.4);
       });
     }
-  } catch (e) {
-    // navegador pode bloquear antes de interação do usuário
-  }
+  } catch (e) {}
 }
 
 // ==========================================
@@ -273,17 +266,12 @@ function emojiCoracao() {
 }
 
 function mostrarAvatarFlutuante() {
-  // 🎯 Troca a IMAGEM principal do mascote
   if (mascoteImg) {
     const novaSrc = IMAGENS_MASCOTE[avatarAtual] || IMAGEM_MASCOTE_PADRAO;
-
-    // Só troca se for diferente (evita repaint desnecessário)
     if (mascoteImg.getAttribute("src") !== novaSrc) {
-      // Efeito suave ao trocar
       mascoteImg.style.transition = "opacity 0.3s ease, transform 0.3s ease";
       mascoteImg.style.opacity = "0";
       mascoteImg.style.transform = "scale(0.85)";
-
       setTimeout(() => {
         mascoteImg.src = novaSrc;
         mascoteImg.style.opacity = "1";
@@ -291,10 +279,7 @@ function mostrarAvatarFlutuante() {
       }, 250);
     }
   }
-  // Atualiza data-skin pra CSS/JS saberem qual tá ativa
-  if (mascoteImg) {
-    mascoteImg.setAttribute("data-skin", avatarAtual);
-  }
+  if (mascoteImg) mascoteImg.setAttribute("data-skin", avatarAtual);
 }
 mostrarAvatarFlutuante();
 
@@ -304,7 +289,6 @@ mostrarAvatarFlutuante();
 function atualizarProgressoSkin() {
   if (!skinProgressoBox || !skinProgressoFill) return;
 
-  // Fonte de verdade: xpCore (Firebase) > script.js > localStorage
   let cliques;
   if (window.xpCore?.estaPronto?.()) {
     cliques = window.xpCore.obterCliquesMascote();
@@ -314,10 +298,8 @@ function atualizarProgressoSkin() {
     cliques = parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
   }
 
-  // Função auxiliar pra traduzir
   const traduzir = window.t ? window.t : (k) => k;
 
-  // Admin tem todas as skins, então não mostra progresso
   if (SOU_ADMIN) {
     skinProgressoBox.classList.add("completo");
     if (proximaSkinNome) proximaSkinNome.textContent = traduzir("skin_admin") || "👑 Admin";
@@ -326,17 +308,14 @@ function atualizarProgressoSkin() {
     return;
   }
 
-  // Lista de skins bloqueáveis (com cliquesNecessarios > 0)
   const SKINS_BLOQUEAVEIS = [
     { id: "simpson", nomeKey: "skin_simpson", meta: 1500 },
     { id: "mafioso", nomeKey: "skin_mafioso", meta: 3000 },
   ];
 
-  // Encontra a próxima skin a desbloquear
   const proxima = SKINS_BLOQUEAVEIS.find((s) => cliques < s.meta);
 
   if (!proxima) {
-    // Todas desbloqueadas 🎉
     skinProgressoBox.classList.add("completo");
     if (proximaSkinNome) proximaSkinNome.textContent = traduzir("skin_todas_desbloqueadas") || "🎉 Todas desbloqueadas!";
     if (proximaSkinContagem) proximaSkinContagem.textContent = "✓";
@@ -345,7 +324,6 @@ function atualizarProgressoSkin() {
   }
 
   skinProgressoBox.classList.remove("completo");
-
   const nome = traduzir(proxima.nomeKey) || proxima.id;
   if (proximaSkinNome) proximaSkinNome.textContent = nome;
   if (proximaSkinContagem) {
@@ -355,19 +333,15 @@ function atualizarProgressoSkin() {
   skinProgressoFill.style.width = `${percentual}%`;
 }
 
-// Chama na inicialização
 atualizarProgressoSkin();
 
-// Escuta mudanças de cliques (evento do script.js)
 window.addEventListener("mascote:cliques", () => {
   atualizarProgressoSkin();
 });
 
-// Escuta mudanças de skin
 window.addEventListener("skin:mudou", (e) => {
   const skinId = e.detail?.skinId;
   if (skinId && IMAGENS_MASCOTE[skinId]) {
-    // Bloqueia troca pra admin se não for admin
     if (skinId === "admin" && !SOU_ADMIN) return;
     avatarAtual = skinId;
     try {
@@ -378,7 +352,6 @@ window.addEventListener("skin:mudou", (e) => {
   }
 });
 
-// Escuta mudanças de skin em outra aba
 window.addEventListener("storage", (e) => {
   if (e.key === "skin_ativa" && e.newValue && IMAGENS_MASCOTE[e.newValue]) {
     if (e.newValue === "admin" && !SOU_ADMIN) return;
@@ -387,21 +360,15 @@ window.addEventListener("storage", (e) => {
   }
 });
 
-// Escuta mudanças no avatar em tempo real (Firebase legado)
 onValue(ref(db, "mascote/avatares/" + MINHA_MATRICULA), (snap) => {
   const av = snap.val()?.avatar;
   if (av && AVATARES[av]) {
-    // Bloqueia avatar admin pra não-admin
     if (av === "admin" && !SOU_ADMIN) return;
-
-    // Só sobrescreve se NÃO for uma skin nova (pra preservar escolha do novo sistema)
     const skinAtualLocal = localStorage.getItem("skin_ativa");
     const isSkinNova = skinAtualLocal === "simpson" || skinAtualLocal === "mafioso" || skinAtualLocal === "admin";
     if (!isSkinNova) {
       avatarAtual = av;
-      try {
-        localStorage.setItem("mascote_avatar", av);
-      } catch (e) {}
+      try { localStorage.setItem("mascote_avatar", av); } catch (e) {}
       mostrarAvatarFlutuante();
     }
   }
@@ -520,9 +487,7 @@ function verificarNovoMarco(valorAnterior, valorNovo) {
         soltarConfete(marco.valor >= 1000000 ? 120 : 40);
         tocarSom(marco.valor >= 1000000 ? "limite" : "marco");
         mostrarNotificacao(
-          `${marco.icone} NOVO MARCO: ${marco.valor.toLocaleString(
-            "pt-BR"
-          )} CARINHOS! 🎉`,
+          `${marco.icone} NOVO MARCO: ${marco.valor.toLocaleString("pt-BR")} CARINHOS! 🎉`,
           "sucesso"
         );
       }
@@ -539,9 +504,7 @@ function atualizarProgresso() {
     progressoFill.style.width = `${percentual}%`;
   }
   if (progressoTexto) {
-    progressoTexto.textContent = `${carinhosGlobais.toLocaleString(
-      "pt-BR"
-    )} / ${LIMITE_CARINHOS.toLocaleString("pt-BR")}`;
+    progressoTexto.textContent = `${carinhosGlobais.toLocaleString("pt-BR")} / ${LIMITE_CARINHOS.toLocaleString("pt-BR")}`;
   }
   if (mascoteLikesSpan) {
     mascoteLikesSpan.textContent = carinhosGlobais.toLocaleString("pt-BR");
@@ -648,19 +611,16 @@ function renderizarRanking() {
   }
 }
 
-// Escuta perfis (para pegar nome e foto no ranking)
 onValue(ref(db, "perfis_alunos"), (snap) => {
   perfisCache = snap.val() || {};
   renderizarRanking();
 });
 
-// Escuta ranking em tempo real
 onValue(ref(db, "mascote/por_aluno"), (snap) => {
   rankingDataCache = snap.val() || {};
   renderizarRanking();
 });
 
-// Toggle colapsar
 btnToggleRanking?.addEventListener("click", () => {
   const colapsado = mascoteRankingEl?.classList.toggle("colapsado");
   btnToggleRanking.setAttribute("aria-expanded", colapsado ? "false" : "true");
@@ -688,7 +648,7 @@ onValue(meuRef, (snap) => {
 });
 
 // ==========================================
-// 💖 DAR CARINHO (com cooldown + transaction)
+// 💖 DAR CARINHO
 // ==========================================
 async function darCarinho(event) {
   if (!podeClicar) return;
@@ -710,33 +670,26 @@ async function darCarinho(event) {
   tocarSom("carinho");
 
   // ==========================================
-  // 🆕 REGISTRA CLIQUE + XP (via xpCore)
+  // REGISTRA CLIQUE + XP
+  // - Logado: xpCore.incrementarCliquesMascote() (chama a API)
+  // - Anônimo: fallback local
   // ==========================================
   const cliquesAntes = window.xpCore?.estaPronto?.()
     ? window.xpCore.obterCliquesMascote()
-    : (window.obterCliquesMascote
-        ? window.obterCliquesMascote()
-        : parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10));
+    : parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
 
-  // Delega pro xpCore (Firebase quando logado, localStorage quando anônimo)
   if (window.xpCore?.estaPronto?.()) {
+    // A API do carinho já incrementa cliquesMascote + xp + total + por_aluno
     window.xpCore.incrementarCliquesMascote(1);
-    window.xpCore.incrementarXP(1, "clique_mascote");
-  } else if (window.adicionarCliqueMascote) {
-    // Fallback: script.js delegação (Patch #4)
-    window.adicionarCliqueMascote(1);
-    if (window.adicionarXP) window.adicionarXP(1, "clique_mascote");
   } else {
-    // Último fallback: localStorage puro
     localStorage.setItem("xp_cliques_mascote", String(cliquesAntes + 1));
     const xpAtual = parseInt(localStorage.getItem("xp_total") || "0", 10);
     localStorage.setItem("xp_total", String(xpAtual + 1));
   }
 
-  // Recalcula a barra da próxima skin
   atualizarProgressoSkin();
 
-  // 🆕 Detecta desbloqueio de skin nova
+  // Detecta desbloqueio de skin nova
   const cliquesDepois = cliquesAntes + 1;
   const SKINS_BLOQUEAVEIS = [
     { id: "simpson", meta: 1500, nomeKey: "skin_simpson" },
@@ -746,7 +699,6 @@ async function darCarinho(event) {
 
   SKINS_BLOQUEAVEIS.forEach((s) => {
     if (cliquesAntes < s.meta && cliquesDepois >= s.meta) {
-      // 🎉 Acabou de desbloquear!
       soltarConfete(80);
       tocarSom("desbloqueio");
       const nome = traduzir(s.nomeKey) || s.id;
@@ -756,9 +708,7 @@ async function darCarinho(event) {
     }
   });
 
-  // ==========================================
   // Corações voando
-  // ==========================================
   let x, y;
   if (event && event.clientX && event.clientY) {
     x = event.clientX;
@@ -781,18 +731,24 @@ async function darCarinho(event) {
     }, i * 60);
   }
 
-  try {
-    await runTransaction(totalRef, (valorAtual) => {
-      const v = Number(valorAtual) || 0;
-      if (v >= LIMITE_CARINHOS) return v;
-      return v + 1;
-    });
-    await runTransaction(meuRef, (valorAtual) => {
-      const v = Number(valorAtual) || 0;
-      return v + 1;
-    });
-  } catch (err) {
-    console.error("[mascote] Erro ao salvar carinho:", err);
+  // ==========================================
+  // Se anônimo: escreve direto no Firebase (fallback)
+  // Se logado: API já cuidou de tudo em incrementarCliquesMascote()
+  // ==========================================
+  if (SOU_ANONIMO) {
+    try {
+      await runTransaction(totalRef, (valorAtual) => {
+        const v = Number(valorAtual) || 0;
+        if (v >= LIMITE_CARINHOS) return v;
+        return v + 1;
+      });
+      await runTransaction(meuRef, (valorAtual) => {
+        const v = Number(valorAtual) || 0;
+        return v + 1;
+      });
+    } catch (err) {
+      console.error("[mascote] Erro ao salvar carinho anônimo:", err);
+    }
   }
 
   const faltam = LIMITE_CARINHOS - carinhosGlobais - 1;
