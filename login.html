@@ -727,11 +727,6 @@
           <div id="calendar"></div>
         </div>
 
-        <button type="button" id="btn-novo-evento" class="btn-novo-evento is-hidden">
-          <i class="fa-solid fa-plus"></i>
-          <span>Novo Evento</span>
-        </button>
-
         <div class="calendario-legenda" id="calendario-legenda"></div>
       </div>
     </section>
@@ -1023,108 +1018,6 @@
             Usar meta global
           </button>
           <button type="button" class="button is-success" data-salvar data-i18n="salvar">Salvar</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- MODAL NOVO EVENTO -->
-    <div id="modal-novo-evento" class="modal-overlay is-hidden">
-      <div class="modal-content modal-evento" onclick="event.stopPropagation()">
-        <button type="button" class="modal-close" id="btn-fechar-evento" aria-label="Fechar">
-          &times;
-        </button>
-
-        <h2 class="modal-title">
-          <i class="fa-solid fa-calendar-plus"></i>
-          <span>Novo Evento</span>
-        </h2>
-        <p class="modal-subtitle">O evento aparece pra todos os alunos na hora.</p>
-
-        <form id="form-novo-evento">
-          <label class="field-label" for="evento-titulo">Título *</label>
-          <input type="text" id="evento-titulo" maxlength="200" placeholder="Ex: Prova de Matemática" required />
-
-          <label class="field-label" for="evento-descricao">Descrição</label>
-          <textarea id="evento-descricao" maxlength="2000" rows="3" placeholder="Detalhes (opcional)"></textarea>
-
-          <label class="field-label" for="evento-local">Local</label>
-          <input type="text" id="evento-local" maxlength="200" placeholder="Ex: Sala 12 (opcional)" />
-
-          <label class="field-checkbox" for="evento-dia-todo">
-            <input type="checkbox" id="evento-dia-todo" />
-            <span class="field-checkbox-marca"></span>
-            <span class="field-checkbox-texto">
-              <i class="fa-solid fa-sun"></i>
-              Evento de dia todo (sem horário)
-            </span>
-          </label>
-
-          <div id="evento-datas-horario" class="evento-datas-grid">
-            <div>
-              <label class="field-label" for="evento-inicio">Início *</label>
-              <input type="datetime-local" id="evento-inicio" />
-            </div>
-            <div>
-              <label class="field-label" for="evento-fim">Fim *</label>
-              <input type="datetime-local" id="evento-fim" />
-            </div>
-          </div>
-
-          <div id="evento-datas-todo" class="evento-datas-grid is-hidden">
-            <div>
-              <label class="field-label" for="evento-inicio-data">Data de início *</label>
-              <input type="date" id="evento-inicio-data" />
-            </div>
-            <div>
-              <label class="field-label" for="evento-fim-data">Data de término *</label>
-              <input type="date" id="evento-fim-data" />
-            </div>
-          </div>
-
-          <label class="field-label" for="evento-cor">Cor do evento</label>
-          <select id="evento-cor">
-            <option value="roxo" selected>🟣 Roxo (Reuniões/Aulas)</option>
-            <option value="vermelho">🔴 Vermelho (Provas)</option>
-            <option value="laranja">🟠 Laranja (Trabalhos)</option>
-            <option value="verde">🟢 Verde (Feriados)</option>
-            <option value="azul">🔵 Azul (Esportes)</option>
-            <option value="rosa">🩷 Rosa (Festas)</option>
-          </select>
-
-          <div id="evento-status" class="evento-status is-hidden"></div>
-
-          <div class="modal-actions">
-            <button type="button" class="button btn-cancelar" id="btn-cancelar-evento">Cancelar</button>
-            <button type="submit" class="button is-success" id="btn-criar-evento">
-              <i class="fa-solid fa-calendar-plus"></i> Criar evento
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- MODAL OPÇÕES DO EVENTO -->
-    <div id="modal-opcoes-evento" class="modal-overlay is-hidden">
-      <div class="modal-content modal-opcoes-evento" onclick="event.stopPropagation()">
-        <button type="button" class="modal-close" id="btn-fechar-opcoes" aria-label="Fechar">
-          &times;
-        </button>
-
-        <h2 class="modal-title">
-          <i class="fa-solid fa-calendar-day"></i>
-          <span id="opcoes-evento-titulo">Evento</span>
-        </h2>
-        <p class="modal-subtitle" id="opcoes-evento-data"></p>
-
-        <div class="opcoes-evento-acoes">
-          <button type="button" id="btn-editar-evento" class="btn-opcao-evento editar">
-            <i class="fa-solid fa-pen"></i>
-            <span>Editar</span>
-          </button>
-          <button type="button" id="btn-excluir-evento" class="btn-opcao-evento excluir">
-            <i class="fa-solid fa-trash"></i>
-            <span>Excluir</span>
-          </button>
         </div>
       </div>
     </div>
