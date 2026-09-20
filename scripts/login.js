@@ -159,6 +159,7 @@ const TRADUCOES_LOGIN = {
     dias: "dias", conquistas_titulo: "Conquistas", todas: "Todas",
     desbloqueadas: "Desbloqueadas", bloqueadas: "Bloqueadas",
     proxima_skin: "Próxima skin:", skin_bloqueada: "Bloqueada",
+    skin_admin: "Admin",
     conquistas_visiveis_titulo: "Conquistas no perfil",
     conquistas_visiveis_desc: "Escolha quais conquistas os outros verão no seu perfil. Sem seleção = mostra todas.",
     menu: "Menu", nav_notas: "Notas", nav_notas_desc: "Sua calculadora",
@@ -238,6 +239,7 @@ const TRADUCOES_LOGIN = {
     dias: "days", conquistas_titulo: "Achievements", todas: "All",
     desbloqueadas: "Unlocked", bloqueadas: "Locked",
     proxima_skin: "Next skin:", skin_bloqueada: "Locked",
+    skin_admin: "Admin",
     conquistas_visiveis_titulo: "Achievements on profile",
     conquistas_visiveis_desc: "Choose which achievements others will see on your profile. No selection = shows all.",
     nav_inicio: "Home", nav_inicio_desc: "Homepage", menu: "Menu",
@@ -317,6 +319,7 @@ const TRADUCOES_LOGIN = {
     dias: "días", conquistas_titulo: "Logros", todas: "Todos",
     desbloqueadas: "Desbloqueados", bloqueadas: "Bloqueados",
     proxima_skin: "Próxima skin:", skin_bloqueada: "Bloqueada",
+    skin_admin: "Admin",
     conquistas_visiveis_titulo: "Logros en el perfil",
     conquistas_visiveis_desc: "Elige qué logros verán los demás en tu perfil. Sin selección = muestra todos.",
     nav_inicio: "Inicio", nav_inicio_desc: "Página de inicio", menu: "Menú",
@@ -1619,7 +1622,6 @@ function renderizarSeletorAvatar() {
 
   const cliques = meusCliquesMascote;
   const skins = obterSkinsDisponiveis();
-  const ehAdmin = window.usuarioLogado.matricula === MATRICULA_ADMIN;
 
   grid.innerHTML = skins.map((av) => {
     const ativo = av.id === avatarSelecionado;
@@ -2664,7 +2666,7 @@ function atualizarTimersContagem() {
 }
 
 // ==========================================
-// SALA DOS PROFESSORES (bugs corrigidos)
+// SALA DOS PROFESSORES
 // ==========================================
 async function carregarSalaProfessores() {
   if (__salaDadosCarregados) return;

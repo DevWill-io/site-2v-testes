@@ -31,9 +31,10 @@ const db = getDatabase(app);
 const LIMITE_CARINHOS = 1000000;
 const COOLDOWN_MS = 350;
 const MATRICULA_STORAGE_KEY = "mascote_matricula_temp";
+const MATRICULA_ADMIN = "20261101110002";
 
 // ==========================================
-// 🎭 AVATARES DO MASCOTE
+// 🎭 AVATARES DO MASCOTE (com admin)
 // ==========================================
 const AVATARES = {
   padrao: "🐾",
@@ -42,9 +43,9 @@ const AVATARES = {
   alien: "👽",
   simpson: "🍩",
   mafioso: "🕴️",
+  admin: "👑",
 };
 
-// 🖼️ Imagens reais de cada avatar
 const IMAGENS_MASCOTE = {
   padrao: "img/MascotePadrao.png",
   genio: "img/MascoteGenio.png",
@@ -52,6 +53,7 @@ const IMAGENS_MASCOTE = {
   alien: "img/MascoteAlien.png",
   simpson: "img/MascoteSimpson.png",
   mafioso: "img/MascoteMafioso.png",
+  admin: "img/MascoteAdmin.png",
 };
 
 const IMAGEM_MASCOTE_PADRAO = "img/MascotePadrao.png";
@@ -64,13 +66,6 @@ let meusCarinhos = 0;
 let podeClicar = true;
 let somLigado = localStorage.getItem("mascote_som") !== "off";
 let marcosAnteriores = new Set();
-let avatarAtual = (function () {
-  // 🆕 Prioridade: skin_ativa (novo sistema) → mascote_avatar (legado) → padrao
-  const skinAtiva = localStorage.getItem("skin_ativa");
-  const avatarLegado = localStorage.getItem("mascote_avatar");
-  const escolhido = skinAtiva || avatarLegado || "padrao";
-  return IMAGENS_MASCOTE[escolhido] ? escolhido : "padrao";
-})();
 let perfisCache = {};
 let rankingDataCache = {};
 
@@ -98,7 +93,36 @@ function obterMatricula() {
 }
 
 const MINHA_MATRICULA = obterMatricula();
-console.log("[mascote] Matrícula usada:", MINHA_MATRICULA);
+const SOU_ADMIN = MINHA_MATRICULA === MATRICULA_ADMIN;
+console.log("[mascote] Matrícula usada:", MINHA_MATRICULA, "| É admin?", SOU_ADMIN);
+
+// ==========================================
+// Inicializa avatarAtual com prioridade correta
+// ==========================================
+let avatarAtual = (function () {
+  // Se for admin, força admin se não tiver uma skin customizada
+  if (SOU_ADMIN) {
+    const skinSalva = localStorage.getItem("skin_ativa");
+    if (!skinSalva || !IMAGENS_MASCOTE[skinSalva]) return "admin";
+    return skinSalva;
+  }
+  // Não-admin: pega skin salva ou padrão
+  const skinAtiva = localStorage.getItem("skin_ativa");
+  const avatarLegado = localStorage.getItem("mascote_avatar");
+  const escolhido = skinAtiva || avatarLegado || "padrao";
+  // Bloqueia admin pra não-admin
+  if (escolhido === "admin") return "padrao";
+  return IMAGENS_MASCOTE[escolhido] ? escolhido : "padrao";
+})();
+
+// Se for admin e a skin salva não for admin, força admin
+if (SOU_ADMIN) {
+  const skinSalva = localStorage.getItem("skin_ativa");
+  if (!skinSalva || skinSalva === "padrao") {
+    avatarAtual = "admin";
+    try { localStorage.setItem("skin_ativa", "admin"); } catch (e) {}
+  }
+}
 
 // ==========================================
 // ELEMENTOS DO DOM
@@ -117,7 +141,7 @@ const rankingMeusCarinhos = document.getElementById("ranking-meus-carinhos");
 const btnToggleRanking = document.getElementById("btn-toggle-ranking");
 const mascoteRankingEl = document.getElementById("mascote-ranking");
 
-// 🆕 Elementos da barra de progresso da SKIN
+// Elementos da barra de progresso da skin
 const skinProgressoBox = document.getElementById("mascote-skin-progresso");
 const proximaSkinNome = document.getElementById("proxima-skin-nome");
 const proximaSkinContagem = document.getElementById("proxima-skin-contagem");
@@ -171,7 +195,6 @@ function tocarSom(tipo = "carinho") {
         o.stop(audioCtx.currentTime + i * 0.12 + 0.35);
       });
     } else if (tipo === "desbloqueio") {
-      // 🆕 Som especial pra desbloquear skin
       [659.25, 880, 1046.5, 1318.5, 1567.98].forEach((freq, i) => {
         const o = audioCtx.createOscillator();
         const g = audioCtx.createGain();
@@ -258,7 +281,19 @@ function atualizarProgressoSkin() {
     ? window.obterCliquesMascote()
     : parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
 
-  // Lista de skins bloqueadas (com cliquesNecessarios > 0)
+  // Função auxiliar pra traduzir
+  const traduzir = window.t ? window.t : (k) => k;
+
+  // Admin tem todas as skins, então não mostra progresso
+  if (SOU_ADMIN) {
+    skinProgressoBox.classList.add("completo");
+    if (proximaSkinNome) proximaSkinNome.textContent = traduzir("skin_admin") || "👑 Admin";
+    if (proximaSkinContagem) proximaSkinContagem.textContent = "✓";
+    skinProgressoFill.style.width = "100%";
+    return;
+  }
+
+  // Lista de skins bloqueáveis (com cliquesNecessarios > 0)
   const SKINS_BLOQUEAVEIS = [
     { id: "simpson", nomeKey: "skin_simpson", meta: 1500 },
     { id: "mafioso", nomeKey: "skin_mafioso", meta: 3000 },
@@ -266,11 +301,6 @@ function atualizarProgressoSkin() {
 
   // Encontra a próxima skin a desbloquear
   const proxima = SKINS_BLOQUEAVEIS.find((s) => cliques < s.meta);
-
-  // Função auxiliar pra traduzir
-  const traduzir = window.t
-    ? window.t
-    : (k) => k;
 
   if (!proxima) {
     // Todas desbloqueadas 🎉
@@ -295,19 +325,31 @@ function atualizarProgressoSkin() {
 // Chama na inicialização
 atualizarProgressoSkin();
 
-// 🆕 Escuta mudanças de cliques (evento do script.js)
+// Escuta mudanças de cliques (evento do script.js)
 window.addEventListener("mascote:cliques", () => {
   atualizarProgressoSkin();
 });
 
-// 🆕 Escuta mudanças de skin
+// Escuta mudanças de skin
 window.addEventListener("skin:mudou", (e) => {
   const skinId = e.detail?.skinId;
   if (skinId && IMAGENS_MASCOTE[skinId]) {
+    // Bloqueia troca pra admin se não for admin
+    if (skinId === "admin" && !SOU_ADMIN) return;
     avatarAtual = skinId;
     try {
       localStorage.setItem("mascote_avatar", skinId);
+      localStorage.setItem("skin_ativa", skinId);
     } catch (err) {}
+    mostrarAvatarFlutuante();
+  }
+});
+
+// Escuta mudanças de skin em outra aba
+window.addEventListener("storage", (e) => {
+  if (e.key === "skin_ativa" && e.newValue && IMAGENS_MASCOTE[e.newValue]) {
+    if (e.newValue === "admin" && !SOU_ADMIN) return;
+    avatarAtual = e.newValue;
     mostrarAvatarFlutuante();
   }
 });
@@ -316,9 +358,12 @@ window.addEventListener("skin:mudou", (e) => {
 onValue(ref(db, "mascote/avatares/" + MINHA_MATRICULA), (snap) => {
   const av = snap.val()?.avatar;
   if (av && AVATARES[av]) {
+    // Bloqueia avatar admin pra não-admin
+    if (av === "admin" && !SOU_ADMIN) return;
+
     // Só sobrescreve se NÃO for uma skin nova (pra preservar escolha do novo sistema)
     const skinAtualLocal = localStorage.getItem("skin_ativa");
-    const isSkinNova = skinAtualLocal === "simpson" || skinAtualLocal === "mafioso";
+    const isSkinNova = skinAtualLocal === "simpson" || skinAtualLocal === "mafioso" || skinAtualLocal === "admin";
     if (!isSkinNova) {
       avatarAtual = av;
       try {
