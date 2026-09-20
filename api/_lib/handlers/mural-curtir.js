@@ -1,6 +1,6 @@
 import { db } from "../../_lib/firebase.js";
-import { autenticar } from "../auth.js";
-import { ok, erro, metodoObrigatorio, cors, sanitizar } from "../helpers.js";
+import { autenticar } from "../../_lib/auth.js";
+import { ok, erro, metodoObrigatorio, cors, sanitizar } from "../../_lib/helpers.js";
 
 export default async function handler(req, res) {
   cors(res);
@@ -12,6 +12,10 @@ export default async function handler(req, res) {
 
   const id = sanitizar(req.body?.id, 40);
   if (!id) return erro(res, 400, "ID obrigatório");
+
+  // 🆕 Valida se o recado existe
+  const snap = await db.ref(`mural_recados/${id}`).get();
+  if (!snap.exists()) return erro(res, 404, "Recado não encontrado");
 
   const ref = db.ref(`mural_recados/${id}/likes`);
   let curtiu = false;
@@ -31,7 +35,6 @@ export default async function handler(req, res) {
 
   if (!resultado.committed) return erro(res, 500, "Erro ao curtir");
 
-  // Se curtiu (e não descurtiu), incrementa contador + XP
   if (curtiu) {
     await Promise.all([
       db.ref(`usuarios_xp/${matricula}/contadores/curtidas`).transaction((a) => (Number(a) || 0) + 1),
