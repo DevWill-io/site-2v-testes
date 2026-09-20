@@ -4,6 +4,7 @@
 // Fonte de verdade: Firebase (usuarios_xp/{matricula})
 // Cache: localStorage + memória (pra UI não travar)
 // Anônimo: só localStorage (comportamento preservado)
+// Rate limiting: proteção client-side contra abuso
 // ==========================================
 
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
@@ -18,7 +19,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
 // ==========================================
-// CONFIG
+// CONFIG FIREBASE
 // ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyA_wDDRCRJL_WviT6FBorz8dhnHe0-pI8s",
@@ -29,7 +30,6 @@ const firebaseConfig = {
   appId: "1:993749229757:web:ec87d8ca3b8950d70d57d4",
 };
 
-// Reaproveita app existente (o mascote.js já criou um "mascoteApp")
 const app = getApps().find((a) => a.name === "mascoteApp")
   || initializeApp(firebaseConfig, "mascoteApp");
 const db = getDatabase(app);
@@ -53,28 +53,68 @@ const LS = {
 };
 
 // ==========================================
+// 🛡️ RATE LIMITING (client-side)
+// ==========================================
+// Não é 100% à prova de hacker, mas limita o dano.
+// A defesa real está nas Security Rules do Firebase.
+const __rateLimits = {
+  xp:         { max: 200,  janela: 60_000, historico: [] },  // 200 XP/min
+  cliques:    { max: 60,   janela: 1_000,  historico: [] },  // 60 cliques/s
+  contadores: { max: 30,   janela: 60_000, historico: [] },  // 30/min
+  conquistas: { max: 10,   janela: 60_000, historico: [] },  // 10/min
+};
+
+function __verificarRateLimit(tipo) {
+  const cfg = __rateLimits[tipo];
+  if (!cfg) return true;
+  const agora = Date.now();
+  cfg.historico = cfg.historico.filter((t) => agora - t < cfg.janela);
+  if (cfg.historico.length >= cfg.max) {
+    console.warn(`[xp-core] 🛡️ rate limit atingido: ${tipo} (máx ${cfg.max}/${cfg.janela / 1000}s)`);
+    return false;
+  }
+  cfg.historico.push(agora);
+  return true;
+}
+
+// Teto por chamada individual
+const __tetosPorChamada = {
+  xp: 500,
+  cliques: 10,
+  contadores: 5,
+};
+
+function __aplicarTeto(tipo, quantidade) {
+  const teto = __tetosPorChamada[tipo];
+  if (teto && quantidade > teto) {
+    console.warn(`[xp-core] 🛡️ quantidade ${quantidade} acima do teto (${teto}) para ${tipo}`);
+    return teto;
+  }
+  return quantidade;
+}
+
+// ==========================================
 // ESTADO EM MEMÓRIA (cache rápido)
 // ==========================================
 const cache = {
-  matricula: null,       // string | null
-  ehAnonimo: true,       // boolean
+  matricula: null,
+  ehAnonimo: true,
   xp: 0,
   cliquesMascote: 0,
   streak: 0,
   ultimaVisita: "",
   skinAtiva: "padrao",
-  conquistas: {},        // { id: { desbloqueadaEm } }
+  conquistas: {},
   contadores: {
     recados: 0,
     curtidas: 0,
     simulador: 0,
     periodos: 0,
   },
-  pronto: false,         // flag: já sincronizou com Firebase?
-  migrado: false,        // flag: migração local já rodou?
+  pronto: false,
+  migrado: false,
 };
 
-// Fila de escritas pendentes (offline)
 const filaOffline = [];
 
 // ==========================================
@@ -85,12 +125,10 @@ function hojeISO() {
 }
 
 function obterMatricula() {
-  // 1) variável global (login.js define após SUAP)
   if (window.usuarioLogado?.matricula &&
       window.usuarioLogado.matricula !== "Matrícula não disponível") {
     return window.usuarioLogado.matricula;
   }
-  // 2) cookie do SUAP
   const matCookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("matricula="));
@@ -98,7 +136,6 @@ function obterMatricula() {
     const v = matCookie.split("=")[1];
     if (v && v !== "Matrícula não disponível") return v;
   }
-  // 3) localStorage
   const matLocal = localStorage.getItem(LS.MATRICULA);
   if (matLocal && matLocal !== "Matrícula não disponível") return matLocal;
   return null;
@@ -145,6 +182,9 @@ async function incrementarXP(quantidade, motivo) {
   quantidade = Number(quantidade) || 0;
   if (quantidade <= 0) return cache.xp;
 
+  if (!__verificarRateLimit("xp")) return cache.xp;
+  quantidade = __aplicarTeto("xp", quantidade);
+
   // Atualiza cache local imediatamente (UI responde rápido)
   cache.xp += quantidade;
   lsSet(LS.XP, cache.xp);
@@ -168,6 +208,11 @@ async function incrementarXP(quantidade, motivo) {
 // ==========================================
 async function incrementarCliquesMascote(quantidade) {
   quantidade = Number(quantidade) || 1;
+  if (quantidade <= 0) return cache.cliquesMascote;
+
+  if (!__verificarRateLimit("cliques")) return cache.cliquesMascote;
+  quantidade = __aplicarTeto("cliques", quantidade);
+
   cache.cliquesMascote += quantidade;
   lsSet(LS.CLIQUES, cache.cliquesMascote);
   emitir("mascote:cliques", { total: cache.cliquesMascote, adicionado: quantidade });
@@ -196,9 +241,13 @@ async function incrementarContador(nome, quantidade = 1) {
     return 0;
   }
   quantidade = Number(quantidade) || 1;
+  if (quantidade <= 0) return cache.contadores[nome] || 0;
+
+  if (!__verificarRateLimit("contadores")) return cache.contadores[nome] || 0;
+  quantidade = __aplicarTeto("contadores", quantidade);
+
   cache.contadores[nome] = (cache.contadores[nome] || 0) + quantidade;
 
-  // Espelha no localStorage (compat com código antigo que ainda lê)
   const lsChave = {
     recados: LS.RECADOS,
     curtidas: LS.CURTIDAS,
@@ -248,7 +297,6 @@ async function registrarAcessoDiario() {
 
   emitir("xp:streak", { streak: novoStreak, bonusXP, novo: true });
 
-  // Persiste no Firebase
   if (!cache.ehAnonimo && cache.matricula) {
     try {
       await update(ref(db, `usuarios_xp/${cache.matricula}`), {
@@ -260,7 +308,6 @@ async function registrarAcessoDiario() {
     }
   }
 
-  // Bônus de XP
   await incrementarXP(bonusXP, "login_diario");
 
   return { streak: novoStreak, novo: true, bonusXP };
@@ -271,7 +318,9 @@ async function registrarAcessoDiario() {
 // ==========================================
 async function desbloquearConquista(id) {
   if (!id) return false;
-  if (cache.conquistas[id]) return false; // já desbloqueada
+  if (cache.conquistas[id]) return false;
+
+  if (!__verificarRateLimit("conquistas")) return false;
 
   const agora = Date.now();
   cache.conquistas[id] = { desbloqueadaEm: agora };
@@ -323,7 +372,6 @@ async function migrarLocalSeNecessario() {
 
   const mat = cache.matricula;
   try {
-    // Verifica flag no Firebase
     const snapFlag = await get(ref(db, `usuarios_xp/${mat}/migracaoLocal/concluidaEm`));
     if (snapFlag.exists()) {
       cache.migrado = true;
@@ -333,7 +381,6 @@ async function migrarLocalSeNecessario() {
 
     console.log("[xp-core] 🔄 Iniciando migração local → Firebase...");
 
-    // Lê valores locais
     const xpLocal = lsGet(LS.XP, 0);
     const cliquesLocal = lsGet(LS.CLIQUES, 0);
     const recadosLocal = lsGet(LS.RECADOS, 0);
@@ -341,14 +388,12 @@ async function migrarLocalSeNecessario() {
     const simuladorLocal = lsGet(LS.SIMULADOR, 0);
     const periodosLocal = lsGet(LS.PERIODOS, 0);
 
-    // Lê valores do Firebase
     const snapFB = await get(ref(db, `usuarios_xp/${mat}`));
     const fb = snapFB.val() || {};
     const xpFB = Number(fb.xp) || 0;
     const cliquesFB = Number(fb.cliquesMascote) || 0;
     const contFB = fb.contadores || {};
 
-    // Soma máxima (nunca diminui)
     const xpFinal = Math.max(xpLocal, xpFB);
     const cliquesFinal = Math.max(cliquesLocal, cliquesFB);
     const recadosFinal = Math.max(recadosLocal, Number(contFB.recados) || 0);
@@ -356,7 +401,6 @@ async function migrarLocalSeNecessario() {
     const simuladorFinal = Math.max(simuladorLocal, Number(contFB.simulador) || 0);
     const periodosFinal = Math.max(periodosLocal, Number(contFB.periodos) || 0);
 
-    // Escreve tudo atomicamente
     await update(ref(db, `usuarios_xp/${mat}`), {
       xp: xpFinal,
       cliquesMascote: cliquesFinal,
@@ -373,7 +417,6 @@ async function migrarLocalSeNecessario() {
       },
     });
 
-    // Atualiza cache
     cache.xp = xpFinal;
     cache.cliquesMascote = cliquesFinal;
     cache.contadores = {
@@ -384,7 +427,6 @@ async function migrarLocalSeNecessario() {
     };
     cache.migrado = true;
 
-    // Limpa localStorage dos valores já migrados
     try {
       localStorage.removeItem(LS.XP);
       localStorage.removeItem(LS.CLIQUES);
@@ -413,7 +455,6 @@ async function sincronizar() {
   cache.matricula = obterMatricula();
   cache.ehAnonimo = !cache.matricula;
 
-  // Carrega do localStorage primeiro (resposta rápida)
   cache.xp = lsGet(LS.XP, 0);
   cache.cliquesMascote = lsGet(LS.CLIQUES, 0);
   cache.streak = lsGet(LS.STREAK, 0);
@@ -434,7 +475,6 @@ async function sincronizar() {
     return;
   }
 
-  // Logado → puxa do Firebase
   try {
     const snap = await get(ref(db, `usuarios_xp/${cache.matricula}`));
     const dados = snap.val() || {};
@@ -453,7 +493,6 @@ async function sincronizar() {
       };
     }
 
-    // Skin ativa: prioridade Firebase > localStorage
     try {
       const snapSkin = await get(ref(db, `perfis_alunos/${cache.matricula}/mascoteAvatar`));
       if (snapSkin.exists()) {
@@ -463,7 +502,6 @@ async function sincronizar() {
       }
     } catch {}
 
-    // Espelha no localStorage (compat com código antigo)
     lsSet(LS.XP, cache.xp);
     lsSet(LS.CLIQUES, cache.cliquesMascote);
     lsSet(LS.STREAK, cache.streak);
@@ -476,11 +514,9 @@ async function sincronizar() {
     cache.pronto = true;
     emitir("xpCore:pronto", { anonimo: false, matricula: cache.matricula });
 
-    // Dispara eventos pra UI se redesenhar
     emitir("xp:update", { total: cache.xp });
     emitir("mascote:cliques", { total: cache.cliquesMascote });
 
-    // Migração 1x por matrícula
     await migrarLocalSeNecessario();
   } catch (e) {
     console.warn("[xp-core] erro ao sincronizar com Firebase:", e);
@@ -545,10 +581,9 @@ async function processarFilaOffline() {
 window.addEventListener("online", processarFilaOffline);
 
 // ==========================================
-// REGISTRAÇÃO DE AÇÕES ESPECÍFICAS (atalhos)
+// ATALHOS ESPECÍFICOS
 // ==========================================
 
-// Marca que viu um período (evita duplicar)
 async function registrarPeriodoVisto(periodoLabel) {
   if (!periodoLabel) return false;
   let vistos = [];
@@ -564,7 +599,6 @@ async function registrarPeriodoVisto(periodoLabel) {
   return true;
 }
 
-// Marca que simulador foi usado (respeitando limite diário local)
 async function registrarUsoSimulador() {
   const hoje = hojeISO();
   let dados = {};
@@ -584,7 +618,6 @@ async function registrarUsoSimulador() {
 // API PÚBLICA
 // ==========================================
 window.xpCore = {
-  // leitura
   obterXP,
   obterCliquesMascote,
   obterStreak,
@@ -595,7 +628,6 @@ window.xpCore = {
   obterMatriculaAtual,
   estaPronto,
 
-  // escrita
   incrementarXP,
   incrementarCliquesMascote,
   incrementarContador,
@@ -605,14 +637,13 @@ window.xpCore = {
   registrarPeriodoVisto,
   registrarUsoSimulador,
 
-  // controle
   sincronizar,
   migrarLocalSeNecessario,
   observarFirebase,
 
-  // debug
   _cache: cache,
   _filaOffline: filaOffline,
+  _rateLimits: __rateLimits,
 };
 
 // ==========================================
@@ -621,13 +652,10 @@ window.xpCore = {
 (async () => {
   console.log("[xp-core] inicializando...");
 
-  // 1) Sincroniza com Firebase (se logado) ou carrega local (anônimo)
   await sincronizar();
 
-  // 2) Escuta mudanças em tempo real (só se logado)
   if (!cache.ehAnonimo) observarFirebase();
 
-  // 3) Reenvia pendências offline
   if (navigator.onLine && !cache.ehAnonimo) processarFilaOffline();
 
   console.log("[xp-core] pronto.", {
