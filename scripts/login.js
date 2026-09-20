@@ -69,14 +69,12 @@ const AVATARES_MASCOTE = [
   { id: "admin",   nome: "Admin",   arquivo: "img/MascoteAdmin.png",   gratis: false, apenasAdmin: true, admin: true },
 ];
 
-// Retorna a lista de skins visíveis para a matrícula atual
 function obterSkinsDisponiveis() {
   const mat = window.usuarioLogado?.matricula;
   const ehAdmin = mat === MATRICULA_ADMIN;
   return AVATARES_MASCOTE.filter((s) => (s.apenasAdmin ? ehAdmin : true));
 }
 
-// Busca skin pelo id (sempre inclui admin, pra exibir no perfil público)
 function obterMascotePorId(id) {
   return AVATARES_MASCOTE.find((m) => m.id === id) || AVATARES_MASCOTE[0];
 }
@@ -98,21 +96,40 @@ const NIVEIS = [
 ];
 
 // ==========================================
-// 🎖️ CONQUISTAS (com ícones Font Awesome)
+// 🎖️ CONQUISTAS (com ícones Font Awesome + tipos + metas)
 // ==========================================
 const CONQUISTAS = [
-  { id: "primeiro_carinho", icone: "fa-solid fa-hand-pointer", emoji: "🎯", nome: "Primeiro Carinho", desc: "Deu seu primeiro carinho no mascote", raridade: "comum" },
-  { id: "estiloso", icone: "fa-solid fa-palette", emoji: "🎨", nome: "Estiloso", desc: "Mudou o avatar do mascote", raridade: "comum" },
-  { id: "comunicador", icone: "fa-solid fa-comments", emoji: "💬", nome: "Comunicador", desc: "Postou 10 recados", raridade: "comum" },
-  { id: "cientista", icone: "fa-solid fa-flask", emoji: "🧪", nome: "Cientista", desc: "Usou o simulador 10 vezes", raridade: "comum" },
-  { id: "carinhoso", icone: "fa-solid fa-heart", emoji: "❤️", nome: "Carinhoso", desc: "Deu 100 carinhos no mascote", raridade: "raro" },
-  { id: "nota_100", icone: "fa-solid fa-graduation-cap", emoji: "🎓", nome: "Nota 100", desc: "Tirou 100 em alguma matéria", raridade: "raro" },
-  { id: "streak_7", icone: "fa-solid fa-fire", emoji: "🔥", nome: "Streak 7", desc: "Logou 7 dias seguidos", raridade: "raro" },
-  { id: "apaixonado", icone: "fa-solid fa-heart-pulse", emoji: "💖", nome: "Apaixonado", desc: "Deu 500 carinhos no mascote", raridade: "epico" },
-  { id: "nota_maxima", icone: "fa-solid fa-trophy", emoji: "🏆", nome: "Nota Máxima", desc: "Média geral ≥ 90", raridade: "epico" },
-  { id: "simpson_unlocked", icone: "fa-solid fa-cookie-bite", emoji: "🍩", nome: "Simpson Chegou", desc: "Desbloqueou a skin do Simpson (1.500 cliques)", raridade: "epico" },
-  { id: "streak_30", icone: "fa-solid fa-star", emoji: "⭐", nome: "Streak 30", desc: "Logou 30 dias seguidos", raridade: "lendario" },
-  { id: "mafioso_unlocked", icone: "fa-solid fa-user-tie", emoji: "🕴️", nome: "Mafioso no Pedaço", desc: "Desbloqueou a skin Mafioso (3.000 cliques)", raridade: "lendario" },
+  // ===== CARINHOS NO MASCOTE (progressivas) =====
+  { id: "primeiro_carinho", icone: "fa-solid fa-hand-pointer", emoji: "🎯", nome: "Primeiro Carinho", desc: "Deu seu primeiro carinho no mascote", raridade: "comum", tipo: "cliques", meta: 1 },
+  { id: "cliques_100",     icone: "fa-solid fa-hand",           emoji: "👋", nome: "100 Carinhos",     desc: "Deu 100 carinhos no mascote",   raridade: "comum",  tipo: "cliques", meta: 100 },
+  { id: "cliques_250",     icone: "fa-solid fa-hands-clapping", emoji: "👏", nome: "250 Carinhos",     desc: "Deu 250 carinhos no mascote",   raridade: "comum",  tipo: "cliques", meta: 250 },
+  { id: "carinhoso",       icone: "fa-solid fa-heart",          emoji: "❤️", nome: "Carinhoso",        desc: "Deu 500 carinhos no mascote",   raridade: "raro",   tipo: "cliques", meta: 500 },
+  { id: "cliques_1000",    icone: "fa-solid fa-heart-circle-plus", emoji: "💗", nome: "1000 Carinhos", desc: "Deu 1000 carinhos no mascote", raridade: "raro",   tipo: "cliques", meta: 1000 },
+  { id: "simpson_unlocked", icone: "fa-solid fa-cookie-bite",  emoji: "🍩", nome: "Simpson Chegou",   desc: "Desbloqueou a skin do Simpson (1.500 cliques)", raridade: "epico", tipo: "cliques", meta: 1500 },
+  { id: "cliques_2500",    icone: "fa-solid fa-fire-flame-curved", emoji: "🔥", nome: "2500 Carinhos", desc: "Deu 2500 carinhos no mascote", raridade: "epico", tipo: "cliques", meta: 2500 },
+  { id: "mafioso_unlocked", icone: "fa-solid fa-user-tie",     emoji: "🕴️", nome: "Mafioso no Pedaço", desc: "Desbloqueou a skin Mafioso (3.000 cliques)", raridade: "lendario", tipo: "cliques", meta: 3000 },
+  { id: "cliques_5000",    icone: "fa-solid fa-crown",         emoji: "👑", nome: "5000 Carinhos",    desc: "Deu 5000 carinhos no mascote", raridade: "lendario", tipo: "cliques", meta: 5000 },
+  { id: "cliques_10000",   icone: "fa-solid fa-gem",           emoji: "💎", nome: "10000 Carinhos",   desc: "Deu 10000 carinhos no mascote", raridade: "lendario", tipo: "cliques", meta: 10000 },
+
+  // ===== NÍVEL / XP =====
+  { id: "nivel_5",         icone: "fa-solid fa-star-half-stroke", emoji: "⭐", nome: "Dev Pleno",     desc: "Alcançou o nível 5",  raridade: "raro",     tipo: "nivel", meta: 5 },
+  { id: "nivel_10",        icone: "fa-solid fa-star",          emoji: "🌟", nome: "Lenda Viva",       desc: "Alcançou o nível 10", raridade: "lendario", tipo: "nivel", meta: 10 },
+
+  // ===== STREAK =====
+  { id: "streak_7",        icone: "fa-solid fa-fire",          emoji: "🔥", nome: "Streak 7",         desc: "Logou 7 dias seguidos", raridade: "raro",     tipo: "streak", meta: 7 },
+  { id: "streak_30",       icone: "fa-solid fa-star",          emoji: "⭐", nome: "Streak 30",        desc: "Logou 30 dias seguidos", raridade: "lendario", tipo: "streak", meta: 30 },
+
+  // ===== NOTAS =====
+  { id: "nota_100",        icone: "fa-solid fa-graduation-cap", emoji: "🎓", nome: "Nota 100",       desc: "Tirou 100 em alguma matéria", raridade: "raro",  tipo: "manual", meta: 1 },
+  { id: "nota_maxima",     icone: "fa-solid fa-trophy",        emoji: "🏆", nome: "Nota Máxima",      desc: "Média geral ≥ 90", raridade: "epico", tipo: "manual", meta: 1 },
+
+  // ===== INTERAÇÕES =====
+  { id: "estiloso",        icone: "fa-solid fa-palette",       emoji: "🎨", nome: "Estiloso",         desc: "Mudou o avatar do mascote", raridade: "comum", tipo: "manual", meta: 1 },
+  { id: "comunicador",     icone: "fa-solid fa-comments",      emoji: "💬", nome: "Comunicador",      desc: "Postou 10 recados no mural", raridade: "comum", tipo: "recados", meta: 10 },
+  { id: "social",          icone: "fa-solid fa-share-nodes",   emoji: "🔗", nome: "Sociável",         desc: "Curtiu 20 recados", raridade: "comum", tipo: "curtidas", meta: 20 },
+  { id: "cientista",       icone: "fa-solid fa-flask",         emoji: "🧪", nome: "Cientista",        desc: "Usou o simulador 10 vezes", raridade: "comum", tipo: "simulador", meta: 10 },
+  { id: "metódico",        icone: "fa-solid fa-bullseye",      emoji: "🎯", nome: "Metódico",         desc: "Definiu 5 metas individuais", raridade: "raro", tipo: "metas", meta: 5 },
+  { id: "explorador",      icone: "fa-solid fa-compass",       emoji: "🧭", nome: "Explorador",       desc: "Consultou 3 períodos diferentes", raridade: "raro", tipo: "periodos", meta: 3 },
 ];
 
 // Recompensas de XP
@@ -421,6 +438,9 @@ async function adicionarXP(quantidade, motivo) {
       if (typeof exibirToast === "function") {
         exibirToast(`🎉 SUBIU DE NÍVEL! ${nivelDepois.nome} (Nv ${nivelDepois.nivel})`, "sucesso");
       }
+      // 🆕 Checa conquistas de nível automaticamente
+      if (nivelDepois.nivel >= 5) desbloquearConquista("nivel_5");
+      if (nivelDepois.nivel >= 10) desbloquearConquista("nivel_10");
     }
     meuXP = xpDepois;
     renderizarPainelXP();
@@ -487,6 +507,8 @@ async function atualizarStreakLogin() {
     await adicionarXP(XP_RECOMPENSAS.login_diario, "login_diario");
     if (streak >= 7) desbloquearConquista("streak_7");
     if (streak >= 30) desbloquearConquista("streak_30");
+    // 🆕 Checa todas as conquistas automáticas ao logar
+    setTimeout(() => checarConquistasAutomaticas(), 500);
   } catch (e) {
     console.warn("[streak] Erro:", e);
   }
@@ -594,6 +616,77 @@ async function migrarXPLocalParaFirebase(mat) {
 }
 
 // ==========================================
+// 🎖️ CHECAGEM AUTOMÁTICA DE CONQUISTAS
+// ==========================================
+async function checarConquistasAutomaticas() {
+  const mat = window.usuarioLogado.matricula;
+  if (!mat || mat === "Matrícula não disponível") return;
+
+  // ===== Por CLiques no mascote =====
+  meusCliquesMascote = parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
+  for (const c of CONQUISTAS) {
+    if (c.tipo === "cliques" && meusCliquesMascote >= c.meta) {
+      await desbloquearConquista(c.id);
+    }
+  }
+
+  // ===== Por NÍVEL/XP =====
+  const nivelInfo = calcularNivel(meuXP);
+  for (const c of CONQUISTAS) {
+    if (c.tipo === "nivel" && nivelInfo.nivel >= c.meta) {
+      await desbloquearConquista(c.id);
+    }
+  }
+
+  // ===== Por STREAK =====
+  for (const c of CONQUISTAS) {
+    if (c.tipo === "streak" && minhaStreak >= c.meta) {
+      await desbloquearConquista(c.id);
+    }
+  }
+
+  // ===== Por SIMULADOR =====
+  const usosSim = parseInt(localStorage.getItem("xp_simulador_total") || "0", 10);
+  for (const c of CONQUISTAS) {
+    if (c.tipo === "simulador" && usosSim >= c.meta) {
+      await desbloquearConquista(c.id);
+    }
+  }
+
+  // ===== Por METAS definidas =====
+  const metasCount = Object.keys(__metasDisciplinas || {}).length;
+  for (const c of CONQUISTAS) {
+    if (c.tipo === "metas" && metasCount >= c.meta) {
+      await desbloquearConquista(c.id);
+    }
+  }
+
+  // ===== Por PERÍODOS consultados =====
+  const periodosCount = parseInt(localStorage.getItem("xp_periodos_total") || "0", 10);
+  for (const c of CONQUISTAS) {
+    if (c.tipo === "periodos" && periodosCount >= c.meta) {
+      await desbloquearConquista(c.id);
+    }
+  }
+
+  // ===== Por RECADOS postados =====
+  const recadosCount = parseInt(localStorage.getItem("xp_recados_total") || "0", 10);
+  for (const c of CONQUISTAS) {
+    if (c.tipo === "recados" && recadosCount >= c.meta) {
+      await desbloquearConquista(c.id);
+    }
+  }
+
+  // ===== Por CURTIDAS dadas =====
+  const curtidasCount = parseInt(localStorage.getItem("xp_curtidas_total") || "0", 10);
+  for (const c of CONQUISTAS) {
+    if (c.tipo === "curtidas" && curtidasCount >= c.meta) {
+      await desbloquearConquista(c.id);
+    }
+  }
+}
+
+// ==========================================
 // PAINEL DE XP E CONQUISTAS
 // ==========================================
 async function carregarPainelXP() {
@@ -608,15 +701,15 @@ async function carregarPainelXP() {
     minhaStreak = Number(dados.streak) || 0;
     minhasConquistas = dados.conquistas || {};
     meusCliquesMascote = parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
+
     renderizarPainelXP();
     renderizarConquistas();
+
     const avatarSalvo = dados.mascoteAvatar || localStorage.getItem("skin_ativa") || "padrao";
     avatarSelecionado = avatarSalvo;
-    if (meusCliquesMascote >= 1500) await desbloquearConquista("simpson_unlocked");
-    if (meusCliquesMascote >= 3000) await desbloquearConquista("mafioso_unlocked");
-    if (meusCliquesMascote >= 100) await desbloquearConquista("carinhoso");
-    if (meusCliquesMascote >= 500) await desbloquearConquista("apaixonado");
-    if (meusCliquesMascote >= 1) await desbloquearConquista("primeiro_carinho");
+
+    // 🆕 Checagem automática
+    await checarConquistasAutomaticas();
   } catch (e) {
     console.warn("[painelXP] Erro:", e);
     meuXP = parseInt(localStorage.getItem("xp_total") || "0", 10);
@@ -1052,7 +1145,7 @@ onValue(perfisRef, (snapshot) => {
 });
 
 // ==========================================
-// ENVIO DE RECADOS (+10 XP)
+// ENVIO DE RECADOS (+10 XP + conta recados)
 // ==========================================
 const formRecado = document.getElementById("form-recado");
 if (formRecado) {
@@ -1082,6 +1175,10 @@ if (formRecado) {
       .then(() => {
         exibirToast("Recado publicado! +10 XP", "sucesso");
         adicionarXP(XP_RECOMPENSAS.recado_postado, "recado_postado");
+        // 🆕 Conta recados totais
+        const totalRecadosUser = parseInt(localStorage.getItem("xp_recados_total") || "0", 10) + 1;
+        localStorage.setItem("xp_recados_total", String(totalRecadosUser));
+        if (totalRecadosUser >= 10) desbloquearConquista("comunicador");
         if (msgInput) msgInput.value = "";
         if (linkInput) linkInput.value = "";
         const contador = document.getElementById("contador-caracteres");
@@ -1442,6 +1539,9 @@ window.editarRecado = function (id) {
   });
 };
 
+// ==========================================
+// CURTIR RECADO (+1 XP + conta curtidas)
+// ==========================================
 window.curtirRecado = function (id) {
   const itemRef = ref(db, "mural_recados/" + id);
   get(itemRef).then((snapshot) => {
@@ -1452,6 +1552,10 @@ window.curtirRecado = function (id) {
       if (i === -1) {
         likes.push(window.usuarioLogado.matricula);
         adicionarXP(XP_RECOMPENSAS.curtida, "curtida");
+        // 🆕 Conta curtidas dadas
+        const totalCurtidas = parseInt(localStorage.getItem("xp_curtidas_total") || "0", 10) + 1;
+        localStorage.setItem("xp_curtidas_total", String(totalCurtidas));
+        if (totalCurtidas >= 20) desbloquearConquista("social");
       } else {
         likes.splice(i, 1);
       }
@@ -2274,6 +2378,9 @@ function atualizarLinhaNota(tr, d, meta) {
   }
 }
 
+// ==========================================
+// SIMULADOR (com contador persistente)
+// ==========================================
 function bindSimuladores(corpo) {
   corpo.querySelectorAll(".simulador-input").forEach(function (input) {
     if (input.dataset.bound) return;
@@ -2295,9 +2402,11 @@ function bindSimuladores(corpo) {
       if (val !== "" && podeGanharXPSimulador()) {
         registrarXPSimulador();
         adicionarXP(XP_RECOMPENSAS.simulador, "simulador");
+        // 🆕 Conta total de usos do simulador
+        const totalSim = parseInt(localStorage.getItem("xp_simulador_total") || "0", 10) + 1;
+        localStorage.setItem("xp_simulador_total", String(totalSim));
+        if (totalSim >= 10) desbloquearConquista("cientista");
       }
-      contadorSimulador++;
-      if (contadorSimulador >= 10) desbloquearConquista("cientista");
     });
   });
   corpo.querySelectorAll(".btn-meta-disciplina").forEach(function (btn) {
@@ -2309,6 +2418,9 @@ function bindSimuladores(corpo) {
   });
 }
 
+// ==========================================
+// MODAL META DISCIPLINA (com contador de metas)
+// ==========================================
 function abrirModalMetaDisciplina(codigo, nome) {
   var modal = document.getElementById("modal-meta-disciplina");
   if (!modal) return;
@@ -2338,6 +2450,11 @@ function abrirModalMetaDisciplina(codigo, nome) {
     if (__notasCache.length) renderizarNotas(__notasCache);
     if (valorAnterior !== __metasDisciplinas[codigo]) {
       adicionarXP(XP_RECOMPENSAS.definir_meta, "definir_meta");
+      // 🆕 Checa conquista de metas
+      setTimeout(() => {
+        const metasCount = Object.keys(__metasDisciplinas || {}).length;
+        if (metasCount >= 5) desbloquearConquista("metódico");
+      }, 100);
     }
     exibirToast("Meta salva (" + rangeInput.value + ").", "sucesso");
   };
@@ -2428,6 +2545,9 @@ function salvarResumoBoletimFirebase(ano, periodo, disciplinas) {
   } catch (e) { console.warn("[resumo boletim] exceção:", e); }
 }
 
+// ==========================================
+// CARREGAR BOLETIM (com contador de períodos únicos)
+// ==========================================
 function carregarBoletim(ano, periodo) {
   atualizarStatusNotas("Buscando notas no SUAP...", "loading");
   suap.getAuthenticatedResource(
@@ -2443,6 +2563,17 @@ function carregarBoletim(ano, periodo) {
       if (!jaGanhouXPBoletim(label)) {
         marcarXPBoletim(label);
         adicionarXP(XP_RECOMPENSAS.ver_boletim, "ver_boletim");
+        // 🆕 Conta períodos únicos consultados
+        let periodosVistos = [];
+        try {
+          periodosVistos = JSON.parse(localStorage.getItem("xp_periodos_vistos") || "[]");
+        } catch (e) { periodosVistos = []; }
+        if (!periodosVistos.includes(label)) {
+          periodosVistos.push(label);
+          localStorage.setItem("xp_periodos_vistos", JSON.stringify(periodosVistos));
+          localStorage.setItem("xp_periodos_total", String(periodosVistos.length));
+          if (periodosVistos.length >= 3) desbloquearConquista("explorador");
+        }
       }
     },
     function (xhr) {
@@ -3070,6 +3201,12 @@ document.addEventListener("DOMContentLoaded", function () {
   initMenuLateral();
   inicializarFiltrosConquistas();
   inicializarBotoesConquistasVisiveis();
+
+  // 🆕 Escuta cliques do mascote pra checar conquistas em tempo real
+  window.addEventListener("mascote:cliques", () => {
+    meusCliquesMascote = parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
+    checarConquistasAutomaticas();
+  });
 
   document.querySelectorAll("#menu-idioma .dropdown-item").forEach(function (btn) {
     btn.addEventListener("click", function () { trocarIdioma(btn.dataset.idioma); });
