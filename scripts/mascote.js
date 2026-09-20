@@ -86,26 +86,16 @@ const SOU_ADMIN = MINHA_MATRICULA === MATRICULA_ADMIN;
 const SOU_ANONIMO = MINHA_MATRICULA.startsWith("anon_");
 console.log("[mascote] Matrícula:", MINHA_MATRICULA, "| Admin?", SOU_ADMIN, "| Anônimo?", SOU_ANONIMO);
 
+// Skin inicial vem do localStorage.
+// Será sobrescrita pelo Firebase (onValue) quando o login.js trocar a skin.
 let avatarAtual = (function () {
-  if (SOU_ADMIN) {
-    const skinSalva = localStorage.getItem("skin_ativa");
-    if (!skinSalva || !IMAGENS_MASCOTE[skinSalva]) return "admin";
-    return skinSalva;
-  }
   const skinAtiva = localStorage.getItem("skin_ativa");
   const avatarLegado = localStorage.getItem("mascote_avatar");
   const escolhido = skinAtiva || avatarLegado || "padrao";
-  if (escolhido === "admin") return "padrao";
+  // Se não é admin, nunca aceita "admin"
+  if (escolhido === "admin" && !SOU_ADMIN) return "padrao";
   return IMAGENS_MASCOTE[escolhido] ? escolhido : "padrao";
 })();
-
-if (SOU_ADMIN) {
-  const skinSalva = localStorage.getItem("skin_ativa");
-  if (!skinSalva || skinSalva === "padrao") {
-    avatarAtual = "admin";
-    try { localStorage.setItem("skin_ativa", "admin"); } catch (e) {}
-  }
-}
 
 const mascoteImg = document.getElementById("mascoteImg");
 const btnCarinho = document.getElementById("darCarinhoBtn");
