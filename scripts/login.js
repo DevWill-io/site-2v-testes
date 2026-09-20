@@ -122,6 +122,7 @@ let contadorSimulador = 0;
 
 let avatarSelecionado = "padrao";
 let filtroConquistasAtivo = "todas";
+let conquistasVisiveisSelecionadas = null;
 
 // ==========================================
 // 📋 DICIONÁRIO DE TRADUÇÕES
@@ -143,6 +144,8 @@ const TRADUCOES_LOGIN = {
     dias: "dias", conquistas_titulo: "Conquistas", todas: "Todas",
     desbloqueadas: "Desbloqueadas", bloqueadas: "Bloqueadas",
     proxima_skin: "Próxima skin:", skin_bloqueada: "Bloqueada",
+    conquistas_visiveis_titulo: "Conquistas no perfil",
+    conquistas_visiveis_desc: "Escolha quais conquistas os outros verão no seu perfil. Sem seleção = mostra todas.",
     menu: "Menu", nav_notas: "Notas", nav_notas_desc: "Sua calculadora",
     nav_horarios: "Horários", nav_horarios_desc: "Rotina semanal",
     nav_mural: "Mural", nav_mural_desc: "Recados da turma",
@@ -220,6 +223,8 @@ const TRADUCOES_LOGIN = {
     dias: "days", conquistas_titulo: "Achievements", todas: "All",
     desbloqueadas: "Unlocked", bloqueadas: "Locked",
     proxima_skin: "Next skin:", skin_bloqueada: "Locked",
+    conquistas_visiveis_titulo: "Achievements on profile",
+    conquistas_visiveis_desc: "Choose which achievements others will see on your profile. No selection = shows all.",
     nav_inicio: "Home", nav_inicio_desc: "Homepage", menu: "Menu",
     nav_notas: "Grades", nav_notas_desc: "Your calculator",
     nav_horarios: "Schedule", nav_horarios_desc: "Weekly routine",
@@ -297,6 +302,8 @@ const TRADUCOES_LOGIN = {
     dias: "días", conquistas_titulo: "Logros", todas: "Todos",
     desbloqueadas: "Desbloqueados", bloqueadas: "Bloqueados",
     proxima_skin: "Próxima skin:", skin_bloqueada: "Bloqueada",
+    conquistas_visiveis_titulo: "Logros en el perfil",
+    conquistas_visiveis_desc: "Elige qué logros verán los demás en tu perfil. Sin selección = muestra todos.",
     nav_inicio: "Inicio", nav_inicio_desc: "Página de inicio", menu: "Menú",
     nav_notas: "Notas", nav_notas_desc: "Tu calculadora",
     nav_horarios: "Horarios", nav_horarios_desc: "Rutina semanal",
@@ -383,7 +390,6 @@ function calcularNivel(xp) {
 async function adicionarXP(quantidade, motivo) {
   const mat = window.usuarioLogado.matricula;
   if (!mat || mat === "Matrícula não disponível") return;
-
   try {
     const refXP = ref(db, "usuarios_xp/" + mat);
     const snap = await get(refXP);
@@ -408,19 +414,15 @@ async function adicionarXP(quantidade, motivo) {
 async function desbloquearConquista(idConquista) {
   const mat = window.usuarioLogado.matricula;
   if (!mat || mat === "Matrícula não disponível") return;
-
   try {
     const refConquista = ref(db, `usuarios_xp/${mat}/conquistas/${idConquista}`);
     const snap = await get(refConquista);
     if (snap.exists()) return;
-
     await update(refConquista, { desbloqueadaEm: Date.now() });
     const c = CONQUISTAS.find(x => x.id === idConquista);
     if (c && typeof exibirToast === "function") {
       exibirToast(`${c.icone} CONQUISTA: ${c.nome}!`, "sucesso");
     }
-
-    // +10 XP por conquista
     try {
       const refXP = ref(db, "usuarios_xp/" + mat);
       const snapXP = await get(refXP);
@@ -440,7 +442,6 @@ async function desbloquearConquista(idConquista) {
     } catch (e) {
       console.warn("[conquista XP] erro:", e);
     }
-
     minhasConquistas[idConquista] = { desbloqueadaEm: Date.now() };
     renderizarConquistas();
   } catch (e) {
@@ -451,7 +452,6 @@ async function desbloquearConquista(idConquista) {
 async function atualizarStreakLogin() {
   const mat = window.usuarioLogado.matricula;
   if (!mat || mat === "Matrícula não disponível") return;
-
   try {
     const refXP = ref(db, "usuarios_xp/" + mat);
     const snap = await get(refXP);
@@ -460,16 +460,13 @@ async function atualizarStreakLogin() {
     const ultimaVisita = dados.ultimaVisita || "";
     let streak = Number(dados.streak) || 0;
     if (ultimaVisita === hoje) return;
-
     const ontem = new Date();
     ontem.setDate(ontem.getDate() - 1);
     const ontemStr = ontem.toISOString().slice(0, 10);
     if (ultimaVisita === ontemStr) streak += 1;
     else streak = 1;
-
     await update(refXP, { streak, ultimaVisita: hoje });
     await adicionarXP(XP_RECOMPENSAS.login_diario, "login_diario");
-
     if (streak >= 7) desbloquearConquista("streak_7");
     if (streak >= 30) desbloquearConquista("streak_30");
   } catch (e) {
@@ -544,24 +541,19 @@ async function migrarXPLocalParaFirebase(mat) {
 async function carregarPainelXP() {
   const mat = window.usuarioLogado.matricula;
   if (!mat || mat === "Matrícula não disponível") return;
-
   try {
     await migrarXPLocalParaFirebase(mat);
     const refXP = ref(db, "usuarios_xp/" + mat);
     const snap = await get(refXP);
     const dados = snap.val() || {};
-
     meuXP = Number(dados.xp) || 0;
     minhaStreak = Number(dados.streak) || 0;
     minhasConquistas = dados.conquistas || {};
     meusCliquesMascote = parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
-
     renderizarPainelXP();
     renderizarConquistas();
-
     const avatarSalvo = dados.mascoteAvatar || localStorage.getItem("skin_ativa") || "padrao";
     avatarSelecionado = avatarSalvo;
-
     if (meusCliquesMascote >= 1500) await desbloquearConquista("simpson_unlocked");
     if (meusCliquesMascote >= 3000) await desbloquearConquista("mafioso_unlocked");
     if (meusCliquesMascote >= 100) await desbloquearConquista("carinhoso");
@@ -604,22 +596,18 @@ function renderizarConquistas() {
   const grid = document.getElementById("conquistas-grid");
   const contador = document.getElementById("conquistas-contador");
   if (!grid) return;
-
   const conquistasFiltradas = CONQUISTAS.filter((c) => {
     const desbloqueada = !!minhasConquistas[c.id];
     if (filtroConquistasAtivo === "desbloqueadas") return desbloqueada;
     if (filtroConquistasAtivo === "bloqueadas") return !desbloqueada;
     return true;
   });
-
   const totalDesbloqueadas = CONQUISTAS.filter((c) => !!minhasConquistas[c.id]).length;
   if (contador) contador.textContent = `${totalDesbloqueadas}/${CONQUISTAS.length}`;
-
   if (conquistasFiltradas.length === 0) {
     grid.innerHTML = `<p class="conquistas-vazio">Nenhuma conquista nesta categoria.</p>`;
     return;
   }
-
   grid.innerHTML = conquistasFiltradas.map((c) => {
     const desbloqueada = !!minhasConquistas[c.id];
     const raridade = c.raridade || "comum";
@@ -642,6 +630,63 @@ function inicializarFiltrosConquistas() {
       filtroConquistasAtivo = btn.dataset.filtro || "todas";
       renderizarConquistas();
     });
+  });
+}
+
+// ==========================================
+// 🆕 SELETOR DE CONQUISTAS VISÍVEIS
+// ==========================================
+function renderizarSeletorConquistasVisiveis() {
+  const grid = document.getElementById("conquistas-visiveis-grid");
+  if (!grid) return;
+
+  if (CONQUISTAS.length === 0) {
+    grid.innerHTML = '<p class="conquistas-visiveis-vazio">Nenhuma conquista disponível.</p>';
+    return;
+  }
+
+  const selecionadas = conquistasVisiveisSelecionadas;
+
+  grid.innerHTML = CONQUISTAS.map((c) => {
+    const desbloqueada = !!minhasConquistas[c.id];
+    const estaSelecionada = selecionadas === null ? desbloqueada : selecionadas.includes(c.id);
+    const raridade = c.raridade || "comum";
+    return `
+      <div
+        class="conquista-visivel-item ${estaSelecionada ? "selecionada" : ""} ${raridade} ${!desbloqueada ? "bloqueada" : ""}"
+        data-id="${c.id}"
+        title="${escaparHTML(c.nome)} — ${escaparHTML(c.desc)}${!desbloqueada ? " (🔒 Bloqueada)" : ""}"
+      >
+        ${c.icone}
+      </div>`;
+  }).join("");
+
+  grid.querySelectorAll(".conquista-visivel-item:not(.bloqueada)").forEach((el) => {
+    el.addEventListener("click", () => {
+      const id = el.dataset.id;
+      if (conquistasVisiveisSelecionadas === null) {
+        conquistasVisiveisSelecionadas = CONQUISTAS
+          .filter((c) => !!minhasConquistas[c.id])
+          .map((c) => c.id);
+      }
+      const idx = conquistasVisiveisSelecionadas.indexOf(id);
+      if (idx >= 0) conquistasVisiveisSelecionadas.splice(idx, 1);
+      else conquistasVisiveisSelecionadas.push(id);
+      el.classList.toggle("selecionada", conquistasVisiveisSelecionadas.includes(id));
+    });
+  });
+}
+
+function inicializarBotoesConquistasVisiveis() {
+  document.getElementById("btn-conquistas-todas")?.addEventListener("click", () => {
+    conquistasVisiveisSelecionadas = CONQUISTAS
+      .filter((c) => !!minhasConquistas[c.id])
+      .map((c) => c.id);
+    renderizarSeletorConquistasVisiveis();
+  });
+  document.getElementById("btn-conquistas-nenhuma")?.addEventListener("click", () => {
+    conquistasVisiveisSelecionadas = [];
+    renderizarSeletorConquistasVisiveis();
   });
 }
 
@@ -910,7 +955,6 @@ if (themeToggle) {
     if (window.__graficoEvolucao && typeof desenharGraficoEvolucao === "function") desenharGraficoEvolucao();
   });
 }
-
 // ==========================================
 // FIREBASE LISTENERS
 // ==========================================
@@ -1012,7 +1056,7 @@ if (inputBuscaPerfis) {
 }
 
 // ==========================================
-// CONQUISTAS NO MODAL DE PERFIL
+// CONQUISTAS NO MODAL DE PERFIL (com visibilidade customizada)
 // ==========================================
 async function carregarConquistasNoModalPerfil(matricula) {
   const secao = document.getElementById("modal-perfil-conquistas");
@@ -1030,18 +1074,38 @@ async function carregarConquistasNoModalPerfil(matricula) {
   }
 
   try {
-    const snap = await get(ref(db, "usuarios_xp/" + matricula + "/conquistas"));
-    const conquistas = snap.val() || {};
-    const desbloqueadas = CONQUISTAS.filter((c) => !!conquistas[c.id]);
-    if (contador) contador.textContent = `${desbloqueadas.length}/${CONQUISTAS.length}`;
+    const [snapConquistas, snapPerfil] = await Promise.all([
+      get(ref(db, "usuarios_xp/" + matricula + "/conquistas")),
+      get(ref(db, "perfis_alunos/" + matricula)),
+    ]);
+    const conquistas = snapConquistas.val() || {};
+    const perfil = snapPerfil.val() || {};
 
-    grid.innerHTML = CONQUISTAS.map((c) => {
+    let conquistasVisiveis = perfil.conquistasVisiveis;
+    const temSelecao = Array.isArray(conquistasVisiveis);
+
+    const desbloqueadas = CONQUISTAS.filter((c) => !!conquistas[c.id]);
+
+    let conquistasParaMostrar;
+    if (temSelecao) {
+      conquistasParaMostrar = CONQUISTAS.filter((c) => conquistasVisiveis.includes(c.id) && !!conquistas[c.id]);
+      if (conquistasParaMostrar.length === 0) {
+        if (contador) contador.textContent = `0/${CONQUISTAS.length}`;
+        grid.innerHTML = '<p class="modal-perfil-conquistas-vazio">Este aluno não exibe conquistas publicamente.</p>';
+        return;
+      }
+    } else {
+      conquistasParaMostrar = desbloqueadas;
+    }
+
+    if (contador) contador.textContent = `${conquistasParaMostrar.length}/${CONQUISTAS.length}`;
+
+    grid.innerHTML = conquistasParaMostrar.map((c) => {
       const desbl = !!conquistas[c.id];
       const raridade = c.raridade || "comum";
-      const statusIcon = desbl ? "✓" : "🔒";
       return `
         <div class="modal-conquista-badge ${desbl ? "desbloqueada" : "bloqueada"} ${raridade}"
-             title="${escaparHTML(c.nome)} — ${escaparHTML(c.desc)} ${statusIcon}">
+             title="${escaparHTML(c.nome)} — ${escaparHTML(c.desc)}">
           ${c.icone}
         </div>`;
     }).join("");
@@ -1074,6 +1138,30 @@ window.abrirModalPerfil = function (identificador) {
   if (imgEl) imgEl.src = fotoExibir;
   if (nomeEl) nomeEl.textContent = nomeExibir;
   if (matEl) matEl.textContent = perfil.matricula || perfil.id || "Não informada";
+
+  // 🆕 Carrega nível + XP do aluno visualizado
+  (async function carregarNivelDoPerfil() {
+    const nivelBox = document.getElementById("modal-perfil-nivel");
+    const badgeEl = document.getElementById("modal-perfil-nivel-badge");
+    const nomeNivelEl = document.getElementById("modal-perfil-nivel-nome");
+    const xpEl = document.getElementById("modal-perfil-nivel-xp");
+    if (!nivelBox) return;
+    try {
+      const mat = perfil.matricula || perfil.id;
+      const snap = await get(ref(db, "usuarios_xp/" + mat));
+      const dados = snap.val() || {};
+      const xp = Number(dados.xp) || 0;
+      const nivelInfo = calcularNivel(xp);
+      if (badgeEl) badgeEl.textContent = nivelInfo.nivel;
+      if (nomeNivelEl) nomeNivelEl.textContent = nivelInfo.nome;
+      if (xpEl) xpEl.textContent = `${xp.toLocaleString("pt-BR")} XP`;
+      nivelBox.classList.remove("is-hidden");
+    } catch (err) {
+      console.warn("[nível perfil] erro:", err);
+      nivelBox.classList.add("is-hidden");
+    }
+  })();
+
   if (acessoEl) acessoEl.textContent = perfil.ultimoAcesso ? new Date(perfil.ultimoAcesso).toLocaleString("pt-BR") : t("nao_registrado");
   if (bioEl) {
     if (perfil.bio && String(perfil.bio).trim()) { bioEl.textContent = perfil.bio; bioEl.classList.remove("is-hidden"); }
@@ -1165,7 +1253,6 @@ window.alternarComentarios = function (recadoId) {
   if (box) box.style.display = box.style.display === "none" ? "block" : "none";
 };
 
-// +3 XP por comentário
 window.adicionarComentario = function (recadoId) {
   const inputEl = document.getElementById(`input-comentario-${recadoId}`);
   if (!inputEl) return;
@@ -1253,7 +1340,6 @@ window.editarRecado = function (id) {
   });
 };
 
-// +1 XP só na 1ª curtida
 window.curtirRecado = function (id) {
   const itemRef = ref(db, "mural_recados/" + id);
   get(itemRef).then((snapshot) => {
@@ -1414,6 +1500,9 @@ window.carregarPerfilUsuario = function (matricula) {
         perfilEditadoEm: dados.perfilEditadoEm || (local && local.perfilEditadoEm) || 0,
         ultimoAcesso: dados.ultimoAcesso || Date.now(),
         mascoteAvatar: dados.mascoteAvatar || (local && local.mascoteAvatar) || "padrao",
+        conquistasVisiveis: Array.isArray(dados.conquistasVisiveis)
+          ? dados.conquistasVisiveis
+          : (local && Array.isArray(local.conquistasVisiveis) ? local.conquistasVisiveis : null),
       };
       window.aplicarPerfilNoCard(perfilFinal);
       salvarPerfilLocal(matricula, perfilFinal);
@@ -1490,6 +1579,12 @@ window.abrirModalEditarPerfil = function () {
 
   avatarSelecionado = perfilUsuarioAtual.mascoteAvatar || "padrao";
   renderizarSeletorAvatar();
+
+  // 🆕 Carrega preferência de conquistas visíveis
+  const cv = perfilUsuarioAtual.conquistasVisiveis;
+  conquistasVisiveisSelecionadas = Array.isArray(cv) ? cv.slice() : null;
+  renderizarSeletorConquistasVisiveis();
+
   document.getElementById("modal-editar-perfil")?.classList.remove("is-hidden");
 };
 
@@ -1563,6 +1658,7 @@ async function salvarPerfilEditado() {
     matricula, foto: fotoFinal, bio, redes,
     perfilEditadoEm: agora, ultimoAcesso: agora,
     mascoteAvatar: avatarSelecionado,
+    conquistasVisiveis: conquistasVisiveisSelecionadas === null ? null : conquistasVisiveisSelecionadas.slice(),
   };
   const btnSalvar = document.getElementById("btn-salvar-perfil");
   const textoOriginal = btnSalvar.innerHTML;
@@ -2069,7 +2165,6 @@ function atualizarLinhaNota(tr, d, meta) {
   }
 }
 
-// +2 XP por uso do simulador
 function bindSimuladores(corpo) {
   corpo.querySelectorAll(".simulador-input").forEach(function (input) {
     if (input.dataset.bound) return;
@@ -2105,7 +2200,6 @@ function bindSimuladores(corpo) {
   });
 }
 
-// +5 XP por definir meta
 function abrirModalMetaDisciplina(codigo, nome) {
   var modal = document.getElementById("modal-meta-disciplina");
   if (!modal) return;
@@ -2225,7 +2319,6 @@ function salvarResumoBoletimFirebase(ano, periodo, disciplinas) {
   } catch (e) { console.warn("[resumo boletim] exceção:", e); }
 }
 
-// +5 XP por ver boletim (1x por período)
 function carregarBoletim(ano, periodo) {
   atualizarStatusNotas("Buscando notas no SUAP...", "loading");
   suap.getAuthenticatedResource(
@@ -2471,10 +2564,7 @@ async function carregarSalaProfessores() {
   __salaDadosCarregados = true;
 
   const tbody = document.getElementById("sala-lista-alunos");
-  if (!tbody) {
-    console.warn("[sala] tbody #sala-lista-alunos não encontrado");
-    return;
-  }
+  if (!tbody) { console.warn("[sala] tbody #sala-lista-alunos não encontrado"); return; }
 
   console.log("[sala] Iniciando carregamento...");
 
@@ -2487,7 +2577,6 @@ async function carregarSalaProfessores() {
   ]);
 
   const [perfisRes, carinhosRes, resumosRes, recadosRes, xpRes] = resultados;
-
   if (perfisRes.status === "rejected") console.warn("[sala] perfis falhou:", perfisRes.reason);
   if (carinhosRes.status === "rejected") console.warn("[sala] carinhos falhou:", carinhosRes.reason);
   if (resumosRes.status === "rejected") console.warn("[sala] resumos falhou:", resumosRes.reason);
@@ -2540,54 +2629,32 @@ async function carregarSalaProfessores() {
     tbody.innerHTML = `<tr><td colspan="7" class="sala-vazio"><i class="fa-regular fa-folder-open"></i> Nenhum aluno cadastrado.</td></tr>`;
   } else {
     tbody.innerHTML = alunos.map((a) => {
-      const diasSemAcesso = a.ultimoAcesso
-        ? Math.floor((Date.now() - a.ultimoAcesso) / (1000 * 60 * 60 * 24))
-        : null;
-      let statusClasse = "ok";
-      let statusLabel = "Ativo";
-      if (diasSemAcesso !== null && diasSemAcesso > 14) {
-        statusClasse = "danger";
-        statusLabel = `${diasSemAcesso}d sem acesso`;
-      } else if (diasSemAcesso !== null && diasSemAcesso > 7) {
-        statusClasse = "warn";
-        statusLabel = `${diasSemAcesso}d sem acesso`;
-      }
+      const diasSemAcesso = a.ultimoAcesso ? Math.floor((Date.now() - a.ultimoAcesso) / (1000 * 60 * 60 * 24)) : null;
+      let statusClasse = "ok", statusLabel = "Ativo";
+      if (diasSemAcesso !== null && diasSemAcesso > 14) { statusClasse = "danger"; statusLabel = `${diasSemAcesso}d sem acesso`; }
+      else if (diasSemAcesso !== null && diasSemAcesso > 7) { statusClasse = "warn"; statusLabel = `${diasSemAcesso}d sem acesso`; }
 
       let mediaHTML;
       if (a.mediaGeral !== null) {
         const cor = a.mediaGeral >= 60 ? "var(--success)" : a.mediaGeral >= 40 ? "var(--warning)" : "var(--danger)";
         mediaHTML = `<strong style="color:${cor}">${a.mediaGeral.toFixed(1)}</strong>`;
-      } else {
-        mediaHTML = `<span class="sala-sem-dados" title="Aluno ainda não abriu o site"><i class="fa-solid fa-clock"></i> Pendente</span>`;
-      }
+      } else mediaHTML = `<span class="sala-sem-dados" title="Aluno ainda não abriu o site"><i class="fa-solid fa-clock"></i> Pendente</span>`;
 
       let faltasHTML;
       if (a.faltasTotais !== null) {
         const cor = a.faltasTotais > 15 ? "var(--danger)" : a.faltasTotais > 10 ? "var(--warning)" : "var(--text-main)";
         faltasHTML = `<span style="color:${cor};font-weight:600">${a.faltasTotais}</span>`;
-      } else {
-        faltasHTML = `<span class="sala-sem-dados"><i class="fa-solid fa-clock"></i> Pendente</span>`;
-      }
+      } else faltasHTML = `<span class="sala-sem-dados"><i class="fa-solid fa-clock"></i> Pendente</span>`;
 
-      return `
-        <tr data-nome="${a.nome.toLowerCase()}" data-mat="${a.matricula}">
-          <td>
-            <div class="td-aluno">
-              <img src="${a.foto}" alt="${a.nome}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=random'">
-              <span>${escaparHTML(a.nome)}</span>
-            </div>
-          </td>
-          <td>${a.matricula}</td>
-          <td>${mediaHTML}</td>
-          <td>${faltasHTML}</td>
-          <td><i class="fa-solid fa-heart" style="color:#ff6b6b;font-size:0.8rem;"></i> ${a.carinhos.toLocaleString("pt-BR")}</td>
-          <td>
-            <span title="${a.numConquistas} de ${CONQUISTAS.length} conquistas • ${a.xpTotal} XP" style="font-weight:700;color:${a.numConquistas >= 9 ? 'var(--success)' : a.numConquistas >= 5 ? 'var(--warning)' : 'var(--text-main)'};">
-              🎖️ ${a.numConquistas}/${CONQUISTAS.length}
-            </span>
-          </td>
-          <td><span class="sala-badge ${statusClasse}">${statusLabel}</span></td>
-        </tr>`;
+      return `<tr data-nome="${a.nome.toLowerCase()}" data-mat="${a.matricula}">
+        <td><div class="td-aluno"><img src="${a.foto}" alt="${a.nome}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=random'"><span>${escaparHTML(a.nome)}</span></div></td>
+        <td>${a.matricula}</td>
+        <td>${mediaHTML}</td>
+        <td>${faltasHTML}</td>
+        <td><i class="fa-solid fa-heart" style="color:#ff6b6b;font-size:0.8rem;"></i> ${a.carinhos.toLocaleString("pt-BR")}</td>
+        <td><span title="${a.numConquistas} de ${CONQUISTAS.length} conquistas • ${a.xpTotal} XP" style="font-weight:700;color:${a.numConquistas >= 9 ? 'var(--success)' : a.numConquistas >= 5 ? 'var(--warning)' : 'var(--text-main)'};">🎖️ ${a.numConquistas}/${CONQUISTAS.length}</span></td>
+        <td><span class="sala-badge ${statusClasse}">${statusLabel}</span></td>
+      </tr>`;
     }).join("");
   }
 
@@ -2602,31 +2669,20 @@ async function carregarSalaProfessores() {
     if (elAlu) elAlu.textContent = alunos.length;
     const top = alunos.reduce((max, a) => (a.carinhos > (max?.carinhos || 0) ? a : max), null);
     if (elTop) elTop.textContent = top ? `${top.nome} (${top.carinhos})` : "—";
-  } catch (e) {
-    console.warn("[sala] erro nos stats:", e);
-  }
+  } catch (e) { console.warn("[sala] erro nos stats:", e); }
 
   const engajamentoLista = document.getElementById("sala-engajamento-lista");
   if (engajamentoLista) {
     try {
       const ordenados = [...alunos].sort((a, b) => b.carinhos - a.carinhos).slice(0, 10);
-      engajamentoLista.innerHTML = ordenados
-        .filter((a) => a.carinhos > 0)
-        .map((a, i) => `
-          <div class="sala-engajamento-item">
-            <span style="font-weight:800;color:var(--accent);min-width:26px;">${i + 1}º</span>
-            <img src="${a.foto}" alt="${a.nome}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=random'">
-            <div class="sala-engajamento-info">
-              <div class="sala-engajamento-nome">${escaparHTML(a.nome)}</div>
-              <div class="sala-engajamento-metricas">
-                <span><i class="fa-solid fa-heart" style="color:#ff6b6b;"></i> ${a.carinhos.toLocaleString("pt-BR")} carinhos</span>
-              </div>
-            </div>
-          </div>`)
-        .join("") || '<p class="sala-vazio-msg">Sem dados de engajamento ainda.</p>';
-    } catch (e) {
-      console.warn("[sala] erro engajamento:", e);
-    }
+      engajamentoLista.innerHTML = ordenados.filter((a) => a.carinhos > 0).map((a, i) => `
+        <div class="sala-engajamento-item">
+          <span style="font-weight:800;color:var(--accent);min-width:26px;">${i + 1}º</span>
+          <img src="${a.foto}" alt="${a.nome}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=random'">
+          <div class="sala-engajamento-info"><div class="sala-engajamento-nome">${escaparHTML(a.nome)}</div>
+          <div class="sala-engajamento-metricas"><span><i class="fa-solid fa-heart" style="color:#ff6b6b;"></i> ${a.carinhos.toLocaleString("pt-BR")} carinhos</span></div></div>
+        </div>`).join("") || '<p class="sala-vazio-msg">Sem dados de engajamento ainda.</p>';
+    } catch (e) { console.warn("[sala] erro engajamento:", e); }
   }
 
   const buscaInput = document.getElementById("sala-busca-aluno");
@@ -2873,6 +2929,7 @@ document.addEventListener("DOMContentLoaded", function () {
   renderizarLegendaCalendario();
   initMenuLateral();
   inicializarFiltrosConquistas();
+  inicializarBotoesConquistasVisiveis();
 
   document.querySelectorAll("#menu-idioma .dropdown-item").forEach(function (btn) {
     btn.addEventListener("click", function () { trocarIdioma(btn.dataset.idioma); });
@@ -3004,25 +3061,12 @@ document.addEventListener("DOMContentLoaded", function () {
         carregarPainelXP();
         atualizarStreakLogin();
 
-        // DEBUG: verificar se a matrícula é admin
-        console.log("[admin check] Matrícula logada:", matriculaSuap);
-        console.log("[admin check] Matrículas admin:", ADMIN_MATRICULAS_SALA);
-        console.log("[admin check] É admin?", ADMIN_MATRICULAS_SALA.includes(matriculaSuap));
-
         if (ADMIN_MATRICULAS_SALA.includes(matriculaSuap)) {
           setTimeout(() => {
             const secaoSala = document.getElementById("sala-professores");
-            if (secaoSala) {
-              secaoSala.classList.remove("is-admin-hidden");
-              console.log("[sala] Seção destravada");
-            } else {
-              console.warn("[sala] #sala-professores não encontrado no DOM");
-            }
+            if (secaoSala) secaoSala.classList.remove("is-admin-hidden");
             const menuItemSala = document.getElementById("menu-item-sala");
-            if (menuItemSala) {
-              menuItemSala.classList.remove("is-hidden");
-              console.log("[sala] Menu item destravado");
-            }
+            if (menuItemSala) menuItemSala.classList.remove("is-hidden");
             carregarSalaProfessores();
           }, 1000);
         }
