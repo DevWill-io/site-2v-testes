@@ -1,5 +1,5 @@
 // ==========================================
-// 🎯 api/[...path].js — Roteador central (catch-all)
+// 🎯 api/_router.js — Roteador central
 // ==========================================
 import handlerXpAdd from "./_lib/handlers/xp-add.js";
 import handlerXpContador from "./_lib/handlers/xp-contador.js";
@@ -17,11 +17,9 @@ import handlerRankingCarinhos from "./_lib/handlers/ranking-carinhos.js";
 import handlerRankingXp from "./_lib/handlers/ranking-xp.js";
 
 export default async function handler(req, res) {
-  // req.query.path chega como array (ex: ["xp", "add"]) ou string (ex: "xp")
-  const pathArray = Array.isArray(req.query.path)
-    ? req.query.path
-    : [req.query.path];
-  const path = pathArray.filter(Boolean).join("/");
+  const url = req.url.split("?")[0];
+  const path = url.replace(/^\/api\/?/, "").replace(/^\/*/, "");
+  console.log("[api] URL:", url, "| path:", path);
 
   const rotas = {
     "xp/add": handlerXpAdd,
