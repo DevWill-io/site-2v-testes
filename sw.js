@@ -6,6 +6,7 @@ const ASSETS_CACHE = [
   "/",
   "/login.html",
   "/index.html",
+  "/tutorial.html",
   "/styles/login.css",
   "/styles/style.css",
   "/styles/mascote.css",
