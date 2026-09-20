@@ -1,5 +1,5 @@
 /* ==========================================
-   🔇 REMOVE O FUNDO AZUL DE CLIQUE + CURSOR "|"
+   🔇 REMOVE FUNDO AZUL + CURSOR "|"
    ========================================== */
 * {
     -webkit-tap-highlight-color: transparent;
@@ -37,18 +37,20 @@ input, textarea, [contenteditable="true"] {
 
 button, a, label, [role="button"],
 .navbar, .menu-lateral, .menu-item, .menu-acao-btn,
-.btn-theme, .btn-menu-hamburguer, .btn-fechar-menu {
+.btn-theme, .btn-menu-hamburguer, .btn-fechar-menu,
+.btn-instalar-app {
     user-select: none;
     -webkit-user-select: none;
 }
 
-p, h1, h2, h3, h4, h5, h6, span, li, .recado-mensagem, .projeto-card p {
+p, h1, h2, h3, h4, h5, h6, span, li,
+.recado-mensagem, .projeto-card p {
     user-select: text;
     -webkit-user-select: text;
 }
 
 /* ==========================================
-   VARIÁVEIS GLOBAIS — tema dinâmico
+   VARIÁVEIS GLOBAIS
    ========================================== */
 :root {
     --tema-h: 265;
@@ -220,6 +222,24 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ==========================================
+   📱 BOTÃO INSTALAR APP
+   ========================================== */
+.btn-instalar-app {
+    color: var(--accent);
+    animation: bounceInstall 2s ease-in-out infinite;
+}
+
+.btn-instalar-app:hover {
+    background: hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.2);
+    transform: translateY(-2px);
+}
+
+@keyframes bounceInstall {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+/* ==========================================
    DROPDOWNS
    ========================================== */
 .menu-dropdown { position: relative; }
@@ -330,9 +350,7 @@ a { text-decoration: none; color: inherit; }
 }
 
 @media (min-width: 1101px) {
-    .menu-lateral {
-        width: 420px;
-    }
+    .menu-lateral { width: 420px; }
 }
 
 .menu-lateral-header {
@@ -1030,6 +1048,7 @@ body.light-theme .frase-do-dia {
 .tabela-horarios .intervalo { background-color: var(--bg-base); font-weight: bold; color: var(--accent); }
 .horario-legenda { text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-top: 20px; }
 .horario-legenda i { margin-right: 8px; }
+.horario-legenda a { color: var(--accent); text-decoration: underline; }
 
 .galeria { background-color: var(--bg-base); }
 .galeria-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); gap: 20px; }
@@ -1075,22 +1094,4 @@ body.light-theme .frase-do-dia {
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
-}
-
-/* ==========================================
-   📱 BOTÃO INSTALAR APP
-   ========================================== */
-.btn-instalar-app {
-    animation: bounceInstall 2s ease-in-out infinite;
-    color: var(--accent);
-}
-
-.btn-instalar-app:hover {
-    background: hsl(var(--tema-h), var(--tema-s), var(--tema-l) / 0.2);
-    transform: translateY(-2px);
-}
-
-@keyframes bounceInstall {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-3px); }
 }
