@@ -277,7 +277,7 @@
       </div>
     </main>
 
-    <!-- 🆕 PAINEL DE XP E CONQUISTAS -->
+    <!-- PAINEL DE XP E CONQUISTAS -->
     <section id="xp-painel" class="xp-painel is-authenticated is-hidden">
       <div class="container">
         <div class="xp-card">
@@ -768,12 +768,13 @@
                     <th data-i18n="sala_th_media">Média</th>
                     <th data-i18n="sala_th_faltas">Faltas</th>
                     <th data-i18n="sala_th_carinhos">Carinhos</th>
+                    <th data-i18n="sala_th_conquistas">Conquistas</th>
                     <th data-i18n="sala_th_status">Status</th>
                   </tr>
                 </thead>
                 <tbody id="sala-lista-alunos">
                   <tr>
-                    <td colspan="6" class="sala-vazio">
+                    <td colspan="7" class="sala-vazio">
                       <i class="fa-solid fa-spinner fa-spin"></i>
                       <span data-i18n="sala_carregando">Carregando dados...</span>
                     </td>
@@ -835,6 +836,16 @@
           </p>
           <p id="modal-perfil-bio" class="modal-perfil-bio is-hidden"></p>
           <div id="modal-perfil-redes" class="modal-perfil-redes is-hidden"></div>
+
+          <div id="modal-perfil-conquistas" class="modal-perfil-conquistas is-hidden">
+            <h4 class="modal-perfil-conquistas-titulo">
+              <i class="fa-solid fa-medal"></i>
+              <span data-i18n="conquistas_titulo">Conquistas</span>
+              <span id="modal-perfil-conquistas-contador" class="modal-perfil-conquistas-contador">0/0</span>
+            </h4>
+            <div id="modal-perfil-conquistas-grid" class="modal-perfil-conquistas-grid"></div>
+          </div>
+
           <p style="margin-top: 12px; font-size: 0.85em; color: var(--text-muted);">
             <span data-i18n="ultimo_acesso">Último Acesso:</span>
             <span id="modal-perfil-acesso" data-i18n="nao_registrado">Não registrado</span>
