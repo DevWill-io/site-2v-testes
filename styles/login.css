@@ -4079,14 +4079,16 @@ body.light-theme .field-checkbox-marca {
    SALA DOS PROFESSORES — CORREÇÃO DA ABA ADMINS
    ========================================== */
 .sala-painel {
-  min-height: auto !important;
   height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
   overflow: visible !important;
 }
 
-.sala-tab-content {
-  min-height: auto;
-  height: auto;
+.sala-tab-content.ativo {
+  height: auto !important;
+  min-height: auto !important;
+  overflow: visible !important;
 }
 
 .sala-tab-content.ativo {
