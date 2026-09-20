@@ -1,5 +1,5 @@
 // ==========================================
-// 🎯 api/index.js — Roteador central de todas as chamadas
+// 🎯 api/[...path].js — Roteador central (catch-all)
 // ==========================================
 import handlerXpAdd from "./_lib/handlers/xp-add.js";
 import handlerXpContador from "./_lib/handlers/xp-contador.js";
@@ -17,12 +17,12 @@ import handlerRankingCarinhos from "./_lib/handlers/ranking-carinhos.js";
 import handlerRankingXp from "./_lib/handlers/ranking-xp.js";
 
 export default async function handler(req, res) {
-  // Extrai o caminho da URL (ex: "/api/xp/add")
-  const { url } = req;
-  // Remove a query string e o prefixo "/api"
-  const path = url.split("?")[0].replace(/^\/api\/?/, "");
+  // req.query.path chega como array (ex: ["xp", "add"]) ou string (ex: "xp")
+  const pathArray = Array.isArray(req.query.path)
+    ? req.query.path
+    : [req.query.path];
+  const path = pathArray.filter(Boolean).join("/");
 
-  // Mapeamento: path → handler
   const rotas = {
     "xp/add": handlerXpAdd,
     "xp/contador": handlerXpContador,
@@ -39,9 +39,8 @@ export default async function handler(req, res) {
     "ranking/xp": handlerRankingXp,
   };
 
-  // Rota especial para perfil público: /api/perfil/:matricula
+  // Rota especial: /api/perfil/:matricula
   if (path.startsWith("perfil/") && path !== "perfil/update") {
-    req.query = req.query || {};
     req.query.matricula = path.replace("perfil/", "");
     return handlerPerfilPublico(req, res);
   }
@@ -51,6 +50,8 @@ export default async function handler(req, res) {
     return rotaHandler(req, res);
   }
 
-  // Se não encontrou, retorna 404
-  res.status(404).json({ sucesso: false, erro: "Endpoint não encontrado" });
+  return res.status(404).json({
+    sucesso: false,
+    erro: `Endpoint não encontrado: /api/${path}`,
+  });
 }
