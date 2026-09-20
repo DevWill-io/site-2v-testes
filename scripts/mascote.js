@@ -2,7 +2,7 @@
 // 🐾 MASCOTE — Firebase v12 modular + Interações
 // ==========================================
 // Leitura em tempo real: Firebase onValue (permitido)
-// Escrita de carinho: /api/mascote/carinho (via API quando logado)
+// Escrita de carinho: via xp-core.js (que chama /api/mascote?tipo=carinho quando logado)
 // Anônimo: mantém comportamento antigo (localStorage + runTransaction)
 // ==========================================
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
@@ -16,7 +16,6 @@ import {
   push,
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
-// Reaproveita a MESMA config do login
 const firebaseConfig = {
   apiKey: "AIzaSyA_wDDRCRJL_WviT6FBorz8dhnHe0-pI8s",
   authDomain: "muralturmanormal.firebaseapp.com",
@@ -30,17 +29,11 @@ const app = getApps().find((a) => a.name === "mascoteApp")
   || initializeApp(firebaseConfig, "mascoteApp");
 const db = getDatabase(app);
 
-// ==========================================
-// CONFIGURAÇÕES
-// ==========================================
 const LIMITE_CARINHOS = 1000000;
 const COOLDOWN_MS = 350;
 const MATRICULA_STORAGE_KEY = "mascote_matricula_temp";
 const MATRICULA_ADMIN = "20261101110002";
 
-// ==========================================
-// 🎭 AVATARES DO MASCOTE (com admin)
-// ==========================================
 const AVATARES = {
   padrao: "🐾",
   genio: "🧠",
@@ -63,34 +56,6 @@ const IMAGENS_MASCOTE = {
 
 const IMAGEM_MASCOTE_PADRAO = "img/MascotePadrao.png";
 
-// ==========================================
-// 🌐 CHAMADA À API (helper)
-// ==========================================
-function obterTokenSuap() {
-  const m = document.cookie.match(/(?:^|;\s*)suapToken=([^;]+)/);
-  if (m) return decodeURIComponent(m[1]);
-  return localStorage.getItem("suapToken") || null;
-}
-
-async function chamarAPI(endpoint, corpo) {
-  const token = obterTokenSuap();
-  if (!token) throw new Error("Sem token SUAP");
-  const res = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
-    },
-    body: JSON.stringify(corpo || {}),
-  });
-  const dados = await res.json();
-  if (!res.ok) throw new Error(dados.erro || "Erro na API");
-  return dados;
-}
-
-// ==========================================
-// ESTADO
-// ==========================================
 let carinhosGlobais = 0;
 let meusCarinhos = 0;
 let podeClicar = true;
@@ -99,9 +64,6 @@ let marcosAnteriores = new Set();
 let perfisCache = {};
 let rankingDataCache = {};
 
-// ==========================================
-// PEGA MATRÍCULA (SUAP → cookie → localStorage → anônimo)
-// ==========================================
 function obterMatricula() {
   const matCookie = document.cookie
     .split("; ")
@@ -122,11 +84,8 @@ function obterMatricula() {
 const MINHA_MATRICULA = obterMatricula();
 const SOU_ADMIN = MINHA_MATRICULA === MATRICULA_ADMIN;
 const SOU_ANONIMO = MINHA_MATRICULA.startsWith("anon_");
-console.log("[mascote] Matrícula usada:", MINHA_MATRICULA, "| É admin?", SOU_ADMIN, "| Anônimo?", SOU_ANONIMO);
+console.log("[mascote] Matrícula:", MINHA_MATRICULA, "| Admin?", SOU_ADMIN, "| Anônimo?", SOU_ANONIMO);
 
-// ==========================================
-// Inicializa avatarAtual com prioridade correta
-// ==========================================
 let avatarAtual = (function () {
   if (SOU_ADMIN) {
     const skinSalva = localStorage.getItem("skin_ativa");
@@ -148,9 +107,6 @@ if (SOU_ADMIN) {
   }
 }
 
-// ==========================================
-// ELEMENTOS DO DOM
-// ==========================================
 const mascoteImg = document.getElementById("mascoteImg");
 const btnCarinho = document.getElementById("darCarinhoBtn");
 const mascoteLikesSpan = document.getElementById("mascote-likes");
@@ -170,9 +126,6 @@ const proximaSkinNome = document.getElementById("proxima-skin-nome");
 const proximaSkinContagem = document.getElementById("proxima-skin-contagem");
 const skinProgressoFill = document.getElementById("skin-progresso-fill");
 
-// ==========================================
-// 🔊 ÁUDIO (Web Audio API — sem arquivos externos)
-// ==========================================
 let audioCtx = null;
 
 function tocarSom(tipo = "carinho") {
@@ -234,9 +187,6 @@ function tocarSom(tipo = "carinho") {
   } catch (e) {}
 }
 
-// ==========================================
-// BOTÃO DE MUTE
-// ==========================================
 function criarBotaoMute() {
   if (document.getElementById("btn-mute-mascote")) return;
   const btn = document.createElement("button");
@@ -258,9 +208,6 @@ function criarBotaoMute() {
 }
 criarBotaoMute();
 
-// ==========================================
-// 🎨 EMOJI DO AVATAR
-// ==========================================
 function emojiCoracao() {
   return AVATARES[avatarAtual] || "💖";
 }
@@ -283,9 +230,6 @@ function mostrarAvatarFlutuante() {
 }
 mostrarAvatarFlutuante();
 
-// ==========================================
-// 🎁 SISTEMA DE SKINS — Barra de progresso
-// ==========================================
 function atualizarProgressoSkin() {
   if (!skinProgressoBox || !skinProgressoFill) return;
 
@@ -374,9 +318,6 @@ onValue(ref(db, "mascote/avatares/" + MINHA_MATRICULA), (snap) => {
   }
 });
 
-// ==========================================
-// 🎨 CORAÇÕES VOANDO
-// ==========================================
 function criarCoracao(x, y) {
   const coracao = document.createElement("div");
   coracao.textContent = emojiCoracao();
@@ -388,9 +329,6 @@ function criarCoracao(x, y) {
   setTimeout(() => coracao.remove(), 1200);
 }
 
-// ==========================================
-// 🎉 CONFETES
-// ==========================================
 function soltarConfete(qtd = 40) {
   const cores = ["#ff4757", "#ffa502", "#2ed573", "#1e90ff", "#a55eea", "#ffd700"];
   for (let i = 0; i < qtd; i++) {
@@ -408,9 +346,6 @@ function soltarConfete(qtd = 40) {
   }
 }
 
-// ==========================================
-// 🔔 NOTIFICAÇÕES
-// ==========================================
 function mostrarNotificacao(mensagem, tipo = "sucesso") {
   const notif = document.createElement("div");
   notif.textContent = mensagem;
@@ -444,9 +379,6 @@ function mostrarNotificacao(mensagem, tipo = "sucesso") {
   }, 2200);
 }
 
-// ==========================================
-// 🏆 MARCOS DE CONQUISTA
-// ==========================================
 const MARCOS = [
   { valor: 100, icone: "🥉", texto: "100" },
   { valor: 1000, icone: "🥈", texto: "1k" },
@@ -495,9 +427,6 @@ function verificarNovoMarco(valorAnterior, valorNovo) {
   });
 }
 
-// ==========================================
-// 🎨 ATUALIZAR UI
-// ==========================================
 function atualizarProgresso() {
   if (progressoFill) {
     const percentual = Math.min((carinhosGlobais / LIMITE_CARINHOS) * 100, 100);
@@ -550,9 +479,6 @@ function atualizarBotaoLimite() {
   }
 }
 
-// ==========================================
-// 🏆 RANKING DO MASCOTE
-// ==========================================
 function renderizarRanking() {
   if (!rankingLista) return;
   const data = rankingDataCache || {};
@@ -626,9 +552,6 @@ btnToggleRanking?.addEventListener("click", () => {
   btnToggleRanking.setAttribute("aria-expanded", colapsado ? "false" : "true");
 });
 
-// ==========================================
-// 💾 FIREBASE — leitura em tempo real
-// ==========================================
 const totalRef = ref(db, "mascote/total_carinhos");
 const meuRef = ref(db, "mascote/por_aluno/" + MINHA_MATRICULA);
 
@@ -647,9 +570,6 @@ onValue(meuRef, (snap) => {
   renderizarRanking();
 });
 
-// ==========================================
-// 💖 DAR CARINHO
-// ==========================================
 async function darCarinho(event) {
   if (!podeClicar) return;
 
@@ -669,17 +589,11 @@ async function darCarinho(event) {
   }
   tocarSom("carinho");
 
-  // ==========================================
-  // REGISTRA CLIQUE + XP
-  // - Logado: xpCore.incrementarCliquesMascote() (chama a API)
-  // - Anônimo: fallback local
-  // ==========================================
   const cliquesAntes = window.xpCore?.estaPronto?.()
     ? window.xpCore.obterCliquesMascote()
     : parseInt(localStorage.getItem("xp_cliques_mascote") || "0", 10);
 
   if (window.xpCore?.estaPronto?.()) {
-    // A API do carinho já incrementa cliquesMascote + xp + total + por_aluno
     window.xpCore.incrementarCliquesMascote(1);
   } else {
     localStorage.setItem("xp_cliques_mascote", String(cliquesAntes + 1));
@@ -689,7 +603,6 @@ async function darCarinho(event) {
 
   atualizarProgressoSkin();
 
-  // Detecta desbloqueio de skin nova
   const cliquesDepois = cliquesAntes + 1;
   const SKINS_BLOQUEAVEIS = [
     { id: "simpson", meta: 1500, nomeKey: "skin_simpson" },
@@ -708,7 +621,6 @@ async function darCarinho(event) {
     }
   });
 
-  // Corações voando
   let x, y;
   if (event && event.clientX && event.clientY) {
     x = event.clientX;
@@ -731,10 +643,6 @@ async function darCarinho(event) {
     }, i * 60);
   }
 
-  // ==========================================
-  // Se anônimo: escreve direto no Firebase (fallback)
-  // Se logado: API já cuidou de tudo em incrementarCliquesMascote()
-  // ==========================================
   if (SOU_ANONIMO) {
     try {
       await runTransaction(totalRef, (valorAtual) => {
@@ -779,15 +687,9 @@ async function darCarinho(event) {
   }
 }
 
-// ==========================================
-// 🔗 EVENTOS
-// ==========================================
 if (btnCarinho) btnCarinho.addEventListener("click", darCarinho);
 if (mascoteImg) mascoteImg.addEventListener("click", darCarinho);
 
-// ==========================================
-// 🎁 FUNÇÕES EXTRAS
-// ==========================================
 window.resetarCarinhos = function () {
   if (!confirm("⚠️ Resetar os carinhos? Só admin deveria fazer isso."))
     return;

@@ -207,7 +207,7 @@ async function incrementarXP(quantidade, motivo) {
 
   if (!cache.ehAnonimo && cache.matricula) {
     try {
-      await chamarAPI("/api/xp/add", { quantidade, motivo });
+      await chamarAPI("/api/xp?tipo=add", { quantidade, motivo });
     } catch (e) {
       console.warn("[xp-core] erro API incrementarXP, enfileirando:", e);
       filaOffline.push({ tipo: "xp", qtd: quantidade, motivo });
@@ -232,11 +232,8 @@ async function incrementarCliquesMascote(quantidade) {
 
   if (!cache.ehAnonimo && cache.matricula) {
     try {
-      // A API do carinho incrementa cliquesMascote + xp + total + por_aluno
-      // Uma chamada por clique
       for (let i = 0; i < quantidade; i++) {
-        const r = await chamarAPI("/api/mascote/carinho", {});
-        // Atualiza cache local com o total global retornado
+        const r = await chamarAPI("/api/mascote?tipo=carinho", {});
         if (typeof r.totalGlobal === "number") {
           emitir("mascote:total-global", { total: r.totalGlobal });
         }
@@ -279,7 +276,7 @@ async function incrementarContador(nome, quantidade = 1) {
 
   if (!cache.ehAnonimo && cache.matricula) {
     try {
-      await chamarAPI("/api/xp/contador", { nome, quantidade });
+      await chamarAPI("/api/xp?tipo=contador", { nome, quantidade });
     } catch (e) {
       console.warn("[xp-core] erro API incrementarContador, enfileirando:", e);
       filaOffline.push({ tipo: "contador", nome, qtd: quantidade });
@@ -316,7 +313,7 @@ async function registrarAcessoDiario() {
 
   if (!cache.ehAnonimo && cache.matricula) {
     try {
-      const r = await chamarAPI("/api/xp/acesso-diario", {});
+      const r = await chamarAPI("/api/xp?tipo=acesso-diario", {});
       cache.streak = r.streak || novoStreak;
       if (r.bonusXP) {
         cache.xp += r.bonusXP;
@@ -326,12 +323,10 @@ async function registrarAcessoDiario() {
       return { streak: r.streak, novo: r.novo, bonusXP: r.bonusXP };
     } catch (e) {
       console.warn("[xp-core] erro API acessoDiario:", e);
-      // Fallback local: soma bônus no cache
       cache.xp += bonusXP;
       lsSet(LS.XP, cache.xp);
     }
   } else {
-    // Anônimo: soma bônus local
     cache.xp += bonusXP;
     lsSet(LS.XP, cache.xp);
   }
@@ -349,7 +344,7 @@ async function desbloquearConquista(id) {
 
   if (!cache.ehAnonimo && cache.matricula) {
     try {
-      const r = await chamarAPI("/api/conquista/unlock", { id });
+      const r = await chamarAPI("/api/conquista", { id });
       if (!r.desbloqueada && r.jaTinha) {
         cache.conquistas[id] = { desbloqueadaEm: Date.now() };
         return false;
@@ -364,7 +359,6 @@ async function desbloquearConquista(id) {
     }
   }
 
-  // Anônimo
   const agora = Date.now();
   cache.conquistas[id] = { desbloqueadaEm: agora };
   emitir("xpCore:conquista", { id, desbloqueadaEm: agora });
@@ -383,7 +377,7 @@ async function definirSkinAtiva(skinId) {
 
   if (!cache.ehAnonimo && cache.matricula) {
     try {
-      await chamarAPI("/api/mascote/skin", { skinId });
+      await chamarAPI("/api/mascote?tipo=skin", { skinId });
     } catch (e) {
       console.warn("[xp-core] erro API definirSkinAtiva:", e);
       return false;
@@ -589,13 +583,13 @@ async function processarFilaOffline() {
   for (const item of fila) {
     try {
       if (item.tipo === "xp") {
-        await chamarAPI("/api/xp/add", { quantidade: item.qtd, motivo: item.motivo });
+        await chamarAPI("/api/xp?tipo=add", { quantidade: item.qtd, motivo: item.motivo });
       } else if (item.tipo === "cliques") {
         for (let i = 0; i < item.qtd; i++) {
-          await chamarAPI("/api/mascote/carinho", {});
+          await chamarAPI("/api/mascote?tipo=carinho", {});
         }
       } else if (item.tipo === "contador") {
-        await chamarAPI("/api/xp/contador", { nome: item.nome, quantidade: item.qtd });
+        await chamarAPI("/api/xp?tipo=contador", { nome: item.nome, quantidade: item.qtd });
       }
     } catch (e) {
       filaOffline.push(item);
