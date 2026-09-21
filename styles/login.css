@@ -4269,3 +4269,91 @@ body.light-theme .cargo-badge-lendario {
     text-align: center;
   }
 }
+
+/* ===================================================================
+   👑 BADGE EXCLUSIVA DO ADMIN
+   ===================================================================
+   Aparece ao lado do nome do admin em todos os lugares onde o cargo
+   aparece (exceto Sala dos Professores e Ranking).
+   =================================================================== */
+
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  margin-right: 6px;
+  font-size: 0.75rem;
+  vertical-align: middle;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #ffd700, #ff8c00);
+  color: #000;
+  border: 1.5px solid #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+  animation: brilhoAdmin 2s ease-in-out infinite;
+  cursor: help;
+}
+
+.admin-badge i {
+  font-size: 0.72rem;
+}
+
+@keyframes brilhoAdmin {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 1);
+  }
+}
+
+/* No modal de perfil (badge um pouco maior) */
+.modal-perfil-badges .admin-badge,
+.user-profile-card .admin-badge {
+  width: 26px;
+  height: 26px;
+  font-size: 0.85rem;
+}
+
+.modal-perfil-badges .admin-badge i,
+.user-profile-card .admin-badge i {
+  font-size: 0.82rem;
+}
+
+/* Mural e Membros (badge compacta) */
+.recado-nome .admin-badge,
+.perfil-nome .admin-badge {
+  width: 18px;
+  height: 18px;
+  font-size: 0.65rem;
+  margin-right: 5px;
+}
+
+.recado-nome .admin-badge i,
+.perfil-nome .admin-badge i {
+  font-size: 0.62rem;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .admin-badge {
+    width: 19px;
+    height: 19px;
+    font-size: 0.68rem;
+    margin-right: 4px;
+  }
+  .admin-badge i {
+    font-size: 0.62rem;
+  }
+  .modal-perfil-badges .admin-badge,
+  .user-profile-card .admin-badge {
+    width: 22px;
+    height: 22px;
+  }
+  .modal-perfil-badges .admin-badge i,
+  .user-profile-card .admin-badge i {
+    font-size: 0.7rem;
+  }
+}

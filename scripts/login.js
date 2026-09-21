@@ -87,6 +87,11 @@ function addStopSeguro(gradient, posicao, cor, fallback) {
 // 🎭 SKINS DO MASCOTE
 // ==========================================
 const MATRICULA_ADMIN = "20261101110002";
+// 👑 Badge exclusiva do admin
+function montarBadgeAdmin(matricula) {
+  if (String(matricula) !== MATRICULA_ADMIN) return "";
+  return `<span class="admin-badge" title="Administrador do site"><i class="fa-solid fa-crown"></i></span>`;
+}
 
 // ==========================================
 // 🎭 SKINS DO MASCOTE
@@ -898,9 +903,21 @@ function renderizarCargoNoCardPrincipal() {
   const card = document.querySelector(".user-profile-card");
   if (!card) return;
 
-  // Remove badge antigo, se existir
-  const antigo = card.querySelector(".user-cargo-badge");
-  if (antigo) antigo.remove();
+  // Remove badges antigas, se existirem
+  const antigoCargo = card.querySelector(".user-cargo-badge");
+  if (antigoCargo) antigoCargo.remove();
+  const antigoAdmin = card.querySelector(".user-admin-badge");
+  if (antigoAdmin) antigoAdmin.remove();
+
+  // 👑 Badge de admin (independente do cargo)
+  const mat = window.usuarioLogado?.matricula;
+  if (String(mat) === MATRICULA_ADMIN) {
+    const adminBadge = document.createElement("span");
+    adminBadge.className = "user-admin-badge";
+    adminBadge.innerHTML = montarBadgeAdmin(mat);
+    const nomeEl = card.querySelector(".user-name");
+    if (nomeEl) nomeEl.insertAdjacentElement("beforebegin", adminBadge);
+  }
 
   if (!meuCargo) return;
 
@@ -933,11 +950,24 @@ async function carregarCargoNoModalPerfil(matricula) {
   const container = document.getElementById("modal-perfil-badges");
   if (!container) return;
 
-  // Remove cargo antigo
-  const antigo = container.querySelector(".modal-perfil-cargo");
-  if (antigo) antigo.remove();
+  // Remove badges antigas
+  const antigoCargo = container.querySelector(".modal-perfil-cargo");
+  if (antigoCargo) antigoCargo.remove();
+  const antigoAdmin = container.querySelector(".modal-perfil-admin-badge");
+  if (antigoAdmin) antigoAdmin.remove();
 
   if (!matricula) return;
+
+  // 👑 Badge de admin (independente do cargo)
+  if (String(matricula) === MATRICULA_ADMIN) {
+    const adminBadge = document.createElement("div");
+    adminBadge.className = "modal-perfil-admin-badge";
+    adminBadge.innerHTML = `<span class="admin-badge" title="Administrador do site"><i class="fa-solid fa-crown"></i></span>`;
+    // Insere ANTES do cargo (se existir) ou no final
+    const cargoEl = container.querySelector(".modal-perfil-cargo");
+    if (cargoEl) cargoEl.insertAdjacentElement("beforebegin", adminBadge);
+    else container.appendChild(adminBadge);
+  }
 
   try {
     // Lê do Firebase direto (mais rápido que a API)
@@ -1559,6 +1589,7 @@ window.renderizarMural = function () {
     const btnEditar = ehAutor || ehAdmin ? `<button type="button" class="btn-like" style="color: #eccc68;" onclick="editarRecado('${recado.id}')"><i class="fa-solid fa-pen"></i></button>` : "";
     const mensagemComLinks = converterLinks(escaparHTML(recado.mensagem));
     const nomeSeguro = escaparHTML(nomeParaExibicao(recado.autor_nome));
+    const adminBadgeMural = montarBadgeAdmin(recado.autor_matricula);
     // Cargo do autor (busca do cache, sem chamada extra)
     const cargoAutor = bancoDeCargos[recado.autor_matricula] || null;
     const cargoBadgeMural = cargoAutor
@@ -1581,7 +1612,7 @@ window.renderizarMural = function () {
     div.className = "recado-item";
     div.innerHTML = `
       <div class="recado-header">
-        <span class="recado-nome">${nomeSeguro}</span>${cargoBadgeMural}
+                <span class="recado-nome">${adminBadgeMural}${nomeSeguro}</span>${cargoBadgeMural}
         <span class="recado-data" title="${textoExpiracao}"><i class="fa-regular fa-clock" style="font-size:0.85em;margin-right:3px;"></i>${recado.data}${tagEditado} • <small style="opacity:0.8;">${textoExpiracao}</small></span>
       </div>
       <p class="recado-mensagem">${mensagemComLinks}</p>
@@ -1656,6 +1687,7 @@ window.renderizarPerfis = function () {
     card.setAttribute("onclick", `abrirModalPerfil('${identificador}')`);
     card.style.cursor = "pointer";
     const nomeExibir = perfil.nomeCompleto || perfil.nome || "Usuário sem nome";
+    const adminBadgeMembro = montarBadgeAdmin(identificador);
     const fotoFinal = perfil.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random`;
     const mascoteId = perfil.mascoteAvatar || "padrao";
     const mascote = obterMascotePorId(mascoteId);
@@ -1674,7 +1706,7 @@ window.renderizarPerfis = function () {
         <img src="${escaparHTML(fotoFinal)}" alt="${escaparHTML(nomeExibir)}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random'">
       </div>
       <div class="perfil-info">
-        <h4 class="perfil-nome">${escaparHTML(nomeExibir)}${cargoBadgeMembro}</h4>
+        <h4 class="perfil-nome">${adminBadgeMembro}${escaparHTML(nomeExibir)}${cargoBadgeMembro}</h4>
         <span class="perfil-matricula">${escaparHTML(matriculaParaExibicao(perfil.matricula || perfil.id))}</span>
       </div>
     `;
