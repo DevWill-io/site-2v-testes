@@ -2897,42 +2897,6 @@ function marcarTodasLidas() {
 let __contagemInterval = null;
 
 function renderizarProximosEventos(eventos) {
-  var container = document.getElementById("proximos-eventos-lista");
-  if (!container) return;
-  var hoje = new Date();
-  hoje.setHours(0, 0, 0, 0);
-  var em7dias = new Date(hoje);
-  em7dias.setDate(em7dias.getDate() + 7);
-  var proximos = eventos.filter(function (ev) {
-    var inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
-    inicio.setHours(0, 0, 0, 0);
-    return inicio >= hoje && inicio <= em7dias;
-  }).sort(function (a, b) {
-    var da = a.start instanceof Date ? a.start : new Date(a.start);
-    var db = b.start instanceof Date ? b.start : new Date(b.start);
-    return da - db;
-  }).slice(0, 4);
-  if (proximos.length === 0) {
-    container.innerHTML = "";
-    document.getElementById("proximos-eventos")?.classList.add("is-hidden");
-  } else {
-    document.getElementById("proximos-eventos")?.classList.remove("is-hidden");
-    var MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-    container.innerHTML = proximos.map(function (ev) {
-      var inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
-      var dia = inicio.getDate();
-      var mes = MESES[inicio.getMonth()];
-      var diffDias = Math.floor((inicio - hoje) / (1000 * 60 * 60 * 24));
-      var classeCard = "evento-card";
-      var badgeHTML = "";
-      if (diffDias === 0) { classeCard += " hoje"; badgeHTML = '<span class="evento-badge hoje"><i class="fa-solid fa-fire"></i> HOJE</span>'; }
-      else if (diffDias === 1) { classeCard += " destaque"; badgeHTML = '<span class="evento-badge amanha">Amanhã</span>'; }
-      else if (diffDias <= 3) { classeCard += " destaque"; badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`; }
-      else badgeHTML = `<span class="evento-badge semana">Em ${diffDias} dias</span>`;
-      var cor = ev.backgroundColor || ev.borderColor || "#8b5edd";
-      return `<div class="${classeCard}" style="border-left-color:${cor}"><div class="evento-data" style="background:${cor}22"><span class="evento-dia" style="color:${cor}">${String(dia).padStart(2, "0")}</span><span class="evento-mes">${mes}</span></div><div class="evento-info"><div class="evento-titulo">${escaparHTML(ev.title || "Sem título")}</div><div class="evento-descricao">${inicio.toLocaleDateString("pt-BR", { weekday: "long" })}</div>${badgeHTML}</div></div>`;
-    }).join("");
-  }
   atualizarContagemRegressiva(eventos);
 }
 
@@ -3121,6 +3085,7 @@ async function carregarSalaProfessores() {
         periodo: r.periodo || "—",
         numConquistas,
         xpTotal,
+        cargo,  // 🆕
       };
     });
   alunos.sort((a, b) => a.nome.localeCompare(b.nome));
@@ -3534,6 +3499,7 @@ document.addEventListener("DOMContentLoaded", function () {
         locale: obterIdiomaAtual(),
         initialDate: "2026-09-01",
         validRange: { start: "2026-09-01", end: "2026-12-31" },
+        timeZone: "America/Fortaleza",
         googleCalendarApiKey: "AIzaSyB9XFKFwtZNQJrN2Kh7UPZxraPXEwqFytw",
         events: "acb20a08d58749d48304dbda5c87bfb7f0671483ecc4ed942683ad5a1307e78d@group.calendar.google.com",
         eventDidMount: function (info) { pintarElementoEvento(info.el, info.event.title); },
