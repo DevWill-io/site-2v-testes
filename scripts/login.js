@@ -195,6 +195,9 @@ let minhaStreak = 0;
 let meusCliquesMascote = 0;
 let minhasConquistas = {};
 let contadorSimulador = 0;
+let meuCargo = null;          // 🆕 cargo ativo do aluno (id + info)
+let meuCargoDesde = null;     // 🆕 quando ganhou
+let meusCargosTodos = [];     // 🆕 lista de todos os cargos do aluno
 
 let avatarSelecionado = "padrao";
 let filtroConquistasAtivo = "todas";
@@ -579,6 +582,7 @@ let __salaDadosCarregados = false;
 
 window.usuarioLogado = { nome: "", matricula: "", foto: "", fotoOriginal: "" };
 let bancoDeRecados = [];
+let bancoDeCargos = {};  // 🆕 cache de cargos por matrícula
 let bancoDePerfis = [];
 let filtroRecadoTexto = "";
 let filtroPerfilTexto = "";
@@ -847,6 +851,136 @@ async function checarConquistasAutomaticas() {
   const curtidasCount = window.xpCore.obterContador("curtidas");
   for (const c of CONQUISTAS) {
     if (c.tipo === "curtidas" && curtidasCount >= c.meta) await desbloquearConquista(c.id);
+  }
+}
+
+// ==========================================
+// 🎖️ CARGOS — carregamento
+// ==========================================
+async function carregarCargos() {
+  const mat = window.usuarioLogado?.matricula;
+  if (!mat || mat === "Matrícula não disponível") return;
+
+  try {
+    const token = obterTokenSuap();
+    if (!token) return;
+
+    const r = await fetch("/api/cargos?tipo=meus", {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token,
+      },
+    });
+
+    if (!r.ok) {
+      console.warn("[cargos] erro na API:", r.status);
+      return;
+    }
+
+    const dados = await r.json();
+    if (!dados.sucesso) return;
+
+    meuCargo = dados.ativoInfo || null;
+    meuCargoDesde = dados.desde || null;
+    meusCargosTodos = dados.todosInfo || [];
+
+    // Renderiza no perfil do card principal (se existir)
+    renderizarCargoNoCardPrincipal();
+  } catch (e) {
+    console.warn("[cargos] erro:", e.message);
+  }
+}
+
+// ==========================================
+// 🎖️ CARGOS — renderização (card do próprio usuário)
+// ==========================================
+function renderizarCargoNoCardPrincipal() {
+  const card = document.querySelector(".user-profile-card");
+  if (!card) return;
+
+  // Remove badge antigo, se existir
+  const antigo = card.querySelector(".user-cargo-badge");
+  if (antigo) antigo.remove();
+
+  if (!meuCargo) return;
+
+  // Monta o badge
+  const badge = document.createElement("div");
+  badge.className = `user-cargo-badge cargo-badge-${meuCargo.raridade}`;
+  badge.title = `${meuCargo.nome} — ${meuCargo.desc}`;
+  badge.innerHTML = `
+    <i class="fa-solid ${meuCargo.icone}"></i>
+    <span>${escaparHTML(meuCargo.nome)}</span>
+  `;
+
+  // Insere depois do nome (h4.user-name)
+  const nomeEl = card.querySelector(".user-name");
+  if (nomeEl) {
+    nomeEl.insertAdjacentElement("afterend", badge);
+  } else {
+    // Fallback: insere no começo do user-details
+    const details = card.querySelector(".user-details");
+    if (details) details.insertAdjacentElement("afterbegin", badge);
+  }
+}
+
+// ==========================================
+// 🎖️ CARGOS — renderização (modal de perfil público)
+// ==========================================
+// Chamada quando alguém abre o perfil de outro aluno
+// ou o próprio perfil no modal.
+async function carregarCargoNoModalPerfil(matricula) {
+  const container = document.getElementById("modal-perfil-badges");
+  if (!container) return;
+
+  // Remove cargo antigo
+  const antigo = container.querySelector(".modal-perfil-cargo");
+  if (antigo) antigo.remove();
+
+  if (!matricula) return;
+
+  try {
+    // Lê do Firebase direto (mais rápido que a API)
+    const snap = await get(ref(db, `cargos/${matricula}`));
+    const dados = snap.val();
+    if (!dados || !dados.ativo) return;
+
+    // Busca info completa do cargo (a API tem)
+    const token = obterTokenSuap();
+    let infoCargo = null;
+
+    if (token) {
+      const r = await fetch("/api/cargos?tipo=top", {
+        headers: { "Authorization": "Bearer " + token },
+      });
+      if (r.ok) {
+        const topData = await r.json();
+        const entrada = topData.cargos?.[dados.ativo];
+        if (entrada) infoCargo = entrada.cargo;
+      }
+    }
+
+    // Fallback: monta um badge simples se a API não retornou
+    if (!infoCargo) {
+      infoCargo = {
+        id: dados.ativo,
+        nome: dados.ativo.charAt(0).toUpperCase() + dados.ativo.slice(1),
+        icone: "fa-medal",
+        raridade: dados.raridade || "comum",
+      };
+    }
+
+    const badge = document.createElement("div");
+    badge.className = `modal-perfil-cargo cargo-badge-${infoCargo.raridade}`;
+    badge.title = `${infoCargo.nome}${infoCargo.desc ? " — " + infoCargo.desc : ""}`;
+    badge.innerHTML = `
+      <i class="fa-solid ${infoCargo.icone}"></i>
+      <span>${escaparHTML(infoCargo.nome)}</span>
+    `;
+
+    container.appendChild(badge);
+  } catch (e) {
+    console.warn("[cargos modal] erro:", e.message);
   }
 }
 
@@ -1188,6 +1322,13 @@ onValue(perfisRef, (snapshot) => {
     if (meuPerfil && typeof window.aplicarPerfilNoCard === "function") window.aplicarPerfilNoCard(meuPerfil);
   }
 });
+// 🆕 Escuta cargos (para mostrar badge no mural/membros)
+onValue(ref(db, "cargos"), (snapshot) => {
+  bancoDeCargos = snapshot.val() || {};
+  // Re-renderiza mural e perfis pra atualizar badges
+  window.renderizarMural();
+  window.renderizarPerfis();
+});
 
 // ==========================================
 // ENVIO DE RECADOS (via API)
@@ -1379,6 +1520,7 @@ window.abrirModalPerfil = function (identificador) {
   }
 
   carregarConquistasNoModalPerfil(perfil.matricula || perfil.id);
+  carregarCargoNoModalPerfil(perfil.matricula || perfil.id);  // 🆕
   modal.classList.remove("is-hidden");
 };
 
@@ -1417,6 +1559,13 @@ window.renderizarMural = function () {
     const btnEditar = ehAutor || ehAdmin ? `<button type="button" class="btn-like" style="color: #eccc68;" onclick="editarRecado('${recado.id}')"><i class="fa-solid fa-pen"></i></button>` : "";
     const mensagemComLinks = converterLinks(escaparHTML(recado.mensagem));
     const nomeSeguro = escaparHTML(nomeParaExibicao(recado.autor_nome));
+    // Cargo do autor (busca do cache, sem chamada extra)
+    const cargoAutor = bancoDeCargos[recado.autor_matricula] || null;
+    const cargoBadgeMural = cargoAutor
+      ? `<span class="recado-cargo-badge cargo-badge-${cargoAutor.raridade}" title="${escaparHTML(cargoAutor.nome)}${cargoAutor.desc ? " — " + escaparHTML(cargoAutor.desc) : ""}">
+           <i class="fa-solid ${cargoAutor.icone}"></i>
+         </span>`
+      : "";
     const tagEditado = recado.editado ? ' <small style="opacity:0.6;font-style:italic;">(editado)</small>' : "";
     const anexoHTML = recado.link_anexo ? `<div class="recado-anexo" style="margin-top:8px;"><a href="${recado.link_anexo}" target="_blank" rel="noopener noreferrer" style="font-size:0.85em;color:#70a1ff;text-decoration:underline;"><i class="fa-solid fa-paperclip"></i> Ver anexo</a></div>` : "";
     const comentariosObj = recado.comentarios || {};
@@ -1432,7 +1581,7 @@ window.renderizarMural = function () {
     div.className = "recado-item";
     div.innerHTML = `
       <div class="recado-header">
-        <span class="recado-nome">${nomeSeguro}</span>
+        <span class="recado-nome">${nomeSeguro}</span>${cargoBadgeMural}
         <span class="recado-data" title="${textoExpiracao}"><i class="fa-regular fa-clock" style="font-size:0.85em;margin-right:3px;"></i>${recado.data}${tagEditado} • <small style="opacity:0.8;">${textoExpiracao}</small></span>
       </div>
       <p class="recado-mensagem">${mensagemComLinks}</p>
@@ -1511,6 +1660,12 @@ window.renderizarPerfis = function () {
     const mascoteId = perfil.mascoteAvatar || "padrao";
     const mascote = obterMascotePorId(mascoteId);
     const ehAdminSkin = mascoteId === "admin";
+    const cargoDoPerfil = bancoDeCargos[identificador] || null;
+    const cargoBadgeMembro = cargoDoPerfil?.ativo
+      ? `<span class="perfil-cargo-badge cargo-badge-${cargoDoPerfil.raridade}" title="${escaparHTML(cargoDoPerfil.nome || cargoDoPerfil.ativo)}">
+           <i class="fa-solid ${cargoDoPerfil.icone || 'fa-medal'}"></i>
+         </span>`
+      : "";
     card.innerHTML = `
       <div class="perfil-card-mascote ${ehAdminSkin ? "admin" : ""}" title="Mascote: ${escaparHTML(mascote.nome)}">
         <img src="${mascote.arquivo}" alt="${escaparHTML(mascote.nome)}" onerror="this.style.display='none'">
@@ -1519,7 +1674,7 @@ window.renderizarPerfis = function () {
         <img src="${escaparHTML(fotoFinal)}" alt="${escaparHTML(nomeExibir)}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(nomeExibir)}&background=random'">
       </div>
       <div class="perfil-info">
-        <h4 class="perfil-nome">${escaparHTML(nomeExibir)}</h4>
+        <h4 class="perfil-nome">${escaparHTML(nomeExibir)}${cargoBadgeMembro}</h4>
         <span class="perfil-matricula">${escaparHTML(matriculaParaExibicao(perfil.matricula || perfil.id))}</span>
       </div>
     `;
@@ -2811,6 +2966,69 @@ function atualizarTimersContagem() {
 }
 
 // ==========================================
+// 🎖️ RECALCULAR CARGOS (admin)
+// ==========================================
+window.recalcularCargos = async function () {
+  const btn = document.getElementById("btn-recalcular-cargos");
+  const status = document.getElementById("sala-cargos-status");
+  if (!btn || btn.disabled) return;
+
+  const token = obterTokenSuap();
+  if (!token) {
+    exibirToast("Token expirado. Faça login de novo.", "erro");
+    return;
+  }
+
+  btn.disabled = true;
+  const htmlOriginal = btn.innerHTML;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Recalculando...</span>';
+  if (status) status.textContent = "";
+
+  try {
+    const r = await fetch("/api/cargos?tipo=recalcular", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token,
+      },
+      body: "{}",
+    });
+
+    const dados = await r.json();
+
+    if (!r.ok || !dados.sucesso) {
+      throw new Error(dados.erro || "Erro desconhecido");
+    }
+
+    // Mostra resumo
+    const totalCargos = dados.totalCargos || 0;
+    const totalAlunos = dados.totalAlunos || 0;
+    exibirToast(
+      `✅ Cargos recalculados: ${totalCargos} cargos em ${totalAlunos} alunos`,
+      "sucesso"
+    );
+    if (status) {
+      status.textContent = `✓ ${totalCargos} cargos recalculados`;
+      status.className = "sala-cargos-status sucesso";
+    }
+
+    // Recarrega a sala pra atualizar a coluna "Cargo"
+    __salaDadosCarregados = false;
+    await carregarSalaProfessores();
+  } catch (e) {
+    console.error("[cargos] erro:", e);
+    exibirToast("Erro ao recalcular: " + e.message, "erro");
+    if (status) {
+      status.textContent = "✗ " + e.message;
+      status.className = "sala-cargos-status erro";
+    }
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = htmlOriginal;
+  }
+};
+
+// ==========================================
 // SALA DOS PROFESSORES
 // ==========================================
 async function carregarSalaProfessores() {
@@ -2819,23 +3037,26 @@ async function carregarSalaProfessores() {
   const tbody = document.getElementById("sala-lista-alunos");
   if (!tbody) return;
   console.log("[sala] Iniciando carregamento...");
-  const resultados = await Promise.allSettled([
+    const resultados = await Promise.allSettled([
     get(perfisRef),
     get(ref(db, "mascote/por_aluno")),
     get(ref(db, "resumo_boletim")),
     get(ref(db, "mural_recados")),
     get(ref(db, "usuarios_xp")),
+    get(ref(db, "cargos")),  // 🆕
   ]);
-  const [perfisRes, carinhosRes, resumosRes, recadosRes, xpRes] = resultados;
+  const [perfisRes, carinhosRes, resumosRes, recadosRes, xpRes, cargosRes] = resultados;
   const perfisSnap = perfisRes.status === "fulfilled" ? perfisRes.value : { val: () => ({}) };
   const carinhosSnap = carinhosRes.status === "fulfilled" ? carinhosRes.value : { val: () => ({}) };
   const resumosSnap = resumosRes.status === "fulfilled" ? resumosRes.value : { val: () => ({}) };
   const recadosSnap = recadosRes.status === "fulfilled" ? recadosRes.value : { exists: () => false, val: () => ({}) };
   const xpSnap = xpRes.status === "fulfilled" ? xpRes.value : { val: () => ({}) };
+  const cargosSnap = cargosRes.status === "fulfilled" ? cargosRes.value : { val: () => ({}) };
   const perfis = perfisSnap.val() || {};
   const carinhos = carinhosSnap.val() || {};
   const resumos = resumosSnap.val() || {};
   const xpData = xpSnap.val() || {};
+  const cargosData = cargosSnap.val() || {};
   const totalRecados = recadosSnap.exists() ? Object.keys(recadosSnap.val() || {}).length : 0;
   console.log("[sala] Perfis:", Object.keys(perfis).length, "| XP keys:", Object.keys(xpData).length);
   const alunos = Object.keys(perfis)
@@ -2846,6 +3067,16 @@ async function carregarSalaProfessores() {
       const numConquistas = contarConquistasDoAluno(xpData, mat);
       const xpAluno = obterXpDoAluno(xpData, mat) || {};
       const xpTotal = Number(xpAluno.xp) || 0;
+      const cargoData = cargosData[mat];
+      const cargo = cargoData?.ativo
+        ? {
+            id: cargoData.ativo,
+            raridade: cargoData.raridade || "comum",
+            nome: cargoData.nome || cargoData.ativo,
+            icone: cargoData.icone || "fa-medal",
+            desc: cargoData.desc || "",
+          }
+        : null;
       return {
         matricula: mat,
         nome: p.nome || p.nomeCompleto || "Aluno " + mat.slice(-4),
@@ -2862,7 +3093,7 @@ async function carregarSalaProfessores() {
     });
   alunos.sort((a, b) => a.nome.localeCompare(b.nome));
   if (alunos.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="sala-vazio"><i class="fa-regular fa-folder-open"></i> Nenhum aluno cadastrado.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="sala-vazio"><i class="fa-regular fa-folder-open"></i> Nenhum aluno cadastrado.</td></tr>`;
   } else {
     tbody.innerHTML = alunos.map((a) => {
       const diasSemAcesso = a.ultimoAcesso ? Math.floor((Date.now() - a.ultimoAcesso) / (1000 * 60 * 60 * 24)) : null;
@@ -2879,6 +3110,12 @@ async function carregarSalaProfessores() {
         const cor = a.faltasTotais > 15 ? "var(--danger)" : a.faltasTotais > 10 ? "var(--warning)" : "var(--text-main)";
         faltasHTML = `<span style="color:${cor};font-weight:600">${a.faltasTotais}</span>`;
       } else faltasHTML = `<span class="sala-sem-dados"><i class="fa-solid fa-clock"></i> Pendente</span>`;
+            const cargoBadge = a.cargo
+        ? `<span class="sala-cargo-badge cargo-badge-${a.cargo.raridade}" title="${escaparHTML(a.cargo.nome)} — ${escaparHTML(a.cargo.desc || "")}">
+             <i class="fa-solid ${a.cargo.icone}"></i>
+             <span>${escaparHTML(a.cargo.nome)}</span>
+           </span>`
+        : `<span class="sala-sem-dados" title="Sem cargo no momento"><i class="fa-solid fa-minus"></i></span>`;
       return `<tr data-nome="${a.nome.toLowerCase()}" data-mat="${a.matricula}">
         <td><div class="td-aluno"><img src="${a.foto}" alt="${a.nome}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(a.nome)}&background=random'"><span>${escaparHTML(a.nome)}</span></div></td>
         <td>${a.matricula}</td>
@@ -2886,6 +3123,7 @@ async function carregarSalaProfessores() {
         <td>${faltasHTML}</td>
         <td><i class="fa-solid fa-heart" style="color:#ff6b6b;font-size:0.8rem;"></i> ${a.carinhos.toLocaleString("pt-BR")}</td>
         <td><span title="${a.numConquistas} de ${CONQUISTAS.length} conquistas • ${a.xpTotal} XP" style="font-weight:700;color:${a.numConquistas >= 9 ? 'var(--success)' : a.numConquistas >= 5 ? 'var(--warning)' : 'var(--text-main)'};">🎖️ ${a.numConquistas}/${CONQUISTAS.length}</span></td>
+        <td>${cargoBadge}</td>
         <td><span class="sala-badge ${statusClasse}">${statusLabel}</span></td>
       </tr>`;
     }).join("");
@@ -2958,6 +3196,14 @@ async function carregarSalaProfessores() {
       });
     });
   }
+
+  // 🆕 Botão "Recalcular Cargos"
+  const btnRecalcular = document.getElementById("btn-recalcular-cargos");
+  if (btnRecalcular && !btnRecalcular.dataset.bound) {
+    btnRecalcular.dataset.bound = "1";
+    btnRecalcular.addEventListener("click", window.recalcularCargos);
+  }
+
     document.querySelectorAll(".sala-tab").forEach((tab) => {
     if (tab.dataset.bound) return;
     tab.dataset.bound = "1";
@@ -3334,6 +3580,7 @@ document.addEventListener("DOMContentLoaded", function () {
         gerarNotificacoesRecados();
         carregarPainelXP();
         atualizarStreakLogin();
+        carregarCargos();  // 🆕 carrega o cargo do aluno
         if (MATRICULAS_ADMIN.includes(matriculaSuap)) {
           setTimeout(() => {
             const secaoSala = document.getElementById("sala-professores");

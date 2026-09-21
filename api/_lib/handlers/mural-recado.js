@@ -3,11 +3,31 @@ import { db } from "../../_lib/firebase.js";
 import { autenticar, ehAdmin } from "../../_lib/auth.js";
 import { verificarRateLimit } from "../../_lib/rateLimit.js";
 import { ok, erro, cors, sanitizar } from "../../_lib/helpers.js";
+import { aplicarBonus } from "../cargos-config.js";
 
 const RATE_MAX = 10;
 const RATE_JANELA = 60_000;
 const MSG_MAX = 200;
 const LINK_MAX = 500;
+const XP_RECADO = 10;
+const CARGO_CACHE_TTL = 60_000;
+
+const __cacheCargos = new Map();
+
+async function obterCargoAtivo(matricula) {
+  const agora = Date.now();
+  const cache = __cacheCargos.get(matricula);
+  if (cache && cache.expiraEm > agora) return cache.cargoId;
+
+  try {
+    const snap = await db.ref(`cargos/${matricula}/ativo`).get();
+    const cargoId = snap.val() || null;
+    __cacheCargos.set(matricula, { cargoId, expiraEm: agora + CARGO_CACHE_TTL });
+    return cargoId;
+  } catch (e) {
+    return null;
+  }
+}
 
 export default async function handler(req, res) {
   cors(res);
@@ -52,7 +72,24 @@ export default async function handler(req, res) {
       editado: false,
     });
 
-    return ok(res, { id: ref.key });
+    // ---- Bônus de XP ----
+    const cargoId = await obterCargoAtivo(matricula);
+    const xpComBonus = cargoId
+      ? aplicarBonus(XP_RECADO, cargoId, "recado")
+      : XP_RECADO;
+
+    // Incrementa XP + contador de recados
+    await Promise.all([
+      db.ref(`usuarios_xp/${matricula}/xp`).transaction((a) => (Number(a) || 0) + xpComBonus),
+      db.ref(`usuarios_xp/${matricula}/contadores/recados`).transaction((a) => (Number(a) || 0) + 1),
+    ]);
+
+    return ok(res, {
+      id: ref.key,
+      xpGanho: xpComBonus,
+      bonusAplicado: xpComBonus - XP_RECADO,
+      cargoAtivo: cargoId,
+    });
   }
 
   // ============================

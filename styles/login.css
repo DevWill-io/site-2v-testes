@@ -3926,3 +3926,346 @@ body.light-theme .field-checkbox-marca {
 .btn-opcao-evento:active {
   transform: translateY(0) scale(0.97);
 }
+
+/* ===================================================================
+   🎖️ CARGOS — badges de cargo do aluno
+   ===================================================================
+   Cores por raridade:
+   - comum    → cinza/roxo suave
+   - raro     → azul
+   - epico    → roxo vibrante
+   - lendario → dourado com brilho
+   =================================================================== */
+
+/* ---------- Badge genérico (card do perfil) ---------- */
+.user-cargo-badge,
+.modal-perfil-cargo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  border: 1.5px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: help;
+  user-select: none;
+}
+
+.user-cargo-badge {
+  margin-top: 8px;
+}
+
+.user-cargo-badge i,
+.modal-perfil-cargo i {
+  font-size: 0.85rem;
+}
+
+.user-cargo-badge:hover,
+.modal-perfil-cargo:hover {
+  transform: translateY(-1px);
+}
+
+/* ---------- Raridade: COMUM (cinza/roxo suave) ---------- */
+.cargo-badge-comum {
+  background: linear-gradient(135deg,
+    rgba(139, 94, 221, 0.15),
+    rgba(139, 94, 221, 0.08));
+  border-color: rgba(139, 94, 221, 0.4);
+  color: var(--accent, #cebdec);
+  box-shadow: 0 2px 8px rgba(139, 94, 221, 0.15);
+}
+.cargo-badge-comum:hover {
+  box-shadow: 0 4px 14px rgba(139, 94, 221, 0.3);
+}
+
+/* ---------- Raridade: RARO (azul) ---------- */
+.cargo-badge-raro {
+  background: linear-gradient(135deg,
+    rgba(59, 130, 246, 0.2),
+    rgba(59, 130, 246, 0.08));
+  border-color: rgba(59, 130, 246, 0.5);
+  color: #60a5fa;
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.2);
+}
+.cargo-badge-raro:hover {
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+}
+
+/* ---------- Raridade: ÉPICO (roxo vibrante) ---------- */
+.cargo-badge-epico {
+  background: linear-gradient(135deg,
+    rgba(168, 85, 247, 0.25),
+    rgba(168, 85, 247, 0.1));
+  border-color: rgba(168, 85, 247, 0.6);
+  color: #c084fc;
+  box-shadow: 0 2px 12px rgba(168, 85, 247, 0.3);
+}
+.cargo-badge-epico:hover {
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.55);
+}
+
+/* ---------- Raridade: LENDÁRIO (dourado com brilho) ---------- */
+.cargo-badge-lendario {
+  background: linear-gradient(135deg,
+    rgba(245, 158, 11, 0.3),
+    rgba(217, 119, 6, 0.15));
+  border-color: rgba(245, 158, 11, 0.7);
+  color: #fbbf24;
+  box-shadow: 0 2px 14px rgba(245, 158, 11, 0.45);
+  animation: brilhoCargoLendario 2.6s ease-in-out infinite;
+}
+.cargo-badge-lendario:hover {
+  box-shadow: 0 4px 24px rgba(245, 158, 11, 0.75);
+}
+
+@keyframes brilhoCargoLendario {
+  0%, 100% {
+    box-shadow: 0 2px 14px rgba(245, 158, 11, 0.45);
+  }
+  50% {
+    box-shadow: 0 4px 22px rgba(245, 158, 11, 0.85);
+  }
+}
+
+/* ---------- Modal de perfil: badge ao lado do nome ---------- */
+.modal-perfil-cargo {
+  margin: 8px auto 0;
+}
+
+/* Dentro do `.modal-perfil-badges` (já existe no login.html) */
+.modal-perfil-badges .modal-perfil-cargo {
+  margin: 0;
+  height: 48px;
+  padding: 0 16px;
+  font-size: 0.85rem;
+}
+
+/* ---------- Modo claro: ajustes de contraste ---------- */
+body.light-theme .cargo-badge-comum {
+  background: linear-gradient(135deg,
+    rgba(139, 94, 221, 0.12),
+    rgba(139, 94, 221, 0.05));
+  color: #6b46c1;
+}
+
+body.light-theme .cargo-badge-raro {
+  background: linear-gradient(135deg,
+    rgba(59, 130, 246, 0.15),
+    rgba(59, 130, 246, 0.05));
+  color: #2563eb;
+}
+
+body.light-theme .cargo-badge-epico {
+  background: linear-gradient(135deg,
+    rgba(168, 85, 247, 0.18),
+    rgba(168, 85, 247, 0.06));
+  color: #7c3aed;
+}
+
+body.light-theme .cargo-badge-lendario {
+  background: linear-gradient(135deg,
+    rgba(245, 158, 11, 0.22),
+    rgba(217, 119, 6, 0.1));
+  color: #d97706;
+}
+
+/* ---------- Mobile: badge menor ---------- */
+@media (max-width: 600px) {
+  .user-cargo-badge,
+  .modal-perfil-cargo {
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    gap: 5px;
+  }
+
+  .user-cargo-badge i,
+  .modal-perfil-cargo i {
+    font-size: 0.78rem;
+  }
+
+  .modal-perfil-badges .modal-perfil-cargo {
+    height: 42px;
+    padding: 0 12px;
+    font-size: 0.78rem;
+  }
+}
+
+/* ---------- Sala dos Professores: badge de cargo na tabela ---------- */
+.sala-cargo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.sala-cargo-badge i {
+  font-size: 0.75rem;
+}
+
+/* ---------- Mural: badge pequeno ao lado do autor ---------- */
+.recado-cargo-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  margin-left: 6px;
+  font-size: 0.65rem;
+  vertical-align: middle;
+  border: 1px solid transparent;
+}
+
+/* ---------- Membros: badge pequeno ao lado do nome ---------- */
+.perfil-cargo-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  margin-left: 6px;
+  font-size: 0.62rem;
+  vertical-align: middle;
+  border: 1px solid transparent;
+}
+
+/* ---------- Cores por raridade (aplicadas a todas as badges) ---------- */
+/* Comum */
+.sala-cargo-badge.cargo-badge-comum,
+.recado-cargo-badge.cargo-badge-comum,
+.perfil-cargo-badge.cargo-badge-comum {
+  background: rgba(139, 94, 221, 0.2);
+  border-color: rgba(139, 94, 221, 0.45);
+  color: var(--accent, #cebdec);
+}
+
+/* Raro */
+.sala-cargo-badge.cargo-badge-raro,
+.recado-cargo-badge.cargo-badge-raro,
+.perfil-cargo-badge.cargo-badge-raro {
+  background: rgba(59, 130, 246, 0.22);
+  border-color: rgba(59, 130, 246, 0.55);
+  color: #60a5fa;
+}
+
+/* Épico */
+.sala-cargo-badge.cargo-badge-epico,
+.recado-cargo-badge.cargo-badge-epico,
+.perfil-cargo-badge.cargo-badge-epico {
+  background: rgba(168, 85, 247, 0.25);
+  border-color: rgba(168, 85, 247, 0.6);
+  color: #c084fc;
+}
+
+/* Lendário */
+.sala-cargo-badge.cargo-badge-lendario,
+.recado-cargo-badge.cargo-badge-lendario,
+.perfil-cargo-badge.cargo-badge-lendario {
+  background: rgba(245, 158, 11, 0.3);
+  border-color: rgba(245, 158, 11, 0.7);
+  color: #fbbf24;
+  animation: brilhoCargoLendario 2.6s ease-in-out infinite;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .sala-cargo-badge {
+    font-size: 0.68rem;
+    padding: 2px 8px;
+  }
+  .sala-cargo-badge span {
+    display: none; /* só o ícone em mobile */
+  }
+  .recado-cargo-badge,
+  .perfil-cargo-badge {
+    width: 16px;
+    height: 16px;
+    font-size: 0.58rem;
+  }
+}
+
+/* ===================================================================
+   🎖️ BOTÃO "RECALCULAR CARGOS" (Sala dos Professores)
+   =================================================================== */
+.sala-acoes-admin {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.btn-recalcular-cargos {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #8b5edd, #6b46c1);
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(139, 94, 221, 0.35);
+}
+
+.btn-recalcular-cargos:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(139, 94, 221, 0.55);
+}
+
+.btn-recalcular-cargos:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-recalcular-cargos:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-recalcular-cargos i {
+  font-size: 0.95rem;
+}
+
+/* Status (mensagem ao lado do botão) */
+.sala-cargos-status {
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.sala-cargos-status.sucesso {
+  color: var(--success, #10b981);
+}
+
+.sala-cargos-status.erro {
+  color: var(--danger, #ff4757);
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .btn-recalcular-cargos {
+    padding: 9px 16px;
+    font-size: 0.82rem;
+  }
+  .sala-cargos-status {
+    font-size: 0.75rem;
+    flex-basis: 100%;
+    text-align: center;
+  }
+}

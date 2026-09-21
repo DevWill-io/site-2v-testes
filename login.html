@@ -733,12 +733,12 @@
 
         <section id="sala-professores" class="sala-professores is-authenticated is-hidden is-admin-hidden">
       <div class="container">
-        <div class="section-title">
-          <h2>
-            <i class="fa-solid fa-user-tie" style="color: var(--accent);"></i>
-            <span data-i18n="sala_titulo">Sala dos Professores</span>
-          </h2>
-          <p data-i18n="sala_sub">Visão geral da turma (acesso restrito)</p>
+        <div class="sala-acoes-admin">
+          <button type="button" id="btn-recalcular-cargos" class="btn-acao btn-recalcular-cargos">
+            <i class="fa-solid fa-rotate"></i>
+            <span>Recalcular Cargos</span>
+          </button>
+          <span id="sala-cargos-status" class="sala-cargos-status"></span>
         </div>
 
         <div class="sala-tabs">
@@ -777,6 +777,7 @@
                     <th data-i18n="sala_th_faltas">Faltas</th>
                     <th data-i18n="sala_th_carinhos">Carinhos</th>
                     <th data-i18n="sala_th_conquistas">Conquistas</th>
+                    <th>Cargo</th>
                     <th data-i18n="sala_th_status">Status</th>
                   </tr>
                 </thead>

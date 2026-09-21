@@ -92,6 +92,17 @@ let somLigado = localStorage.getItem("mascote_som") !== "off";
 let marcosAnteriores = new Set();
 let perfisCache = {};
 let rankingDataCache = {};
+let cargosCache = {};  // 🆕 cache de cargos por matrícula
+
+function escaparHTML(texto) {
+  if (!texto) return "";
+  return String(texto)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 function obterMatricula() {
   const matCookie = document.cookie
@@ -620,6 +631,12 @@ function renderizarRanking() {
 
 onValue(ref(db, "perfis_alunos"), (snap) => {
   perfisCache = snap.val() || {};
+  renderizarRanking();
+});
+
+// 🆕 Escuta cargos (para mostrar badge no ranking)
+onValue(ref(db, "cargos"), (snap) => {
+  cargosCache = snap.val() || {};
   renderizarRanking();
 });
 

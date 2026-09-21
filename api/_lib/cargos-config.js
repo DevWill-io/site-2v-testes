@@ -175,7 +175,7 @@ export function bonusDoCargo(cargoId, acao) {
  */
 export function aplicarBonus(xp, cargoId, acao) {
   const bonus = bonusDoCargo(cargoId, acao);
-  return Math.round(xp * (1 + bonus));
+  return Math.ceil(xp * (1 + bonus));
 }
 
 /**
