@@ -2152,7 +2152,14 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
     flex-wrap: wrap;
     gap: 6px;
 }
-.recado-nome { font-weight: 700; color: var(--accent); }
+.recado-nome {
+  font-weight: 700;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
 .recado-data { font-size: 0.8rem; }
 .recado-mensagem { color: var(--text-main); line-height: 1.5; word-break: break-word; }
 .recado-mensagem a { color: var(--accent); text-decoration: underline; }
@@ -4328,7 +4335,12 @@ body.light-theme .cargo-badge-lendario {
   width: 18px;
   height: 18px;
   font-size: 0.65rem;
-  margin-right: 5px;
+  margin-right: 0;  /* 🆕 o gap do pai já cuida */
+}
+
+.recado-nome .recado-cargo-badge {
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .recado-nome .admin-badge i,

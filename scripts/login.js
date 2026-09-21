@@ -1612,8 +1612,8 @@ window.renderizarMural = function () {
     div.className = "recado-item";
     div.innerHTML = `
       <div class="recado-header">
-                <span class="recado-nome">${adminBadgeMural}${nomeSeguro}</span>${cargoBadgeMural}
-        <span class="recado-data" title="${textoExpiracao}"><i class="fa-regular fa-clock" style="font-size:0.85em;margin-right:3px;"></i>${recado.data}${tagEditado} • <small style="opacity:0.8;">${textoExpiracao}</small></span>
+        <span class="recado-nome">${adminBadgeMural}${nomeSeguro}${cargoBadgeMural}</span>
+        <span class="recado-data" title="${textoExpiracao}">...</span>
       </div>
       <p class="recado-mensagem">${mensagemComLinks}</p>
       ${anexoHTML}
