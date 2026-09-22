@@ -1380,6 +1380,8 @@ if (themeToggle) {
 // ==========================================
 // FIREBASE LISTENERS
 // ==========================================
+// 🆕 Mural com debounce
+let __muralRenderTimer = null;
 onValue(recadosRef, (snapshot) => {
   bancoDeRecados = [];
   const agora = Date.now();
@@ -1395,30 +1397,50 @@ onValue(recadosRef, (snapshot) => {
       bancoDeRecados.push({ id, ...recado, timestampCriacao, duracaoHoras });
     }
   });
-  window.renderizarMural();
-  if (typeof gerarNotificacoesRecados === "function") gerarNotificacoesRecados();
+  clearTimeout(__muralRenderTimer);
+  __muralRenderTimer = setTimeout(() => {
+    if (typeof window.renderizarMural === "function") window.renderizarMural();
+    if (typeof gerarNotificacoesRecados === "function") gerarNotificacoesRecados();
+  }, 300);
 });
 
+// 🆕 Perfis com debounce e comparação (evita re-render desnecessário)
+let __perfisRenderTimer = null;
 onValue(perfisRef, (snapshot) => {
-  bancoDePerfis = [];
+  const novos = [];
   snapshot.forEach((childSnapshot) => {
     const dados = childSnapshot.val() || {};
-    bancoDePerfis.push({ id: childSnapshot.key, ...dados });
+    novos.push({ id: childSnapshot.key, ...dados });
   });
-  window.renderizarPerfis();
-  if (window.usuarioLogado.matricula) {
-    const meuPerfil = bancoDePerfis.find((p) =>
-      String(p.matricula) === String(window.usuarioLogado.matricula) ||
-      String(p.id) === String(window.usuarioLogado.matricula));
-    if (meuPerfil && typeof window.aplicarPerfilNoCard === "function") window.aplicarPerfilNoCard(meuPerfil);
-  }
+
+  // Só re-renderiza se mudou de verdade
+  const mudou = JSON.stringify(novos) !== JSON.stringify(bancoDePerfis);
+  if (!mudou) return;
+  bancoDePerfis = novos;
+
+  // Debounce: espera 300ms antes de renderizar
+  clearTimeout(__perfisRenderTimer);
+  __perfisRenderTimer = setTimeout(() => {
+    if (typeof window.renderizarPerfis === "function") window.renderizarPerfis();
+    if (window.usuarioLogado.matricula) {
+      const meuPerfil = bancoDePerfis.find((p) =>
+        String(p.matricula) === String(window.usuarioLogado.matricula) ||
+        String(p.id) === String(window.usuarioLogado.matricula));
+      if (meuPerfil && typeof window.aplicarPerfilNoCard === "function") {
+        window.aplicarPerfilNoCard(meuPerfil);
+      }
+    }
+  }, 300);
 });
-// 🆕 Escuta cargos (para mostrar badge no mural/membros)
+// 🆕 Cargos com debounce (evita renderizar 2x a cada mudança)
+let __cargosRenderTimer = null;
 onValue(ref(db, "cargos"), (snapshot) => {
   bancoDeCargos = snapshot.val() || {};
-  // Re-renderiza mural e perfis pra atualizar badges
-  window.renderizarMural();
-  window.renderizarPerfis();
+  clearTimeout(__cargosRenderTimer);
+  __cargosRenderTimer = setTimeout(() => {
+    if (typeof window.renderizarMural === "function") window.renderizarMural();
+    if (typeof window.renderizarPerfis === "function") window.renderizarPerfis();
+  }, 300);
 });
 
 // ==========================================
