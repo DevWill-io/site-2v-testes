@@ -156,15 +156,44 @@ const proximaSkinNome = document.getElementById("proxima-skin-nome");
 const proximaSkinContagem = document.getElementById("proxima-skin-contagem");
 const skinProgressoFill = document.getElementById("skin-progresso-fill");
 
+// 🎵 AudioContext — criado só sob demanda (evita bloqueio do navegador)
 let audioCtx = null;
+let audioDesbloqueado = false;
 
-function tocarSom(tipo = "carinho") {
-  if (!somLigado) return;
+// 🔓 Desbloqueia o áudio na primeira interação do usuário
+function desbloquearAudio() {
+  if (audioDesbloqueado) return;
   try {
     if (!audioCtx) {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
+    if (audioCtx.state === "suspended") {
+      audioCtx.resume();
+    }
+    audioDesbloqueado = true;
+  } catch (e) {
+    // Silencioso — não trava a UX
+  }
+}
 
+// Registra o desbloqueio no primeiro toque/clique
+document.addEventListener("click", desbloquearAudio, { once: true, passive: true });
+document.addEventListener("touchstart", desbloquearAudio, { once: true, passive: true });
+document.addEventListener("keydown", desbloquearAudio, { once: true });
+
+function tocarSom(tipo = "carinho") {
+  if (!somLigado) return;
+
+  // ⚠️ Só toca se o áudio já foi desbloqueado por interação do usuário
+  if (!audioDesbloqueado || !audioCtx) return;
+
+  // Se o contexto tá suspenso, tenta resumir (sem criar novo)
+  if (audioCtx.state === "suspended") {
+    audioCtx.resume().catch(() => {});
+    return;
+  }
+
+  try {
     if (tipo === "carinho") {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
@@ -214,7 +243,9 @@ function tocarSom(tipo = "carinho") {
         o.stop(audioCtx.currentTime + i * 0.1 + 0.4);
       });
     }
-  } catch (e) {}
+  } catch (e) {
+    // Silencioso
+  }
 }
 
 function criarBotaoMute() {
