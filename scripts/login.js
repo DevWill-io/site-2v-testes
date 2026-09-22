@@ -3493,22 +3493,47 @@ function initMenuLateral() {
   marcarAtivosMenuLateral();
   const sections = document.querySelectorAll("section[id]");
   const menuItems = document.querySelectorAll(".menu-lateral-nav .menu-item");
-  if (menuItems.length > 0) {
+  if (menuItems.length > 0 && sections.length > 0) {
+    // 🆕 Cache dos offsets (não recalcula toda hora)
+    let offsetsCache = [];
+    function recalcularOffsets() {
+      offsetsCache = Array.from(sections).map((s) => ({
+        el: s,
+        top: s.offsetTop,
+      }));
+    }
+    recalcularOffsets();
+
+    // Recalcula offsets em resize (com debounce)
+    let resizeTimer = null;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(recalcularOffsets, 200);
+    }, { passive: true });
+
     let ticking = false;
+    let ultimoActive = null;
+
     window.addEventListener("scroll", () => {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
         let current = "";
-        sections.forEach((section) => {
-          const sectionTop = section.offsetTop;
-          if (pageYOffset >= sectionTop - 250) current = section.getAttribute("id");
-        });
-        menuItems.forEach((item) => {
-          item.classList.remove("active");
-          const href = item.getAttribute("href") || "";
-          if (href.startsWith("#") && href.substring(1) === current) item.classList.add("active");
-        });
+        const y = window.pageYOffset;
+        for (let i = 0; i < offsetsCache.length; i++) {
+          if (y >= offsetsCache[i].top - 250) current = offsetsCache[i].el.id;
+          else break;
+        }
+
+        // 🆕 Só mexe no DOM se mudou de seção
+        if (current !== ultimoActive) {
+          ultimoActive = current;
+          menuItems.forEach((item) => {
+            const href = item.getAttribute("href") || "";
+            const isActive = href.startsWith("#") && href.substring(1) === current;
+            item.classList.toggle("active", isActive);
+          });
+        }
         ticking = false;
       });
     }, { passive: true });
