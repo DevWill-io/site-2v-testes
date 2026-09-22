@@ -587,6 +587,9 @@ let __salaDadosCarregados = false;
 
 window.usuarioLogado = { nome: "", matricula: "", foto: "", fotoOriginal: "" };
 let bancoDeRecados = [];
+// 🎨 Cache de cores dos eventos do Google Calendar
+// Formato: { "eventoId": "#hex", ... }
+let gcalCoresCache = {};
 let bancoDeCargos = {};  // 🆕 cache de cargos por matrícula
 let bancoDePerfis = [];
 let filtroRecadoTexto = "";
@@ -1265,30 +1268,84 @@ if ("serviceWorker" in navigator) {
 // ==========================================
 // 🎨 REGRAS DE CORES DO CALENDÁRIO
 // ==========================================
-const REGRAS_CORES_CALENDARIO = [
-  { regex: /prova|avalia|exame|teste/i, cor: "#ff4757", textoKey: "cal_provas" },
-  { regex: /trabalho|projeto|entrega|lista|seminario|seminário/i, cor: "#f59e0b", textoKey: "cal_trabalhos" },
-  { regex: /feriado|recesso|f[eé]rias|ponto facultativo/i, cor: "#10b981", textoKey: "cal_feriados" },
-  { regex: /reuni[aã]o|aula|encontro|palestra/i, cor: "#7c3aed", textoKey: "cal_reunioes" },
-  { regex: /jogo|esporte|campeonato|torneio/i, cor: "#06b6d4", textoKey: "cal_esportes" },
-  { regex: /festa|evento|apresenta|show/i, cor: "#ec4899", textoKey: "cal_festas" },
-];
-const COR_PADRAO_CALENDARIO = { cor: "#8b5edd", textoKey: "cal_outros" };
+// 🎨 Cor neutra única pra eventos sem cor escolhida no Google Calendar
+const COR_PADRAO_CALENDARIO = "#8b5edd";
 
-function corDoEvento(titulo) {
-  var t2 = String(titulo || "").toLowerCase();
-  for (var i = 0; i < REGRAS_CORES_CALENDARIO.length; i++) {
-    if (REGRAS_CORES_CALENDARIO[i].regex.test(t2)) return REGRAS_CORES_CALENDARIO[i].cor;
+// 🎨 Categorias de matéria (cores oficiais do Google Calendar)
+// Pra mudar, edita aqui + atualiza no Google Calendar
+const MATERIAS = [
+  { nome: "Matemática",  cor: "#D50000" }, // Tomate
+  { nome: "Geografia",   cor: "#F6BF26" }, // Banana (era Manga)
+  { nome: "Química",     cor: "#0B8043" }, // Manjericão (era Pistache)
+  { nome: "Português",   cor: "#3F51B5" }, // Mirtilo
+  { nome: "Autoria",     cor: "#8E24AA" }, // Uva
+  { nome: "Sociologia",  cor: "#E67C73" }, // Flamingo
+];
+
+// ==========================================
+// 🎨 GCAL — Carrega cores dos eventos do Google Calendar
+// ==========================================
+// Chama /api/gcal/cores uma vez. O backend tem cache de 5 min.
+async function carregarCoresGoogle() {
+  try {
+    const r = await fetch("/api/gcal?tipo=cores");
+    if (!r.ok) {
+      console.warn("[gcal] erro ao buscar cores:", r.status);
+      return;
+    }
+    const dados = await r.json();
+    if (dados.sucesso && dados.cores) {
+      gcalCoresCache = dados.cores;
+      console.log("[gcal] cores carregadas:", Object.keys(dados.cores).length, "eventos");
+      // 🆕 Re-renderiza a legenda com as cores carregadas
+      if (typeof renderizarLegendaCalendario === "function") {
+        renderizarLegendaCalendario();
+      }
+    }
+  } catch (e) {
+    console.warn("[gcal] erro:", e.message);
   }
-  return COR_PADRAO_CALENDARIO.cor;
 }
 
+// ==========================================
+// 🎨 Pinta um elemento de evento do calendário
+// ==========================================
+function pintarElementoEvento(el, titulo, eventoId) {
+  var cor = corDoEvento(titulo, eventoId);
+  el.style.setProperty("background-color", cor, "important");
+  el.style.setProperty("border-color", cor, "important");
+  el.style.setProperty("color", "#ffffff", "important");
+}
+
+// 🎨 Cor da Química (fallback por título — Sálvia não é exposta pela API)
+const COR_QUIMICA = "#0B8043";
+
+// 🎨 Só usa a cor do Google. Sem cor → tenta pelo título. Sem título → neutra.
+function corDoEvento(titulo, eventoId) {
+  // 1️⃣ Cor do Google Calendar (prioridade)
+  if (eventoId && gcalCoresCache[eventoId]) {
+    return gcalCoresCache[eventoId];
+  }
+
+  // 2️⃣ Fallback específico: Química (e derivados)
+  var t2 = String(titulo || "").toLowerCase();
+  if (/\bqu[ií]mica?\b/.test(t2)) {
+    return COR_QUIMICA;
+  }
+
+  // 3️⃣ Cor neutra
+  return COR_PADRAO_CALENDARIO;
+}
+
+// 🎨 Legenda das categorias de matéria (cores fixas do Google Calendar)
 function renderizarLegendaCalendario() {
-  var container = document.getElementById("calendario-legenda");
+  const container = document.getElementById("calendario-legenda");
   if (!container) return;
-  var todas = REGRAS_CORES_CALENDARIO.concat([COR_PADRAO_CALENDARIO]);
-  container.innerHTML = todas.map(function (item) {
-    return `<div class="legenda-item"><span class="legenda-cor" style="background:${item.cor}"></span><span class="legenda-texto">${escaparHTML(t(item.textoKey))}</span></div>`;
+  container.innerHTML = MATERIAS.map(function (m) {
+    return `<div class="legenda-item">
+      <span class="legenda-cor" style="background:${m.cor}"></span>
+      <span class="legenda-texto">${escaparHTML(m.nome)}</span>
+    </div>`;
   }).join("");
 }
 
@@ -2905,59 +2962,105 @@ function atualizarContagemRegressiva(eventos) {
   if (!grid) return;
   const agora = Date.now();
   const em30dias = agora + 30 * 24 * 60 * 60 * 1000;
+
   const proximos = (eventos || []).map((ev) => {
-    const inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
-    return { titulo: ev.title || "Evento", data: inicio };
-  }).filter((e) => e.data.getTime() >= agora && e.data.getTime() <= em30dias)
+    const dataStr = ev.startStr || (ev.start instanceof Date ? ev.start.toISOString() : ev.start);
+    let inicio;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dataStr)) {
+      inicio = new Date(dataStr + "T12:00:00-03:00");
+    } else {
+      inicio = ev.start instanceof Date ? ev.start : new Date(ev.start);
+    }
+    return { titulo: ev.title || "Evento", data: inicio, dataStr };
+  }).filter((e) => e.data.getTime() >= agora - 12 * 60 * 60 * 1000 && e.data.getTime() <= em30dias)
     .sort((a, b) => a.data - b.data).slice(0, 4);
+
   if (proximos.length === 0) {
     grid.innerHTML = `<div class="contagem-vazio"><i class="fa-regular fa-calendar"></i><p data-i18n="contagem_vazio">Nenhum evento próximo nos próximos 30 dias.</p></div>`;
     if (__contagemInterval) clearInterval(__contagemInterval);
     return;
   }
+
   grid.innerHTML = proximos.map((ev, i) => {
     const diffMs = ev.data.getTime() - agora;
     const diffHoras = diffMs / (1000 * 60 * 60);
     let classe = "";
     if (diffHoras < 24) classe = "urgente";
     else if (diffHoras < 72) classe = "proximo";
-    return `<div class="contagem-card ${classe}" data-index="${i}" data-data="${ev.data.toISOString()}">
+    // 🆕 Só o bloco de "dias" (evento all-day não precisa de horas/min/seg)
+    return `<div class="contagem-card ${classe}" data-index="${i}" data-data="${ev.dataStr}">
       <div class="contagem-titulo">${escaparHTML(ev.titulo)}</div>
       <div class="contagem-timer" id="timer-${i}">
-        <div class="contagem-bloco"><span class="contagem-num" data-tipo="dias">0</span><span class="contagem-label" data-i18n="contagem_dias">dias</span></div>
-        <div class="contagem-bloco"><span class="contagem-num" data-tipo="horas">00</span><span class="contagem-label" data-i18n="contagem_horas">horas</span></div>
-        <div class="contagem-bloco"><span class="contagem-num" data-tipo="min">00</span><span class="contagem-label" data-i18n="contagem_min">min</span></div>
-        <div class="contagem-bloco"><span class="contagem-num" data-tipo="seg">00</span><span class="contagem-label" data-i18n="contagem_seg">seg</span></div>
+        <div class="contagem-bloco">
+          <span class="contagem-num" data-tipo="dias">0</span>
+          <span class="contagem-label" data-tipo="dias">dias</span>
+        </div>
       </div>
-      <div class="contagem-data"><i class="fa-regular fa-calendar-check"></i>${ev.data.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}</div>
+      <div class="contagem-data"><i class="fa-regular fa-calendar-check"></i>${formatarDataPtBR(ev.dataStr)}</div>
     </div>`;
   }).join("");
+
   if (typeof aplicarTraducoes === "function") aplicarTraducoes();
   if (__contagemInterval) clearInterval(__contagemInterval);
   atualizarTimersContagem();
-  __contagemInterval = setInterval(atualizarTimersContagem, 1000);
+  __contagemInterval = setInterval(atualizarTimersContagem, 60000);
+}
+
+// 🆕 Formata data em pt-BR no fuso de Fortaleza
+// Aceita "YYYY-MM-DD" (all-day) ou ISO com hora
+function formatarDataPtBR(dataStr) {
+  if (!dataStr) return "";
+  // All-day: "YYYY-MM-DD"
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dataStr)) {
+    const [ano, mes, dia] = dataStr.split("-");
+    const meses = ["janeiro","fevereiro","março","abril","maio","junho",
+                   "julho","agosto","setembro","outubro","novembro","dezembro"];
+    return `${dia} de ${meses[parseInt(mes, 10) - 1]} de ${ano}`;
+  }
+  // Com hora: ISO
+  return new Date(dataStr).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    timeZone: "America/Fortaleza",
+  });
+}
+
+function calcularDiasCalendario(dataEventoISO) {
+  if (!dataEventoISO) return 0;
+  const hojeStr = new Date().toLocaleDateString("en-CA", { timeZone: "America/Fortaleza" });
+  let eventoStr;
+  // 🆕 Aceita tanto "YYYY-MM-DD" quanto ISO completo
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dataEventoISO)) {
+    eventoStr = dataEventoISO;
+  } else {
+    eventoStr = new Date(dataEventoISO).toLocaleDateString("en-CA", { timeZone: "America/Fortaleza" });
+  }
+  const hoje = new Date(hojeStr + "T12:00:00Z");
+  const evento = new Date(eventoStr + "T12:00:00Z");
+  return Math.round((evento - hoje) / (1000 * 60 * 60 * 24));
 }
 
 function atualizarTimersContagem() {
   const cards = document.querySelectorAll(".contagem-card[data-data]");
-  const agora = Date.now();
   cards.forEach((card) => {
-    const data = new Date(card.dataset.data).getTime();
-    const diff = Math.max(0, data - agora);
-    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const min = Math.floor((diff / (1000 * 60)) % 60);
-    const seg = Math.floor((diff / 1000) % 60);
-    const timer = card.querySelector(".contagem-timer");
-    if (!timer) return;
-    const elDias = timer.querySelector('[data-tipo="dias"]');
-    const elHoras = timer.querySelector('[data-tipo="horas"]');
-    const elMin = timer.querySelector('[data-tipo="min"]');
-    const elSeg = timer.querySelector('[data-tipo="seg"]');
-    if (elDias) elDias.textContent = dias;
-    if (elHoras) elHoras.textContent = String(horas).padStart(2, "0");
-    if (elMin) elMin.textContent = String(min).padStart(2, "0");
-    if (elSeg) elSeg.textContent = String(seg).padStart(2, "0");
+    const dataISO = card.dataset.data;
+    const dias = Math.max(0, calcularDiasCalendario(dataISO));
+    const elDias = card.querySelector('[data-tipo="dias"]');
+    const elLabel = card.querySelector('.contagem-label[data-tipo="dias"]') 
+                 || card.querySelector(".contagem-label");
+    if (!elDias) return;
+
+    if (dias === 0) {
+      elDias.textContent = "HOJE";
+      if (elLabel) elLabel.textContent = "";
+    } else if (dias === 1) {
+      elDias.textContent = "1";
+      if (elLabel) elLabel.textContent = "dia";
+    } else {
+      elDias.textContent = dias;
+      if (elLabel) elLabel.textContent = "dias";
+    }
   });
 }
 
@@ -3486,46 +3589,59 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     document.querySelectorAll(".is-authenticated").forEach(function (el) { el.classList.remove("is-hidden"); });
     carregarPeriodosNotas();
-    var calendarEl = document.getElementById("calendar");
+    carregarCoresGoogle();  // 🆕 carrega as cores do Google Calendar
+        var calendarEl = document.getElementById("calendar");
     if (calendarEl && typeof FullCalendar !== "undefined") {
-      function pintarElementoEvento(el, titulo) {
-        var cor = corDoEvento(titulo);
-        el.style.setProperty("background-color", cor, "important");
-        el.style.setProperty("border-color", cor, "important");
-        el.style.setProperty("color", "#ffffff", "important");
-      }
-      var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: "dayGridMonth",
-        locale: obterIdiomaAtual(),
-        initialDate: "2026-09-01",
-        validRange: { start: "2026-09-01", end: "2026-12-31" },
-        timeZone: "America/Fortaleza",
-        googleCalendarApiKey: "AIzaSyB9XFKFwtZNQJrN2Kh7UPZxraPXEwqFytw",
-        events: "acb20a08d58749d48304dbda5c87bfb7f0671483ecc4ed942683ad5a1307e78d@group.calendar.google.com",
-        eventDidMount: function (info) { pintarElementoEvento(info.el, info.event.title); },
-        eventsSet: function (eventos) {
-          renderizarProximosEventos(eventos);
-          setTimeout(function () {
-            document.querySelectorAll(".fc-event").forEach(function (el) { pintarElementoEvento(el, el.innerText || ""); });
-          }, 50);
-        },
-        eventClick: function (arg) {
-          if (arg.event.url) {
-            window.open(arg.event.url, "_blank");
-            arg.jsEvent.preventDefault();
-          }
-        },
-      });
-      calendar.render();
-
-      var observer = new MutationObserver(function () {
-        document.querySelectorAll(".fc-event").forEach(function (el) {
-          var texto = el.innerText || "";
-          var cor = corDoEvento(texto);
-          if (el.style.getPropertyValue("background-color") !== cor) pintarElementoEvento(el, texto);
+      // 🆕 Espera as cores carregarem ANTES de renderizar o calendário
+      carregarCoresGoogle().then(function () {
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: "dayGridMonth",
+          locale: obterIdiomaAtual(),
+          initialDate: "2026-09-01",
+          validRange: { start: "2026-09-01", end: "2026-12-31" },
+          timeZone: "America/Fortaleza",
+          googleCalendarApiKey: "AIzaSyB9XFKFwtZNQJrN2Kh7UPZxraPXEwqFytw",
+          events: "acb20a08d58749d48304dbda5c87bfb7f0671483ecc4ed942683ad5a1307e78d@group.calendar.google.com",
+          eventDidMount: function (info) {
+            pintarElementoEvento(info.el, info.event.title, info.event.id);
+          },
+          eventsSet: function (eventos) {
+            renderizarProximosEventos(eventos);
+            setTimeout(function () {
+              document.querySelectorAll(".fc-event").forEach(function (el) {
+                var texto = el.innerText || "";
+                var ev = eventos.find(function (e) { return (e.title || "") === texto; });
+                var id = ev ? ev.id : null;
+                pintarElementoEvento(el, texto, id);
+              });
+            }, 50);
+          },
+          eventClick: function (arg) {
+            if (arg.event.url) {
+              window.open(arg.event.url, "_blank");
+              arg.jsEvent.preventDefault();
+            }
+          },
         });
+        calendar.render();
+
+        var observer = new MutationObserver(function () {
+          var eventos = calendar.getEvents();
+          document.querySelectorAll(".fc-event").forEach(function (el) {
+            var texto = el.innerText || "";
+            var ev = eventos.find(function (e) { return (e.title || "") === texto; });
+            var id = ev ? ev.id : null;
+            var cor = corDoEvento(texto, id);
+            if (el.style.getPropertyValue("background-color") !== cor) {
+              pintarElementoEvento(el, texto, id);
+            }
+          });
+        });
+        observer.observe(calendarEl, { childList: true, subtree: true, attributes: true, attributeFilter: ["style"] });
+
+        // 🆕 Guarda o calendar numa variável global (se quiser usar em outro lugar)
+        window.__calendar = calendar;
       });
-      observer.observe(calendarEl, { childList: true, subtree: true, attributes: true, attributeFilter: ["style"] });
     }
     var scope = suap.getToken().getScope();
     suap.getResource(scope, function (dados_suap) {
