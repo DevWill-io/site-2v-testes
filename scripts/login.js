@@ -115,6 +115,7 @@ const AVATARES_MASCOTE = [
   { id: "turma1",   nome: "Turma 1",  arquivo: "img/MascoteTurma1.png",   gratis: false, tipo: "cliques", cliquesNecessarios: 4000,  admin: false },
   { id: "turma2",   nome: "Turma 2",  arquivo: "img/MascoteTurma2.png",   gratis: false, tipo: "cliques", cliquesNecessarios: 5000,  admin: false },
   { id: "turma3",   nome: "Turma 3",  arquivo: "img/MascoteTurma3.png",   gratis: false, tipo: "cliques", cliquesNecessarios: 10000, admin: false },
+  { id: "sabrina", nome: "Sabrina", arquivo: "img/MascoteSabrina.png", gratis: false, tipo: "cliques", cliquesNecessarios: 800, admin: false },
 
   // Desbloqueio por conquista
   { id: "100",       nome: "100",         arquivo: "img/Mascote100.png",       gratis: false, tipo: "conquista", conquistaNecessaria: "nerd",     admin: false },
@@ -223,6 +224,7 @@ const TRADUCOES_LOGIN = {
     encerrar_sessao: "Encerrar Sessão", idioma: "Idioma", tema: "Tema",
     cor_tema: "Cor do tema", modo: "Modo", cor_roxo: "Roxo", cor_azul: "Azul",
     cor_verde: "Verde", cor_rosa: "Rosa", cor_laranja: "Laranja",
+    cor_laranja: "Laranja", cor_ambar: "Amarelo-Âmbar",
     modo_claro: "Claro", modo_escuro: "Escuro", instalar_app: "Instalar app",
     notificacoes: "Notificações", marcar_todas: "Marcar todas", sem_notif: "Sem notificações.",
     dias: "dias", conquistas_titulo: "Conquistas", todas: "Todas",
@@ -303,6 +305,7 @@ const TRADUCOES_LOGIN = {
     encerrar_sessao: "Log Out", idioma: "Language", tema: "Theme",
     cor_tema: "Theme color", modo: "Mode", cor_roxo: "Purple", cor_azul: "Blue",
     cor_verde: "Green", cor_rosa: "Pink", cor_laranja: "Orange",
+    cor_laranja: "Orange", cor_ambar: "Yellow-Amber",
     modo_claro: "Light", modo_escuro: "Dark", instalar_app: "Install app",
     notificacoes: "Notifications", marcar_todas: "Mark all", sem_notif: "No notifications.",
     dias: "days", conquistas_titulo: "Achievements", todas: "All",
@@ -382,6 +385,7 @@ const TRADUCOES_LOGIN = {
     encerrar_sessao: "Cerrar Sesión", idioma: "Idioma", tema: "Tema",
     cor_tema: "Color del tema", modo: "Modo", cor_roxo: "Morado", cor_azul: "Azul",
     cor_verde: "Verde", cor_rosa: "Rosa", cor_laranja: "Naranja",
+    cor_laranja: "Naranja", cor_ambar: "Amarillo-Ámbar",
     modo_claro: "Claro", modo_escuro: "Oscuro", instalar_app: "Instalar app",
     notificacoes: "Notificaciones", marcar_todas: "Marcar todas", sem_notif: "Sin notificaciones.",
     dias: "días", conquistas_titulo: "Logros", todas: "Todos",
@@ -1206,7 +1210,7 @@ function trocarIdioma(novoIdioma) {
 // ==========================================
 // 🎨 TEMAS
 // ==========================================
-const TEMAS_DISPONIVEIS = ["roxo", "azul", "verde", "rosa", "laranja"];
+const TEMAS_DISPONIVEIS = ["roxo", "azul", "verde", "rosa", "laranja", "ambar"];
 const TEMA_PADRAO = "roxo";
 
 function obterTemaAtual() {
@@ -1221,7 +1225,7 @@ function aplicarTema(novoTema) {
   localStorage.setItem("tema-cor", novoTema);
   var meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
-    var cores = { roxo: "#8b5edd", azul: "#3b82f6", verde: "#10b981", rosa: "#ec4899", laranja: "#f97316" };
+    var cores = { roxo: "#8b5edd", azul: "#3b82f6", verde: "#10b981", rosa: "#ec4899", laranja: "#f97316", ambar: "#f59e0b" };
     meta.setAttribute("content", cores[novoTema] || "#8b5edd");
   }
   document.querySelectorAll("#menu-tema .dropdown-item").forEach(function (btn) {

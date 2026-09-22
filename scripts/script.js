@@ -42,6 +42,7 @@ const TRADUCOES = {
     cor_verde: "Verde",
     cor_rosa: "Rosa",
     cor_laranja: "Laranja",
+    cor_ambar: "Amarelo-Âmbar",
     modo_claro: "Claro",
     modo_escuro: "Escuro",
 
@@ -359,6 +360,7 @@ const TRADUCOES = {
     cor_verde: "Green",
     cor_rosa: "Pink",
     cor_laranja: "Orange",
+    cor_ambar: "Yellow-Amber";
     modo_claro: "Light",
     modo_escuro: "Dark",
 
@@ -651,6 +653,7 @@ const TRADUCOES = {
     cor_verde: "Verde",
     cor_rosa: "Rosa",
     cor_laranja: "Naranja",
+    cor_ambar: "Amarillo-Ámbar",
     modo_claro: "Claro",
     modo_escuro: "Oscuro",
 
@@ -974,7 +977,7 @@ function trocarIdioma(novoIdioma) {
 // ==========================================
 // 🎨 TEMAS DE COR
 // ==========================================
-const TEMAS_DISPONIVEIS = ["roxo", "azul", "verde", "rosa", "laranja"];
+const TEMAS_DISPONIVEIS = ["roxo", "azul", "verde", "rosa", "laranja", "ambar"];
 const TEMA_PADRAO = "roxo";
 
 function obterTemaAtual() {
@@ -992,13 +995,7 @@ function aplicarTema(novoTema) {
 
   var meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
-    var cores = {
-      roxo: "#8b5edd",
-      azul: "#3b82f6",
-      verde: "#10b981",
-      rosa: "#ec4899",
-      laranja: "#f97316",
-    };
+    var cores = { roxo: "#8b5edd", azul: "#3b82f6", verde: "#10b981", rosa: "#ec4899", laranja: "#f97316", ambar: "#f59e0b" };
     meta.setAttribute("content", cores[novoTema] || "#8b5edd");
   }
 

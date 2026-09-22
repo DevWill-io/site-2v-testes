@@ -123,16 +123,19 @@ body.tema-azul    { --tema-h: 215; --tema-s: 85%; --tema-l: 55%; }
 body.tema-verde   { --tema-h: 155; --tema-s: 65%; --tema-l: 45%; }
 body.tema-rosa    { --tema-h: 330; --tema-s: 75%; --tema-l: 60%; }
 body.tema-laranja { --tema-h: 25;  --tema-s: 90%; --tema-l: 55%; }
+body.tema-ambar   { --tema-h: 38;  --tema-s: 90%; --tema-l: 55%; }
 
 body.tema-azul    { --text-muted: hsl(215, 30%, 72%); }
 body.tema-verde   { --text-muted: hsl(155, 25%, 70%); }
 body.tema-rosa    { --text-muted: hsl(330, 30%, 78%); }
 body.tema-laranja { --text-muted: hsl(25,  30%, 78%); }
+body.tema-ambar   { --text-muted: hsl(38,  30%, 78%); }
 
 body.tema-azul.light-theme    { --text-muted: hsl(215, 30%, 40%); }
 body.tema-verde.light-theme   { --text-muted: hsl(155, 30%, 35%); }
 body.tema-rosa.light-theme    { --text-muted: hsl(330, 35%, 40%); }
 body.tema-laranja.light-theme { --text-muted: hsl(25,  40%, 38%); }
+body.tema-ambar.light-theme   { --text-muted: hsl(38,  40%, 38%); }
 
 /* ==========================================
    RESET & BASE
@@ -411,6 +414,7 @@ body.light-theme .dropdown-item:hover {
 .tema-swatch-verde   { background: linear-gradient(135deg, #34d399, #059669); }
 .tema-swatch-rosa    { background: linear-gradient(135deg, #f472b6, #db2777); }
 .tema-swatch-laranja { background: linear-gradient(135deg, #fb923c, #ea580c); }
+.tema-swatch-ambar   { background: linear-gradient(135deg, #fbbf24, #d97706); }
 
 .painel-notificacoes {
     position: fixed;
