@@ -360,7 +360,7 @@ const TRADUCOES = {
     cor_verde: "Green",
     cor_rosa: "Pink",
     cor_laranja: "Orange",
-    cor_ambar: "Yellow-Amber";
+    cor_ambar: "Yellow-Amber",
     modo_claro: "Light",
     modo_escuro: "Dark",
 
