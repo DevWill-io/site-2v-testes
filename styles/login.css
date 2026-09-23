@@ -1033,8 +1033,6 @@ body.menu-aberto { overflow: hidden; }
 .xp-painel {
   background-color: var(--bg-base);
   padding: 40px 0 10px;
-  content-visibility: auto;
-  contain-intrinsic-size: auto 400px;
 }
 
 .xp-card {
@@ -1141,8 +1139,6 @@ body.menu-aberto { overflow: hidden; }
     border-radius: 16px;
     padding: 20px;
     box-shadow: 0 10px 30px var(--shadow-soft);
-    content-visibility: auto;
-    contain-intrinsic-size: auto 500px;
 }
 
 .conquistas-header {
@@ -2078,8 +2074,6 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
 .mural {
   background-color: var(--bg-base);
   animation: fadeIn 0.6s ease-out forwards;
-  content-visibility: auto;
-  contain-intrinsic-size: auto 800px;
 }
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
@@ -2192,8 +2186,6 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
    =================================================================== */
 .perfis {
   background-color: var(--bg-surface);
-  content-visibility: auto;
-  contain-intrinsic-size: auto 600px;
 }
 .lista-perfis {
     display: grid;
@@ -2281,8 +2273,6 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
    =================================================================== */
 .agenda {
   background-color: var(--bg-base);
-  content-visibility: auto;
-  contain-intrinsic-size: auto 600px;
 }
 .calendar-wrapper {
     padding: 20px;
@@ -2369,8 +2359,6 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
 .sala-professores {
   background-color: var(--bg-base);
   padding: 60px 0;
-  content-visibility: auto;
-  contain-intrinsic-size: auto 800px;
 }
 .sala-professores.is-admin-hidden { display: none !important; }
 
