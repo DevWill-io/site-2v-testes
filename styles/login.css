@@ -73,7 +73,7 @@ p, h1, h2, h3, h4, h5, h6, span, li,
     --shadow: rgba(0, 0, 0, 0.4);
     --shadow-soft: rgba(0, 0, 0, 0.2);
     --border-color: rgba(206, 189, 236, 0.18);
-    --transition: all 0.3s ease;
+    --transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
 }
 
 body {
@@ -197,8 +197,6 @@ img { max-width: 100%; display: block; }
     width: 90%;
     max-width: 1200px;
     background: rgba(25, 0, 75, 0.85);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--border-color);
     border-radius: 40px;
     z-index: 1000;
@@ -210,7 +208,7 @@ img { max-width: 100%; display: block; }
     transition: var(--transition);
 }
 
-body.light-theme .login-header { background: rgba(255, 255, 255, 0.85); }
+body.light-theme .login-header { background: rgba(255, 255, 255, 0.95); }
 
 .login-logo {
     font-size: 1.2rem;
@@ -1033,8 +1031,10 @@ body.menu-aberto { overflow: hidden; }
    ⭐ PAINEL DE XP E CONQUISTAS
    =================================================================== */
 .xp-painel {
-    background-color: var(--bg-base);
-    padding: 40px 0 10px;
+  background-color: var(--bg-base);
+  padding: 40px 0 10px;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 400px;
 }
 
 .xp-card {
@@ -1141,6 +1141,8 @@ body.menu-aberto { overflow: hidden; }
     border-radius: 16px;
     padding: 20px;
     box-shadow: 0 10px 30px var(--shadow-soft);
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
 }
 
 .conquistas-header {
@@ -1318,8 +1320,8 @@ body.menu-aberto { overflow: hidden; }
     animation: brilhoLendario 2.6s ease-in-out infinite;
 }
 @keyframes brilhoLendario {
-    0%, 100% { box-shadow: 0 4px 18px rgba(245, 158, 11, 0.55); }
-    50%      { box-shadow: 0 4px 26px rgba(245, 158, 11, 0.9); }
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.03); }
 }
 
 .conquistas-vazio {
@@ -1367,8 +1369,8 @@ body.menu-aberto { overflow: hidden; }
     animation: pulseCard 2.2s ease-in-out infinite;
 }
 @keyframes pulseCard {
-    0%, 100% { box-shadow: 0 4px 14px var(--shadow-soft); }
-    50% { box-shadow: 0 4px 24px rgba(255, 71, 87, 0.25); }
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.005); }
 }
 
 .evento-data {
@@ -1459,8 +1461,8 @@ body.menu-aberto { overflow: hidden; }
     animation: pulseUrgente 2s ease-in-out infinite;
 }
 @keyframes pulseUrgente {
-    0%, 100% { box-shadow: 0 4px 14px var(--shadow-soft); }
-    50% { box-shadow: 0 4px 24px rgba(255, 71, 87, 0.3); }
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.005); }
 }
 .contagem-card.proximo { border-left-color: var(--warning); }
 
@@ -2073,7 +2075,12 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
 /* ===================================================================
    MURAL
    =================================================================== */
-.mural { background-color: var(--bg-base); animation: fadeIn 0.6s ease-out forwards; }
+.mural {
+  background-color: var(--bg-base);
+  animation: fadeIn 0.6s ease-out forwards;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
+}
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -2183,7 +2190,11 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
 /* ===================================================================
    PERFIS
    =================================================================== */
-.perfis { background-color: var(--bg-surface); }
+.perfis {
+  background-color: var(--bg-surface);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
 .lista-perfis {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -2268,7 +2279,11 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
 /* ===================================================================
    AGENDA
    =================================================================== */
-.agenda { background-color: var(--bg-base); }
+.agenda {
+  background-color: var(--bg-base);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
 .calendar-wrapper {
     padding: 20px;
     border-radius: 12px;
@@ -2352,8 +2367,10 @@ body.light-theme .media-bar { background: rgba(15, 23, 42, 0.1); }
    SALA DOS PROFESSORES
    =================================================================== */
 .sala-professores {
-    background-color: var(--bg-base);
-    padding: 60px 0;
+  background-color: var(--bg-base);
+  padding: 60px 0;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
 }
 .sala-professores.is-admin-hidden { display: none !important; }
 
@@ -4035,12 +4052,8 @@ body.light-theme .field-checkbox-marca {
 }
 
 @keyframes brilhoCargoLendario {
-  0%, 100% {
-    box-shadow: 0 2px 14px rgba(245, 158, 11, 0.45);
-  }
-  50% {
-    box-shadow: 0 4px 22px rgba(245, 158, 11, 0.85);
-  }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
 }
 
 /* ---------- Modal de perfil: badge ao lado do nome ---------- */
@@ -4312,12 +4325,8 @@ body.light-theme .cargo-badge-lendario {
 }
 
 @keyframes brilhoAdmin {
-  0%, 100% {
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(255, 215, 0, 1);
-  }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 /* No modal de perfil (badge um pouco maior) */
@@ -4372,4 +4381,61 @@ body.light-theme .cargo-badge-lendario {
   .user-profile-card .admin-badge i {
     font-size: 0.7rem;
   }
+}
+
+/* ===================================================================
+   🍷 RARIDADE MÍTICA — Vermelho vinho
+   =================================================================== */
+
+.conquista-card.desbloqueada.mitico .conquista-icone {
+  background: linear-gradient(135deg, #800020, #5e1914);
+  box-shadow: 0 4px 20px rgba(128, 0, 32, 0.6);
+  animation: brilhoMitico 2.2s ease-in-out infinite;
+}
+
+.conquista-card.desbloqueada.mitico {
+  border-color: rgba(128, 0, 32, 0.5);
+}
+
+@keyframes brilhoMitico {
+  0%, 100% { box-shadow: 0 4px 20px rgba(128, 0, 32, 0.6); }
+  50% { box-shadow: 0 4px 32px rgba(128, 0, 32, 1); }
+}
+
+.modal-conquista-badge.desbloqueada.mitico {
+  background: linear-gradient(135deg, #800020, #5e1914);
+  box-shadow: 0 4px 20px rgba(128, 0, 32, 0.6);
+  animation: brilhoMitico 2.2s ease-in-out infinite;
+}
+
+.conquista-visivel-item.mitico.selecionada {
+  background: linear-gradient(135deg, #800020, #5e1914);
+  box-shadow: 0 4px 18px rgba(128, 0, 32, 0.55);
+}
+
+.cargo-badge-mitico {
+  background: linear-gradient(135deg, rgba(128, 0, 32, 0.3), rgba(94, 25, 20, 0.15));
+  border-color: rgba(128, 0, 32, 0.7);
+  color: #c97b8a;
+  box-shadow: 0 2px 14px rgba(128, 0, 32, 0.5);
+  animation: brilhoMitico 2.2s ease-in-out infinite;
+}
+
+.sala-cargo-badge.cargo-badge-mitico,
+.recado-cargo-badge.cargo-badge-mitico,
+.perfil-cargo-badge.cargo-badge-mitico,
+.ranking-cargo-badge.cargo-badge-mitico {
+  background: rgba(128, 0, 32, 0.3);
+  border-color: rgba(128, 0, 32, 0.7);
+  color: #c97b8a;
+  animation: brilhoMitico 2.2s ease-in-out infinite;
+}
+
+body.light-theme .conquista-card.desbloqueada.mitico {
+  border-color: rgba(128, 0, 32, 0.4);
+}
+
+body.light-theme .cargo-badge-mitico {
+  background: linear-gradient(135deg, rgba(128, 0, 32, 0.18), rgba(94, 25, 20, 0.08));
+  color: #800020;
 }
