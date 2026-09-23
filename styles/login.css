@@ -172,6 +172,18 @@ a { text-decoration: none; color: inherit; }
 img { max-width: 100%; display: block; }
 
 .is-hidden { display: none !important; }
+/* 🆕 Quando autenticado, reserva espaço pras seções carregarem */
+body.autenticado .xp-painel {
+  min-height: 400px;
+}
+
+body.autenticado .mural {
+  min-height: 600px;
+}
+
+body.autenticado .perfis {
+  min-height: 400px;
+}
 .text-center { text-align: center; }
 .highlight { color: var(--accent); }
 
@@ -882,6 +894,7 @@ body.menu-aberto { overflow: hidden; }
     padding: 40px 30px;
     box-shadow: 0 10px 30px var(--shadow);
     transition: var(--transition);
+    min-height: 400px;
 }
 
 .login-card-title { font-size: 1.8rem; margin-bottom: 5px; text-align: center; }
@@ -3352,6 +3365,13 @@ body.light-theme .conquistas-visiveis-grid {
     border-top: 1px solid var(--border-color);
     background-color: var(--bg-base);
     transition: var(--transition);
+    /* 🆕 Esconde até tudo carregar */
+    visibility: hidden;
+}
+
+body.autenticado .login-footer,
+body.carregado .login-footer {
+    visibility: visible;
 }
 .login-footer p { color: var(--text-muted); font-size: 0.9rem; }
 .login-footer a { color: var(--accent); font-weight: 600; transition: var(--transition); }

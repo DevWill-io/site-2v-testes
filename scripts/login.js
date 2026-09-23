@@ -3638,6 +3638,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (window.location.hash.includes("access_token")) {
       history.replaceState(null, null, window.location.pathname);
     }
+    document.body.classList.add("autenticado");
     document.querySelectorAll(".is-authenticated").forEach(function (el) { el.classList.remove("is-hidden"); });
     carregarPeriodosNotas();
     carregarCoresGoogle();  // 🆕 carrega as cores do Google Calendar
@@ -3760,6 +3761,10 @@ document.addEventListener("DOMContentLoaded", function () {
       if (inputRecadoNome) { inputRecadoNome.style.display = "none"; inputRecadoNome.removeAttribute("required"); }
       window.renderizarMural();
       window.renderizarPerfis();
+      // 🆕 Marca como carregado (revela footer)
+      setTimeout(() => {
+        document.body.classList.add("carregado");
+      }, 500);
     });
   } else {
     document.querySelectorAll(".is-anonymous").forEach(function (el) { el.classList.remove("is-hidden"); });
