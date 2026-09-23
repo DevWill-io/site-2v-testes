@@ -1,8 +1,8 @@
 // ==========================================
 // CONFIGURAÇÕES DO SUAP
 // ==========================================
-var CLIENT_ID = "St1KggSNx1eA8FnNe5Bi8jfM7MODYSFZGUaj8cpf";
-var REDIRECT_URI = "https://infoweb-2v-devlopers.vercel.app/login.html";
+var CLIENT_ID = "N5fy0li9iGLuqz633Tgi2xwiCUG9gmtkWWJKVLBV";
+var REDIRECT_URI = "https://infoweb-2v.vercel.app/login.html";
 var SUAP_URL = "https://suap.ifrn.edu.br";
 var SCOPE = "identificacao email documentos_pessoais";
 
@@ -115,7 +115,6 @@ const AVATARES_MASCOTE = [
   { id: "turma1",   nome: "Turma 1",  arquivo: "img/MascoteTurma1.png",   gratis: false, tipo: "cliques", cliquesNecessarios: 4000,  admin: false },
   { id: "turma2",   nome: "Turma 2",  arquivo: "img/MascoteTurma2.png",   gratis: false, tipo: "cliques", cliquesNecessarios: 5000,  admin: false },
   { id: "turma3",   nome: "Turma 3",  arquivo: "img/MascoteTurma3.png",   gratis: false, tipo: "cliques", cliquesNecessarios: 10000, admin: false },
-  { id: "sabrina", nome: "Sabrina", arquivo: "img/MascoteSabrina.png", gratis: false, tipo: "cliques", cliquesNecessarios: 800, admin: false },
 
   // Desbloqueio por conquista
   { id: "100",       nome: "100",         arquivo: "img/Mascote100.png",       gratis: false, tipo: "conquista", conquistaNecessaria: "nerd",     admin: false },
@@ -224,7 +223,6 @@ const TRADUCOES_LOGIN = {
     encerrar_sessao: "Encerrar Sessão", idioma: "Idioma", tema: "Tema",
     cor_tema: "Cor do tema", modo: "Modo", cor_roxo: "Roxo", cor_azul: "Azul",
     cor_verde: "Verde", cor_rosa: "Rosa", cor_laranja: "Laranja",
-    cor_laranja: "Laranja", cor_ambar: "Amarelo-Âmbar",
     modo_claro: "Claro", modo_escuro: "Escuro", instalar_app: "Instalar app",
     notificacoes: "Notificações", marcar_todas: "Marcar todas", sem_notif: "Sem notificações.",
     dias: "dias", conquistas_titulo: "Conquistas", todas: "Todas",
@@ -305,7 +303,6 @@ const TRADUCOES_LOGIN = {
     encerrar_sessao: "Log Out", idioma: "Language", tema: "Theme",
     cor_tema: "Theme color", modo: "Mode", cor_roxo: "Purple", cor_azul: "Blue",
     cor_verde: "Green", cor_rosa: "Pink", cor_laranja: "Orange",
-    cor_laranja: "Orange", cor_ambar: "Yellow-Amber",
     modo_claro: "Light", modo_escuro: "Dark", instalar_app: "Install app",
     notificacoes: "Notifications", marcar_todas: "Mark all", sem_notif: "No notifications.",
     dias: "days", conquistas_titulo: "Achievements", todas: "All",
@@ -385,7 +382,6 @@ const TRADUCOES_LOGIN = {
     encerrar_sessao: "Cerrar Sesión", idioma: "Idioma", tema: "Tema",
     cor_tema: "Color del tema", modo: "Modo", cor_roxo: "Morado", cor_azul: "Azul",
     cor_verde: "Verde", cor_rosa: "Rosa", cor_laranja: "Naranja",
-    cor_laranja: "Naranja", cor_ambar: "Amarillo-Ámbar",
     modo_claro: "Claro", modo_escuro: "Oscuro", instalar_app: "Instalar app",
     notificacoes: "Notificaciones", marcar_todas: "Marcar todas", sem_notif: "Sin notificaciones.",
     dias: "días", conquistas_titulo: "Logros", todas: "Todos",
@@ -1210,7 +1206,7 @@ function trocarIdioma(novoIdioma) {
 // ==========================================
 // 🎨 TEMAS
 // ==========================================
-const TEMAS_DISPONIVEIS = ["roxo", "azul", "verde", "rosa", "laranja", "ambar"];
+const TEMAS_DISPONIVEIS = ["roxo", "azul", "verde", "rosa", "laranja"];
 const TEMA_PADRAO = "roxo";
 
 function obterTemaAtual() {
@@ -1225,7 +1221,7 @@ function aplicarTema(novoTema) {
   localStorage.setItem("tema-cor", novoTema);
   var meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
-    var cores = { roxo: "#8b5edd", azul: "#3b82f6", verde: "#10b981", rosa: "#ec4899", laranja: "#f97316", ambar: "#f59e0b" };
+    var cores = { roxo: "#8b5edd", azul: "#3b82f6", verde: "#10b981", rosa: "#ec4899", laranja: "#f97316" };
     meta.setAttribute("content", cores[novoTema] || "#8b5edd");
   }
   document.querySelectorAll("#menu-tema .dropdown-item").forEach(function (btn) {
@@ -1380,8 +1376,6 @@ if (themeToggle) {
 // ==========================================
 // FIREBASE LISTENERS
 // ==========================================
-// 🆕 Mural com debounce
-let __muralRenderTimer = null;
 onValue(recadosRef, (snapshot) => {
   bancoDeRecados = [];
   const agora = Date.now();
@@ -1397,50 +1391,30 @@ onValue(recadosRef, (snapshot) => {
       bancoDeRecados.push({ id, ...recado, timestampCriacao, duracaoHoras });
     }
   });
-  clearTimeout(__muralRenderTimer);
-  __muralRenderTimer = setTimeout(() => {
-    if (typeof window.renderizarMural === "function") window.renderizarMural();
-    if (typeof gerarNotificacoesRecados === "function") gerarNotificacoesRecados();
-  }, 300);
+  window.renderizarMural();
+  if (typeof gerarNotificacoesRecados === "function") gerarNotificacoesRecados();
 });
 
-// 🆕 Perfis com debounce e comparação (evita re-render desnecessário)
-let __perfisRenderTimer = null;
 onValue(perfisRef, (snapshot) => {
-  const novos = [];
+  bancoDePerfis = [];
   snapshot.forEach((childSnapshot) => {
     const dados = childSnapshot.val() || {};
-    novos.push({ id: childSnapshot.key, ...dados });
+    bancoDePerfis.push({ id: childSnapshot.key, ...dados });
   });
-
-  // Só re-renderiza se mudou de verdade
-  const mudou = JSON.stringify(novos) !== JSON.stringify(bancoDePerfis);
-  if (!mudou) return;
-  bancoDePerfis = novos;
-
-  // Debounce: espera 300ms antes de renderizar
-  clearTimeout(__perfisRenderTimer);
-  __perfisRenderTimer = setTimeout(() => {
-    if (typeof window.renderizarPerfis === "function") window.renderizarPerfis();
-    if (window.usuarioLogado.matricula) {
-      const meuPerfil = bancoDePerfis.find((p) =>
-        String(p.matricula) === String(window.usuarioLogado.matricula) ||
-        String(p.id) === String(window.usuarioLogado.matricula));
-      if (meuPerfil && typeof window.aplicarPerfilNoCard === "function") {
-        window.aplicarPerfilNoCard(meuPerfil);
-      }
-    }
-  }, 300);
+  window.renderizarPerfis();
+  if (window.usuarioLogado.matricula) {
+    const meuPerfil = bancoDePerfis.find((p) =>
+      String(p.matricula) === String(window.usuarioLogado.matricula) ||
+      String(p.id) === String(window.usuarioLogado.matricula));
+    if (meuPerfil && typeof window.aplicarPerfilNoCard === "function") window.aplicarPerfilNoCard(meuPerfil);
+  }
 });
-// 🆕 Cargos com debounce (evita renderizar 2x a cada mudança)
-let __cargosRenderTimer = null;
+// 🆕 Escuta cargos (para mostrar badge no mural/membros)
 onValue(ref(db, "cargos"), (snapshot) => {
   bancoDeCargos = snapshot.val() || {};
-  clearTimeout(__cargosRenderTimer);
-  __cargosRenderTimer = setTimeout(() => {
-    if (typeof window.renderizarMural === "function") window.renderizarMural();
-    if (typeof window.renderizarPerfis === "function") window.renderizarPerfis();
-  }, 300);
+  // Re-renderiza mural e perfis pra atualizar badges
+  window.renderizarMural();
+  window.renderizarPerfis();
 });
 
 // ==========================================
@@ -3515,47 +3489,22 @@ function initMenuLateral() {
   marcarAtivosMenuLateral();
   const sections = document.querySelectorAll("section[id]");
   const menuItems = document.querySelectorAll(".menu-lateral-nav .menu-item");
-  if (menuItems.length > 0 && sections.length > 0) {
-    // 🆕 Cache dos offsets (não recalcula toda hora)
-    let offsetsCache = [];
-    function recalcularOffsets() {
-      offsetsCache = Array.from(sections).map((s) => ({
-        el: s,
-        top: s.offsetTop,
-      }));
-    }
-    recalcularOffsets();
-
-    // Recalcula offsets em resize (com debounce)
-    let resizeTimer = null;
-    window.addEventListener("resize", () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(recalcularOffsets, 200);
-    }, { passive: true });
-
+  if (menuItems.length > 0) {
     let ticking = false;
-    let ultimoActive = null;
-
     window.addEventListener("scroll", () => {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
         let current = "";
-        const y = window.pageYOffset;
-        for (let i = 0; i < offsetsCache.length; i++) {
-          if (y >= offsetsCache[i].top - 250) current = offsetsCache[i].el.id;
-          else break;
-        }
-
-        // 🆕 Só mexe no DOM se mudou de seção
-        if (current !== ultimoActive) {
-          ultimoActive = current;
-          menuItems.forEach((item) => {
-            const href = item.getAttribute("href") || "";
-            const isActive = href.startsWith("#") && href.substring(1) === current;
-            item.classList.toggle("active", isActive);
-          });
-        }
+        sections.forEach((section) => {
+          const sectionTop = section.offsetTop;
+          if (pageYOffset >= sectionTop - 250) current = section.getAttribute("id");
+        });
+        menuItems.forEach((item) => {
+          item.classList.remove("active");
+          const href = item.getAttribute("href") || "";
+          if (href.startsWith("#") && href.substring(1) === current) item.classList.add("active");
+        });
         ticking = false;
       });
     }, { passive: true });
@@ -3638,9 +3587,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (window.location.hash.includes("access_token")) {
       history.replaceState(null, null, window.location.pathname);
     }
-    document.body.classList.add("autenticado");
-    // 🆕 Marca autenticado
-    document.body.classList.add("autenticado");
     document.querySelectorAll(".is-authenticated").forEach(function (el) { el.classList.remove("is-hidden"); });
     carregarPeriodosNotas();
     carregarCoresGoogle();  // 🆕 carrega as cores do Google Calendar
@@ -3763,14 +3709,6 @@ document.addEventListener("DOMContentLoaded", function () {
       if (inputRecadoNome) { inputRecadoNome.style.display = "none"; inputRecadoNome.removeAttribute("required"); }
       window.renderizarMural();
       window.renderizarPerfis();
-      // 🆕 Revela tudo depois que Firebase respondeu + delay
-      setTimeout(() => {
-        document.body.classList.add("carregado");
-      }, 800);
-      // 🆕 Marca como carregado (revela footer)
-      setTimeout(() => {
-        document.body.classList.add("carregado");
-      }, 500);
     });
   } else {
     document.querySelectorAll(".is-anonymous").forEach(function (el) { el.classList.remove("is-hidden"); });
