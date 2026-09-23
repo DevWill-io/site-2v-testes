@@ -3639,6 +3639,8 @@ document.addEventListener("DOMContentLoaded", function () {
       history.replaceState(null, null, window.location.pathname);
     }
     document.body.classList.add("autenticado");
+    // 🆕 Marca autenticado
+    document.body.classList.add("autenticado");
     document.querySelectorAll(".is-authenticated").forEach(function (el) { el.classList.remove("is-hidden"); });
     carregarPeriodosNotas();
     carregarCoresGoogle();  // 🆕 carrega as cores do Google Calendar
@@ -3761,6 +3763,10 @@ document.addEventListener("DOMContentLoaded", function () {
       if (inputRecadoNome) { inputRecadoNome.style.display = "none"; inputRecadoNome.removeAttribute("required"); }
       window.renderizarMural();
       window.renderizarPerfis();
+      // 🆕 Revela tudo depois que Firebase respondeu + delay
+      setTimeout(() => {
+        document.body.classList.add("carregado");
+      }, 800);
       // 🆕 Marca como carregado (revela footer)
       setTimeout(() => {
         document.body.classList.add("carregado");
